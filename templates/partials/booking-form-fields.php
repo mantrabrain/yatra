@@ -689,6 +689,9 @@ $payment_method_options = apply_filters('yatra_payment_method_options', [], [
     'deposit_percentage'         => $deposit_percentage,
     'partial_payment'            => $partial_payment,
     'partial_payment_percentage' => $partial_payment_percentage,
+    // Tour start (when a date is already chosen) → Pro hides deposit/partial for
+    // tour-anchored payments when the tour is inside the balance-due window.
+    'travel_date'                => isset($booking->travel_date) ? (string) $booking->travel_date : '',
 ]);
 
 $has_flexible_options = $flexible_payments_enabled && !empty($payment_method_options);

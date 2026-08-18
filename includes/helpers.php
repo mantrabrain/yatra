@@ -476,8 +476,19 @@ if (!function_exists('yatra_get_currency_symbol')) {
  * @return string Formatted duration
  */
 if (!function_exists('yatra_format_duration')) {
-    function yatra_format_duration(int $days, ?int $nights = null): string
+    function yatra_format_duration(int $days, ?int $nights = null, ?int $hours = null): string
     {
+        // Hour-based (single-day) tours take precedence when a positive hours
+        // value is supplied. Optional trailing arg keeps every existing
+        // two-argument call unchanged.
+        if ($hours !== null && $hours > 0) {
+            return sprintf(
+                /* translators: %d: number of hours. */
+                _n('%d hour', '%d hours', $hours, 'yatra'),
+                $hours
+            );
+        }
+
         if ($days > 0 && $nights !== null && $nights > 0) {
             /* translators: 1: number of days, 2: number of nights. */
             return sprintf(__('%1$d days / %2$d nights', 'yatra'), $days, $nights);

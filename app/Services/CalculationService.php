@@ -381,6 +381,9 @@ class CalculationService
         $payment_amounts = $this->calculatePaymentAmounts($final_total, $payment_method, [
             'trip_id'         => $trip_id,
             'travelers_count' => $travelers_count,
+            // Tour start → Pro can force full payment when the tour is within
+            // the balance-due window (tour-anchored scheduled payments).
+            'travel_date'     => $travel_date,
         ]);
         
         // ── Currency ────────────────────────────────────────────────────

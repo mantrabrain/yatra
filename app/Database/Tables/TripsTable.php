@@ -67,6 +67,7 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `trip_type` varchar(50) DEFAULT 'multi_day',
     `duration_days` smallint(5) UNSIGNED DEFAULT NULL COMMENT 'Total days',
     `duration_nights` smallint(5) UNSIGNED DEFAULT NULL COMMENT 'Total nights',
+    `duration_hours` smallint(5) UNSIGNED DEFAULT NULL COMMENT 'Duration in hours for hour-based (single-day) tours; NULL = day-based',
     `available_from` date DEFAULT NULL COMMENT 'First available date',
     `available_to` date DEFAULT NULL COMMENT 'Last available date',
     `booking_window_days` smallint(5) UNSIGNED DEFAULT 30 COMMENT 'Days in advance to book',

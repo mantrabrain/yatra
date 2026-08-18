@@ -1135,14 +1135,17 @@ class Trip
     public function getDuration(): array
     {
         $duration = '';
-        if (!empty($this->duration_days)) {
+        if ($this->isHoursBased()) {
+            $duration = yatra_format_duration(0, null, $this->getDurationHours());
+        } elseif (!empty($this->duration_days)) {
             $duration = yatra_format_duration($this->duration_days, $this->duration_nights ?? null);
         }
-        
+
         return [
             'formatted' => $duration,
             'days' => $this->duration_days ?? 0,
             'nights' => $this->duration_nights ?? 0,
+            'hours' => $this->getDurationHours(),
             'has_duration' => !empty($duration)
         ];
     }
@@ -1561,6 +1564,28 @@ class Trip
     public function getDurationNights(): int
     {
         return $this->duration_nights ?? 0;
+    }
+
+    /**
+     * Duration in hours for hour-based (single-day) tours. 0 when the tour is
+     * day-based (the default) — see {@see self::isHoursBased()}.
+     */
+    public function getDurationHours(): int
+    {
+        return (int) ($this->duration_hours ?? 0);
+    }
+
+    /**
+     * Whether this tour's duration is expressed in hours rather than days.
+     *
+     * True only when a positive `duration_hours` is set — so every existing
+     * (day-based) trip returns false and keeps its current behaviour. Used by
+     * the front-end duration display and the Google Calendar module to build a
+     * same-day timed event instead of a multi-day span.
+     */
+    public function isHoursBased(): bool
+    {
+        return $this->getDurationHours() > 0;
     }
 
     /**

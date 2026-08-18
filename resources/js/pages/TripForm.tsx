@@ -301,6 +301,7 @@ function buildTripAiContext(formData: any): Record<string, unknown> {
     difficulty_level: formData?.difficulty_level ?? "",
     duration_days: formData?.duration_days ?? "",
     duration_nights: formData?.duration_nights ?? "",
+    duration_hours: formData?.duration_hours ?? "",
     best_season: formData?.best_season ?? "",
     price: formData?.price ?? "",
     deposit_percentage: formData?.deposit_percentage ?? "",
@@ -367,6 +368,7 @@ interface TripFormData {
   trip_type: "single_day" | "multi_day" | "flexible";
   duration_days: string;
   duration_nights: string;
+  duration_hours: string;
   available_from: string;
   available_to: string;
   booking_window_days: string;
@@ -716,6 +718,7 @@ const TripForm: React.FC = () => {
       trip_type: "multi_day",
       duration_days: "7",
       duration_nights: "6",
+      duration_hours: "",
       available_from: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
         .toISOString()
         .split("T")[0], // 30 days from now
@@ -973,6 +976,7 @@ const TripForm: React.FC = () => {
       trip_type: "multi_day",
       duration_days: "14",
       duration_nights: "13",
+      duration_hours: "",
       available_from: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000)
         .toISOString()
         .split("T")[0],
@@ -1235,6 +1239,7 @@ const TripForm: React.FC = () => {
       trip_type: "multi_day",
       duration_days: "10",
       duration_nights: "9",
+      duration_hours: "",
       available_from: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000)
         .toISOString()
         .split("T")[0],
@@ -1474,6 +1479,7 @@ const TripForm: React.FC = () => {
     trip_type: "multi_day",
     duration_days: "",
     duration_nights: "",
+    duration_hours: "",
     available_from: "",
     available_to: "",
     booking_window_days: "",
@@ -2217,6 +2223,7 @@ const TripForm: React.FC = () => {
           : "multi_day")) as "single_day" | "multi_day" | "flexible",
       duration_days: tripData.duration_days?.toString() || "",
       duration_nights: tripData.duration_nights?.toString() || "",
+      duration_hours: tripData.duration_hours?.toString() || "",
       available_from: tripData.available_from || "",
       available_to: tripData.available_to || "",
       booking_window_days: tripData.booking_window_days?.toString() || "",
@@ -2480,6 +2487,7 @@ const TripForm: React.FC = () => {
         "trip_type",
         "duration_days",
         "duration_nights",
+        "duration_hours",
       ],
       location: ["destinations", "starting_location", "ending_location"],
       duration: ["available_from", "available_to", "booking_window_days"],
@@ -4553,9 +4561,15 @@ const TripForm: React.FC = () => {
                           name="trip_type"
                           value="multi_day"
                           checked={formData.trip_type === "multi_day"}
-                          onChange={(e) =>
-                            handleFieldChange("trip_type", e.target.value)
-                          }
+                          onChange={(e) => {
+                            handleFieldChange("trip_type", e.target.value);
+                            // A multi-day trip is never hour-based — drop any
+                            // hours set while it was a single-day tour.
+                            setFormData((prev) => ({
+                              ...prev,
+                              duration_hours: "",
+                            }));
+                          }}
                           className="sr-only"
                         />
                         <div className="flex flex-1">
@@ -4700,6 +4714,44 @@ const TripForm: React.FC = () => {
                       )}
                     </div>
                   </div>
+
+                  {/* Duration (Hours) — hour-based single-day tours */}
+                  {formData.trip_type === "single_day" && (
+                    <div className="mt-4">
+                      <label
+                        htmlFor="duration_hours"
+                        className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
+                      >
+                        {__("Duration (Hours)", "yatra")}
+                      </label>
+                      <Input
+                        id="duration_hours"
+                        type="number"
+                        min="1"
+                        max="24"
+                        value={formData.duration_hours}
+                        onChange={(e) =>
+                          handleFieldChange("duration_hours", e.target.value)
+                        }
+                        placeholder={__("e.g., 8", "yatra")}
+                        className={
+                          errors.duration_hours ? "border-red-500" : ""
+                        }
+                      />
+                      <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                        {__(
+                          "Optional — for an hour-based day tour (e.g. an 8-hour experience). When set, the tour's duration shows in hours and Google Calendar creates a same-day timed event instead of an all-day one. Leave empty for a normal day tour.",
+                          "yatra",
+                        )}
+                      </p>
+                      {errors.duration_hours && (
+                        <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                          <AlertCircle className="w-4 h-4" />
+                          {errors.duration_hours}
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

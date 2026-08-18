@@ -1,6 +1,6 @@
-import { j as jsxRuntimeExports, r as reactExports, u as useQuery, z as ArrowLeft, p as Calendar, U as Users, d as Mail, aY as Phone, az as AlertCircle, k as FileText, i as CreditCard, F as FileSignature, av as CheckCircle, ar as Clock, bj as Send } from "./react-vendor-xzSqHjRF.js";
-import { _ as __, i as getCountryName, e as formatDate, f as formatYatraMoney, b as apiService, a as apiClient } from "./index-CbMRo6lO.js";
-import { u as usePermissions, N as Skeleton, C as Card, f as CardHeader, d as CardContent, P as PageHeader, B as Button, r as ConditionalRender, g as CardTitle } from "../../admin/dist/js/app.js";
+import { j as jsxRuntimeExports, a5 as React, v as useMutation, d as Mail, x as ChevronDown, r as reactExports, u as useQuery, z as ArrowLeft, p as Calendar, U as Users, aY as Phone, az as AlertCircle, k as FileText, i as CreditCard, F as FileSignature, av as CheckCircle, ar as Clock, bj as Send } from "./react-vendor-xzSqHjRF.js";
+import { u as useToast, _ as __, a as apiClient, i as getCountryName, e as formatDate, f as formatYatraMoney, b as apiService } from "./index-CbMRo6lO.js";
+import { a9 as Popover, aa as PopoverTrigger, B as Button, ab as PopoverContent, u as usePermissions, N as Skeleton, C as Card, f as CardHeader, d as CardContent, P as PageHeader, r as ConditionalRender, g as CardTitle } from "../../admin/dist/js/app.js";
 function phoneData() {
   return window.yatraPhoneData || {};
 }
@@ -64,6 +64,99 @@ const PhoneDisplay = ({
       ]
     }
   );
+};
+const EMAIL_ITEMS = [
+  { type: "confirmation", label: __("Booking confirmation", "yatra"), group: "customer" },
+  {
+    type: "payment_confirmation",
+    label: __("Payment confirmation", "yatra"),
+    group: "customer",
+    needsPayment: true
+  },
+  { type: "reminder", label: __("Trip reminder", "yatra"), group: "customer" },
+  {
+    type: "cancellation",
+    label: __("Cancellation notice", "yatra"),
+    group: "customer",
+    statuses: ["cancelled"]
+  },
+  {
+    type: "completed",
+    label: __("Trip completed / thank-you", "yatra"),
+    group: "customer",
+    statuses: ["completed"]
+  },
+  { type: "admin_new_booking", label: __("New booking", "yatra"), group: "admin" },
+  {
+    type: "admin_payment_received",
+    label: __("Payment received", "yatra"),
+    group: "admin",
+    needsPayment: true
+  }
+];
+const ResendEmailMenu = ({
+  bookingId,
+  status = "",
+  amountPaid = 0
+}) => {
+  const { showToast } = useToast();
+  const [open, setOpen] = React.useState(false);
+  const mutation = useMutation({
+    mutationFn: async (type) => {
+      const res = await apiClient.post(`/bookings/${bookingId}/send-email`, {
+        type
+      });
+      if (res && res.success === false) {
+        throw new Error(res.message || __("Failed to send email.", "yatra"));
+      }
+      return res;
+    },
+    onSuccess: (res) => {
+      showToast((res == null ? void 0 : res.message) || __("Email sent.", "yatra"), "success");
+      setOpen(false);
+    },
+    onError: (err) => {
+      showToast((err == null ? void 0 : err.message) || __("Failed to send email.", "yatra"), "error");
+    }
+  });
+  const paid = Number(amountPaid || 0) > 0;
+  const items = EMAIL_ITEMS.filter((item) => {
+    if (item.needsPayment && !paid) return false;
+    if (item.statuses && !item.statuses.includes(status)) return false;
+    return true;
+  });
+  const customerItems = items.filter((i) => i.group === "customer");
+  const adminItems = items.filter((i) => i.group === "admin");
+  const renderItem = (item) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+    "button",
+    {
+      type: "button",
+      disabled: mutation.isPending,
+      onClick: () => mutation.mutate(item.type),
+      className: "w-full text-left px-3 py-2 text-sm rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed",
+      children: item.label
+    },
+    item.type
+  );
+  const groupLabel = (text) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-3 pt-2 pb-1 text-[11px] font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500", children: text });
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(Popover, { open, onOpenChange: setOpen, children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(PopoverTrigger, { asChild: true, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { variant: "outline", className: "flex items-center gap-2", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { className: "w-4 h-4" }),
+      __("Resend Email", "yatra"),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { className: "w-4 h-4" })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(PopoverContent, { align: "end", className: "w-64 p-1", children: [
+      customerItems.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+        groupLabel(__("To customer", "yatra")),
+        customerItems.map(renderItem)
+      ] }),
+      adminItems.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+        groupLabel(__("To admin", "yatra")),
+        adminItems.map(renderItem)
+      ] }),
+      mutation.isPending && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-3 py-2 text-xs text-gray-400", children: __("Sending…", "yatra") })
+    ] })
+  ] });
 };
 const ViewBooking = () => {
   var _a, _b, _c, _d, _e, _f, _g, _h;
@@ -377,6 +470,14 @@ const ViewBooking = () => {
         title: __("Booking Details", "yatra"),
         description: __("View complete booking information", "yatra"),
         actions: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_bookings", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            ResendEmailMenu,
+            {
+              bookingId: Number(booking.id),
+              status: booking.booking_status,
+              amountPaid: Number(booking.amount_paid) || 0
+            }
+          ) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_bookings", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: handleEdit, className: "flex items-center gap-2", children: __("Edit Booking", "yatra") }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs(
             Button,
@@ -1064,4 +1165,4 @@ const ViewBooking = () => {
 export {
   ViewBooking as default
 };
-//# sourceMappingURL=ViewBooking-BtL7C3fO.js.map
+//# sourceMappingURL=ViewBooking-DtCdk4c_.js.map

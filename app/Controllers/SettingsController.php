@@ -103,6 +103,8 @@ class SettingsController extends BaseController
         'scheduled_payment_installments' => 1, // Number of installments (if type is installments)
         'scheduled_payment_interval' => 30, // Days between installments
         'scheduled_payment_reminder_days' => 3, // Days before to send reminder
+        'balance_anchor' => 'booking', // 'booking' (BC default) | 'tour' (relative to tour date)
+        'balance_due_days' => 14, // When anchor=tour: balance due this many days before the tour
         'allow_save_payment_methods' => false,
         
         // Email Settings (WordPress site defaults when Yatra options are missing)
@@ -467,6 +469,8 @@ class SettingsController extends BaseController
                     'scheduled_payment_installments',
                     'scheduled_payment_interval',
                     'scheduled_payment_reminder_days',
+                    'balance_anchor',
+                    'balance_due_days',
                 ] as $sk
             ) {
                 if (array_key_exists($sk, $this->default_settings)) {
@@ -527,6 +531,8 @@ class SettingsController extends BaseController
                 'scheduled_payment_installments',
                 'scheduled_payment_interval',
                 'scheduled_payment_reminder_days',
+                'balance_anchor',
+                'balance_due_days',
             ];
             
             // Collect flexible payment settings to delegate to Pro

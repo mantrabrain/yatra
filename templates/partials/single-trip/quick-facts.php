@@ -18,7 +18,9 @@ if (!defined('ABSPATH')) {
             <div class="yatra-quick-fact-label"><?php echo esc_html__('Duration', 'yatra'); ?></div>
             <div class="yatra-quick-fact-value">
                 <?php
-                if ($trip->getTripType() === 'single_day') {
+                if ($trip->isHoursBased()) {
+                    echo esc_html(yatra_format_duration(0, null, $trip->getDurationHours()));
+                } elseif ($trip->getTripType() === 'single_day') {
                     echo esc_html__('Day Trip', 'yatra');
                 } else {
                     echo esc_html(yatra_format_duration($trip->getDurationDays(), $trip->getDurationNights()));

@@ -1,6 +1,6 @@
 import { t as useQueryClient, r as reactExports, u as useQuery, v as useMutation, j as jsxRuntimeExports, bM as Building2, bN as Palette, c5 as PanelLeft, c6 as Layout, ba as Lock, D as Loader2, aV as Save, S as Sparkles, C as Crown, V as ExternalLink, ax as X, aS as Image, x as ChevronDown, y as ChevronRight, aQ as Eye, bw as EyeOff, bb as GripVertical } from "./react-vendor-xzSqHjRF.js";
 import { u as useToast, _ as __, I as Input, a as apiClient } from "./index-CbMRo6lO.js";
-import { aw as DEFAULT_MENU_ITEMS, ax as useWordPressMedia, P as PageHeader, C as Card, d as CardContent, B as Button, f as CardHeader, g as CardTitle, h as CardDescription, v as Label, ay as MenuIcon, az as ICON_MAP, I as IconPicker } from "../../admin/dist/js/app.js";
+import { az as DEFAULT_MENU_ITEMS, aA as useWordPressMedia, P as PageHeader, C as Card, d as CardContent, B as Button, f as CardHeader, g as CardTitle, h as CardDescription, v as Label, aB as MenuIcon, aC as ICON_MAP, I as IconPicker } from "../../admin/dist/js/app.js";
 import { M as ModulePageSkeleton } from "./module-skeleton-Cb1q-Zbx.js";
 function toPickerValue(icon) {
   if (!icon) return null;
@@ -1165,4 +1165,4 @@ const WhiteLabel = () => {
 export {
   WhiteLabel as default
 };
-//# sourceMappingURL=WhiteLabel-DGBv_X_H.js.map
+//# sourceMappingURL=WhiteLabel-y6Wb_vpi.js.map

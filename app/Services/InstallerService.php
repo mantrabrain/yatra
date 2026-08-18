@@ -517,6 +517,72 @@ class InstallerService
     }
 
     /**
+     * Add the `duration_hours` column to the trips table for hour-based
+     * (single-day) tours. Purely additive and nullable — existing trips get
+     * NULL and behave exactly as before (day-based via `duration_days`). Only
+     * tours that later set a positive `duration_hours` change behaviour.
+     *
+     * Idempotent: guarded by a one-shot option AND an INFORMATION_SCHEMA check,
+     * so it runs its ALTER at most once and is a no-op when the column already
+     * exists (fresh installs get it from TripsTable::getSchema()).
+     */
+    public static function maybeAddTripDurationHoursColumn(): void
+    {
+        if (get_option('yatra_trip_duration_hours_v1')) {
+            return;
+        }
+
+        if (!class_exists('Yatra\\Database\\Tables\\TripsTable')) {
+            return;
+        }
+
+        $table = \Yatra\Database\Tables\TripsTable::getTableName();
+        if (!self::databaseTableExists($table)) {
+            return;
+        }
+
+        global $wpdb;
+
+        $columnExists = $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
+                 WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = %s",
+                DB_NAME,
+                $table,
+                'duration_hours'
+            )
+        );
+
+        if (!$columnExists) {
+            // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name escaped, static column definition.
+            $wpdb->query(
+                'ALTER TABLE `' . esc_sql($table) . '` '
+                . "ADD COLUMN `duration_hours` smallint(5) UNSIGNED DEFAULT NULL "
+                . "COMMENT 'Duration in hours for hour-based (single-day) tours; NULL = day-based' "
+                . 'AFTER `duration_nights`'
+            );
+
+            // Re-check so we only mark this done when the column really exists.
+            // If the ALTER failed (e.g. a restrictive host), leave the one-shot
+            // flag unset so it retries on the next admin load rather than
+            // disabling the feature permanently.
+            $columnExists = $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
+                     WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = %s",
+                    DB_NAME,
+                    $table,
+                    'duration_hours'
+                )
+            );
+        }
+
+        if ($columnExists) {
+            update_option('yatra_trip_duration_hours_v1', '1', false);
+        }
+    }
+
+    /**
      * Fill canonical + legacy email identity options when empty (upgrades, partial installs, or empty strings in DB).
      * Idempotent; safe to run on each admin load via maybeBackfillEmailTemplateDefaults().
      */

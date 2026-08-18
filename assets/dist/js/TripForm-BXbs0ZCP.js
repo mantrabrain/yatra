@@ -1827,6 +1827,7 @@ function buildTripAiContext(formData) {
     difficulty_level: (formData == null ? void 0 : formData.difficulty_level) ?? "",
     duration_days: (formData == null ? void 0 : formData.duration_days) ?? "",
     duration_nights: (formData == null ? void 0 : formData.duration_nights) ?? "",
+    duration_hours: (formData == null ? void 0 : formData.duration_hours) ?? "",
     best_season: (formData == null ? void 0 : formData.best_season) ?? "",
     price: (formData == null ? void 0 : formData.price) ?? "",
     deposit_percentage: (formData == null ? void 0 : formData.deposit_percentage) ?? "",
@@ -1981,6 +1982,7 @@ const TripForm = () => {
       trip_type: "multi_day",
       duration_days: "7",
       duration_nights: "6",
+      duration_hours: "",
       available_from: new Date(Date.now() + 30 * 24 * 60 * 60 * 1e3).toISOString().split("T")[0],
       // 30 days from now
       available_to: new Date(Date.now() + 365 * 24 * 60 * 60 * 1e3).toISOString().split("T")[0],
@@ -2222,6 +2224,7 @@ const TripForm = () => {
       trip_type: "multi_day",
       duration_days: "14",
       duration_nights: "13",
+      duration_hours: "",
       available_from: new Date(Date.now() + 60 * 24 * 60 * 60 * 1e3).toISOString().split("T")[0],
       available_to: new Date(Date.now() + 365 * 24 * 60 * 60 * 1e3).toISOString().split("T")[0],
       booking_window_days: "60",
@@ -2463,6 +2466,7 @@ const TripForm = () => {
       trip_type: "multi_day",
       duration_days: "10",
       duration_nights: "9",
+      duration_hours: "",
       available_from: new Date(Date.now() + 45 * 24 * 60 * 60 * 1e3).toISOString().split("T")[0],
       available_to: new Date(Date.now() + 365 * 24 * 60 * 60 * 1e3).toISOString().split("T")[0],
       booking_window_days: "45",
@@ -2685,6 +2689,7 @@ const TripForm = () => {
     trip_type: "multi_day",
     duration_days: "",
     duration_nights: "",
+    duration_hours: "",
     available_from: "",
     available_to: "",
     booking_window_days: "",
@@ -3252,7 +3257,7 @@ const TripForm = () => {
     }).filter((faq) => faq.question && faq.answer);
   };
   reactExports.useEffect(() => {
-    var _a2, _b2, _c2, _d2, _e2, _f2, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r;
+    var _a2, _b2, _c2, _d2, _e2, _f2, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s;
     if (!tripData || !isEditMode) {
       return;
     }
@@ -3285,15 +3290,16 @@ const TripForm = () => {
       trip_type: tripData.trip_type || (tripData.duration_days && parseInt(((_e2 = tripData.duration_days) == null ? void 0 : _e2.toString()) || "0") === 1 ? "single_day" : "multi_day"),
       duration_days: ((_f2 = tripData.duration_days) == null ? void 0 : _f2.toString()) || "",
       duration_nights: ((_g = tripData.duration_nights) == null ? void 0 : _g.toString()) || "",
+      duration_hours: ((_h = tripData.duration_hours) == null ? void 0 : _h.toString()) || "",
       available_from: tripData.available_from || "",
       available_to: tripData.available_to || "",
-      booking_window_days: ((_h = tripData.booking_window_days) == null ? void 0 : _h.toString()) || "",
+      booking_window_days: ((_i = tripData.booking_window_days) == null ? void 0 : _i.toString()) || "",
       seasonal_availability: tripData.seasonal_availability || "",
       best_season: tripData.best_season || "",
       peak_season: tripData.peak_season || "",
       off_season: tripData.off_season || "",
       activity_types: extractIds(tripData.activity_types || []),
-      difficulty_level: ((_i = tripData.difficulty_level) == null ? void 0 : _i.toString()) || "",
+      difficulty_level: ((_j = tripData.difficulty_level) == null ? void 0 : _j.toString()) || "",
       trip_category: extractIds(tripData.trip_category || []),
       tags: Array.isArray(tripData.tags) ? tripData.tags : [],
       featured_priority: tripData.featured_priority || "none",
@@ -3305,8 +3311,8 @@ const TripForm = () => {
       dropoff_location: tripData.dropoff_location || "",
       transportation_details: tripData.transportation_details || "",
       pricing_type: tripData.pricing_type || (tripData.price_types && Array.isArray(tripData.price_types) && tripData.price_types.length > 0 ? "traveler_based" : "regular"),
-      original_price: ((_j = tripData.original_price) == null ? void 0 : _j.toString()) || "",
-      discounted_price: ((_k = tripData.discounted_price) == null ? void 0 : _k.toString()) || "",
+      original_price: ((_k = tripData.original_price) == null ? void 0 : _k.toString()) || "",
+      discounted_price: ((_l = tripData.discounted_price) == null ? void 0 : _l.toString()) || "",
       price_types: Array.isArray(tripData.price_types) ? tripData.price_types.map((pt) => {
         var _a3, _b3;
         return {
@@ -3316,19 +3322,19 @@ const TripForm = () => {
           is_default: Boolean(pt.is_default)
         };
       }) : [],
-      deposit_amount: ((_l = tripData.deposit_amount) == null ? void 0 : _l.toString()) || "",
-      deposit_percentage: ((_m = tripData.deposit_percentage) == null ? void 0 : _m.toString()) || "",
+      deposit_amount: ((_m = tripData.deposit_amount) == null ? void 0 : _m.toString()) || "",
+      deposit_percentage: ((_n = tripData.deposit_percentage) == null ? void 0 : _n.toString()) || "",
       payment_terms: tripData.payment_terms || "",
-      max_travelers: ((_n = tripData.max_travelers) == null ? void 0 : _n.toString()) || "",
-      min_travelers: ((_o = tripData.min_travelers) == null ? void 0 : _o.toString()) || "",
+      max_travelers: ((_o = tripData.max_travelers) == null ? void 0 : _o.toString()) || "",
+      min_travelers: ((_p = tripData.min_travelers) == null ? void 0 : _p.toString()) || "",
       booking_deadline_hours: tripData.booking_deadline_hours || "",
       cancellation_policy: tripData.cancellation_policy || "",
-      age_min: ((_p = tripData.age_min) == null ? void 0 : _p.toString()) || "",
-      age_max: ((_q = tripData.age_max) == null ? void 0 : _q.toString()) || "",
+      age_min: ((_q = tripData.age_min) == null ? void 0 : _q.toString()) || "",
+      age_max: ((_r = tripData.age_max) == null ? void 0 : _r.toString()) || "",
       physical_requirements: tripData.physical_requirements || "",
       visa_requirements: tripData.visa_requirements || "",
       vaccination_requirements: tripData.vaccination_requirements || "",
-      disable_booking: Boolean((_r = tripData.custom_fields) == null ? void 0 : _r.disable_booking),
+      disable_booking: Boolean((_s = tripData.custom_fields) == null ? void 0 : _s.disable_booking),
       // tinyint(1) columns can serialize from PHP/wpdb as the string "0"/"1".
       // JS treats "0" as truthy, so a plain `value || false` would leave the
       // checkbox stuck on after the user un-checked + saved. Coerce explicitly.
@@ -3509,7 +3515,8 @@ const TripForm = () => {
         "featured_image",
         "trip_type",
         "duration_days",
-        "duration_nights"
+        "duration_nights",
+        "duration_hours"
       ],
       location: ["destinations", "starting_location", "ending_location"],
       duration: ["available_from", "available_to", "booking_window_days"],
@@ -5204,7 +5211,13 @@ ${tripErrorContext.details || ""}`;
                                 name: "trip_type",
                                 value: "multi_day",
                                 checked: formData.trip_type === "multi_day",
-                                onChange: (e) => handleFieldChange("trip_type", e.target.value),
+                                onChange: (e) => {
+                                  handleFieldChange("trip_type", e.target.value);
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    duration_hours: ""
+                                  }));
+                                },
                                 className: "sr-only"
                               }
                             ),
@@ -5322,6 +5335,37 @@ ${tripErrorContext.details || ""}`;
                     /* @__PURE__ */ jsxRuntimeExports.jsx(AlertCircle, { className: "w-4 h-4" }),
                     errors.duration_nights
                   ] })
+                ] })
+              ] }),
+              formData.trip_type === "single_day" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-4", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "label",
+                  {
+                    htmlFor: "duration_hours",
+                    className: "block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5",
+                    children: __$1("Duration (Hours)", "yatra")
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    id: "duration_hours",
+                    type: "number",
+                    min: "1",
+                    max: "24",
+                    value: formData.duration_hours,
+                    onChange: (e) => handleFieldChange("duration_hours", e.target.value),
+                    placeholder: __$1("e.g., 8", "yatra"),
+                    className: errors.duration_hours ? "border-red-500" : ""
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1.5 text-xs text-gray-500 dark:text-gray-400", children: __$1(
+                  "Optional — for an hour-based day tour (e.g. an 8-hour experience). When set, the tour's duration shows in hours and Google Calendar creates a same-day timed event instead of an all-day one. Leave empty for a normal day tour.",
+                  "yatra"
+                ) }),
+                errors.duration_hours && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(AlertCircle, { className: "w-4 h-4" }),
+                  errors.duration_hours
                 ] })
               ] })
             ] }) })
@@ -9634,4 +9678,4 @@ A: ${f.answer}`).join("\n\n"),
 export {
   TripForm as default
 };
-//# sourceMappingURL=TripForm-DiHD1jqy.js.map
+//# sourceMappingURL=TripForm-BXbs0ZCP.js.map

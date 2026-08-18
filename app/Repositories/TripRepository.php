@@ -272,6 +272,7 @@ class TripRepository extends BaseRepository
      */
     public function create(array $data): int
     {
+        $data = $this->dropUnsupportedDurationHours($data);
         $id = parent::create($data);
         do_action('yatra_trip_created', $id);
 
@@ -279,10 +280,30 @@ class TripRepository extends BaseRepository
     }
 
     /**
+     * Defensive: if the `duration_hours` column is somehow missing (a failed or
+     * pending column-add migration on a restrictive host), drop it from the
+     * write set so a normal trip save still succeeds instead of erroring on an
+     * unknown column. The hour-based feature simply stays off until the column
+     * exists — it never breaks saving.
+     *
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    protected function dropUnsupportedDurationHours(array $data): array
+    {
+        if (array_key_exists('duration_hours', $data) && !$this->tripTableHasColumn('duration_hours')) {
+            unset($data['duration_hours']);
+        }
+
+        return $data;
+    }
+
+    /**
      * Override update method to provide proper field formats
      */
     public function update(int $id, array $data): bool
     {
+        $data = $this->dropUnsupportedDurationHours($data);
         $data = $this->sanitizeData($data);
         $data['updated_at'] = current_time('mysql');
 

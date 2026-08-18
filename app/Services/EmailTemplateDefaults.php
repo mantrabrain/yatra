@@ -1336,18 +1336,29 @@ final class EmailTemplateDefaults
 
     private static function htmlScheduledPaymentReminder(): string
     {
+        // "Pay your balance now" CTA. The href is the {{balance_payment_url}}
+        // merge tag (a secure, guest-accessible balance link supplied by Pro
+        // Scheduled Payments); it is built manually rather than via
+        // EmailTemplateLayout::button() because that esc_url()s the href, which
+        // would strip the merge-tag braces. Pro passes an already-escaped URL.
+        $cta = '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0;"><tr>'
+            . '<td style="border-radius:10px;background:#0d9488;">'
+            . '<a href="{{balance_payment_url}}" style="display:inline-block;padding:14px 28px;font-family:\'Segoe UI\',Roboto,Arial,sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:10px;">'
+            . esc_html__('Pay your balance now', 'yatra') . '</a></td></tr></table>';
+
         $inner = '<p style="margin:0 0 16px;font-size:17px;color:#0f172a;">Hello {{customer_first_name}},</p>'
             . '<p style="margin:0 0 20px;color:#475569;">'
-            . esc_html__('This is a reminder that a scheduled payment is coming up for your booking.', 'yatra')
+            . esc_html__('This is a reminder that the remaining balance for your booking is coming up.', 'yatra')
             . '</p>'
             . EmailTemplateLayout::detailCard([
                 ['label' => 'Reference', 'value' => '{{booking_reference}}'],
                 ['label' => 'Amount', 'value' => '{{scheduled_amount_formatted}}'],
-                ['label' => 'Scheduled date', 'value' => '{{scheduled_date_formatted}}'],
+                ['label' => 'Due date', 'value' => '{{scheduled_date_formatted}}'],
                 ['label' => 'Type', 'value' => '{{payment_type_label}}'],
             ])
+            . $cta
             . '<p style="margin:24px 0 0;font-size:14px;color:#64748b;">'
-            . esc_html__('If you need to update your payment method, contact us before the charge date.', 'yatra')
+            . esc_html__('If you have any questions about this payment, please contact us before the due date.', 'yatra')
             . '</p>';
 
         return EmailTemplateLayout::customer(

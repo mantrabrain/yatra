@@ -43,6 +43,25 @@ class NotificationService
     }
 
     /**
+     * Resend just the customer payment-received email (part- or full-payment
+     * template, exactly as the automated flow chooses it). Public entry for the
+     * admin "resend email" action.
+     */
+    public static function resendCustomerPaymentEmail(array $paymentData): void
+    {
+        self::notifyCustomerPaymentReceived($paymentData);
+    }
+
+    /**
+     * Resend just the admin payment-received notification. Public entry for the
+     * admin "resend email" action.
+     */
+    public static function resendAdminPaymentEmail(array $paymentData): void
+    {
+        self::notifyAdminPaymentReceived($paymentData);
+    }
+
+    /**
      * Notify admin of new booking
      */
     private static function notifyAdminNewBooking(int $bookingId, $bookingData): void

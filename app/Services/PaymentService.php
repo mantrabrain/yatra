@@ -106,9 +106,30 @@ class PaymentService
             return ['success' => false, 'message' => __('Failed to create payment.', 'yatra')];
         }
 
-        // Update booking amount paid
+        // Update booking amount paid (also refreshes amount_due + payment_status,
+        // so the notification below picks the correct part/full template).
         $totalPaid = $this->paymentRepository->getTotalPaidForBooking((int) $data['booking_id']);
         $this->bookingRepository->updateAmountPaid((int) $data['booking_id'], $totalPaid);
+
+        // Notify the customer AND the admin that a payment was received — mirrors
+        // the automated online-payment notifications, which this manual-entry
+        // path otherwise skips. Only when the entry represents money actually
+        // received (a completed payment); pending/failed/refunded records don't
+        // trigger a "payment received" email. Respects the payment-email template
+        // toggles (via sendIfEnabled) and is filterable so operators can opt out.
+        $status = strtolower(trim((string) ($data['status'] ?? '')));
+        $isReceived = in_array($status, ['completed', 'paid', 'succeeded'], true);
+        if (
+            $isReceived
+            && (bool) apply_filters('yatra_send_manual_payment_emails', true, (int) $data['booking_id'], $data)
+        ) {
+            NotificationService::sendPaymentCompletedNotification([
+                'booking_id' => (int) $data['booking_id'],
+                'amount' => (float) ($data['amount'] ?? 0),
+                'payment_method' => (string) ($data['gateway'] ?? ($data['payment_method'] ?? '')),
+                'transaction_id' => (string) ($data['transaction_id'] ?? ''),
+            ]);
+        }
 
         return [
             'success' => true,

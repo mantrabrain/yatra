@@ -35,6 +35,7 @@ import {
   CardTitle,
 } from "../components/ui/card";
 import { ConditionalRender } from "../components/ui/conditional-render";
+import { ResendEmailMenu } from "../components/bookings/ResendEmailMenu";
 import { Skeleton } from "../components/ui/skeleton";
 import { formatYatraMoney } from "../lib/currency-display";
 
@@ -481,6 +482,13 @@ const ViewBooking: React.FC = () => {
         description={__("View complete booking information", "yatra")}
         actions={
           <div className="flex gap-2">
+            <ConditionalRender capability="yatra_edit_bookings">
+              <ResendEmailMenu
+                bookingId={Number(booking.id)}
+                status={booking.booking_status}
+                amountPaid={Number(booking.amount_paid) || 0}
+              />
+            </ConditionalRender>
             <ConditionalRender capability="yatra_edit_bookings">
               <Button onClick={handleEdit} className="flex items-center gap-2">
                 {__("Edit Booking", "yatra")}

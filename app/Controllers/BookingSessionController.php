@@ -4519,7 +4519,9 @@ echo esc_html(sprintf(__('Traveler %1$d: %2$s', 'yatra'), $i + 1, $traveler_name
         // hand off to `yatra_calculate_amount_due` so Pro can apply absolute
         // overrides too (e.g. trip.deposit_amount as a fixed cap). Doing both
         // keeps the math consistent with CalculationService::calculatePaymentAmounts().
-        $context = ['trip_id' => $trip_id];
+        // Tour start → Pro can force full payment when the tour is within the
+        // balance-due window (tour-anchored scheduled payments).
+        $context = ['trip_id' => $trip_id, 'travel_date' => (string) ($travel_date ?? '')];
         $flexible_payments_enabled = apply_filters('yatra_flexible_payments_enabled', false);
         $deposit_percentage = (int) apply_filters('yatra_deposit_percentage', 20, $context);
         $partial_percentage = (int) apply_filters('yatra_partial_payment_percentage', 30, $context);

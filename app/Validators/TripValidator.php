@@ -524,6 +524,21 @@ class TripValidator
                 : (array) $data['custom_fields'];
         }
 
+        // Hour-based duration only applies to single-day tours. Clamp to a sane
+        // day-length range, and never let a multi-day / flexible trip carry
+        // hours — otherwise the Google Calendar module would build a short timed
+        // event instead of the correct multi-day span. Only enforced when both
+        // fields are present in the payload (the trip form always sends both).
+        if (array_key_exists('duration_hours', $sanitized)) {
+            $sanitized['duration_hours'] = max(0, min(24, (int) $sanitized['duration_hours']));
+            if (
+                array_key_exists('trip_type', $sanitized)
+                && $sanitized['trip_type'] !== 'single_day'
+            ) {
+                $sanitized['duration_hours'] = 0;
+            }
+        }
+
         return apply_filters('yatra_trip_sanitize_data', $sanitized, $data);
     }
 }

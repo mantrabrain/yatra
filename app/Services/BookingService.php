@@ -387,7 +387,12 @@ class BookingService
                 $bs_total - $bs_paid,
                 $bs_total,
                 $bs_payment_method,
-                ['trip_id' => (int) ($data['trip_id'] ?? 0)]
+                [
+                    'trip_id'     => (int) ($data['trip_id'] ?? 0),
+                    // Tour start lets Pro enforce "pay in full when the tour is
+                    // within the balance-due window" (tour-anchored payments).
+                    'travel_date' => (string) ($data['travel_date'] ?? ($data['start_date'] ?? '')),
+                ]
             );
             $data['amount_due'] = max(0.0, round($bs_due_now, 2));
 
@@ -1359,8 +1364,12 @@ class BookingService
             return ['success' => false, 'message' => __('Booking not found.', 'yatra')];
         }
 
-        if (empty($booking->contact_email)) {
-            return ['success' => false, 'message' => __('No email address found.', 'yatra')];
+        // Customer-facing emails need a recipient; admin notifications go to the
+        // store admin address, so they don't require the booking's contact email.
+        $customerEmail = (string) ($booking->contact_email ?? '');
+        $customerTypes = ['confirmation', 'reminder', 'cancellation', 'completed', 'payment_confirmation'];
+        if (in_array($emailType, $customerTypes, true) && $customerEmail === '') {
+            return ['success' => false, 'message' => __('No customer email address on this booking.', 'yatra')];
         }
 
         switch ($emailType) {
@@ -1372,6 +1381,48 @@ class BookingService
                 $this->sendBookingReminderEmail($booking);
                 break;
 
+            case 'cancellation':
+                // Mirrors sendStatusChangeNotification() so the resent email is
+                // identical to the automated cancellation email.
+                $vars = TransactionalEmailTemplateService::variablesFromBooking($booking);
+                $vars['cancellation_reason'] = (string) ($booking->cancellation_reason ?? '');
+                TransactionalEmailTemplateService::sendIfEnabled(
+                    TransactionalEmailTemplateService::TYPE_BOOKING_CANCELLATION,
+                    $customerEmail,
+                    $vars
+                );
+                break;
+
+            case 'completed':
+                $vars = TransactionalEmailTemplateService::variablesFromBooking($booking);
+                $vars['completion_date'] = date_i18n(get_option('date_format'));
+                TransactionalEmailTemplateService::sendIfEnabled(
+                    TransactionalEmailTemplateService::TYPE_BOOKING_COMPLETED,
+                    $customerEmail,
+                    $vars
+                );
+                break;
+
+            case 'payment_confirmation':
+                $paymentData = $this->buildPaymentDataForResend($booking);
+                if ($paymentData === null) {
+                    return ['success' => false, 'message' => __('No recorded payment to resend for this booking.', 'yatra')];
+                }
+                \Yatra\Services\NotificationService::resendCustomerPaymentEmail($paymentData);
+                break;
+
+            case 'admin_new_booking':
+                \Yatra\Services\NotificationService::sendBookingCreatedNotification($bookingId, (array) $booking);
+                break;
+
+            case 'admin_payment_received':
+                $paymentData = $this->buildPaymentDataForResend($booking);
+                if ($paymentData === null) {
+                    return ['success' => false, 'message' => __('No recorded payment to resend for this booking.', 'yatra')];
+                }
+                \Yatra\Services\NotificationService::resendAdminPaymentEmail($paymentData);
+                break;
+
             default:
                 return ['success' => false, 'message' => __('Unknown email type.', 'yatra')];
         }
@@ -1379,6 +1430,30 @@ class BookingService
         return [
             'success' => true,
             'message' => __('Email sent successfully.', 'yatra'),
+        ];
+    }
+
+    /**
+     * Reconstruct the payment-notification payload for a resend from the latest
+     * payment on the booking (falling back to the booking's own amount_paid /
+     * gateway when no ledger row exists). Returns null when nothing has been
+     * paid, so there is no payment to acknowledge.
+     */
+    private function buildPaymentDataForResend(object $booking): ?array
+    {
+        $bookingId = (int) ($booking->id ?? 0);
+        $payment = $this->paymentRepository->findLatestByBookingId($bookingId);
+
+        $amount = (float) ($payment->amount ?? $booking->amount_paid ?? 0);
+        if ($amount <= 0) {
+            return null;
+        }
+
+        return [
+            'booking_id' => $bookingId,
+            'amount' => $amount,
+            'payment_method' => (string) ($payment->gateway ?? $booking->payment_gateway ?? ''),
+            'transaction_id' => (string) ($payment->transaction_id ?? ''),
         ];
     }
 

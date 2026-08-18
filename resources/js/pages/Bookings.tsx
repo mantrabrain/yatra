@@ -17,6 +17,7 @@ import {
   CreditCard,
   CircleDollarSign,
   Undo2,
+  Mail,
 } from "lucide-react";
 import {
   Pagination,
@@ -37,7 +38,7 @@ import { Card, CardContent } from "../components/ui/card";
 import { ConditionalRender } from "../components/ui/conditional-render";
 import { ConfirmationDialog } from "../components/ui/confirmation-dialog";
 import { formatYatraMoney } from "../lib/currency-display";
-import { apiService } from "../lib/api-client";
+import { apiService, apiClient } from "../lib/api-client";
 import { formatDate as formatDateUtil } from "../lib/dateFormat";
 import { getErrorContext } from "../lib/errors";
 import { usePermissions } from "../hooks/usePermissions";
@@ -771,6 +772,25 @@ const Bookings: React.FC = () => {
     },
   ];
 
+  /**
+   * Manually (re)send a transactional email for a booking from the row actions.
+   * Errors and disabled-recipient cases surface via the endpoint's message.
+   */
+  const resendBookingEmail = async (bookingId: number, type: string) => {
+    try {
+      const res: any = await apiClient.post(
+        `/bookings/${bookingId}/send-email`,
+        { type },
+      );
+      if (res?.success === false) {
+        throw new Error(res.message || __("Failed to send email"));
+      }
+      showToast(res?.message || __("Email sent"), "success");
+    } catch (error: any) {
+      showToast(error?.message || __("Failed to send email"), "error");
+    }
+  };
+
   const actions = [
     {
       key: "view",
@@ -888,6 +908,26 @@ const Bookings: React.FC = () => {
       condition: (booking: Booking) =>
         can("yatra_edit_bookings") && booking.payment_status !== action.value,
     })),
+    {
+      key: "resend_confirmation",
+      label: __("Resend confirmation email"),
+      icon: <Mail className="w-4 h-4" />,
+      onClick: (booking: Booking) => resendBookingEmail(booking.id, "confirmation"),
+      condition: (booking: Booking) =>
+        can("yatra_edit_bookings") && !!booking.customer_email,
+    },
+    {
+      key: "resend_payment",
+      label: __("Resend payment email"),
+      icon: <Mail className="w-4 h-4" />,
+      onClick: (booking: Booking) =>
+        resendBookingEmail(booking.id, "payment_confirmation"),
+      // Only when a payment has actually been recorded.
+      condition: (booking: Booking) =>
+        can("yatra_edit_bookings") &&
+        !!booking.customer_email &&
+        Number(booking.amount_paid || 0) > 0,
+    },
     {
       key: "delete",
       label: __("Delete"),

@@ -1884,6 +1884,8 @@ const Settings = () => {
       discount_stacking_mode: "both",
       scheduled_payment_interval: 30,
       scheduled_payment_reminder_days: 3,
+      balance_anchor: "booking",
+      balance_due_days: 14,
       gateway_configs: {
         stripe: {
           enabled: true,
@@ -3713,6 +3715,54 @@ const Settings = () => {
                       /* @__PURE__ */ jsxRuntimeExports.jsx(
                         FormField,
                         {
+                          id: "balance_anchor",
+                          label: __("Balance schedule", "yatra"),
+                          description: __(
+                            "Whether the remaining balance is scheduled a fixed number of days after the deposit, or relative to the tour start date.",
+                            "yatra"
+                          ),
+                          children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                            Select,
+                            {
+                              id: "balance_anchor",
+                              name: "balance_anchor",
+                              value: formData.balance_anchor,
+                              onChange: handleFieldChange,
+                              children: [
+                                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "booking", children: __("A fixed number of days after the deposit", "yatra") }),
+                                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "tour", children: __("A number of days before the tour date", "yatra") })
+                              ]
+                            }
+                          )
+                        }
+                      ),
+                      formData.balance_anchor === "tour" && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        FormField,
+                        {
+                          id: "balance_due_days",
+                          label: __("Days before tour", "yatra"),
+                          description: __(
+                            "The balance is collected this many days before the tour starts. Bookings made inside this window must pay in full up front.",
+                            "yatra"
+                          ),
+                          children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            Input,
+                            {
+                              id: "balance_due_days",
+                              type: "number",
+                              min: 1,
+                              max: 365,
+                              value: formData.balance_due_days,
+                              name: "balance_due_days",
+                              onChange: handleFieldChange,
+                              className: "max-w-xs"
+                            }
+                          )
+                        }
+                      ),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        FormField,
+                        {
                           id: "scheduled_payment_type",
                           label: __("Schedule type", "yatra"),
                           description: __(
@@ -3734,7 +3784,7 @@ const Settings = () => {
                           )
                         }
                       ),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      formData.balance_anchor !== "tour" && /* @__PURE__ */ jsxRuntimeExports.jsx(
                         FormField,
                         {
                           id: "scheduled_payment_days",
@@ -8264,4 +8314,4 @@ const Settings = () => {
 export {
   Settings as default
 };
-//# sourceMappingURL=Settings-z7nK9LKk.js.map
+//# sourceMappingURL=Settings-BmSRWwzK.js.map

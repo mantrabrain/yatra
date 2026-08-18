@@ -428,8 +428,11 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                                 <?php
                                 $duration_days = (int) ($trip->duration_days ?? 0);
                                 $duration_nights = isset($trip->duration_nights) ? (int) $trip->duration_nights : null;
+                                $duration_hours = (int) ($trip->duration_hours ?? 0);
                                 ?>
-                                <?php if ($duration_days > 0) : ?>
+                                <?php if ($duration_hours > 0) : ?>
+                                    <span><?php echo esc_html(yatra_format_duration(0, null, $duration_hours)); ?></span>
+                                <?php elseif ($duration_days > 0) : ?>
                                     <?php if ($duration_days <= 1) : ?>
                                         <span><?php esc_html_e('Day Trip', 'yatra'); ?></span>
                                     <?php else : ?>

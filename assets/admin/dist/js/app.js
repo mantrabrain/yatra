@@ -1,4 +1,4 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-DiHD1jqy.js","../../../dist/js/react-vendor-xzSqHjRF.js","../css/react-vendor.css","../../../dist/js/index-CbMRo6lO.js","../css/index.css","../../../dist/js/BuildItineraryModal-ZwjF_pCL.js","../../../dist/js/ProFeature-97ewna1x.js","../../../dist/js/Settings-z7nK9LKk.js","../../../dist/js/Team-Bk-2HOlE.js","../../../dist/js/Reports-S1LiUBAm.js","../../../dist/js/DiscountForm--OXC6TLT.js","../../../dist/js/ApplicableTripSelector-BYZjxt18.js","../../../dist/js/Itinerary-Do2hZtmM.js","../../../dist/js/RecurringRuleForm-CZVn9vM6.js","./Whatsapp.js","../../../dist/js/module-skeleton-Cb1q-Zbx.js","../../../dist/js/ChannelManager-B369twWu.js","../../../dist/js/Webhooks-CnRxl1B7.js","../../../dist/js/TripConsentForm-ClLISE_5.js","../../../dist/js/BookingForm-DkL1nwFO.js","../../../dist/js/ViewBooking-BtL7C3fO.js","../../../dist/js/AvailabilityForm-BOtuwB57.js","../../../dist/js/DynamicPricing-pIYuZsxl.js","../../../dist/js/RuleTypeSelectionModal-Bgbf_xbp.js","../../../dist/js/toggle-DUbJsrWf.js","../../../dist/js/DynamicPricingRuleForm-Dg6kEVSu.js","../../../dist/js/AiAssistant-Dvltmd3o.js","../../../dist/js/AbandonedRecovery-rMedCeJ6.js","../../../dist/js/WhiteLabel-DGBv_X_H.js"])))=>i.map(i=>d[i]);
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-BXbs0ZCP.js","../../../dist/js/react-vendor-xzSqHjRF.js","../css/react-vendor.css","../../../dist/js/index-CbMRo6lO.js","../css/index.css","../../../dist/js/BuildItineraryModal-ZwjF_pCL.js","../../../dist/js/ProFeature-97ewna1x.js","../../../dist/js/Settings-BmSRWwzK.js","../../../dist/js/Team-Bk-2HOlE.js","../../../dist/js/Reports-S1LiUBAm.js","../../../dist/js/DiscountForm--OXC6TLT.js","../../../dist/js/ApplicableTripSelector-BYZjxt18.js","../../../dist/js/Itinerary-Do2hZtmM.js","../../../dist/js/RecurringRuleForm-CZVn9vM6.js","./Whatsapp.js","../../../dist/js/module-skeleton-Cb1q-Zbx.js","../../../dist/js/ChannelManager-B369twWu.js","../../../dist/js/Webhooks-CnRxl1B7.js","../../../dist/js/TripConsentForm-ClLISE_5.js","../../../dist/js/BookingForm-DkL1nwFO.js","../../../dist/js/ViewBooking-DtCdk4c_.js","../../../dist/js/AvailabilityForm-BOtuwB57.js","../../../dist/js/DynamicPricing-CGjBjSDW.js","../../../dist/js/RuleTypeSelectionModal-Bgbf_xbp.js","../../../dist/js/toggle-DUbJsrWf.js","../../../dist/js/DynamicPricingRuleForm-Dg6kEVSu.js","../../../dist/js/AiAssistant-Dvltmd3o.js","../../../dist/js/AbandonedRecovery-Bs6Jd6MW.js","../../../dist/js/WhiteLabel-y6Wb_vpi.js"])))=>i.map(i=>d[i]);
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key2, value) => key2 in obj ? __defProp(obj, key2, { enumerable: true, configurable: true, writable: true, value }) : obj[key2] = value;
 var __publicField = (obj, key2, value) => __defNormalProp(obj, typeof key2 !== "symbol" ? key2 + "" : key2, value);
@@ -38134,6 +38134,20 @@ const Bookings = () => {
       render: (booking) => getBookingStatusBadge(booking.booking_status)
     }
   ];
+  const resendBookingEmail = async (bookingId, type) => {
+    try {
+      const res = await apiClient.post(
+        `/bookings/${bookingId}/send-email`,
+        { type }
+      );
+      if ((res == null ? void 0 : res.success) === false) {
+        throw new Error(res.message || __2("Failed to send email"));
+      }
+      showToast((res == null ? void 0 : res.message) || __2("Email sent"), "success");
+    } catch (error2) {
+      showToast((error2 == null ? void 0 : error2.message) || __2("Failed to send email"), "error");
+    }
+  };
   const actions = [
     {
       key: "view",
@@ -38246,6 +38260,21 @@ const Bookings = () => {
       // the booking-status actions above behave.
       condition: (booking) => can("yatra_edit_bookings") && booking.payment_status !== action.value
     })),
+    {
+      key: "resend_confirmation",
+      label: __2("Resend confirmation email"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { className: "w-4 h-4" }),
+      onClick: (booking) => resendBookingEmail(booking.id, "confirmation"),
+      condition: (booking) => can("yatra_edit_bookings") && !!booking.customer_email
+    },
+    {
+      key: "resend_payment",
+      label: __2("Resend payment email"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { className: "w-4 h-4" }),
+      onClick: (booking) => resendBookingEmail(booking.id, "payment_confirmation"),
+      // Only when a payment has actually been recorded.
+      condition: (booking) => can("yatra_edit_bookings") && !!booking.customer_email && Number(booking.amount_paid || 0) > 0
+    },
     {
       key: "delete",
       label: __2("Delete"),
@@ -77507,8 +77536,8 @@ const License = () => {
     ] }) }) })
   ] });
 };
-const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-DiHD1jqy.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
-const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-z7nK9LKk.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
+const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-BXbs0ZCP.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
+const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-BmSRWwzK.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
 const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-Bk-2HOlE.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
 const Reports = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Reports-S1LiUBAm.js"), true ? __vite__mapDeps([9,1,2,3,4]) : void 0, import.meta.url));
 const DiscountForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DiscountForm--OXC6TLT.js"), true ? __vite__mapDeps([10,1,2,3,4,11]) : void 0, import.meta.url));
@@ -77519,15 +77548,15 @@ const ChannelManager = reactExports.lazy(() => __vitePreload(() => import("../..
 const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Webhooks-CnRxl1B7.js"), true ? __vite__mapDeps([17,1,2,3,4,15]) : void 0, import.meta.url));
 const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-ClLISE_5.js"), true ? __vite__mapDeps([18,1,2,3,4,11]) : void 0, import.meta.url));
 const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-DkL1nwFO.js"), true ? __vite__mapDeps([19,1,2,3,4]) : void 0, import.meta.url));
-const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-BtL7C3fO.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
+const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-DtCdk4c_.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
 const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-BOtuwB57.js"), true ? __vite__mapDeps([21,1,2,3,4]) : void 0, import.meta.url));
-const DynamicPricing = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DynamicPricing-pIYuZsxl.js"), true ? __vite__mapDeps([22,1,2,23,3,4,24]) : void 0, import.meta.url));
+const DynamicPricing = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DynamicPricing-CGjBjSDW.js"), true ? __vite__mapDeps([22,1,2,23,3,4,24]) : void 0, import.meta.url));
 const DynamicPricingRuleForm = reactExports.lazy(
   () => __vitePreload(() => import("../../../dist/js/DynamicPricingRuleForm-Dg6kEVSu.js"), true ? __vite__mapDeps([25,1,2,3,4,23]) : void 0, import.meta.url)
 );
 const AiAssistant = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AiAssistant-Dvltmd3o.js"), true ? __vite__mapDeps([26,1,2,3,4,15]) : void 0, import.meta.url));
-const AbandonedRecovery = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AbandonedRecovery-rMedCeJ6.js"), true ? __vite__mapDeps([27,1,2,3,4,24]) : void 0, import.meta.url));
-const WhiteLabel = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/WhiteLabel-DGBv_X_H.js"), true ? __vite__mapDeps([28,1,2,3,4,15]) : void 0, import.meta.url));
+const AbandonedRecovery = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AbandonedRecovery-Bs6Jd6MW.js"), true ? __vite__mapDeps([27,1,2,3,4,24]) : void 0, import.meta.url));
+const WhiteLabel = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/WhiteLabel-y6Wb_vpi.js"), true ? __vite__mapDeps([28,1,2,3,4,15]) : void 0, import.meta.url));
 const PageLoadingFallback = () => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-1/3" }),
@@ -77851,33 +77880,36 @@ export {
   TableHead as a6,
   TableBody as a7,
   TableCell as a8,
-  clsx as a9,
-  Dot as aa,
-  findAllByType as ab,
-  ErrorBar as ac,
-  Layer as ad,
-  filterProps as ae,
-  Curve as af,
-  interpolateNumber$2 as ag,
-  isNil$1 as ah,
-  hasClipDot as ai,
-  LabelList as aj,
-  getValueByDataKey as ak,
-  uniqueId as al,
-  Global as am,
-  getCateCoordinateOfLine as an,
-  generateCategoricalChart as ao,
-  XAxis as ap,
-  YAxis as aq,
-  formatAxisMap as ar,
-  SearchFilterToolbar as as,
-  ResponsiveContainer as at,
-  CartesianGrid as au,
-  Tooltip as av,
-  DEFAULT_MENU_ITEMS as aw,
-  useWordPressMedia as ax,
-  MenuIcon as ay,
-  ICON_MAP as az,
+  Popover as a9,
+  useWordPressMedia as aA,
+  MenuIcon as aB,
+  ICON_MAP as aC,
+  PopoverTrigger as aa,
+  PopoverContent as ab,
+  clsx as ac,
+  Dot as ad,
+  findAllByType as ae,
+  ErrorBar as af,
+  Layer as ag,
+  filterProps as ah,
+  Curve as ai,
+  interpolateNumber$2 as aj,
+  isNil$1 as ak,
+  hasClipDot as al,
+  LabelList as am,
+  getValueByDataKey as an,
+  uniqueId as ao,
+  Global as ap,
+  getCateCoordinateOfLine as aq,
+  generateCategoricalChart as ar,
+  XAxis as as,
+  YAxis as at,
+  formatAxisMap as au,
+  SearchFilterToolbar as av,
+  ResponsiveContainer as aw,
+  CartesianGrid as ax,
+  Tooltip as ay,
+  DEFAULT_MENU_ITEMS as az,
   isAiReady as b,
   aiApi as c,
   CardContent as d,

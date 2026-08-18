@@ -1058,6 +1058,14 @@ class SettingsService
             'scheduled_payment_installments' => 1,
             'scheduled_payment_interval' => 30,
             'scheduled_payment_reminder_days' => 3,
+            // Anchor for the remaining-balance schedule:
+            //   'booking' (default, backward-compatible) → balance charged
+            //             scheduled_payment_days after the deposit.
+            //   'tour'    → balance charged/collected balance_due_days BEFORE the
+            //             tour start date, and bookings made within that window
+            //             must pay in full up front.
+            'balance_anchor' => 'booking',
+            'balance_due_days' => 14,
         ];
     }
 

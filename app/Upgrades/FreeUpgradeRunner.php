@@ -173,6 +173,10 @@ final class FreeUpgradeRunner
         // already moved past 3.0.5 by a failed upgrade attempt still heal.
         InstallerService::maybeAddPendingVerificationBookingStatus();
 
+        // Add the nullable `duration_hours` column to trips (hour-based tours).
+        // Additive + idempotent; existing trips get NULL and behave unchanged.
+        InstallerService::maybeAddTripDurationHoursColumn();
+
         // Widen reviews.status enum to accept 'spam' / 'trash' (and
         // recover rows previously coerced to ''). Called directly here
         // rather than relying on the version-chain in runAdminUpgrades()
