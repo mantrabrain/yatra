@@ -4,7 +4,7 @@ Tags: tour-booking, travel-booking, tour-operator, travel, travel-agency
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 3.0.14.1
+Stable tag: 3.0.14.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -280,6 +280,9 @@ Pricing starts at **$99/yr** (Starter, sale) and goes up to **$599/yr** (Scale 1
 == Changelog ==
 
 The two most recent releases are listed below. For the complete version history, see [changelog.txt](https://plugins.svn.wordpress.org/yatra/trunk/changelog.txt).
+
+= 3.0.14.2 — 31 August 2026 =
+* **Fresh installs now create the trips table correctly:** a semicolon inside a column comment broke the `wp_yatra_trips` table creation during dbDelta, so a brand-new install could end up without the trips table — the tour list and sample-data import then failed. Existing sites were unaffected; updating recreates the table automatically.
 
 = 3.0.14.1 — 31 August 2026 =
 * Declared compatibility with WordPress 7.1.

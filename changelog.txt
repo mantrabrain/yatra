@@ -4,6 +4,9 @@ Yatra — Complete Changelog
 The most recent releases are shown in the plugin readme (readme.txt).
 This file is the complete version history.
 
+= 3.0.14.2 — 31 August 2026 =
+* **Fresh installs now create the trips table correctly:** a semicolon inside a column comment broke the `wp_yatra_trips` table creation during dbDelta, so a brand-new install could end up without the trips table — the tour list and sample-data import then failed. Existing sites were unaffected; updating recreates the table automatically.
+
 = 3.0.14.1 — 31 August 2026 =
 * Declared compatibility with WordPress 7.1.
 
