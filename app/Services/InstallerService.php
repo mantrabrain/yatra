@@ -558,7 +558,7 @@ class InstallerService
             $wpdb->query(
                 'ALTER TABLE `' . esc_sql($table) . '` '
                 . "ADD COLUMN `duration_hours` smallint(5) UNSIGNED DEFAULT NULL "
-                . "COMMENT 'Duration in hours for hour-based (single-day) tours; NULL = day-based' "
+                . "COMMENT 'Duration in hours for hour-based single-day tours, NULL means day-based' "
                 . 'AFTER `duration_nights`'
             );
 
