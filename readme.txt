@@ -2,9 +2,9 @@
 Contributors: MantraBrain
 Tags: tour-booking, travel-booking, tour-operator, travel, travel-agency
 Requires at least: 6.0
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 3.0.14
+Stable tag: 3.0.14.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -280,6 +280,9 @@ Pricing starts at **$99/yr** (Starter, sale) and goes up to **$599/yr** (Scale 1
 == Changelog ==
 
 The two most recent releases are listed below. For the complete version history, see [changelog.txt](https://plugins.svn.wordpress.org/yatra/trunk/changelog.txt).
+
+= 3.0.14.1 — 31 August 2026 =
+* Declared compatibility with WordPress 7.1.
 
 = 3.0.14 — 31 August 2026 =
 _With thanks to [Vista-Tours](https://vista-tours.de) for extensive beta testing and the detailed feedback behind many of the fixes in this release._
