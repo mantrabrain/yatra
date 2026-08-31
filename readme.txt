@@ -4,7 +4,7 @@ Tags: tour-booking, travel-booking, tour-operator, travel, travel-agency
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 3.0.13
+Stable tag: 3.0.14
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -280,6 +280,21 @@ Pricing starts at **$99/yr** (Starter, sale) and goes up to **$599/yr** (Scale 1
 == Changelog ==
 
 The two most recent releases are listed below. For the complete version history, see [changelog.txt](https://plugins.svn.wordpress.org/yatra/trunk/changelog.txt).
+
+= 3.0.14 — 31 August 2026 =
+_With thanks to [Vista-Tours](https://vista-tours.de) for extensive beta testing and the detailed feedback behind many of the fixes in this release._
+
+* **Resend booking and payment emails by hand:** administrators can now re-send a booking's confirmation, payment, cancellation, reminder and completed emails — and the admin copies — from the booking view, after a manual change or when an automated email failed to arrive.
+* **Set a day tour's length in hours:** a single-day trip can carry a duration in hours (for example an 8-hour experience). The tour then shows its length in hours, and — with Yatra Pro — Google Calendar creates a same-day timed event of that length instead of an all-day, multi-day one.
+* **Dashboard capacity and occupancy match the Departures page:** the dashboard now reads capacity from your Availability configuration, exactly like Departures, so the two no longer disagree. Legacy "unlimited" capacity markers left on old departures are normalised, and a fully-booked upcoming tour stays visible on the dashboard instead of dropping out of the list.
+* **Star rating on the booking confirmation shows the right colour:** the rating stars rendered all grey on the confirmation page because a stylesheet was not loaded there; the correct colours are now applied.
+* **Cancelling a gateway payment returns to a working page:** cancelling PayPal (or any gateway) under a custom booking page led to a 404. Cancel and failure now land on the booking-confirmation page with a clear "payment not completed" notice.
+* **Offline gateways are never auto-completed:** Bank Transfer and Pay Later bookings could be marked paid automatically; they now stay pending until you confirm the payment by hand.
+* **Correct decimal separator in payment amounts:** amounts formatted wrongly on some European browsers; currency now formats consistently from your store settings. Invoices also use the booking reference as the invoice number.
+* **Completed (past) departures stay visible** in the tour list and the Past tab, independent of when the daily maintenance runs; **bulk-deleting departures** works from the all-tours view; and a new optional **date filter** in trip search and listings lets visitors find tours available on or after a chosen date.
+* **Changing a booking's tour moves its departure with it,** releasing the seat from the old departure and reserving it on the new one.
+* **Global "Always BCC" address can be saved:** the field under Settings → Email accepted an address but never stored it. It now saves, and accepts several comma-separated addresses.
+* **The email template list opens on the Active view,** so disabled or unused templates stay decluttered out of sight; the All and Inactive tabs remain available to review or re-enable them.
 
 = 3.0.13 — 21 July 2026 =
 * **Star ratings now match the number shown:** a 4.9 average drew four-and-a-half stars beside the printed "4.9". Ratings round to the nearest half star everywhere — trip pages, the reviews block, listing cards and the booking confirmation all draw the same rating identically.
