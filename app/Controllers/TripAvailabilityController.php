@@ -637,9 +637,28 @@ class TripAvailabilityController extends BaseController
                 // Sync capacity from availability before returning
                 $date = $d->start_date ?: $d->date;
                 $correctCapacity = $capacityService->getCapacityForDate($d->trip_id, $date, $d->time ?? null);
-                if ($correctCapacity > 0 && $d->max_capacity !== $correctCapacity) {
-                    $departureRepo->update($d->id, ['max_capacity' => $correctCapacity]);
-                    $d->max_capacity = $correctCapacity;
+                if ($correctCapacity > 0) {
+                    if ((int) $d->max_capacity !== $correctCapacity) {
+                        $departureRepo->update($d->id, ['max_capacity' => $correctCapacity]);
+                        $d->max_capacity = $correctCapacity;
+                    }
+                } elseif ((int) $d->max_capacity >= 9999) {
+                    // Normalise a legacy "unlimited"/junk capacity sentinel (e.g.
+                    // 9999/11111) to the canonical unlimited value 0, so it isn't
+                    // shown as a huge literal number here while the dashboard renders
+                    // >= 9999 as 0 — the two disagreeing on capacity and occupancy.
+                    //
+                    // Deliberately heal to 0 (NOT the trip's max_travelers): 0 means
+                    // "unlimited" to both the capacity guard (incrementBookedCount)
+                    // and Departure::calculateStatus(), so healing can never flip an
+                    // already (over-)booked departure to 'full' — which capping to a
+                    // smaller number would, and 'full' departures drop out of the
+                    // dashboard's upcoming view. This keeps the sentinel's original
+                    // "unlimited" meaning while making both surfaces agree.
+                    if ((int) $d->max_capacity !== 0) {
+                        $departureRepo->update($d->id, ['max_capacity' => 0]);
+                        $d->max_capacity = 0;
+                    }
                 }
 
                 // Promote a departure that has taken place to 'past' so a completed

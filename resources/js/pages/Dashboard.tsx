@@ -396,14 +396,22 @@ const Dashboard: React.FC = () => {
     queryFn: async () => {
       const today = new Date();
       const todayStr = formatDateForInput(today);
+      // Fetch all FUTURE departures, not only status === "upcoming". A departure
+      // that a booking has filled flips to status "full" (booked >= capacity),
+      // and a single group-of-x booking fills a small/private departure in one
+      // go — so filtering to "upcoming" here silently dropped fully-booked
+      // upcoming tours from the dashboard while partially-booked ones stayed. We
+      // keep upcoming + full (a full trip is still an upcoming trip, just sold
+      // out) and exclude only cancelled/trash/past.
       const response = await apiClient.get("/departures", {
         params: {
-          status: "upcoming",
           date_from: todayStr,
           include_past: false,
         },
       });
-      const items = response?.data || [];
+      const items = (response?.data || []).filter(
+        (d: any) => d?.status === "upcoming" || d?.status === "full",
+      );
       return items.map((d: any) => {
         const tripTitle = d?.trip?.title || d?.trip_title || d?.title || "";
         const destination =

@@ -876,8 +876,15 @@ class BookingService
                 $endDate = $booking->end_date ?? $this->calculateEndDate($startDate, (int) $booking->trip_id);
                 
                 $trip = $this->tripRepository->find((int) $booking->trip_id);
-                $maxCapacity = $trip ? ($trip->max_capacity ?? 9999) : 9999;
-                
+                // Resolve capacity from the trip's real column (`max_travelers`).
+                // The old `$trip->max_capacity` does not exist on the trips table,
+                // so this always fell back to 9999 — seeding a junk "unlimited"
+                // sentinel that then showed as a huge number on the Departures page
+                // but as 0 on the dashboard. Pass null when unset so
+                // findOrCreateForBooking resolves via Availability, then its own
+                // trip-default fallback, exactly like the primary creation path.
+                $maxCapacity = ($trip && !empty($trip->max_travelers)) ? (int) $trip->max_travelers : null;
+
                 $departure = $this->departureService->findOrCreateForBooking(
                     (int) $booking->trip_id,
                     $startDate,

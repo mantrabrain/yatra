@@ -26941,12 +26941,13 @@ const Dashboard = () => {
       const todayStr = formatDateForInput(today);
       const response = await apiClient.get("/departures", {
         params: {
-          status: "upcoming",
           date_from: todayStr,
           include_past: false
         }
       });
-      const items = (response == null ? void 0 : response.data) || [];
+      const items = ((response == null ? void 0 : response.data) || []).filter(
+        (d) => (d == null ? void 0 : d.status) === "upcoming" || (d == null ? void 0 : d.status) === "full"
+      );
       return items.map((d) => {
         var _a2, _b2, _c2, _d2;
         const tripTitle = ((_a2 = d == null ? void 0 : d.trip) == null ? void 0 : _a2.title) || (d == null ? void 0 : d.trip_title) || (d == null ? void 0 : d.title) || "";
@@ -70457,6 +70458,7 @@ const EMAIL_KEYS = [
   "admin_email",
   "from_email",
   "from_name",
+  "email_always_bcc",
   "email_template_booking",
   "email_template_confirmation",
   "email_template_cancellation",
@@ -70575,6 +70577,7 @@ const EMAIL_SETTINGS_DEFAULTS = {
   admin_email: "admin@wpyatra.com",
   from_email: "noreply@wpyatra.com",
   from_name: "Yatra Travel",
+  email_always_bcc: "",
   email_template_booking: true,
   email_template_confirmation: true,
   email_template_cancellation: true,
@@ -71772,7 +71775,7 @@ const EmailTemplatesList = ({
   const [categoryFilter, setCategoryFilter] = reactExports.useState("all");
   const [recipientFilter, setRecipientFilter] = reactExports.useState("all");
   const [eventFilter, setEventFilter] = reactExports.useState("all");
-  const [statusFilter, setStatusFilter] = reactExports.useState("all");
+  const [statusFilter, setStatusFilter] = reactExports.useState("active");
   const [showColumnsDropdown, setShowColumnsDropdown] = reactExports.useState(false);
   const [selectedIds, setSelectedIds] = reactExports.useState([]);
   const [bulkAction, setBulkAction] = reactExports.useState("");

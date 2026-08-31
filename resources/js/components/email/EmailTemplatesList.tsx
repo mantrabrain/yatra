@@ -156,7 +156,10 @@ export const EmailTemplatesList: React.FC<EmailTemplatesListProps> = ({
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [recipientFilter, setRecipientFilter] = useState("all");
   const [eventFilter, setEventFilter] = useState("all");
-  const [statusFilter, setStatusFilter] = useState("all");
+  // Default to the "Active" view so the list shows only in-use templates and
+  // disabled/unused system templates stay decluttered out of sight. The "All"
+  // and "Inactive" tabs remain one click away to review or re-enable them.
+  const [statusFilter, setStatusFilter] = useState("active");
   const [showColumnsDropdown, setShowColumnsDropdown] = useState(false);
   const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
   const [bulkAction, setBulkAction] = useState("");

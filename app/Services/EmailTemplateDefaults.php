@@ -133,6 +133,10 @@ final class EmailTemplateDefaults
                 'subject' => '📋 Booking cancelled · {{booking_reference}}',
                 'body' => self::htmlCancellationCustomer(),
             ],
+            'admin_booking_cancelled' => [
+                'subject' => '📋 Booking cancelled · {{booking_reference}} (#{{booking_id}})',
+                'body' => self::htmlAdminBookingCancelled(),
+            ],
             'booking_completed' => [
                 'subject' => '🌟 Thanks for traveling with us · {{booking_reference}}',
                 'body' => self::htmlTripCompleted(),
@@ -140,6 +144,10 @@ final class EmailTemplateDefaults
             'payment_received' => [
                 'subject' => '✅ Payment received · {{booking_reference}}',
                 'body' => self::htmlPaymentCustomer(),
+            ],
+            'admin_payment_received' => [
+                'subject' => '✅ Payment received · {{booking_reference}} (#{{booking_id}})',
+                'body' => self::htmlAdminPaymentReceived(),
             ],
             'partial_payment_received' => [
                 'subject' => '💳 Part payment received · {{booking_reference}}',
