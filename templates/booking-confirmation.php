@@ -244,16 +244,33 @@ do_action('yatra_booking_confirmation_header', $booking);
                         // stylesheet (and risk restyling it) the rating rules are
                         // scoped inline here, mirroring assets/css/booking.css.
                         ?>
+                        <?php
+                        // IMPORTANT: these rules are deliberately scoped to
+                        // `.yatra-trip-rating .yatra-rating-stars .yatra-star*`
+                        // (specificity 0,3,0 / 0,4,1) and set `fill` directly on
+                        // the SVG — NOT just `color` + `fill="currentColor"`.
+                        // trip.css / booking.css define `.yatra-rating-stars
+                        // .yatra-star { color:#d1d5db }` (0,2,0) and colour the
+                        // "filled" state with a `.filled` (dot) class, not the
+                        // `-filled` (hyphen) class this markup uses. If either
+                        // stylesheet is present on the confirmation page, its
+                        // grey base out-specifies a plain `.yatra-star-filled`
+                        // and its amber rule never matches — so every star showed
+                        // grey even at 4.8. Winning on specificity + an explicit
+                        // fill makes the amber stick regardless of what's loaded.
+                        ?>
                         <style>
                         .yatra-trip-rating{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-                        .yatra-rating-stars{display:inline-flex;gap:4px}
-                        .yatra-star{width:20px;height:20px;color:#e2e8f0}
-                        .yatra-star svg{width:100%;height:100%}
-                        .yatra-star-filled{color:#f59e0b}
-                        .yatra-star-half{position:relative;color:#e2e8f0}
-                        .yatra-star-half::after{content:"";position:absolute;top:0;left:0;bottom:0;width:50%;overflow:hidden;background:#f59e0b;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpolygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26'/%3E%3C/svg%3E") no-repeat left center / 200% 100%;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpolygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26'/%3E%3C/svg%3E") no-repeat left center / 200% 100%}
-                        .yatra-rating-meta strong{color:#0f172a;margin-right:6px}
-                        .yatra-rating-meta span{color:#64748b;font-size:14px}
+                        .yatra-trip-rating .yatra-rating-stars{display:inline-flex;gap:4px}
+                        .yatra-trip-rating .yatra-rating-stars .yatra-star{width:20px;height:20px;color:#e2e8f0;font-size:0;line-height:0}
+                        .yatra-trip-rating .yatra-rating-stars .yatra-star svg{width:100%;height:100%;display:block;fill:currentColor}
+                        .yatra-trip-rating .yatra-rating-stars .yatra-star-filled{color:#f59e0b}
+                        .yatra-trip-rating .yatra-rating-stars .yatra-star-filled svg{fill:#f59e0b}
+                        .yatra-trip-rating .yatra-rating-stars .yatra-star-half{position:relative;color:#e2e8f0}
+                        .yatra-trip-rating .yatra-rating-stars .yatra-star-half svg{fill:#e2e8f0}
+                        .yatra-trip-rating .yatra-rating-stars .yatra-star-half::after{content:"";position:absolute;top:0;left:0;bottom:0;width:50%;overflow:hidden;background:#f59e0b;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpolygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26'/%3E%3C/svg%3E") no-repeat left center / 200% 100%;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpolygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26'/%3E%3C/svg%3E") no-repeat left center / 200% 100%}
+                        .yatra-trip-rating .yatra-rating-meta strong{color:#0f172a;margin-right:6px}
+                        .yatra-trip-rating .yatra-rating-meta span{color:#64748b;font-size:14px}
                         </style>
                         <div class="yatra-trip-rating">
                             <div class="yatra-rating-stars">
