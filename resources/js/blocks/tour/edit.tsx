@@ -20,6 +20,7 @@ interface TourBlockAttributes {
   columns: number;
   title: string;
   show_pagination: boolean;
+  cardLayout: "inherit" | "standard" | "compact_mobile" | "compact_all";
   destinationIds: number[];
   activityIds: number[];
   categoryIds: number[];
@@ -206,6 +207,31 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
             label={__("Show pagination", "yatra")}
             checked={attributes.show_pagination}
             onChange={(value) => setAttributes({ show_pagination: value })}
+          />
+          <SelectControl
+            label={__("Card layout", "yatra")}
+            help={__(
+              "Override the site-wide Listing Card Layout (Settings → Design) for this block only. Compact shows a denser image + title + price + View Details card.",
+              "yatra",
+            )}
+            value={attributes.cardLayout || "inherit"}
+            options={[
+              { label: __("Use site default", "yatra"), value: "inherit" },
+              { label: __("Standard", "yatra"), value: "standard" },
+              {
+                label: __("Compact (mobile only)", "yatra"),
+                value: "compact_mobile",
+              },
+              {
+                label: __("Compact (everywhere)", "yatra"),
+                value: "compact_all",
+              },
+            ]}
+            onChange={(value: string) =>
+              setAttributes({
+                cardLayout: value as TourBlockAttributes["cardLayout"],
+              })
+            }
           />
         </PanelBody>
         <PanelBody title={__("Filters", "yatra")} initialOpen={false}>

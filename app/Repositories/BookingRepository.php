@@ -265,6 +265,12 @@ class BookingRepository extends BaseRepository
              t.starting_location, t.ending_location"
         ];
 
+        // Hour-based day tours (3.0.14+ column) — guarded so an install whose
+        // upgrade ALTER has not run yet keeps rendering the confirmation page.
+        if ($tripRepository->hasTripColumn('duration_hours')) {
+            $selectParts[] = 't.duration_hours';
+        }
+
         $joins[] = "LEFT JOIN {$tripClassificationTable} tc ON tc.trip_id = t.id";
         $joins[] = "LEFT JOIN {$classificationTable} cls ON cls.id = tc.classification_id";
         $selectParts[] = "GROUP_CONCAT(DISTINCT cls.name ORDER BY tc.`sort_order` SEPARATOR ',') as trip_classifications";
@@ -748,11 +754,22 @@ class BookingRepository extends BaseRepository
         $tripRepository = new \Yatra\Repositories\TripRepository();
         $tripsTable = $tripRepository->getTableName();
 
+        // Confirmed bookings, plus PENDING bookings that have paid something
+        // (a deposit). Under the Auto-Confirm `online` mode a deposit booking
+        // legitimately stays pending until the balance is paid; those customers
+        // are real travellers and must still get the pre-trip reminder — which
+        // already carries the "outstanding balance, please pay before travel"
+        // block for exactly this case. Unpaid pending bookings stay excluded.
+        //
+        // No `t.currency`: the trips table has never had that column, so the
+        // previous SELECT threw "Unknown column" — get_results() then returned
+        // nothing and the reminder cron silently sent zero emails. The booking's
+        // own currency arrives via b.* (and is no longer clobbered by the join).
         return $this->wpdb->get_results($this->wpdb->prepare(
-            "SELECT b.*, t.title as trip_title, t.currency
+            "SELECT b.*, t.title as trip_title
              FROM {$table} b
              LEFT JOIN {$tripsTable} t ON b.trip_id = t.id
-             WHERE b.status = 'confirmed'
+             WHERE (b.status = 'confirmed' OR (b.status = 'pending' AND b.amount_paid > 0))
              AND b.travel_date = %s
              AND b.reminder_sent = 0",
             $travelDate
@@ -833,18 +850,42 @@ class BookingRepository extends BaseRepository
      * @param string $expiryThreshold Datetime threshold
      * @return array
      */
-    public function getExpiredPendingBookings(string $expiryThreshold): array
+    /**
+     * Unpaid bookings past the expiry threshold.
+     *
+     * @param string $expiryThreshold Bookings created before this are expired.
+     * @param string $createdSince    Activation floor: when set, bookings created
+     *                                before it are never expired. Keeps a site
+     *                                that switches the feature on from
+     *                                retroactively cancelling (and emailing about)
+     *                                its historical pending bookings.
+     * @param int    $limit           Batch size. The sweep emails each customer,
+     *                                so an unbounded run could try to send
+     *                                hundreds of emails in one cron request and
+     *                                time out half-way. It runs hourly, so a
+     *                                backlog simply drains over the next runs.
+     * @return array<int, object>
+     */
+    public function getExpiredPendingBookings(string $expiryThreshold, string $createdSince = '', int $limit = 200): array
     {
         $table = $this->getTableName();
 
-        return $this->wpdb->get_results($this->wpdb->prepare(
-            "SELECT id, reference, contact_email, contact_first_name, contact_last_name, trip_id
-             FROM {$table}
-             WHERE status = 'pending'
-             AND payment_status = 'pending'
-             AND created_at < %s",
-            $expiryThreshold
-        ));
+        $sql = "SELECT id, reference, contact_email, contact_first_name, contact_last_name, trip_id
+                FROM {$table}
+                WHERE status = 'pending'
+                AND payment_status = 'pending'
+                AND created_at < %s";
+        $params = [$expiryThreshold];
+
+        if ($createdSince !== '') {
+            $sql .= ' AND created_at >= %s';
+            $params[] = $createdSince;
+        }
+
+        $sql .= ' ORDER BY created_at ASC LIMIT %d';
+        $params[] = max(1, $limit);
+
+        return $this->wpdb->get_results($this->wpdb->prepare($sql, $params));
     }
 
     /**

@@ -676,6 +676,11 @@ class BookingService
                 && function_exists('yatra_trigger_booking_confirmed')) {
                 yatra_trigger_booking_confirmed($id, $oldStatus);
             }
+
+            if ($newStatus === 'cancelled' && $oldStatus !== 'cancelled'
+                && function_exists('yatra_trigger_booking_cancelled')) {
+                yatra_trigger_booking_cancelled($id, $oldStatus);
+            }
         }
 
         // Return the fresh booking so the REST controller's `$result['data']`
@@ -916,6 +921,10 @@ class BookingService
 
         if ($status === 'confirmed' && $oldStatus !== 'confirmed') {
             \yatra_trigger_booking_confirmed($id, $oldStatus);
+        }
+
+        if ($status === 'cancelled' && $oldStatus !== 'cancelled') {
+            \yatra_trigger_booking_cancelled($id, $oldStatus);
         }
 
         return [
@@ -1254,8 +1263,37 @@ class BookingService
     }
 
     /**
+     * Send the "your booking has been confirmed" transactional email.
+     *
+     * Shared by the manual / programmatic status-change path ({@see updateStatus()}
+     * → sendStatusChangeNotification()) and the asynchronous payment-completion
+     * paths (via {@see yatra_trigger_booking_confirmed()}), which set a booking to
+     * `confirmed` with a direct DB write and never pass through updateStatus().
+     * Gated by the template's enabled flag (`sendIfEnabled`).
+     *
+     * @param int $bookingId Booking ID.
+     */
+    public function sendBookingConfirmedEmail(int $bookingId): void
+    {
+        $booking = $this->bookingRepository->findWithTrip($bookingId);
+
+        if (!$booking || empty($booking->contact_email)) {
+            return;
+        }
+
+        $vars = TransactionalEmailTemplateService::variablesFromBooking($booking);
+        $vars['intro_paragraph'] = __('Your booking has been confirmed! Here are your details:', 'yatra');
+        $vars['transactional_context'] = 'status_confirmed';
+        TransactionalEmailTemplateService::sendIfEnabled(
+            TransactionalEmailTemplateService::TYPE_BOOKING_CONFIRMATION,
+            $booking->contact_email,
+            $vars
+        );
+    }
+
+    /**
      * Send status change notification
-     * 
+     *
      * @param int    $bookingId Booking ID
      * @param string $oldStatus Previous status
      * @param string $newStatus New status
@@ -1288,14 +1326,7 @@ class BookingService
         }
 
         if ($newStatus === 'confirmed') {
-            $vars = TransactionalEmailTemplateService::variablesFromBooking($booking);
-            $vars['intro_paragraph'] = __('Your booking has been confirmed! Here are your details:', 'yatra');
-            $vars['transactional_context'] = 'status_confirmed';
-            TransactionalEmailTemplateService::sendIfEnabled(
-                TransactionalEmailTemplateService::TYPE_BOOKING_CONFIRMATION,
-                $booking->contact_email,
-                $vars
-            );
+            $this->sendBookingConfirmedEmail($bookingId);
 
             return;
         }
@@ -1381,7 +1412,17 @@ class BookingService
 
         switch ($emailType) {
             case 'confirmation':
-                $this->sendBookingConfirmationEmail($bookingId);
+                // Resend the email that matches the booking's CURRENT state so it
+                // is identical to the automated one. A confirmed booking gets the
+                // "booking confirmed" email (status_confirmed context → the
+                // `booking_confirmed` / booking.confirmed template); anything
+                // still pending gets the initial "booking received" email
+                // (booking_created context → the `booking_confirmation` template).
+                if ((string) ($booking->status ?? '') === 'confirmed') {
+                    $this->sendBookingConfirmedEmail($bookingId);
+                } else {
+                    $this->sendBookingConfirmationEmail($bookingId);
+                }
                 break;
 
             case 'reminder':

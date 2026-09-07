@@ -1306,10 +1306,21 @@ function yatra_has_booking_session(): bool
  * on this dedicated action. Call this after any code path that sets a booking to `confirmed` without
  * going through {@see \Yatra\Services\BookingService::updateStatus()}.
  *
- * @param int    $bookingId       Booking ID.
- * @param string $previousStatus  Booking status in the database immediately before confirming.
+ * Async payment-completion paths (gateway webhooks / return handlers, scheduled
+ * payments) confirm the booking with a direct DB write, bypassing
+ * updateStatus(). Pass $fromDirectConfirm = true from those paths so this
+ * function replicates the customer-facing side effects updateStatus() would
+ * have run — the "booking confirmed" email AND the `yatra_booking_status_changed`
+ * action that status-based listeners (Pro Email Automation, cache invalidation,
+ * inventory sync) rely on. The manual / checkout / waitlist paths leave it false
+ * because they already run those side effects themselves; passing true there
+ * would double-fire them.
+ *
+ * @param int    $bookingId        Booking ID.
+ * @param string $previousStatus   Booking status in the database immediately before confirming.
+ * @param bool   $fromDirectConfirm True for confirmations that bypassed updateStatus().
  */
-function yatra_trigger_booking_confirmed(int $bookingId, string $previousStatus): void
+function yatra_trigger_booking_confirmed(int $bookingId, string $previousStatus, bool $fromDirectConfirm = false): void
 {
     if ($bookingId < 1 || $previousStatus === 'confirmed') {
         return;
@@ -1322,6 +1333,15 @@ function yatra_trigger_booking_confirmed(int $bookingId, string $previousStatus)
         return;
     }
 
+    if ($fromDirectConfirm) {
+        // Mirror BookingService::updateStatus(): send the confirmation email and
+        // fire the generic status-change action for status-based listeners. Only
+        // async/direct confirms reach here with true — the manual, checkout and
+        // waitlist paths fire these themselves, so this never double-fires.
+        (new \Yatra\Services\BookingService())->sendBookingConfirmedEmail($bookingId);
+        do_action('yatra_booking_status_changed', $bookingId, $previousStatus, 'confirmed');
+    }
+
     /**
      * Booking reached confirmed status (was not confirmed before this transition).
      *
@@ -1332,14 +1352,147 @@ function yatra_trigger_booking_confirmed(int $bookingId, string $previousStatus)
 }
 
 /**
+ * Fire `yatra_booking_cancelled` for a booking that has just been cancelled.
+ *
+ * The action is documented and listened to (Google Calendar removes its event,
+ * the Pro webhook `booking.cancelled` and the WhatsApp cancellation template are
+ * bound to it) but nothing in the plugin ever fired it: only Channel Manager's
+ * OTA ingest did, so an in-app cancellation reached none of those listeners.
+ *
+ * Call it from the specific transition sites — not from a global
+ * `yatra_booking_status_changed` listener — so the OTA path, which already
+ * fires this action itself, cannot double-fire.
+ *
+ * @param int    $bookingId      Booking ID.
+ * @param string $previousStatus Status before the transition.
+ */
+function yatra_trigger_booking_cancelled(int $bookingId, string $previousStatus): void
+{
+    if ($bookingId < 1 || $previousStatus === 'cancelled') {
+        return;
+    }
+
+    $repo = new \Yatra\Repositories\BookingRepository();
+    $booking = $repo->findWithTrip($bookingId);
+
+    // Only announce a cancellation that actually stuck.
+    if (!$booking || ($booking->status ?? '') !== 'cancelled') {
+        return;
+    }
+
+    /**
+     * Booking reached cancelled status (was not cancelled before this transition).
+     *
+     * @param int    $bookingId Booking ID.
+     * @param object $booking   Row from {@see \Yatra\Repositories\BookingRepository::findWithTrip()}.
+     */
+    do_action('yatra_booking_cancelled', $bookingId, $booking);
+}
+
+/**
+ * Resolve the "Auto-Confirm Bookings" mode.
+ *
+ * Modes:
+ *   - 'none'   — never auto-confirm; every booking stays pending for manual review.
+ *   - 'online' — auto-confirm only when a successful ONLINE gateway payment
+ *                (Stripe, PayPal, Razorpay, …) settles the balance in full.
+ *                Deposits / partial payments and offline methods (bank transfer,
+ *                pay-later) stay pending.
+ *   - 'all'    — auto-confirm every booking at checkout, paid or not.
+ *
+ * No migration is stored: the value is resolved on the fly. When the operator
+ * has never chosen a mode (no `yatra_auto_confirm_mode` option), we derive it
+ * from the legacy boolean `auto_confirm_bookings` so each site keeps its ACTUAL
+ * behaviour from the released (buggy) version:
+ *   - true  → 'all'    (it confirmed every booking at checkout)
+ *   - false → 'online' (online payments auto-confirmed anyway — that was the
+ *                        bug — while offline methods stayed pending)
+ * The first time the operator saves the setting, the chosen mode is stored and
+ * becomes authoritative. New installs default to 'online' (see the default in
+ * SettingsController / SettingsService).
+ *
+ * @return string One of: none | online | all.
+ */
+function yatra_get_auto_confirm_mode(): string
+{
+    $raw = get_option('yatra_auto_confirm_mode', null);
+    if (is_string($raw)) {
+        $mode = strtolower(trim($raw));
+        if (in_array($mode, ['none', 'online', 'all'], true)) {
+            return $mode;
+        }
+    }
+
+    // Never configured: preserve the site's experienced behaviour.
+    return \Yatra\Services\SettingsService::isEnabled('auto_confirm_bookings') ? 'all' : 'online';
+}
+
+/**
+ * How far ahead (in months) the storefront lets customers see and book dates.
+ *
+ * Reads `availability_horizon_months` (Settings → Booking). The default, 12, is
+ * the value that was hard-coded before it became configurable, so a site that
+ * never touches the setting behaves exactly as before. Anything outside 1–36
+ * falls back to 12 rather than blanking the calendar. Callers that pass their
+ * own explicit date range (REST `to_date`, the OTA inventory sync, admin
+ * previews) are not affected by this at all.
+ *
+ * Developers can adjust the horizon per request:
+ *
+ *   add_filter('yatra_availability_horizon_months', fn($m) => is_page('summer') ? 6 : $m);
+ *
+ * @return int Months, 1–36.
+ */
+function yatra_get_availability_horizon_months(): int
+{
+    $months = (int) \Yatra\Services\SettingsService::getInt('availability_horizon_months', 12);
+    if ($months < 1 || $months > 36) {
+        $months = 12;
+    }
+
+    /**
+     * Filter the storefront booking horizon.
+     *
+     * @param int $months Horizon in months (1–36).
+     */
+    $filtered = (int) apply_filters('yatra_availability_horizon_months', $months);
+
+    return ($filtered < 1 || $filtered > 36) ? $months : $filtered;
+}
+
+/**
+ * The last date (Y-m-d) the storefront offers: the start date plus the horizon.
+ *
+ * Mirrors the `date('Y-m-d', strtotime('+12 months'))` expression the callers
+ * used before, so with the default setting the result is byte-identical.
+ *
+ * @param string|null $fromDate Start date (Y-m-d). Defaults to today.
+ * @return string Y-m-d.
+ */
+function yatra_get_availability_horizon_date(?string $fromDate = null): string
+{
+    $base = ($fromDate !== null && $fromDate !== '' && strtotime($fromDate) !== false)
+        ? (int) strtotime($fromDate)
+        : time();
+    $ts = strtotime('+' . yatra_get_availability_horizon_months() . ' months', $base);
+
+    return date('Y-m-d', $ts !== false ? $ts : (int) strtotime('+12 months', $base));
+}
+
+/**
  * Decide whether a successful payment should auto-confirm the booking.
  *
- * A booking auto-confirms on payment only when the operator has enabled
- * "Auto-Confirm Bookings", OR the booking is now fully paid. A deposit /
- * partial payment must NOT confirm the booking while auto-confirm is off — the
- * operator confirms it manually. Previously the synchronous-gateway, Stripe and
- * PayPal completion paths force-confirmed on any payment, so deposit bookings
- * were confirmed immediately regardless of the setting.
+ * This runs on the ONLINE payment-completion path. It confirms when the
+ * "Auto-Confirm Bookings" mode is 'all', or when the mode is 'online' AND the
+ * payment settles the balance in full ($fullyPaid). Mode 'none' — and an
+ * 'online' deposit / partial payment — leaves the booking `pending`.
+ *
+ * The $fullyPaid flag is still passed to the `yatra_confirm_booking_on_payment`
+ * filter so an operator who wants the older "confirm once fully paid" behaviour
+ * can opt back in without touching core:
+ *
+ *   add_filter('yatra_confirm_booking_on_payment',
+ *       function ($shouldConfirm, $fullyPaid) { return $shouldConfirm || $fullyPaid; }, 10, 2);
  *
  * @param bool $fullyPaid Whether the booking's balance is now zero.
  * @param int  $bookingId Booking ID (passed to the filter for context).
@@ -1347,18 +1500,95 @@ function yatra_trigger_booking_confirmed(int $bookingId, string $previousStatus)
  */
 function yatra_should_confirm_booking_on_payment(bool $fullyPaid, int $bookingId = 0): bool
 {
-    $autoConfirm = (bool) \Yatra\Services\SettingsService::isEnabled('auto_confirm_bookings');
-    $shouldConfirm = $autoConfirm || $fullyPaid;
+    $mode = yatra_get_auto_confirm_mode();
+    //   'all'    -> always confirm on a successful payment.
+    //   'online' -> confirm only when the payment settles the balance in full;
+    //               a deposit / partial online payment leaves it pending until
+    //               the balance is paid.
+    //   'none'   -> never.
+    $shouldConfirm = ($mode === 'all') || ($mode === 'online' && $fullyPaid);
+    // Backward compatibility for the filter's 4th argument: since 3.0.10 it has
+    // been the old on/off toggle's value. The toggle maps on → 'all' and
+    // off → 'online', so only 'all' may report true here — a legacy-off site
+    // (now 'online') must keep handing existing callbacks `false`. Read the
+    // full mode with yatra_get_auto_confirm_mode() instead of this flag.
+    $autoConfirm = ($mode === 'all');
 
     /**
      * Filter whether a completed payment auto-confirms the booking.
      *
-     * @param bool $shouldConfirm Default: auto-confirm setting is on OR fully paid.
+     * @param bool $shouldConfirm Default: true for mode 'all', or mode 'online' when $fullyPaid.
      * @param bool $fullyPaid     Whether the balance is now zero.
      * @param int  $bookingId     Booking ID.
-     * @param bool $autoConfirm   The `auto_confirm_bookings` setting value.
+     * @param bool $autoConfirm   The old on/off toggle's value — true only for mode
+     *                            'all' (unchanged meaning for callbacks written
+     *                            against 3.0.10–3.0.14). Use yatra_get_auto_confirm_mode()
+     *                            to distinguish 'online' from 'none'.
      */
     return (bool) apply_filters('yatra_confirm_booking_on_payment', $shouldConfirm, $fullyPaid, $bookingId, $autoConfirm);
+}
+
+/**
+ * Determine whether a `yatra_payment_completed` payment settled the balance in
+ * full, from the raw action args.
+ *
+ * `yatra_payment_completed` fires with either an array payload carrying
+ * `booking_id`, or the ($bookingId, $gateway, $txnId, $array) signature — so we
+ * sniff the id out of the args, then read the booking's current `amount_due`.
+ * Uses the same `amount_due <= 0` test as the transactional payment email and
+ * the Email Automation event, so every channel agrees on partial vs full.
+ *
+ * @param array<int, mixed> $hookArgs Raw args the action passed.
+ * @return bool|null True = paid in full, false = partial/deposit, null = unknown.
+ */
+function yatra_payment_completed_is_full(array $hookArgs): ?bool
+{
+    $bookingId = 0;
+    foreach ($hookArgs as $a) {
+        if (is_array($a) && (int) ($a['booking_id'] ?? 0) > 0) {
+            $bookingId = (int) $a['booking_id'];
+            break;
+        }
+        if ($bookingId === 0 && is_numeric($a)) {
+            $bookingId = (int) $a;
+        }
+    }
+
+    if ($bookingId < 1) {
+        return null;
+    }
+
+    $booking = (new \Yatra\Repositories\BookingRepository())->find($bookingId);
+    if (!$booking) {
+        return null;
+    }
+
+    return (float) ($booking->amount_due ?? 0) <= 0;
+}
+
+/**
+ * Gate for the split payment events (`payment.received` = full,
+ * `payment.partial_received` = deposit) which both bind to
+ * `yatra_payment_completed`. Returns true when the given event should be
+ * delivered for this payment, so notification dispatchers (webhooks, WhatsApp)
+ * fire only the matching one. Non-payment events are never gated.
+ *
+ * @param array<int, mixed> $hookArgs Raw args the action passed.
+ */
+function yatra_payment_event_applies(string $eventKey, array $hookArgs): bool
+{
+    if ($eventKey !== 'payment.received' && $eventKey !== 'payment.partial_received') {
+        return true;
+    }
+
+    $isFull = yatra_payment_completed_is_full($hookArgs);
+    if ($isFull === null) {
+        // Can't determine the balance — deliver the "received" (full) event and
+        // suppress the partial one, matching the historical default.
+        $isFull = true;
+    }
+
+    return $eventKey === 'payment.received' ? $isFull : !$isFull;
 }
 
 /**

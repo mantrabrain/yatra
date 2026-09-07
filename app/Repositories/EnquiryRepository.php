@@ -398,9 +398,12 @@ class EnquiryRepository extends BaseRepository
             $prepared['phone'] = sanitize_text_field((string) $data['phone']);
         }
 
-        if (array_key_exists('subject', $data)) {
-            $prepared['subject'] = sanitize_text_field((string) $data['subject']);
-        }
+        // NOTE: no `subject` mapping. The enquiries table has never had a
+        // `subject` column, so writing one made $wpdb reject the whole INSERT /
+        // UPDATE — and create() turns that into an exception, which the public
+        // POST /enquiries endpoint surfaced as a 500 carrying the raw SQL error.
+        // Any caller that sends `subject` is now simply ignored, as it always
+        // effectively was for reads.
 
         if (array_key_exists('message', $data)) {
             $prepared['message'] = sanitize_textarea_field((string) $data['message']);

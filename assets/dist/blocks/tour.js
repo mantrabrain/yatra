@@ -355,6 +355,31 @@
         checked: attributes2.show_pagination,
         onChange: (value) => setAttributes({ show_pagination: value })
       }
+    ), /* @__PURE__ */ element.createElement(
+      components.SelectControl,
+      {
+        label: i18n.__("Card layout", "yatra"),
+        help: i18n.__(
+          "Override the site-wide Listing Card Layout (Settings → Design) for this block only. Compact shows a denser image + title + price + View Details card.",
+          "yatra"
+        ),
+        value: attributes2.cardLayout || "inherit",
+        options: [
+          { label: i18n.__("Use site default", "yatra"), value: "inherit" },
+          { label: i18n.__("Standard", "yatra"), value: "standard" },
+          {
+            label: i18n.__("Compact (mobile only)", "yatra"),
+            value: "compact_mobile"
+          },
+          {
+            label: i18n.__("Compact (everywhere)", "yatra"),
+            value: "compact_all"
+          }
+        ],
+        onChange: (value) => setAttributes({
+          cardLayout: value
+        })
+      }
     )), /* @__PURE__ */ element.createElement(components.PanelBody, { title: i18n.__("Filters", "yatra"), initialOpen: false }, /* @__PURE__ */ element.createElement(
       ClassificationMultiSelect,
       {
@@ -501,6 +526,16 @@
     show_pagination: {
       type: "boolean",
       "default": true
+    },
+    cardLayout: {
+      type: "string",
+      "default": "inherit",
+      "enum": [
+        "inherit",
+        "standard",
+        "compact_mobile",
+        "compact_all"
+      ]
     },
     destinationIds: {
       type: "array",

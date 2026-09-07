@@ -179,7 +179,30 @@ export const DEFAULT_MENU_ITEMS: MenuItemDefault[] = [
   },
   { slug: "departures", label: "Departures", iconName: "Calendar" },
   { slug: "discounts", label: "Discounts", iconName: "BadgePercent" },
-  { slug: "payments", label: "Payments", iconName: "CreditCard" },
+  {
+    slug: "payments",
+    label: "Payments",
+    iconName: "CreditCard",
+    submenu: [
+      {
+        key: "payments.all",
+        parentSlug: "payments",
+        tab: "all",
+        label: "All Payments",
+        iconName: "CreditCard",
+      },
+      // Pro "Scheduled Payments" module. Listed so it can be reordered or
+      // hidden in the menu customizer; actual visibility is still gated on the
+      // module flag at render time, like every other Pro-gated entry.
+      {
+        key: "payments.scheduled",
+        parentSlug: "payments",
+        tab: "scheduled",
+        label: "Scheduled",
+        iconName: "CalendarClock",
+      },
+    ],
+  },
   { slug: "bookings", label: "Bookings", iconName: "Calendar" },
   { slug: "customers", label: "Customers", iconName: "UserCircle" },
   { slug: "travelers", label: "Travelers", iconName: "Plane" },

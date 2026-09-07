@@ -423,6 +423,19 @@ class TripRepository extends BaseRepository
     }
 
     /**
+     * Public, cached column-existence check for the trips table.
+     *
+     * Lets raw SELECTs outside this repository (booking confirmation join,
+     * similar-trips query) add columns introduced by later upgrades — e.g.
+     * `duration_hours` — without failing on an install whose ALTER has not
+     * run yet (see InstallerService::maybeAddTripDurationHoursColumn()).
+     */
+    public function hasTripColumn(string $column): bool
+    {
+        return $this->tripTableHasColumn($column);
+    }
+
+    /**
      * SQL expression for trip "current" list price (matches TripPricingService::resolveRegularCurrentPrice).
      */
     protected function sqlTripEffectiveListPrice(): string

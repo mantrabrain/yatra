@@ -349,6 +349,14 @@ class Bootstrap
      */
     public function deactivate(): void
     {
+        // Clear the booking maintenance sweeps so a deactivated plugin leaves no
+        // orphan events behind in WP-Cron. They are re-scheduled on `init` when
+        // the plugin is active again; the expiry activation floor is an option,
+        // so it survives and still protects pre-existing bookings.
+        foreach (['yatra_booking_expiry', 'yatra_booking_reminder', 'yatra_booking_completion'] as $hook) {
+            wp_clear_scheduled_hook($hook);
+        }
+
         // Clean up if needed
         flush_rewrite_rules();
     }

@@ -41,11 +41,20 @@ class CronHooks
 
         // Booking completion cron: marks confirmed bookings 'completed' once
         // their tour date has passed, which is what fires the booking.completed
-        // email / Email Automation sequence. BookingCronService::register() (its
-        // reminder/expiry events) is not wired anywhere, so nothing here activates
-        // those — only the completion sweep, which self-guards against emailing
+        // email / Email Automation sequence. Self-guards against emailing
         // historical bookings via an activation floor.
         add_action('init', [BookingCronService::class, 'registerCompletionCron']);
         add_action('yatra_booking_completion', [BookingCronService::class, 'completeFinishedBookings']);
+
+        // Unpaid-booking expiry + pre-trip reminder. These two events were only
+        // ever scheduled (and only ever given a callback) inside
+        // BookingCronService::register(), which is not called anywhere — so the
+        // "Booking Expiry (hours)" setting expired nothing and the reminder
+        // email was only reachable through the admin's manual resend. Wiring
+        // them here is what makes both features actually run; expiry carries its
+        // own activation floor so an existing site cannot mass-cancel a backlog.
+        add_action('init', [BookingCronService::class, 'registerMaintenanceCrons']);
+        add_action('yatra_booking_expiry', [BookingCronService::class, 'expirePendingBookings']);
+        add_action('yatra_booking_reminder', [BookingCronService::class, 'sendBookingReminders']);
     }
 }

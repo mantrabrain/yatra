@@ -240,7 +240,17 @@ $initial_total_price = $display_sale_price;
                                     // Prefer the per-card span (matches this card's departure/return
                                     // dates); fall back to the trip default for sample cards.
                                     $duration_days = (int) ($card['duration_days'] ?? $trip_data->duration_days ?? 1);
-                                    echo esc_html($duration_days . ' ' . _n('Day', 'Days', $duration_days, 'yatra'));
+                                    $duration_hours = (int) ($trip_data->duration_hours ?? 0);
+                                    if ($duration_hours > 0) {
+                                        // Hour-based day tour: "8 Hours", not "1 Day".
+                                        echo esc_html(sprintf(
+                                            /* translators: %d: number of hours. */
+                                            _n('%d Hour', '%d Hours', $duration_hours, 'yatra'),
+                                            $duration_hours
+                                        ));
+                                    } else {
+                                        echo esc_html($duration_days . ' ' . _n('Day', 'Days', $duration_days, 'yatra'));
+                                    }
                                     ?>
                                 </div>
                             </div>

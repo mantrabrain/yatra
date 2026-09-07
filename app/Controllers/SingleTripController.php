@@ -397,9 +397,10 @@ class SingleTripController
         // Use centralized AvailabilityResolutionService
         $resolutionService = new \Yatra\Services\AvailabilityResolutionService();
         
-        // Get dates for next 12 months
+        // From today up to the configurable booking horizon (Settings → Booking;
+        // 12 months unless changed — the previous hard-coded value).
         $fromDate = date('Y-m-d');
-        $toDate = date('Y-m-d', strtotime('+12 months'));
+        $toDate = yatra_get_availability_horizon_date($fromDate);
         
         $availability = $resolutionService->getAllAvailabilityDates($trip_id, $fromDate, $toDate, \Yatra\Services\SettingsService::isEnabled('show_sold_out'));
         
@@ -1233,11 +1234,17 @@ class SingleTripController
     private function getSimilarTrips(object $trip): array
     {
         $trip_id = (int) $trip->id;
+
+        // Hour-based day tours (3.0.14+ column) — guarded so an install whose
+        // upgrade ALTER has not run yet keeps rendering similar trips.
+        $duration_hours_col = (new \Yatra\Repositories\TripRepository())->hasTripColumn('duration_hours')
+            ? ', duration_hours'
+            : '';
         
         // Get similar trips based on category or difficulty
         $similar = $this->wpdb->get_results(
             $this->wpdb->prepare(
-                "SELECT id, title, slug, featured_image AS featured_image_id, '' AS featured_image_url, duration_days, duration_nights, 
+                "SELECT id, title, slug, featured_image AS featured_image_id, '' AS featured_image_url, duration_days, duration_nights{$duration_hours_col}, 
                         original_price, sale_price, difficulty_level, 
                         short_description
                  FROM {$this->table_trips} t
@@ -1270,7 +1277,7 @@ class SingleTripController
         if (empty($similar)) {
             $similar = $this->wpdb->get_results(
                 $this->wpdb->prepare(
-                    "SELECT id, title, slug, featured_image AS featured_image_id, '' AS featured_image_url, duration_days, duration_nights, 
+                    "SELECT id, title, slug, featured_image AS featured_image_id, '' AS featured_image_url, duration_days, duration_nights{$duration_hours_col}, 
                             original_price, sale_price, difficulty_level, 
                             short_description
                      FROM {$this->table_trips} 

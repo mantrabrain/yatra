@@ -47,10 +47,22 @@ class SettingsController extends BaseController
         'time_format' => 'H:i',
         'frontend_primary_color' => '#3b82f6',
         'frontend_container_max_width' => '',
+        // Trip listing card density. 'standard' = the current comfortable card;
+        // 'compact_mobile' = compact card on phones/tablets only (desktop grid
+        // unchanged); 'compact_all' = compact card at every screen size.
+        'frontend_listing_card_layout' => 'standard',
 
         // Booking Settings
         'booking_confirmation' => true,
+        // Legacy boolean, kept for backward compatibility. Superseded by
+        // 'auto_confirm_mode' below; the mode is authoritative once stored.
         'auto_confirm_bookings' => false,
+        // Auto-confirm mode: 'none' (never), 'online' (only successful online
+        // gateway payments), or 'all' (confirm every booking at checkout).
+        // Default 'online' (payment complete => confirmed). Existing sites with
+        // no stored mode resolve on the fly via yatra_get_auto_confirm_mode()
+        // (legacy true->all, false->online), preserving their prior behaviour.
+        'auto_confirm_mode' => 'online',
         'auto_confirm_pay_later' => true,
         'require_login' => false,
         'allow_guest_checkout' => true,
@@ -66,6 +78,7 @@ class SettingsController extends BaseController
         // paragraph when the global setting is absent.
         'booking_expiry_hours' => 24,
         'booking_reminder_days' => 3,
+        'availability_horizon_months' => 12,
         'allow_waitlist' => true,
         'waitlist_auto_confirm' => false,
         // Pro: render available departure dates as a <select> instead of a
@@ -412,6 +425,16 @@ class SettingsController extends BaseController
                 // Only use default when the option truly does not exist.
                 if ($value === $unset_sentinel) {
                     $value = $default_value;
+                }
+
+                // Auto-Confirm mode has no stored default — it is resolved on
+                // the fly. Return the effective mode so the admin shows the
+                // site's real behaviour: a stored choice if the operator made
+                // one, otherwise derived from the legacy boolean
+                // (true -> 'all', false -> 'online'). Prevents an existing
+                // "confirm all" site from displaying (and re-saving) as 'online'.
+                if ($key === 'auto_confirm_mode' && function_exists('yatra_get_auto_confirm_mode')) {
+                    $value = yatra_get_auto_confirm_mode();
                 }
 
                 // Stored empty string should behave like "unset" for delivery identity (matches installer / backfill).
@@ -795,6 +818,12 @@ class SettingsController extends BaseController
             if ($key === 'booking_expiry_hours' && $int_value < 0) {
                 return null;
             }
+            // Storefront booking horizon: 1–36 months. Out of range is rejected
+            // (not clamped) so a bad write can never blank the calendar — the
+            // previously stored value, or the 12-month default, stays in force.
+            if ($key === 'availability_horizon_months' && ($int_value < 1 || $int_value > 36)) {
+                return null;
+            }
             if ($key === 'partial_payment_percentage' && ($int_value < 0 || $int_value > 100)) {
                 return null;
             }
@@ -878,6 +907,16 @@ class SettingsController extends BaseController
                 return \Yatra\Utils\FrontendThemeCss::sanitizeContainerMaxWidthSetting(
                     is_string($value) ? $value : ''
                 );
+            }
+            if ($key === 'frontend_listing_card_layout') {
+                $allowed = ['standard', 'compact_mobile', 'compact_all'];
+                $v = is_string($value) ? strtolower(trim($value)) : '';
+                return in_array($v, $allowed, true) ? $v : 'standard';
+            }
+            if ($key === 'auto_confirm_mode') {
+                $allowed = ['none', 'online', 'all'];
+                $v = is_string($value) ? strtolower(trim($value)) : '';
+                return in_array($v, $allowed, true) ? $v : 'online';
             }
             if (is_string($key) && strpos($key, 'email_tpl_') === 0 && substr($key, -5) === '_body') {
                 return wp_kses_post((string) $value);

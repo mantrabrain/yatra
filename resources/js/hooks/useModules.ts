@@ -164,6 +164,14 @@ export const useToggleModule = () => {
         window.yatraAdmin.webhooksEnabled = enabledModules.some(
           (m) => m.slug === "webhooks",
         );
+        // Scheduled Payments — decides whether Payments is a plain menu item
+        // or a parent with All Payments / Scheduled beneath it. Same
+        // instant-toggle pattern, so the submenu appears and disappears as the
+        // module is switched, without reloading the admin.
+        window.yatraAdmin.scheduledPaymentsEnabled = enabledModules.some(
+          (m) =>
+            m.slug === "scheduled_payments" || m.slug === "scheduled-payments",
+        );
         // Team & Access — Agency-only sidebar menu. Also drives the
         // teamEnabled flag that <Can/> reads to decide whether the
         // capability gates apply (vs admin fallback).
@@ -309,6 +317,14 @@ export const useBulkToggleModules = () => {
         // Webhooks — Agency-only sidebar menu, same instant-toggle pattern.
         window.yatraAdmin.webhooksEnabled = enabledModules.some(
           (m) => m.slug === "webhooks",
+        );
+        // Scheduled Payments — decides whether Payments is a plain menu item
+        // or a parent with All Payments / Scheduled beneath it. Same
+        // instant-toggle pattern, so the submenu appears and disappears as the
+        // module is switched, without reloading the admin.
+        window.yatraAdmin.scheduledPaymentsEnabled = enabledModules.some(
+          (m) =>
+            m.slug === "scheduled_payments" || m.slug === "scheduled-payments",
         );
         // Team & Access — Agency-only sidebar menu. Also drives the
         // teamEnabled flag that <Can/> reads to decide whether the

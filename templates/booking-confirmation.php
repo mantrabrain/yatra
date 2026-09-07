@@ -308,7 +308,7 @@ do_action('yatra_booking_confirmation_header', $booking);
                         <?php endif; ?>
 
                         <div class="yatra-trip-meta">
-                            <?php if (!empty($booking->duration_days)) : ?>
+                            <?php if (!empty($booking->duration_days) || !empty($booking->duration_hours)) : ?>
                             <span class="yatra-meta-item">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <circle cx="12" cy="12" r="10"></circle>
@@ -317,8 +317,18 @@ do_action('yatra_booking_confirmation_header', $booking);
                                 <?php
                                 $days = (int) ($booking->duration_days ?? 0);
                                 $nights = (int) ($booking->duration_nights ?? 0);
+                                $hours = (int) ($booking->duration_hours ?? 0);
 
-                                if ($days > 0 && $nights > 0) {
+                                if ($hours > 0) {
+                                    // Hour-based day tour: "8 Hours", not "1 Day".
+                                    printf(
+                                        esc_html(
+                                            /* translators: %d: number of hours. */
+                                            _n('%d Hour', '%d Hours', $hours, 'yatra')
+                                        ),
+                                        $hours
+                                    );
+                                } elseif ($days > 0 && $nights > 0) {
                                     printf(
                                         /* translators: 1: number of days, 2: number of nights. */
                                         esc_html__('%1$d Days / %2$d Nights', 'yatra'),

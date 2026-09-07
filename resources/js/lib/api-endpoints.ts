@@ -111,6 +111,17 @@ export const API_ENDPOINTS = {
   ENQUIRY_STATS: "/enquiries/stats",
   ENQUIRY_RESPOND: (id: string | number) => `/enquiries/${id}/respond`,
 
+  // Scheduled balance payments (Yatra Pro — Scheduled Payments module).
+  // These routes only exist while that module is enabled; the UI is gated on
+  // the same `scheduledPaymentsEnabled` flag the module localizes.
+  SCHEDULED_PAYMENTS: "/scheduled-payments",
+  SCHEDULED_PAYMENTS_STATS: "/scheduled-payments/stats",
+  SCHEDULED_PAYMENT_CANCEL: (id: string | number) =>
+    `/scheduled-payments/${id}/cancel`,
+  SCHEDULED_PAYMENTS_OUTSTANDING: "/scheduled-payments/outstanding",
+  SCHEDULED_PAYMENT_SEND_LINK: (bookingId: string | number) =>
+    `/scheduled-payments/outstanding/${bookingId}/send-link`,
+
   // Reports
   REPORTS: "/reports",
   REPORTS_EXPORT: (type: string) => `/reports/export?type=${type}`,

@@ -29,7 +29,11 @@ class TripShortcode extends BaseShortcode
             'search' => '',
             'columns' => '3',
             'show_pagination' => 'yes',
-            'title' => 'Our Trips'
+            'title' => 'Our Trips',
+            // Per-instance card layout override. 'inherit' (default) = use the
+            // site-wide Settings → Design "Listing Card Layout".
+            // Also accepts: standard | compact_mobile | compact_all.
+            'card_layout' => 'inherit'
         ]);
     }
 

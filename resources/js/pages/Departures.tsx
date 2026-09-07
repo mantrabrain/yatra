@@ -156,8 +156,14 @@ const Departures: React.FC = () => {
       return null;
     }
   });
+  // Lifecycle only. Capacity ("full") is an independent dimension — see
+  // availabilityFilter — so Upcoming shows every future departure regardless
+  // of whether it is available, partially booked or full.
   const [statusFilter, setStatusFilter] = useState<
-    "all" | "upcoming" | "full" | "past" | "cancelled" | "trash"
+    "all" | "upcoming" | "past" | "cancelled" | "trash"
+  >("all");
+  const [availabilityFilter, setAvailabilityFilter] = useState<
+    "all" | "available" | "partial" | "full"
   >("all");
   const [sourceFilter, setSourceFilter] = useState<
     "all" | "manual" | "booking_created"
@@ -300,6 +306,7 @@ const Departures: React.FC = () => {
       "departures",
       selectedTripId,
       statusFilter,
+      availabilityFilter,
       sourceFilter,
       searchTerm,
       dateFrom,
@@ -323,17 +330,19 @@ const Departures: React.FC = () => {
       const response = await apiClient.get(endpoint, {
         params: {
           status: statusFilter !== "all" ? statusFilter : undefined,
+          availability:
+            availabilityFilter !== "all" ? availabilityFilter : undefined,
           source: sourceFilter !== "all" ? sourceFilter : undefined,
           search: searchTerm || undefined,
           date_from: dateFrom && dateFrom.trim() !== "" ? dateFrom : undefined,
           date_to: dateTo && dateTo.trim() !== "" ? dateTo : undefined,
           // Include past-dated departures for every tab except the inherently
-          // future ones (upcoming/full). Without this, the Past / All /
-          // Cancelled / Trash tabs excluded completed departures entirely
-          // (date >= today), so they vanished from the list. A date range
-          // always includes past.
+          // future one (Upcoming — which includes full departures). Without
+          // this, the Past / All / Cancelled / Trash tabs excluded completed
+          // departures entirely (date >= today), so they vanished from the
+          // list. A date range always includes past.
           include_past:
-            statusFilter === "upcoming" || statusFilter === "full"
+            statusFilter === "upcoming"
               ? (dateFrom && dateFrom.trim() !== "") ||
                 (dateTo && dateTo.trim() !== "")
                 ? "true"
@@ -383,6 +392,7 @@ const Departures: React.FC = () => {
     queryKey: [
       "departures-stats",
       selectedTripId,
+      availabilityFilter,
       sourceFilter,
       searchTerm,
       dateFrom,
@@ -396,6 +406,8 @@ const Departures: React.FC = () => {
       const response = await apiClient.get(endpoint, {
         params: {
           // NOTE: intentionally no status param here
+          availability:
+            availabilityFilter !== "all" ? availabilityFilter : undefined,
           source: sourceFilter !== "all" ? sourceFilter : undefined,
           search: searchTerm || undefined,
           date_from: dateFrom && dateFrom.trim() !== "" ? dateFrom : undefined,
@@ -403,8 +415,10 @@ const Departures: React.FC = () => {
           // Always include past so the per-status tab counts (especially Past)
           // reflect completed departures, not only upcoming ones.
           include_past: "true",
-          page: 1,
-          per_page: 1000,
+          // Deliberately no page / per_page: this query exists only to count
+          // rows per status, so it must see every matching departure. The
+          // server honours per_page, so sending one here would silently cap
+          // the tab counts on sites with more departures than the page size.
         },
       });
 
@@ -421,15 +435,16 @@ const Departures: React.FC = () => {
     const counts = {
       all: allDepartures.length,
       upcoming: 0,
-      full: 0,
       past: 0,
       cancelled: 0,
       trash: 0,
     };
 
     allDepartures.forEach((departure) => {
-      if (departure.status === "upcoming") counts.upcoming += 1;
-      if (departure.status === "full") counts.full += 1;
+      // A full departure is still an upcoming one — the stored status merely
+      // swaps 'upcoming' for 'full' at capacity. Count it under Upcoming.
+      if (departure.status === "upcoming" || departure.status === "full")
+        counts.upcoming += 1;
       if (departure.status === "past") counts.past += 1;
       if (departure.status === "cancelled") counts.cancelled += 1;
       if (departure.status === "trash") counts.trash += 1;
@@ -445,7 +460,6 @@ const Departures: React.FC = () => {
       label: __("Upcoming", "yatra"),
       count: statusCounts.upcoming,
     },
-    { key: "full", label: __("Full", "yatra"), count: statusCounts.full },
     { key: "past", label: __("Past", "yatra"), count: statusCounts.past },
     {
       key: "cancelled",
@@ -1184,11 +1198,29 @@ const Departures: React.FC = () => {
                   >
                     <option value="all">{__("All Status", "yatra")}</option>
                     <option value="upcoming">{__("Upcoming", "yatra")}</option>
-                    <option value="full">{__("Full", "yatra")}</option>
                     <option value="past">{__("Past", "yatra")}</option>
                     <option value="cancelled">
                       {__("Cancelled", "yatra")}
                     </option>
+                  </Select>
+                </div>
+                <div className="w-48">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {__("Availability", "yatra")}
+                  </label>
+                  <Select
+                    value={availabilityFilter}
+                    onChange={(e) => {
+                      setAvailabilityFilter(e.target.value as any);
+                      setPage(1);
+                    }}
+                  >
+                    <option value="all">{__("All Availability", "yatra")}</option>
+                    <option value="available">{__("Available", "yatra")}</option>
+                    <option value="partial">
+                      {__("Partially Booked", "yatra")}
+                    </option>
+                    <option value="full">{__("Full", "yatra")}</option>
                   </Select>
                 </div>
                 <div className="w-48">

@@ -38,6 +38,11 @@
       "type": "boolean",
       "default": true
     },
+    "cardLayout": {
+      "type": "string",
+      "default": "inherit",
+      "enum": ["inherit", "standard", "compact_mobile", "compact_all"]
+    },
     "destinationIds": {
       "type": "array",
       "default": []

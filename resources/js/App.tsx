@@ -105,6 +105,7 @@ const RecurringRuleForm = lazy(() => import("./pages/RecurringRuleForm"));
 const Whatsapp = lazy(() => import("./pages/Whatsapp"));
 const ChannelManager = lazy(() => import("./pages/ChannelManager"));
 const Webhooks = lazy(() => import("./pages/Webhooks"));
+const ScheduledPayments = lazy(() => import("./pages/ScheduledPayments"));
 const TripConsentForm = lazy(() => import("./pages/TripConsentForm"));
 const BookingForm = lazy(() => import("./pages/BookingForm"));
 const ViewBooking = lazy(() => import("./pages/ViewBooking"));
@@ -354,6 +355,11 @@ const App: React.FC = () => {
         }
         return <Discounts />;
       case "payments":
+        // Scheduled balance payments (Pro module) live under Payments as a tab.
+        // Checked before the action branches because this tab has no forms.
+        if (tab.toLowerCase() === "scheduled") {
+          return <ScheduledPayments />;
+        }
         // Check if we're viewing, creating, or editing a payment
         if (action === "view") {
           return <ViewPayment />;

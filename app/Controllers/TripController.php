@@ -1516,9 +1516,11 @@ class TripController extends BaseController
             // Fetch availability dates using centralized resolution service
             $resolutionService = new \Yatra\Services\AvailabilityResolutionService();
             
-            // Always show all dates from today onwards (selected_date is only for highlighting)
+            // Always show all dates from today onwards (selected_date is only for
+            // highlighting), up to the configurable booking horizon (Settings →
+            // Booking; 12 months unless changed — the previous hard-coded value).
             $fromDate = date('Y-m-d');
-            $toDate = date('Y-m-d', strtotime('+12 months'));
+            $toDate = yatra_get_availability_horizon_date($fromDate);
             
             $availability_dates = $resolutionService->getAllAvailabilityDates($id, $fromDate, $toDate, \Yatra\Services\SettingsService::isEnabled('show_sold_out'));
 
@@ -1594,6 +1596,9 @@ class TripController extends BaseController
                 'sale_price' => isset($trip->sale_price) ? (float) $trip->sale_price : 0,
                 'currency' => SettingsService::getCurrency(),
                 'duration_days' => isset($trip->duration_days) ? (int) $trip->duration_days : 1,
+                // Hour-based day tours show "8 Hours" instead of "1 Day" on the
+                // availability cards. 0 for every existing (day-based) trip.
+                'duration_hours' => isset($trip->duration_hours) ? (int) $trip->duration_hours : 0,
                 'max_travelers' => isset($trip->max_travelers) ? (int) $trip->max_travelers : 20,
                 'min_travelers' => isset($trip->min_travelers) ? (int) $trip->min_travelers : 1,
                 'pricing_type' => $trip->pricing_type ?? 'regular',

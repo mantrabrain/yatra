@@ -880,9 +880,9 @@ class PayPalGateway extends AbstractPaymentGateway
         $newAmountDue = max(0.0, $totalAmount - $newAmountPaid);
         $paymentStatus = $newAmountDue <= 0.01 ? 'paid' : 'partial';
 
-        // Only auto-confirm when the operator allows it (or fully paid). A
-        // deposit / partial payment must not confirm when "Auto-Confirm
-        // Bookings" is off — the operator confirms it manually.
+        // Only auto-confirm when "Auto-Confirm Bookings" is on; otherwise the
+        // booking stays pending for the operator to confirm manually, regardless
+        // of a successful (full or partial) payment.
         $shouldConfirm = \yatra_should_confirm_booking_on_payment($newAmountDue <= 0.01, $bookingId);
 
         // Update booking payment status
@@ -930,7 +930,7 @@ class PayPalGateway extends AbstractPaymentGateway
         ]);
 
         if ($shouldConfirm) {
-            \yatra_trigger_booking_confirmed($bookingId, $previousBookingStatus);
+            \yatra_trigger_booking_confirmed($bookingId, $previousBookingStatus, true);
         }
 
         // Fire action for other plugins/services

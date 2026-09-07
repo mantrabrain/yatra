@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   MapPin,
   Calendar,
+  CalendarClock,
   CalendarDays,
   Star,
   BarChart3,
@@ -82,6 +83,7 @@ import {
   readMenuOverrides,
   readMenuOrder,
   readUiChrome,
+  DEFAULT_MENU_ITEMS,
   type MenuOverrides,
 } from "../lib/sidebar-menu-defaults";
 import { MenuIcon } from "../lib/menu-icon";
@@ -325,47 +327,23 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSubpage, currentTab, currentAction, urlKey]);
 
-  // Track expanded submenus - initialize based on current subpage
+  // Track expanded submenus — start with the parent of the page being loaded
+  // open, so a deep link or a refresh lands with the right submenu already
+  // expanded (no flash of a collapsed menu).
+  //
+  // Derived from the menu definition rather than a hardcoded list of parents:
+  // it used to name `trips` and `itinerary` explicitly, which meant every other
+  // parent (Payments, and anything added later) stayed collapsed on refresh.
   const [expandedMenus, setExpandedMenus] = useState<string[]>(() => {
     const params = new URLSearchParams(window.location.search);
     const subpage = params.get("subpage") || "dashboard";
-    const menus: string[] = [];
 
-    if (subpage === "trips") {
-      menus.push("trips");
-    }
-
-    if (subpage === "itinerary") {
-      menus.push("itinerary");
-    }
-
-    return menus;
+    return DEFAULT_MENU_ITEMS.some(
+      (item) => item.slug === subpage && (item.submenu?.length ?? 0) > 0,
+    )
+      ? [subpage]
+      : [];
   });
-
-  // Auto-expand menu when on submenu pages
-  useEffect(() => {
-    const menusToExpand: string[] = [];
-
-    if (currentSubpage === "trips") {
-      menusToExpand.push("trips");
-    }
-
-    if (currentSubpage === "itinerary") {
-      menusToExpand.push("itinerary");
-    }
-
-    setExpandedMenus((prev) => {
-      // Only update if the menus to expand are different
-      const newMenus = [...new Set([...prev, ...menusToExpand])];
-      if (
-        newMenus.length !== prev.length ||
-        !newMenus.every((m) => prev.includes(m))
-      ) {
-        return newMenus;
-      }
-      return prev;
-    });
-  }, [currentSubpage, urlKey]);
 
   // Get base admin URL
   const baseUrl = useMemo(() => {
@@ -489,6 +467,34 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           label: __("Payments", "yatra"),
           icon: CreditCard,
           cap: "yatra_view_financial_reports",
+          // Payments only becomes a parent when the Pro "Scheduled Payments"
+          // module is enabled — otherwise there is nothing to nest and it stays
+          // exactly as it was: a single item that navigates straight to the
+          // payments list. Children are only rendered for a visible parent, so
+          // the pair inherits the Payments capability gate.
+          //
+          // `undefined` rather than an empty array: the rest of this component
+          // treats "has a submenu" as truthiness, and an empty array would read
+          // as a parent with no matching child — which would stop the Payments
+          // item highlighting on its own page.
+          submenu: (window as any).yatraAdmin?.scheduledPaymentsEnabled
+            ? [
+                {
+                  tab: "all",
+                  label: __("All Payments", "yatra"),
+                  icon: CreditCard,
+                },
+                {
+                  // "Scheduled" alone — the parent already says Payments. This
+                  // label is also the page's heading (the top bar reads it from
+                  // the active submenu item).
+                  tab: "scheduled",
+                  label: __("Scheduled", "yatra"),
+                  icon: CalendarClock,
+                  isPremium: true,
+                },
+              ]
+            : undefined,
         },
         {
           subpage: "bookings",
@@ -816,6 +822,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     return topLevel.map((atom) => {
       const childAtoms = orderGroup(atom.key, groups.get(atom.key) ?? []);
       return {
+        // React key. NOT `subpage`: a child promoted to top-level keeps its
+        // parent's subpage (`payments.scheduled` → subpage `payments`), so two
+        // siblings could share it. Duplicate keys make React reconcile the
+        // wrong nodes and throw "removeChild ... not a child of this node".
+        menuKey: atom.key,
         subpage: atom.subpage,
         label: atom.label,
         icon: atom.icon,
@@ -823,6 +834,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         isPremium: atom.isPremium,
         submenu: childAtoms.length
           ? childAtoms.map((child) => ({
+              // Unique per child, for the same reason as `menuKey` above:
+              // subpage + tab can repeat once items are moved between parents.
+              menuKey: child.key,
               // Submenu rendering supports both legacy intra-parent items
               // (matching parent's subpage) and promoted/demoted items
               // that point at their own subpage.
@@ -842,6 +856,26 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       };
     });
   }, [menuItems, baseUrl]);
+
+  // Keep the active page's parent expanded as the URL changes. Lives here
+  // (after `brandedMenuItems`) so it reads the menu actually being rendered —
+  // that includes parents the menu customizer created by demoting an item into
+  // one, which the static defaults above don't know about.
+  useEffect(() => {
+    const parentOfCurrentPage = brandedMenuItems.find(
+      (item: any) =>
+        item.subpage === currentSubpage && (item.submenu?.length ?? 0) > 0,
+    );
+    if (!parentOfCurrentPage) {
+      return;
+    }
+
+    setExpandedMenus((prev) =>
+      prev.includes(parentOfCurrentPage.subpage)
+        ? prev
+        : [...prev, parentOfCurrentPage.subpage],
+    );
+  }, [currentSubpage, urlKey, brandedMenuItems]);
 
   /** UI chrome visibility flags (version, Back to WP, Join Community). */
   const uiChrome = useMemo(() => readUiChrome(), []);
@@ -949,7 +983,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               const active = isActive(item.subpage);
 
               return (
-                <div key={item.subpage}>
+                // Keyed by the unique menu key, and by the item's shape: when a
+                // module toggle turns a plain item into a parent (Payments →
+                // All Payments / Scheduled) the branch below swaps an <a> for a
+                // <button> + children, and a shape-aware key makes React remount
+                // that subtree cleanly instead of reusing mismatched nodes.
+                <div
+                  key={`${(item as any).menuKey ?? item.subpage}:${
+                    hasSubmenu ? "parent" : "leaf"
+                  }`}
+                >
                   {hasSubmenu ? (
                     <>
                       <button
@@ -968,11 +1011,26 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                           />
                           <span>{item.label}</span>
                         </div>
-                        {isExpanded ? (
-                          <ChevronDown className="w-4 h-4" />
-                        ) : (
-                          <ChevronRight className="w-4 h-4" />
-                        )}
+                        <div className="flex items-center gap-2">
+                          {/* New-since-last-seen badge. Also rendered here, not
+                              only on flat items: a section that gains children
+                              (Payments) would otherwise lose its badge. */}
+                          {!active && getNewCount(item.subpage) > 0 && (
+                            <span
+                              className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1.5 rounded-full bg-red-500 text-white text-[10px] font-semibold leading-none"
+                              aria-label={`${getNewCount(item.subpage)} ${__("new", "yatra")}`}
+                            >
+                              {getNewCount(item.subpage) > 99
+                                ? "99+"
+                                : getNewCount(item.subpage)}
+                            </span>
+                          )}
+                          {isExpanded ? (
+                            <ChevronDown className="w-4 h-4" />
+                          ) : (
+                            <ChevronRight className="w-4 h-4" />
+                          )}
+                        </div>
                       </button>
                       {isExpanded && item.submenu && (
                         <div className="ml-4 mt-1 space-y-1">
@@ -989,7 +1047,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                             const SubIcon = subItem.icon;
                             return (
                               <a
-                                key={`${navSubpage}.${navTab ?? ""}`}
+                                key={
+                                  subItem.menuKey ??
+                                  `${navSubpage}.${navTab ?? ""}`
+                                }
                                 href={getUrl(navSubpage, navTab)}
                                 onClick={(e) =>
                                   handleMenuNavClick(e, navSubpage, navTab)

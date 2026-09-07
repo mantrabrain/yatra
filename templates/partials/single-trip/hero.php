@@ -84,12 +84,15 @@ $yatra_hero_dp_flags = function_exists('yatra_get_dynamic_pricing_display_flags'
                     <span itemprop="name"><?php echo esc_html($trip->getStartingLocation()); ?></span>
                 </div>
             <?php endif; ?>
-            <?php if (!empty($trip->getDurationDays())): ?>
+            <?php if (!empty($trip->getDurationDays()) || $trip->getDurationHours() > 0): ?>
                 <div class="yatra-hero-duration" itemprop="duration">
                     <?php echo yatra_svg_icon('clock', 'yatra-icon-sm'); ?>
                     <span>
-                        <?php 
-                        if (!empty($trip->getDurationNights()) && $trip->getDurationNights() > 0) {
+                        <?php
+                        if ($trip->getDurationHours() > 0) {
+                            // Hour-based day tour: "8 hours", not "1 day" (matches quick-facts).
+                            echo esc_html(yatra_format_duration(0, null, $trip->getDurationHours()));
+                        } elseif (!empty($trip->getDurationNights()) && $trip->getDurationNights() > 0) {
                             echo esc_html(sprintf(
                                 /* translators: 1: number of days, 2: number of nights. */
                                 _n('%1$d day %2$d night', '%1$d days %2$d nights', $trip->getDurationDays(), 'yatra'),

@@ -824,7 +824,13 @@ class BookingsController extends BaseController
             // Trip duration comes from duration_days/duration_nights (there is no
             // `duration` column — accessing it caused a blank value + PHP notice).
             'trip_duration' => $trip
-                ? yatra_format_duration((int) ($trip->duration_days ?? 0), isset($trip->duration_nights) ? (int) $trip->duration_nights : null)
+                ? yatra_format_duration(
+                    (int) ($trip->duration_days ?? 0),
+                    isset($trip->duration_nights) ? (int) $trip->duration_nights : null,
+                    // Hour-based day tours: "8 hours" instead of "1 day". Absent
+                    // or NULL on every day-based trip, which keeps its wording.
+                    (int) ($trip->duration_hours ?? 0)
+                )
                 : '',
             'trip_difficulty' => $trip ? ($trip->difficulty_name ?? '') : '',
             'departure_location' => $trip ? ($trip->departure_location ?? '') : '',

@@ -20,8 +20,11 @@ import {
   MapPin,
   Send,
   Loader2,
+  CheckCircle,
+  XCircle,
+  Ban,
 } from "lucide-react";
-import { __ } from "../lib/i18n";
+import { __, sprintf } from "../lib/i18n";
 import { apiService } from "../lib/api-client";
 import { formatDate as formatDateUtil } from "../lib/dateFormat";
 import { usePermissions } from "../hooks/usePermissions";
@@ -88,6 +91,8 @@ const Enquiries: React.FC = () => {
   const [pendingBulkAction, setPendingBulkAction] = useState<string | null>(
     null,
   );
+  // Id of the enquiry whose quick status change is in flight (null when idle).
+  const [quickStatusId, setQuickStatusId] = useState<number | null>(null);
   const [showColumnsDropdown, setShowColumnsDropdown] = useState(false);
   const [visibleColumns, setVisibleColumns] = useState(() => {
     if (typeof window === "undefined") {
@@ -132,6 +137,7 @@ const Enquiries: React.FC = () => {
 
     return [
       { value: "mark_completed", label: __("Mark as Completed", "yatra") },
+      { value: "mark_closed", label: __("Mark as Closed", "yatra") },
       { value: "mark_spam", label: __("Mark as Spam", "yatra") },
       { value: "mark_trash", label: __("Move to Trash", "yatra") },
       { value: "delete", label: __("Delete Permanently", "yatra") },
@@ -172,16 +178,26 @@ const Enquiries: React.FC = () => {
     enabled: can("yatra_view_enquiries"),
   });
 
+  // The stats endpoint answers { success, data: { total, by_status, ... } } and
+  // the API client hands back the raw body, so the payload lives under `data`.
+  // Reading the top level meant every count resolved to undefined and each tab
+  // rendered 0. Accept both shapes so an unwrapped response keeps working.
+  const enquiryStats: any =
+    (statsData as any)?.data ?? (statsData as any) ?? {};
+  // COUNT(*) arrives as a string from MySQL; make the counts real numbers.
+  const statusCount = (key: string): number =>
+    Number(enquiryStats?.by_status?.[key]?.count ?? 0) || 0;
+
   const statusCounts = {
-    all: (statsData as any)?.total || 0,
-    new: ((statsData as any)?.by_status?.new?.count as number) || 0,
-    pending: ((statsData as any)?.by_status?.pending?.count as number) || 0,
-    responded: ((statsData as any)?.by_status?.responded?.count as number) || 0,
-    completed: ((statsData as any)?.by_status?.completed?.count as number) || 0,
-    converted: ((statsData as any)?.by_status?.converted?.count as number) || 0,
-    closed: ((statsData as any)?.by_status?.closed?.count as number) || 0,
-    spam: ((statsData as any)?.by_status?.spam?.count as number) || 0,
-    trash: ((statsData as any)?.by_status?.trash?.count as number) || 0,
+    all: Number(enquiryStats?.total ?? 0) || 0,
+    new: statusCount("new"),
+    pending: statusCount("pending"),
+    responded: statusCount("responded"),
+    completed: statusCount("completed"),
+    converted: statusCount("converted"),
+    closed: statusCount("closed"),
+    spam: statusCount("spam"),
+    trash: statusCount("trash"),
   };
 
   // Bulk actions
@@ -200,12 +216,20 @@ const Enquiries: React.FC = () => {
     }
     setBulkApplying(true);
     try {
-      if (["delete", "mark_spam", "mark_trash"].includes(pendingBulkAction)) {
-        await apiService.bulkEnquiriesAction(pendingBulkAction, selectedIds);
-        queryClient.invalidateQueries({ queryKey: ["enquiries"] });
-      }
-    } catch (error) {
+      // Every action offered in `bulkActionOptions` is a valid server action, so
+      // apply whatever was chosen. This used to be an allowlist of delete /
+      // mark_spam / mark_trash, which meant "Mark as Completed" silently did
+      // nothing: the dialog closed and the selection cleared without a request.
+      await apiService.bulkEnquiriesAction(pendingBulkAction, selectedIds);
+      queryClient.invalidateQueries({ queryKey: ["enquiries"] });
+      queryClient.invalidateQueries({ queryKey: ["enquiries-stats"] });
+      showToast(__("Enquiries updated.", "yatra"), "success");
+    } catch (error: any) {
       console.error("Bulk enquiry action error", error);
+      showToast(
+        error?.message || __("Failed to update enquiries.", "yatra"),
+        "error",
+      );
     } finally {
       setBulkApplying(false);
       setBulkConfirmOpen(false);
@@ -293,6 +317,44 @@ const Enquiries: React.FC = () => {
       // PUT endpoint that respond does, gated on respond cap.
       condition: () => can("yatra_respond_to_enquiries"),
     },
+    // Quick status changes, so an enquiry can be handled straight from the list
+    // instead of being opened in edit mode. Same capability as Edit (the backend
+    // gates both on checkCanRespond), each hidden when the enquiry already has
+    // that status. Trashed enquiries are excluded: trash is a deletion staging
+    // area, and the bulk dropdown deliberately offers nothing but delete there.
+    {
+      key: "mark_completed",
+      label: __("Mark as Completed", "yatra"),
+      icon: <CheckCircle className="w-4 h-4" />,
+      onClick: (enquiry: Enquiry) => applyQuickStatus(enquiry, "mark_completed"),
+      condition: (enquiry: Enquiry) =>
+        can("yatra_respond_to_enquiries") &&
+        enquiry.status !== "completed" &&
+        enquiry.status !== "trash" &&
+        statusFilter !== "trash",
+    },
+    {
+      key: "mark_closed",
+      label: __("Mark as Closed", "yatra"),
+      icon: <XCircle className="w-4 h-4" />,
+      onClick: (enquiry: Enquiry) => applyQuickStatus(enquiry, "mark_closed"),
+      condition: (enquiry: Enquiry) =>
+        can("yatra_respond_to_enquiries") &&
+        enquiry.status !== "closed" &&
+        enquiry.status !== "trash" &&
+        statusFilter !== "trash",
+    },
+    {
+      key: "mark_spam",
+      label: __("Mark as Spam", "yatra"),
+      icon: <Ban className="w-4 h-4" />,
+      onClick: (enquiry: Enquiry) => applyQuickStatus(enquiry, "mark_spam"),
+      condition: (enquiry: Enquiry) =>
+        can("yatra_respond_to_enquiries") &&
+        enquiry.status !== "spam" &&
+        enquiry.status !== "trash" &&
+        statusFilter !== "trash",
+    },
     {
       key: "delete",
       label: __("Delete", "yatra"),
@@ -343,6 +405,9 @@ const Enquiries: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["enquiries"] });
+      // Status tab counts come from a separate query; refresh them too or the
+      // tabs keep showing the pre-delete numbers.
+      queryClient.invalidateQueries({ queryKey: ["enquiries-stats"] });
       setDeleteDialogOpen(false);
       setEnquiryToDelete(null);
     },
@@ -355,6 +420,8 @@ const Enquiries: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["enquiries"] });
+      // Responding moves the enquiry to "responded"; keep the tab counts in sync.
+      queryClient.invalidateQueries({ queryKey: ["enquiries-stats"] });
       setRespondDialogOpen(false);
       setSelectedEnquiry(null);
       setResponseMessage("");
@@ -418,6 +485,18 @@ const Enquiries: React.FC = () => {
           "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400",
         label: __("Closed", "yatra"),
       },
+      // 'read' and 'archived' have no status tab, but the bulk endpoint can set
+      // them, so give them a translated badge instead of the raw slug.
+      read: {
+        className:
+          "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
+        label: __("Read", "yatra"),
+      },
+      archived: {
+        className:
+          "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
+        label: __("Archived", "yatra"),
+      },
       spam: {
         className:
           "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400",
@@ -441,6 +520,32 @@ const Enquiries: React.FC = () => {
         {statusInfo.label}
       </Badge>
     );
+  };
+
+  /**
+   * Quick status change straight from the list's actions menu, so an enquiry can
+   * be handled without opening it in edit mode. Uses the same bulk endpoint the
+   * bulk dropdown does (one id), which only ever touches `status` — the enquiry's
+   * message, notes and response history are left untouched.
+   */
+  const applyQuickStatus = async (enquiry: Enquiry, action: string) => {
+    if (quickStatusId !== null) {
+      return; // A quick status change is already in flight.
+    }
+    setQuickStatusId(enquiry.id);
+    try {
+      await apiService.bulkEnquiriesAction(action, [enquiry.id]);
+      queryClient.invalidateQueries({ queryKey: ["enquiries"] });
+      queryClient.invalidateQueries({ queryKey: ["enquiries-stats"] });
+      showToast(__("Enquiry status updated.", "yatra"), "success");
+    } catch (error: any) {
+      showToast(
+        error?.message || __("Failed to update enquiry status.", "yatra"),
+        "error",
+      );
+    } finally {
+      setQuickStatusId(null);
+    }
   };
 
   const handleView = (enquiry: Enquiry) => {
@@ -825,9 +930,15 @@ const Enquiries: React.FC = () => {
         title={__("Apply Bulk Action", "yatra")}
         description={
           pendingBulkAction
-            ? __(
-                `Are you sure you want to apply "${pendingBulkAction}" to the selected enquiries?`,
-                `Are you sure you want to apply "${pendingBulkAction}" to the selected enquiries?`,
+            ? sprintf(
+                /* translators: %s: name of the bulk action, e.g. "Mark as Completed". */
+                __(
+                  'Are you sure you want to apply "%s" to the selected enquiries?',
+                  "yatra",
+                ),
+                bulkActionOptions.find(
+                  (option) => option.value === pendingBulkAction,
+                )?.label || pendingBulkAction,
               )
             : undefined
         }

@@ -328,8 +328,19 @@ class SavedTripRepository extends BaseRepository
             // Format duration using helper function
             $durationDays = !empty($tripObj->duration_days) ? (int) $tripObj->duration_days : null;
             $durationNights = !empty($tripObj->duration_nights) ? (int) $tripObj->duration_nights : null;
+            // Hour-based day tours show "8 hours" instead of "1 day". 0 for every
+            // existing (day-based) trip, so their wording is unchanged.
+            $durationHours = !empty($tripObj->duration_hours) ? (int) $tripObj->duration_hours : 0;
             $duration = '';
-            if (!empty($durationDays)) {
+            if ($durationHours > 0) {
+                $duration = function_exists('yatra_format_duration')
+                    ? yatra_format_duration(0, null, $durationHours)
+                    : sprintf(
+                        /* translators: %d: number of hours. */
+                        _n('%d hour', '%d hours', $durationHours, 'yatra'),
+                        $durationHours
+                    );
+            } elseif (!empty($durationDays)) {
                 if (function_exists('yatra_format_duration')) {
                     $duration = yatra_format_duration($durationDays, $durationNights);
                 } else {

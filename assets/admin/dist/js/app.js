@@ -1,9 +1,9 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-BXbs0ZCP.js","../../../dist/js/react-vendor-xzSqHjRF.js","../css/react-vendor.css","../../../dist/js/index-CbMRo6lO.js","../css/index.css","../../../dist/js/BuildItineraryModal-ZwjF_pCL.js","../../../dist/js/ProFeature-97ewna1x.js","../../../dist/js/Settings-BmSRWwzK.js","../../../dist/js/Team-Bk-2HOlE.js","../../../dist/js/Reports-S1LiUBAm.js","../../../dist/js/DiscountForm--OXC6TLT.js","../../../dist/js/ApplicableTripSelector-BYZjxt18.js","../../../dist/js/Itinerary-Do2hZtmM.js","../../../dist/js/RecurringRuleForm-CZVn9vM6.js","./Whatsapp.js","../../../dist/js/module-skeleton-Cb1q-Zbx.js","../../../dist/js/ChannelManager-B369twWu.js","../../../dist/js/Webhooks-CnRxl1B7.js","../../../dist/js/TripConsentForm-ClLISE_5.js","../../../dist/js/BookingForm-DkL1nwFO.js","../../../dist/js/ViewBooking-DtCdk4c_.js","../../../dist/js/AvailabilityForm-BOtuwB57.js","../../../dist/js/DynamicPricing-CGjBjSDW.js","../../../dist/js/RuleTypeSelectionModal-Bgbf_xbp.js","../../../dist/js/toggle-DUbJsrWf.js","../../../dist/js/DynamicPricingRuleForm-Dg6kEVSu.js","../../../dist/js/AiAssistant-Dvltmd3o.js","../../../dist/js/AbandonedRecovery-Bs6Jd6MW.js","../../../dist/js/WhiteLabel-y6Wb_vpi.js"])))=>i.map(i=>d[i]);
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-CLQImvhJ.js","../../../dist/js/react-vendor-Dl45l0PD.js","../css/react-vendor.css","../../../dist/js/index-0YqMQ0Gb.js","../css/index.css","../../../dist/js/BuildItineraryModal-D8GW2shT.js","../../../dist/js/ProFeature-CePwv7Zz.js","../../../dist/js/Settings-C5RvnmMN.js","../../../dist/js/Team-B54OTO-X.js","../../../dist/js/Reports-De6Gle2r.js","../../../dist/js/DiscountForm-nCjvGJdl.js","../../../dist/js/ApplicableTripSelector-CHN35zYj.js","../../../dist/js/Itinerary-M1YQJyHW.js","../../../dist/js/RecurringRuleForm-CY2V3hrG.js","./Whatsapp.js","../../../dist/js/module-skeleton-CVRJFm3S.js","../../../dist/js/ChannelManager-DlVc6c3Q.js","../../../dist/js/Webhooks-D1I7BQBl.js","../../../dist/js/ScheduledPayments-DjPvvjyg.js","../../../dist/js/TripConsentForm-B0A0u_AZ.js","../../../dist/js/BookingForm-G9U_E5X6.js","../../../dist/js/ViewBooking-y8Yi0hz5.js","../../../dist/js/AvailabilityForm-amQiiorh.js","../../../dist/js/DynamicPricing-DqBKxV9L.js","../../../dist/js/RuleTypeSelectionModal-Ds4T3wir.js","../../../dist/js/toggle-BtCbKaBk.js","../../../dist/js/DynamicPricingRuleForm-D3TUrfP2.js","../../../dist/js/AiAssistant-CHD_pLzt.js","../../../dist/js/AbandonedRecovery-X976JBuk.js","../../../dist/js/WhiteLabel-BeDkf1e9.js"])))=>i.map(i=>d[i]);
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key2, value) => key2 in obj ? __defProp(obj, key2, { enumerable: true, configurable: true, writable: true, value }) : obj[key2] = value;
 var __publicField = (obj, key2, value) => __defNormalProp(obj, typeof key2 !== "symbol" ? key2 + "" : key2, value);
-import { r as reactExports, j as jsxRuntimeExports, W as Wrench, N as Network, M as MessageCircle, S as Sparkles, R as RotateCcw, P as Puzzle, a as MessageSquare, b as Plane, B as BadgePercent, c as Route, F as FileSignature, K as Key, d as Mail, C as Crown, A as Activity, L as List, T as TrendingUp, e as Tag, f as FolderTree, U as Users, g as CircleUser, h as Package, i as CreditCard, k as FileText, l as Settings$1, m as BarChart3, n as Star, o as CalendarDays, p as Calendar$1, q as MapPin, s as LayoutDashboard, u as useQuery, t as useQueryClient, v as useMutation, Z as Zap, w as Webhook, x as ChevronDown, y as ChevronRight, z as ArrowLeft, G as Gift, D as Loader2, E as Sun, H as Moon, I as User, J as RefreshCw, O as Inbox, Q as AlertTriangle, V as ExternalLink, X as isObjectLike_1, _ as _baseGetTag, Y as isArray_1, $ as _MapCache, a0 as getDefaultExportFromCjs, a1 as _Symbol, a2 as isObject$5, a3 as isFunction, a4 as reactIsExports, a5 as React, a6 as _Stack, a7 as _baseIsEqual, a8 as isObject_1, a9 as keys_1, aa as isLength_1, ab as _isIndex, ac as isArguments_1, ad as _Set, ae as _setToArray, af as _SetCache, ag as _cacheHas, ah as _arrayPush, ai as isArrayLike_1, aj as _baseUnary, ak as _getNative, al as eq_1, am as _root, an as isEqual, ao as Animate, ap as _overArg, aq as _arraySome, ar as Clock, as as DollarSign, at as ArrowRight, au as Shield, av as CheckCircle, aw as Plus, ax as X, ay as reactDomExports, az as AlertCircle, aA as Check, aB as Wand2, aC as ChevronLeft, aD as CheckCircle2, aE as HelpCircle, aF as Info, aG as Copy, aH as MoreVertical, aI as Columns, aJ as PenSquare, aK as ArrowUp, aL as ArrowDown, aM as Archive, aN as Trash2, aO as Search, aP as ArrowUpDown, aQ as Eye, aR as Upload, aS as Image, aT as ReactQuill, aU as Pen, aV as Save, aW as CircleDollarSign, aX as Undo2, aY as Phone, aZ as PauseCircle, a_ as ShieldX, a$ as ShieldOff, b0 as Globe, b1 as Award, b2 as Database, b3 as Folder, b4 as Mountain, b5 as UserCheck, b6 as Download, b7 as Server, b8 as XCircle, b9 as Video, ba as Lock, bb as GripVertical, bc as ChevronUp, bd as Play, be as ClipboardCopy, bf as Ban, bg as Bell, bh as Heart, bi as Scissors, bj as Send, bk as Filter, bl as ArrowUpRight, bm as ClipboardCheck, bn as PenTool, bo as Camera, bp as BarChart$1, bq as Megaphone, br as GitBranch, bs as Pause, bt as Settings2, bu as Code, bv as Bug, bw as EyeOff, bx as QueryClient, by as client, bz as QueryClientProvider } from "../../../dist/js/react-vendor-xzSqHjRF.js";
-import { a as apiClient, A as API_ENDPOINTS, u as useToast, _ as __, b as apiService, n as normalizeCurrencyPosition, t as toDateValue, f as formatYatraMoney, r as readYatraCurrencyPositionFromWindow, s as sprintf, c as brandName, d as formatDateForInput, I as Input, e as formatDate$1, g as todayYmd, S as SearchableSelect, h as getCurrencySymbol, i as getCountryName, j as ajaxService, T as ToastProvider, E as ErrorBoundary } from "../../../dist/js/index-CbMRo6lO.js";
+import { r as reactExports, j as jsxRuntimeExports, W as Wrench, N as Network, M as MessageCircle, S as Sparkles, R as RotateCcw, P as Puzzle, a as MessageSquare, b as Plane, B as BadgePercent, c as Route, F as FileSignature, K as Key, d as Mail, C as Crown, A as Activity, L as List, T as TrendingUp, e as Tag, f as FolderTree, U as Users, g as CircleUser, h as Package, i as CreditCard, k as FileText, l as Settings$1, m as BarChart3, n as Star, o as CalendarDays, p as CalendarClock, q as Calendar$1, s as MapPin, t as LayoutDashboard, u as useQuery, v as useQueryClient, w as useMutation, Z as Zap, x as Webhook, y as ChevronDown, z as ChevronRight, D as ArrowLeft, G as Gift, E as Loader2, H as Sun, I as Moon, J as User, O as RefreshCw, Q as Inbox, V as AlertTriangle, X as ExternalLink, Y as isObjectLike_1, _ as _baseGetTag, $ as isArray_1, a0 as _MapCache, a1 as getDefaultExportFromCjs, a2 as _Symbol, a3 as isObject$5, a4 as isFunction, a5 as reactIsExports, a6 as React, a7 as _Stack, a8 as _baseIsEqual, a9 as isObject_1, aa as keys_1, ab as isLength_1, ac as _isIndex, ad as isArguments_1, ae as _Set, af as _setToArray, ag as _SetCache, ah as _cacheHas, ai as _arrayPush, aj as isArrayLike_1, ak as _baseUnary, al as _getNative, am as eq_1, an as _root, ao as isEqual, ap as Animate, aq as _overArg, ar as _arraySome, as as Clock, at as DollarSign, au as ArrowRight, av as Shield, aw as CheckCircle, ax as Plus, ay as X, az as reactDomExports, aA as AlertCircle, aB as Check, aC as Wand2, aD as ChevronLeft, aE as CheckCircle2, aF as HelpCircle, aG as Info, aH as Copy, aI as MoreVertical, aJ as Columns, aK as PenSquare, aL as ArrowUp, aM as ArrowDown, aN as Archive, aO as Trash2, aP as Search, aQ as ArrowUpDown, aR as Eye, aS as Upload, aT as Image, aU as ReactQuill, aV as Pen, aW as Save, aX as CircleDollarSign, aY as Undo2, aZ as Phone, a_ as PauseCircle, a$ as ShieldX, b0 as ShieldOff, b1 as Globe, b2 as Award, b3 as Database, b4 as Folder, b5 as Mountain, b6 as UserCheck, b7 as Download, b8 as Server, b9 as XCircle, ba as Video, bb as Lock, bc as GripVertical, bd as ChevronUp, be as Play, bf as ClipboardCopy, bg as Ban, bh as Bell, bi as Heart, bj as Scissors, bk as Send, bl as Filter, bm as ArrowUpRight, bn as ClipboardCheck, bo as PenTool, bp as Camera, bq as BarChart$1, br as Megaphone, bs as GitBranch, bt as Pause, bu as Settings2, bv as Code, bw as Bug, bx as EyeOff, by as QueryClient, bz as client, bA as QueryClientProvider } from "../../../dist/js/react-vendor-Dl45l0PD.js";
+import { a as apiClient, A as API_ENDPOINTS, u as useToast, _ as __, b as apiService, n as normalizeCurrencyPosition, t as toDateValue, f as formatYatraMoney, r as readYatraCurrencyPositionFromWindow, s as sprintf, c as brandName, d as formatDateForInput, I as Input, e as formatDate$1, g as todayYmd, S as SearchableSelect, h as getCurrencySymbol, i as getCountryName, j as ajaxService, T as ToastProvider, E as ErrorBoundary } from "../../../dist/js/index-0YqMQ0Gb.js";
 const scriptRel = "modulepreload";
 const assetsURL = function(dep, importerUrl) {
   return new URL(dep, importerUrl).href;
@@ -405,7 +405,30 @@ const DEFAULT_MENU_ITEMS = [
   },
   { slug: "departures", label: "Departures", iconName: "Calendar" },
   { slug: "discounts", label: "Discounts", iconName: "BadgePercent" },
-  { slug: "payments", label: "Payments", iconName: "CreditCard" },
+  {
+    slug: "payments",
+    label: "Payments",
+    iconName: "CreditCard",
+    submenu: [
+      {
+        key: "payments.all",
+        parentSlug: "payments",
+        tab: "all",
+        label: "All Payments",
+        iconName: "CreditCard"
+      },
+      // Pro "Scheduled Payments" module. Listed so it can be reordered or
+      // hidden in the menu customizer; actual visibility is still gated on the
+      // module flag at render time, like every other Pro-gated entry.
+      {
+        key: "payments.scheduled",
+        parentSlug: "payments",
+        tab: "scheduled",
+        label: "Scheduled",
+        iconName: "CalendarClock"
+      }
+    ]
+  },
   { slug: "bookings", label: "Bookings", iconName: "Calendar" },
   { slug: "customers", label: "Customers", iconName: "UserCircle" },
   { slug: "travelers", label: "Travelers", iconName: "Plane" },
@@ -462,6 +485,7 @@ const ICON_MAP = {
   LayoutDashboard,
   MapPin,
   Calendar: Calendar$1,
+  CalendarClock,
   CalendarDays,
   Star,
   BarChart3,
@@ -3757,6 +3781,9 @@ const useToggleModule = () => {
         window.yatraAdmin.webhooksEnabled = enabledModules.some(
           (m) => m.slug === "webhooks"
         );
+        window.yatraAdmin.scheduledPaymentsEnabled = enabledModules.some(
+          (m) => m.slug === "scheduled_payments" || m.slug === "scheduled-payments"
+        );
         window.yatraAdmin.teamEnabled = enabledModules.some(
           (m) => m.slug === "team"
         );
@@ -3864,6 +3891,9 @@ const useBulkToggleModules = () => {
         );
         window.yatraAdmin.webhooksEnabled = enabledModules.some(
           (m) => m.slug === "webhooks"
+        );
+        window.yatraAdmin.scheduledPaymentsEnabled = enabledModules.some(
+          (m) => m.slug === "scheduled_payments" || m.slug === "scheduled-payments"
         );
         window.yatraAdmin.teamEnabled = enabledModules.some(
           (m) => m.slug === "team"
@@ -4369,31 +4399,13 @@ const Layout = ({ children }) => {
   const [expandedMenus, setExpandedMenus] = reactExports.useState(() => {
     const params = new URLSearchParams(window.location.search);
     const subpage = params.get("subpage") || "dashboard";
-    const menus = [];
-    if (subpage === "trips") {
-      menus.push("trips");
-    }
-    if (subpage === "itinerary") {
-      menus.push("itinerary");
-    }
-    return menus;
-  });
-  reactExports.useEffect(() => {
-    const menusToExpand = [];
-    if (currentSubpage === "trips") {
-      menusToExpand.push("trips");
-    }
-    if (currentSubpage === "itinerary") {
-      menusToExpand.push("itinerary");
-    }
-    setExpandedMenus((prev) => {
-      const newMenus = [.../* @__PURE__ */ new Set([...prev, ...menusToExpand])];
-      if (newMenus.length !== prev.length || !newMenus.every((m) => prev.includes(m))) {
-        return newMenus;
+    return DEFAULT_MENU_ITEMS.some(
+      (item) => {
+        var _a2;
+        return item.slug === subpage && (((_a2 = item.submenu) == null ? void 0 : _a2.length) ?? 0) > 0;
       }
-      return prev;
-    });
-  }, [currentSubpage, urlKey]);
+    ) ? [subpage] : [];
+  });
   const baseUrl = reactExports.useMemo(() => {
     var _a2;
     return ((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) ? `${window.yatraAdmin.siteUrl}/wp-admin/admin.php?page=yatra` : "/wp-admin/admin.php?page=yatra";
@@ -4408,7 +4420,7 @@ const Layout = ({ children }) => {
     // pre_load_script_translations filter then delivers the locale
     // data to wp.i18n on every admin page load.
     () => {
-      var _a2, _b2, _c2, _d2, _e2, _f2, _g2, _h2, _i2, _j2, _k2, _l2;
+      var _a2, _b2, _c2, _d2, _e2, _f2, _g2, _h2, _i2, _j2, _k2, _l2, _m;
       return [
         {
           subpage: "dashboard",
@@ -4509,7 +4521,33 @@ const Layout = ({ children }) => {
           subpage: "payments",
           label: __("Payments", "yatra"),
           icon: CreditCard,
-          cap: "yatra_view_financial_reports"
+          cap: "yatra_view_financial_reports",
+          // Payments only becomes a parent when the Pro "Scheduled Payments"
+          // module is enabled — otherwise there is nothing to nest and it stays
+          // exactly as it was: a single item that navigates straight to the
+          // payments list. Children are only rendered for a visible parent, so
+          // the pair inherits the Payments capability gate.
+          //
+          // `undefined` rather than an empty array: the rest of this component
+          // treats "has a submenu" as truthiness, and an empty array would read
+          // as a parent with no matching child — which would stop the Payments
+          // item highlighting on its own page.
+          submenu: ((_a2 = window.yatraAdmin) == null ? void 0 : _a2.scheduledPaymentsEnabled) ? [
+            {
+              tab: "all",
+              label: __("All Payments", "yatra"),
+              icon: CreditCard
+            },
+            {
+              // "Scheduled" alone — the parent already says Payments. This
+              // label is also the page's heading (the top bar reads it from
+              // the active submenu item).
+              tab: "scheduled",
+              label: __("Scheduled", "yatra"),
+              icon: CalendarClock,
+              isPremium: true
+            }
+          ] : void 0
         },
         {
           subpage: "bookings",
@@ -4595,7 +4633,7 @@ const Layout = ({ children }) => {
         // `isAgency` and `whiteLabelEnabled`; useModules.ts updates the
         // latter on toggle and fires `yatra-modules-updated` which bumps
         // navRefreshKey → this memo recomputes → menu appears.
-        ...((_a2 = window.yatraAdmin) == null ? void 0 : _a2.isAgency) && ((_b2 = window.yatraAdmin) == null ? void 0 : _b2.whiteLabelEnabled) ? [
+        ...((_b2 = window.yatraAdmin) == null ? void 0 : _b2.isAgency) && ((_c2 = window.yatraAdmin) == null ? void 0 : _c2.whiteLabelEnabled) ? [
           {
             subpage: "white-label",
             label: __("White Label", "yatra"),
@@ -4612,7 +4650,7 @@ const Layout = ({ children }) => {
         // window.yatraAdmin.aiAssistantEnabled and fires
         // `yatra-modules-updated`, which bumps navRefreshKey so this
         // memo recomputes immediately without a page reload.
-        ...((_c2 = window.yatraAdmin) == null ? void 0 : _c2.isAiEligible) && ((_d2 = window.yatraAdmin) == null ? void 0 : _d2.aiAssistantEnabled) ? [
+        ...((_d2 = window.yatraAdmin) == null ? void 0 : _d2.isAiEligible) && ((_e2 = window.yatraAdmin) == null ? void 0 : _e2.aiAssistantEnabled) ? [
           {
             subpage: "ai-assistant",
             label: __("AI Assistant", "yatra"),
@@ -4627,7 +4665,7 @@ const Layout = ({ children }) => {
         // useModules.ts updates `whatsappEnabled` on toggle + fires
         // `yatra-modules-updated` so this menu appears instantly without
         // a page reload.
-        ...((_e2 = window.yatraAdmin) == null ? void 0 : _e2.isAiEligible) && ((_f2 = window.yatraAdmin) == null ? void 0 : _f2.whatsappEnabled) ? [
+        ...((_f2 = window.yatraAdmin) == null ? void 0 : _f2.isAiEligible) && ((_g2 = window.yatraAdmin) == null ? void 0 : _g2.whatsappEnabled) ? [
           {
             subpage: "whatsapp",
             label: __("WhatsApp", "yatra"),
@@ -4641,7 +4679,7 @@ const Layout = ({ children }) => {
         // toggle on. useModules.ts updates `channelManagerEnabled` on
         // toggle + fires `yatra-modules-updated` so this menu appears
         // instantly without a page reload.
-        ...((_g2 = window.yatraAdmin) == null ? void 0 : _g2.isAgency) && ((_h2 = window.yatraAdmin) == null ? void 0 : _h2.channelManagerEnabled) ? [
+        ...((_h2 = window.yatraAdmin) == null ? void 0 : _h2.isAgency) && ((_i2 = window.yatraAdmin) == null ? void 0 : _i2.channelManagerEnabled) ? [
           {
             subpage: "channel-manager",
             label: __("Channel Manager", "yatra"),
@@ -4652,7 +4690,7 @@ const Layout = ({ children }) => {
         ] : [],
         // Webhooks — Agency-tier outbound integration hub. Same gate
         // as Channel Manager / White Label: Agency license + module on.
-        ...((_i2 = window.yatraAdmin) == null ? void 0 : _i2.isAgency) && ((_j2 = window.yatraAdmin) == null ? void 0 : _j2.webhooksEnabled) ? [
+        ...((_j2 = window.yatraAdmin) == null ? void 0 : _j2.isAgency) && ((_k2 = window.yatraAdmin) == null ? void 0 : _k2.webhooksEnabled) ? [
           {
             subpage: "webhooks",
             label: __("Webhooks", "yatra"),
@@ -4665,7 +4703,7 @@ const Layout = ({ children }) => {
         // access + audit log. Gate matches Webhooks: Agency license +
         // module on. The page itself is also cap-gated server-side; the
         // sidebar entry is just UX.
-        ...((_k2 = window.yatraAdmin) == null ? void 0 : _k2.isAgency) && ((_l2 = window.yatraAdmin) == null ? void 0 : _l2.teamEnabled) ? [
+        ...((_l2 = window.yatraAdmin) == null ? void 0 : _l2.isAgency) && ((_m = window.yatraAdmin) == null ? void 0 : _m.teamEnabled) ? [
           {
             subpage: "team",
             label: __("Team & Access", "yatra"),
@@ -4766,12 +4804,20 @@ const Layout = ({ children }) => {
     return topLevel.map((atom) => {
       const childAtoms = orderGroup(atom.key, groups.get(atom.key) ?? []);
       return {
+        // React key. NOT `subpage`: a child promoted to top-level keeps its
+        // parent's subpage (`payments.scheduled` → subpage `payments`), so two
+        // siblings could share it. Duplicate keys make React reconcile the
+        // wrong nodes and throw "removeChild ... not a child of this node".
+        menuKey: atom.key,
         subpage: atom.subpage,
         label: atom.label,
         icon: atom.icon,
         iconOverride: atom.iconOverride,
         isPremium: atom.isPremium,
         submenu: childAtoms.length ? childAtoms.map((child) => ({
+          // Unique per child, for the same reason as `menuKey` above:
+          // subpage + tab can repeat once items are moved between parents.
+          menuKey: child.key,
           // Submenu rendering supports both legacy intra-parent items
           // (matching parent's subpage) and promoted/demoted items
           // that point at their own subpage.
@@ -4787,6 +4833,20 @@ const Layout = ({ children }) => {
       };
     });
   }, [menuItems, baseUrl]);
+  reactExports.useEffect(() => {
+    const parentOfCurrentPage = brandedMenuItems.find(
+      (item) => {
+        var _a2;
+        return item.subpage === currentSubpage && (((_a2 = item.submenu) == null ? void 0 : _a2.length) ?? 0) > 0;
+      }
+    );
+    if (!parentOfCurrentPage) {
+      return;
+    }
+    setExpandedMenus(
+      (prev) => prev.includes(parentOfCurrentPage.subpage) ? prev : [...prev, parentOfCurrentPage.subpage]
+    );
+  }, [currentSubpage, urlKey, brandedMenuItems]);
   const uiChrome = reactExports.useMemo(() => readUiChrome(), []);
   const isActive = (subpage, tab) => {
     if (subpage === "settings" && currentSubpage === "google-calendar") {
@@ -4862,95 +4922,118 @@ const Layout = ({ children }) => {
             const hasSubmenu = item.submenu && item.submenu.length > 0;
             const isExpanded = hasSubmenu && isMenuExpanded(item.subpage);
             const active = isActive(item.subpage);
-            return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: hasSubmenu ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                "button",
+            return (
+              // Keyed by the unique menu key, and by the item's shape: when a
+              // module toggle turns a plain item into a parent (Payments →
+              // All Payments / Scheduled) the branch below swaps an <a> for a
+              // <button> + children, and a shape-aware key makes React remount
+              // that subtree cleanly instead of reusing mismatched nodes.
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "div",
                 {
-                  onClick: () => toggleMenu(item.subpage),
-                  className: `w-full flex items-center justify-between gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${active ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium" : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"}`,
-                  children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(
-                        MenuIcon,
-                        {
-                          icon: item.iconOverride,
-                          fallback: Icon,
-                          className: "w-5 h-5"
-                        }
-                      ),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: item.label })
-                    ] }),
-                    isExpanded ? /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronRight, { className: "w-4 h-4" })
-                  ]
-                }
-              ),
-              isExpanded && item.submenu && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "ml-4 mt-1 space-y-1", children: item.submenu.map((subItem) => {
-                const navSubpage = subItem.subpage ?? item.subpage;
-                const navTab = subItem.tab ?? subItem.tab_orig;
-                const subActive = navTab ? isActive(navSubpage, navTab) : isActive(navSubpage);
-                const SubIcon = subItem.icon;
-                return /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                  "a",
-                  {
-                    href: getUrl(navSubpage, navTab),
-                    onClick: (e) => handleMenuNavClick(e, navSubpage, navTab),
-                    className: `flex items-center gap-3 px-4 py-2 rounded-lg transition-colors relative ${subActive ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium" : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"}`,
-                    children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-                        SubIcon && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-4 h-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                          MenuIcon,
-                          {
-                            icon: subItem.iconOverride,
-                            fallback: SubIcon,
-                            className: "w-4 h-4"
-                          }
-                        ) }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm", children: subItem.label })
-                      ] }),
-                      subItem.isPremium && !isProPluginActive() && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-y-0 right-2 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-4 h-4 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Crown, { className: "w-2.5 h-2.5" }) }) })
-                    ]
-                  },
-                  `${navSubpage}.${navTab ?? ""}`
-                );
-              }) })
-            ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(
-              "a",
-              {
-                href: getUrl(item.subpage),
-                onClick: (e) => handleMenuNavClick(e, item.subpage),
-                className: `flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors relative ${active ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium" : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"}`,
-                children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      MenuIcon,
+                  children: hasSubmenu ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      "button",
                       {
-                        icon: item.iconOverride,
-                        fallback: Icon,
-                        className: "w-5 h-5"
+                        onClick: () => toggleMenu(item.subpage),
+                        className: `w-full flex items-center justify-between gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${active ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium" : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"}`,
+                        children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx(
+                              MenuIcon,
+                              {
+                                icon: item.iconOverride,
+                                fallback: Icon,
+                                className: "w-5 h-5"
+                              }
+                            ),
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: item.label })
+                          ] }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+                            !active && getNewCount(item.subpage) > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                              "span",
+                              {
+                                className: "inline-flex items-center justify-center min-w-[18px] h-[18px] px-1.5 rounded-full bg-red-500 text-white text-[10px] font-semibold leading-none",
+                                "aria-label": `${getNewCount(item.subpage)} ${__("new", "yatra")}`,
+                                children: getNewCount(item.subpage) > 99 ? "99+" : getNewCount(item.subpage)
+                              }
+                            ),
+                            isExpanded ? /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronRight, { className: "w-4 h-4" })
+                          ] })
+                        ]
                       }
                     ),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: item.label })
-                  ] }),
-                  !active && getNewCount(item.subpage) > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    "span",
+                    isExpanded && item.submenu && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "ml-4 mt-1 space-y-1", children: item.submenu.map((subItem) => {
+                      const navSubpage = subItem.subpage ?? item.subpage;
+                      const navTab = subItem.tab ?? subItem.tab_orig;
+                      const subActive = navTab ? isActive(navSubpage, navTab) : isActive(navSubpage);
+                      const SubIcon = subItem.icon;
+                      return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                        "a",
+                        {
+                          href: getUrl(navSubpage, navTab),
+                          onClick: (e) => handleMenuNavClick(e, navSubpage, navTab),
+                          className: `flex items-center gap-3 px-4 py-2 rounded-lg transition-colors relative ${subActive ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium" : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"}`,
+                          children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+                              SubIcon && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-4 h-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                MenuIcon,
+                                {
+                                  icon: subItem.iconOverride,
+                                  fallback: SubIcon,
+                                  className: "w-4 h-4"
+                                }
+                              ) }),
+                              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm", children: subItem.label })
+                            ] }),
+                            subItem.isPremium && !isProPluginActive() && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-y-0 right-2 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-4 h-4 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Crown, { className: "w-2.5 h-2.5" }) }) })
+                          ]
+                        },
+                        subItem.menuKey ?? `${navSubpage}.${navTab ?? ""}`
+                      );
+                    }) })
+                  ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    "a",
                     {
-                      className: "ml-auto inline-flex items-center justify-center min-w-[18px] h-[18px] px-1.5 rounded-full bg-red-500 text-white text-[10px] font-semibold leading-none",
-                      "aria-label": `${getNewCount(item.subpage)} ${__("new", "yatra")}`,
-                      children: getNewCount(item.subpage) > 99 ? "99+" : getNewCount(item.subpage)
-                    }
-                  ),
-                  item.isPremium && !isProPluginActive() && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-y-0 right-2 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-4 h-4 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Crown, { className: "w-2.5 h-2.5" }) }) }),
-                  item.subpage === "license" && isProPluginActive() && licenseStatus && /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    Badge,
-                    {
-                      variant: licenseStatus === "active" ? "success" : licenseStatus === "expired" ? "error" : licenseStatus === "invalid" ? "error" : "error",
-                      className: "text-[10px] px-2 py-0.5",
-                      children: licenseStatus === "active" ? "Active" : licenseStatus === "expired" ? "Expired" : licenseStatus === "invalid" ? "Invalid" : "Inactive"
+                      href: getUrl(item.subpage),
+                      onClick: (e) => handleMenuNavClick(e, item.subpage),
+                      className: `flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors relative ${active ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium" : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"}`,
+                      children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            MenuIcon,
+                            {
+                              icon: item.iconOverride,
+                              fallback: Icon,
+                              className: "w-5 h-5"
+                            }
+                          ),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: item.label })
+                        ] }),
+                        !active && getNewCount(item.subpage) > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          "span",
+                          {
+                            className: "ml-auto inline-flex items-center justify-center min-w-[18px] h-[18px] px-1.5 rounded-full bg-red-500 text-white text-[10px] font-semibold leading-none",
+                            "aria-label": `${getNewCount(item.subpage)} ${__("new", "yatra")}`,
+                            children: getNewCount(item.subpage) > 99 ? "99+" : getNewCount(item.subpage)
+                          }
+                        ),
+                        item.isPremium && !isProPluginActive() && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-y-0 right-2 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-4 h-4 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Crown, { className: "w-2.5 h-2.5" }) }) }),
+                        item.subpage === "license" && isProPluginActive() && licenseStatus && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          Badge,
+                          {
+                            variant: licenseStatus === "active" ? "success" : licenseStatus === "expired" ? "error" : licenseStatus === "invalid" ? "error" : "error",
+                            className: "text-[10px] px-2 py-0.5",
+                            children: licenseStatus === "active" ? "Active" : licenseStatus === "expired" ? "Expired" : licenseStatus === "invalid" ? "Invalid" : "Inactive"
+                          }
+                        )
+                      ]
                     }
                   )
-                ]
-              }
-            ) }, item.subpage);
+                },
+                `${item.menuKey ?? item.subpage}:${hasSubmenu ? "parent" : "leaf"}`
+              )
+            );
           }) }),
           !isProPluginActive() && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "shrink-0 px-4 pb-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "a",
@@ -62349,6 +62432,7 @@ const Departures = () => {
     }
   });
   const [statusFilter, setStatusFilter] = reactExports.useState("all");
+  const [availabilityFilter, setAvailabilityFilter] = reactExports.useState("all");
   const [sourceFilter, setSourceFilter] = reactExports.useState("all");
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [dateFrom, setDateFrom] = reactExports.useState("");
@@ -62456,6 +62540,7 @@ const Departures = () => {
       "departures",
       selectedTripId,
       statusFilter,
+      availabilityFilter,
       sourceFilter,
       searchTerm,
       dateFrom,
@@ -62473,16 +62558,17 @@ const Departures = () => {
       const response = await apiClient.get(endpoint, {
         params: {
           status: statusFilter !== "all" ? statusFilter : void 0,
+          availability: availabilityFilter !== "all" ? availabilityFilter : void 0,
           source: sourceFilter !== "all" ? sourceFilter : void 0,
           search: searchTerm || void 0,
           date_from: dateFrom && dateFrom.trim() !== "" ? dateFrom : void 0,
           date_to: dateTo && dateTo.trim() !== "" ? dateTo : void 0,
           // Include past-dated departures for every tab except the inherently
-          // future ones (upcoming/full). Without this, the Past / All /
-          // Cancelled / Trash tabs excluded completed departures entirely
-          // (date >= today), so they vanished from the list. A date range
-          // always includes past.
-          include_past: statusFilter === "upcoming" || statusFilter === "full" ? dateFrom && dateFrom.trim() !== "" || dateTo && dateTo.trim() !== "" ? "true" : "false" : "true",
+          // future one (Upcoming — which includes full departures). Without
+          // this, the Past / All / Cancelled / Trash tabs excluded completed
+          // departures entirely (date >= today), so they vanished from the
+          // list. A date range always includes past.
+          include_past: statusFilter === "upcoming" ? dateFrom && dateFrom.trim() !== "" || dateTo && dateTo.trim() !== "" ? "true" : "false" : "true",
           page,
           per_page: 20
         }
@@ -62509,6 +62595,7 @@ const Departures = () => {
     queryKey: [
       "departures-stats",
       selectedTripId,
+      availabilityFilter,
       sourceFilter,
       searchTerm,
       dateFrom,
@@ -62519,15 +62606,18 @@ const Departures = () => {
       const response = await apiClient.get(endpoint, {
         params: {
           // NOTE: intentionally no status param here
+          availability: availabilityFilter !== "all" ? availabilityFilter : void 0,
           source: sourceFilter !== "all" ? sourceFilter : void 0,
           search: searchTerm || void 0,
           date_from: dateFrom && dateFrom.trim() !== "" ? dateFrom : void 0,
           date_to: dateTo && dateTo.trim() !== "" ? dateTo : void 0,
           // Always include past so the per-status tab counts (especially Past)
           // reflect completed departures, not only upcoming ones.
-          include_past: "true",
-          page: 1,
-          per_page: 1e3
+          include_past: "true"
+          // Deliberately no page / per_page: this query exists only to count
+          // rows per status, so it must see every matching departure. The
+          // server honours per_page, so sending one here would silently cap
+          // the tab counts on sites with more departures than the page size.
         }
       });
       return (response == null ? void 0 : response.data) || [];
@@ -62539,14 +62629,13 @@ const Departures = () => {
     const counts = {
       all: allDepartures.length,
       upcoming: 0,
-      full: 0,
       past: 0,
       cancelled: 0,
       trash: 0
     };
     allDepartures.forEach((departure) => {
-      if (departure.status === "upcoming") counts.upcoming += 1;
-      if (departure.status === "full") counts.full += 1;
+      if (departure.status === "upcoming" || departure.status === "full")
+        counts.upcoming += 1;
       if (departure.status === "past") counts.past += 1;
       if (departure.status === "cancelled") counts.cancelled += 1;
       if (departure.status === "trash") counts.trash += 1;
@@ -62560,7 +62649,6 @@ const Departures = () => {
       label: __("Upcoming", "yatra"),
       count: statusCounts.upcoming
     },
-    { key: "full", label: __("Full", "yatra"), count: statusCounts.full },
     { key: "past", label: __("Past", "yatra"), count: statusCounts.past },
     {
       key: "cancelled",
@@ -63152,9 +63240,27 @@ const Departures = () => {
               children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Status", "yatra") }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "upcoming", children: __("Upcoming", "yatra") }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "full", children: __("Full", "yatra") }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "past", children: __("Past", "yatra") }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "cancelled", children: __("Cancelled", "yatra") })
+              ]
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-48", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: __("Availability", "yatra") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            Select,
+            {
+              value: availabilityFilter,
+              onChange: (e) => {
+                setAvailabilityFilter(e.target.value);
+                setPage(1);
+              },
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Availability", "yatra") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "available", children: __("Available", "yatra") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "partial", children: __("Partially Booked", "yatra") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "full", children: __("Full", "yatra") })
               ]
             }
           )
@@ -64671,7 +64777,7 @@ function extractError(e) {
   return String(e);
 }
 const Enquiries = () => {
-  var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s;
+  var _a, _b, _c, _d;
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [statusFilter, setStatusFilter] = reactExports.useState("all");
   const [sortBy2, setSortBy] = reactExports.useState("created_at");
@@ -64689,6 +64795,7 @@ const Enquiries = () => {
   const [pendingBulkAction, setPendingBulkAction] = reactExports.useState(
     null
   );
+  const [quickStatusId, setQuickStatusId] = reactExports.useState(null);
   const [showColumnsDropdown, setShowColumnsDropdown] = reactExports.useState(false);
   const [visibleColumns, setVisibleColumns] = reactExports.useState(() => {
     if (typeof window === "undefined") {
@@ -64727,6 +64834,7 @@ const Enquiries = () => {
     }
     return [
       { value: "mark_completed", label: __("Mark as Completed", "yatra") },
+      { value: "mark_closed", label: __("Mark as Closed", "yatra") },
       { value: "mark_spam", label: __("Mark as Spam", "yatra") },
       { value: "mark_trash", label: __("Move to Trash", "yatra") },
       { value: "delete", label: __("Delete Permanently", "yatra") }
@@ -64758,16 +64866,21 @@ const Enquiries = () => {
     },
     enabled: can("yatra_view_enquiries")
   });
+  const enquiryStats = (statsData == null ? void 0 : statsData.data) ?? statsData ?? {};
+  const statusCount = (key2) => {
+    var _a2, _b2;
+    return Number(((_b2 = (_a2 = enquiryStats == null ? void 0 : enquiryStats.by_status) == null ? void 0 : _a2[key2]) == null ? void 0 : _b2.count) ?? 0) || 0;
+  };
   const statusCounts = {
-    all: (statsData == null ? void 0 : statsData.total) || 0,
-    new: ((_b = (_a = statsData == null ? void 0 : statsData.by_status) == null ? void 0 : _a.new) == null ? void 0 : _b.count) || 0,
-    pending: ((_d = (_c = statsData == null ? void 0 : statsData.by_status) == null ? void 0 : _c.pending) == null ? void 0 : _d.count) || 0,
-    responded: ((_f = (_e = statsData == null ? void 0 : statsData.by_status) == null ? void 0 : _e.responded) == null ? void 0 : _f.count) || 0,
-    completed: ((_h = (_g = statsData == null ? void 0 : statsData.by_status) == null ? void 0 : _g.completed) == null ? void 0 : _h.count) || 0,
-    converted: ((_j = (_i = statsData == null ? void 0 : statsData.by_status) == null ? void 0 : _i.converted) == null ? void 0 : _j.count) || 0,
-    closed: ((_l = (_k = statsData == null ? void 0 : statsData.by_status) == null ? void 0 : _k.closed) == null ? void 0 : _l.count) || 0,
-    spam: ((_n = (_m = statsData == null ? void 0 : statsData.by_status) == null ? void 0 : _m.spam) == null ? void 0 : _n.count) || 0,
-    trash: ((_p = (_o = statsData == null ? void 0 : statsData.by_status) == null ? void 0 : _o.trash) == null ? void 0 : _p.count) || 0
+    all: Number((enquiryStats == null ? void 0 : enquiryStats.total) ?? 0) || 0,
+    new: statusCount("new"),
+    pending: statusCount("pending"),
+    responded: statusCount("responded"),
+    completed: statusCount("completed"),
+    converted: statusCount("converted"),
+    closed: statusCount("closed"),
+    spam: statusCount("spam"),
+    trash: statusCount("trash")
   };
   const handleBulkApply = () => {
     if (!bulkAction || selectedIds.length === 0) {
@@ -64783,12 +64896,16 @@ const Enquiries = () => {
     }
     setBulkApplying(true);
     try {
-      if (["delete", "mark_spam", "mark_trash"].includes(pendingBulkAction)) {
-        await apiService.bulkEnquiriesAction(pendingBulkAction, selectedIds);
-        queryClient2.invalidateQueries({ queryKey: ["enquiries"] });
-      }
+      await apiService.bulkEnquiriesAction(pendingBulkAction, selectedIds);
+      queryClient2.invalidateQueries({ queryKey: ["enquiries"] });
+      queryClient2.invalidateQueries({ queryKey: ["enquiries-stats"] });
+      showToast(__("Enquiries updated.", "yatra"), "success");
     } catch (error2) {
       console.error("Bulk enquiry action error", error2);
+      showToast(
+        (error2 == null ? void 0 : error2.message) || __("Failed to update enquiries.", "yatra"),
+        "error"
+      );
     } finally {
       setBulkApplying(false);
       setBulkConfirmOpen(false);
@@ -64871,6 +64988,32 @@ const Enquiries = () => {
       // PUT endpoint that respond does, gated on respond cap.
       condition: () => can("yatra_respond_to_enquiries")
     },
+    // Quick status changes, so an enquiry can be handled straight from the list
+    // instead of being opened in edit mode. Same capability as Edit (the backend
+    // gates both on checkCanRespond), each hidden when the enquiry already has
+    // that status. Trashed enquiries are excluded: trash is a deletion staging
+    // area, and the bulk dropdown deliberately offers nothing but delete there.
+    {
+      key: "mark_completed",
+      label: __("Mark as Completed", "yatra"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-4 h-4" }),
+      onClick: (enquiry) => applyQuickStatus(enquiry, "mark_completed"),
+      condition: (enquiry) => can("yatra_respond_to_enquiries") && enquiry.status !== "completed" && enquiry.status !== "trash" && statusFilter !== "trash"
+    },
+    {
+      key: "mark_closed",
+      label: __("Mark as Closed", "yatra"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(XCircle, { className: "w-4 h-4" }),
+      onClick: (enquiry) => applyQuickStatus(enquiry, "mark_closed"),
+      condition: (enquiry) => can("yatra_respond_to_enquiries") && enquiry.status !== "closed" && enquiry.status !== "trash" && statusFilter !== "trash"
+    },
+    {
+      key: "mark_spam",
+      label: __("Mark as Spam", "yatra"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Ban, { className: "w-4 h-4" }),
+      onClick: (enquiry) => applyQuickStatus(enquiry, "mark_spam"),
+      condition: (enquiry) => can("yatra_respond_to_enquiries") && enquiry.status !== "spam" && enquiry.status !== "trash" && statusFilter !== "trash"
+    },
     {
       key: "delete",
       label: __("Delete", "yatra"),
@@ -64914,6 +65057,7 @@ const Enquiries = () => {
     },
     onSuccess: () => {
       queryClient2.invalidateQueries({ queryKey: ["enquiries"] });
+      queryClient2.invalidateQueries({ queryKey: ["enquiries-stats"] });
       setDeleteDialogOpen(false);
       setEnquiryToDelete(null);
     }
@@ -64924,6 +65068,7 @@ const Enquiries = () => {
     },
     onSuccess: () => {
       queryClient2.invalidateQueries({ queryKey: ["enquiries"] });
+      queryClient2.invalidateQueries({ queryKey: ["enquiries-stats"] });
       setRespondDialogOpen(false);
       setSelectedEnquiry(null);
       setResponseMessage("");
@@ -64932,8 +65077,8 @@ const Enquiries = () => {
   });
   const enquiriesResponse = data;
   const enquiries = (enquiriesResponse == null ? void 0 : enquiriesResponse.data) || (enquiriesResponse == null ? void 0 : enquiriesResponse.enquiries) || [];
-  const total = ((_q = enquiriesResponse == null ? void 0 : enquiriesResponse.meta) == null ? void 0 : _q.total) ?? (enquiriesResponse == null ? void 0 : enquiriesResponse.total) ?? enquiries.length ?? 0;
-  const perPage = ((_r = enquiriesResponse == null ? void 0 : enquiriesResponse.meta) == null ? void 0 : _r.per_page) ?? 10;
+  const total = ((_a = enquiriesResponse == null ? void 0 : enquiriesResponse.meta) == null ? void 0 : _a.total) ?? (enquiriesResponse == null ? void 0 : enquiriesResponse.total) ?? enquiries.length ?? 0;
+  const perPage = ((_b = enquiriesResponse == null ? void 0 : enquiriesResponse.meta) == null ? void 0 : _b.per_page) ?? 10;
   const totalPages = Math.max(1, Math.ceil(total / perPage));
   const errorContext = getErrorContext(error);
   const apiErrorMessage = (data == null ? void 0 : data.error) || (data == null ? void 0 : data.message);
@@ -64968,6 +65113,16 @@ const Enquiries = () => {
         className: "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400",
         label: __("Closed", "yatra")
       },
+      // 'read' and 'archived' have no status tab, but the bulk endpoint can set
+      // them, so give them a translated badge instead of the raw slug.
+      read: {
+        className: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
+        label: __("Read", "yatra")
+      },
+      archived: {
+        className: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
+        label: __("Archived", "yatra")
+      },
       spam: {
         className: "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400",
         label: __("Spam", "yatra")
@@ -64982,6 +65137,25 @@ const Enquiries = () => {
       label: status
     };
     return /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { className: `text-xs ${statusInfo.className}`, children: statusInfo.label });
+  };
+  const applyQuickStatus = async (enquiry, action) => {
+    if (quickStatusId !== null) {
+      return;
+    }
+    setQuickStatusId(enquiry.id);
+    try {
+      await apiService.bulkEnquiriesAction(action, [enquiry.id]);
+      queryClient2.invalidateQueries({ queryKey: ["enquiries"] });
+      queryClient2.invalidateQueries({ queryKey: ["enquiries-stats"] });
+      showToast(__("Enquiry status updated.", "yatra"), "success");
+    } catch (error2) {
+      showToast(
+        (error2 == null ? void 0 : error2.message) || __("Failed to update enquiry status.", "yatra"),
+        "error"
+      );
+    } finally {
+      setQuickStatusId(null);
+    }
   };
   const handleView = (enquiry) => {
     navigate({ subpage: "enquiries", action: "view", id: enquiry.id });
@@ -65300,9 +65474,15 @@ const Enquiries = () => {
           }
         },
         title: __("Apply Bulk Action", "yatra"),
-        description: pendingBulkAction ? __(
-          `Are you sure you want to apply "${pendingBulkAction}" to the selected enquiries?`,
-          `Are you sure you want to apply "${pendingBulkAction}" to the selected enquiries?`
+        description: pendingBulkAction ? sprintf(
+          /* translators: %s: name of the bulk action, e.g. "Mark as Completed". */
+          __(
+            'Are you sure you want to apply "%s" to the selected enquiries?',
+            "yatra"
+          ),
+          ((_c = bulkActionOptions.find(
+            (option) => option.value === pendingBulkAction
+          )) == null ? void 0 : _c.label) || pendingBulkAction
         ) : void 0,
         size: "sm",
         panelClassName: "yatra-model-ui",
@@ -65461,7 +65641,7 @@ const Enquiries = () => {
               }
             )
           ] }),
-          respondMutation.isError && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400", children: ((_s = respondMutation.error) == null ? void 0 : _s.message) || __("Failed to send response. Please try again.", "yatra") })
+          respondMutation.isError && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400", children: ((_d = respondMutation.error) == null ? void 0 : _d.message) || __("Failed to send response. Please try again.", "yatra") })
         ] })
       }
     )
@@ -77539,27 +77719,28 @@ const License = () => {
     ] }) }) })
   ] });
 };
-const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-BXbs0ZCP.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
-const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-BmSRWwzK.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
-const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-Bk-2HOlE.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
-const Reports = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Reports-S1LiUBAm.js"), true ? __vite__mapDeps([9,1,2,3,4]) : void 0, import.meta.url));
-const DiscountForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DiscountForm--OXC6TLT.js"), true ? __vite__mapDeps([10,1,2,3,4,11]) : void 0, import.meta.url));
-const Itinerary = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Itinerary-Do2hZtmM.js"), true ? __vite__mapDeps([12,1,2,3,4,5]) : void 0, import.meta.url));
-const RecurringRuleForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/RecurringRuleForm-CZVn9vM6.js"), true ? __vite__mapDeps([13,1,2,3,4]) : void 0, import.meta.url));
+const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-CLQImvhJ.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
+const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-C5RvnmMN.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
+const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-B54OTO-X.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
+const Reports = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Reports-De6Gle2r.js"), true ? __vite__mapDeps([9,1,2,3,4]) : void 0, import.meta.url));
+const DiscountForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DiscountForm-nCjvGJdl.js"), true ? __vite__mapDeps([10,1,2,3,4,11]) : void 0, import.meta.url));
+const Itinerary = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Itinerary-M1YQJyHW.js"), true ? __vite__mapDeps([12,1,2,3,4,5]) : void 0, import.meta.url));
+const RecurringRuleForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/RecurringRuleForm-CY2V3hrG.js"), true ? __vite__mapDeps([13,1,2,3,4]) : void 0, import.meta.url));
 const Whatsapp = reactExports.lazy(() => __vitePreload(() => import("./Whatsapp.js"), true ? __vite__mapDeps([14,1,2,3,4,15]) : void 0, import.meta.url));
-const ChannelManager = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ChannelManager-B369twWu.js"), true ? __vite__mapDeps([16,1,2,3,4,15]) : void 0, import.meta.url));
-const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Webhooks-CnRxl1B7.js"), true ? __vite__mapDeps([17,1,2,3,4,15]) : void 0, import.meta.url));
-const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-ClLISE_5.js"), true ? __vite__mapDeps([18,1,2,3,4,11]) : void 0, import.meta.url));
-const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-DkL1nwFO.js"), true ? __vite__mapDeps([19,1,2,3,4]) : void 0, import.meta.url));
-const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-DtCdk4c_.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
-const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-BOtuwB57.js"), true ? __vite__mapDeps([21,1,2,3,4]) : void 0, import.meta.url));
-const DynamicPricing = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DynamicPricing-CGjBjSDW.js"), true ? __vite__mapDeps([22,1,2,23,3,4,24]) : void 0, import.meta.url));
+const ChannelManager = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ChannelManager-DlVc6c3Q.js"), true ? __vite__mapDeps([16,1,2,3,4,15]) : void 0, import.meta.url));
+const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Webhooks-D1I7BQBl.js"), true ? __vite__mapDeps([17,1,2,3,4,15]) : void 0, import.meta.url));
+const ScheduledPayments = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ScheduledPayments-DjPvvjyg.js"), true ? __vite__mapDeps([18,1,2,3,4]) : void 0, import.meta.url));
+const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-B0A0u_AZ.js"), true ? __vite__mapDeps([19,1,2,3,4,11]) : void 0, import.meta.url));
+const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-G9U_E5X6.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
+const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-y8Yi0hz5.js"), true ? __vite__mapDeps([21,1,2,3,4]) : void 0, import.meta.url));
+const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-amQiiorh.js"), true ? __vite__mapDeps([22,1,2,3,4]) : void 0, import.meta.url));
+const DynamicPricing = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DynamicPricing-DqBKxV9L.js"), true ? __vite__mapDeps([23,1,2,24,3,4,25]) : void 0, import.meta.url));
 const DynamicPricingRuleForm = reactExports.lazy(
-  () => __vitePreload(() => import("../../../dist/js/DynamicPricingRuleForm-Dg6kEVSu.js"), true ? __vite__mapDeps([25,1,2,3,4,23]) : void 0, import.meta.url)
+  () => __vitePreload(() => import("../../../dist/js/DynamicPricingRuleForm-D3TUrfP2.js"), true ? __vite__mapDeps([26,1,2,3,4,24]) : void 0, import.meta.url)
 );
-const AiAssistant = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AiAssistant-Dvltmd3o.js"), true ? __vite__mapDeps([26,1,2,3,4,15]) : void 0, import.meta.url));
-const AbandonedRecovery = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AbandonedRecovery-Bs6Jd6MW.js"), true ? __vite__mapDeps([27,1,2,3,4,24]) : void 0, import.meta.url));
-const WhiteLabel = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/WhiteLabel-y6Wb_vpi.js"), true ? __vite__mapDeps([28,1,2,3,4,15]) : void 0, import.meta.url));
+const AiAssistant = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AiAssistant-CHD_pLzt.js"), true ? __vite__mapDeps([27,1,2,3,4,15]) : void 0, import.meta.url));
+const AbandonedRecovery = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AbandonedRecovery-X976JBuk.js"), true ? __vite__mapDeps([28,1,2,3,4,25]) : void 0, import.meta.url));
+const WhiteLabel = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/WhiteLabel-BeDkf1e9.js"), true ? __vite__mapDeps([29,1,2,3,4,15]) : void 0, import.meta.url));
 const PageLoadingFallback = () => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-1/3" }),
@@ -77745,6 +77926,9 @@ const App = () => {
         }
         return /* @__PURE__ */ jsxRuntimeExports.jsx(Discounts, {});
       case "payments":
+        if (tab.toLowerCase() === "scheduled") {
+          return /* @__PURE__ */ jsxRuntimeExports.jsx(ScheduledPayments, {});
+        }
         if (action === "view") {
           return /* @__PURE__ */ jsxRuntimeExports.jsx(ViewPayment, {});
         }
@@ -77883,32 +78067,32 @@ export {
   TableHead as a6,
   TableBody as a7,
   TableCell as a8,
-  Popover as a9,
+  SearchFilterToolbar as a9,
   useWordPressMedia as aA,
   MenuIcon as aB,
   ICON_MAP as aC,
-  PopoverTrigger as aa,
-  PopoverContent as ab,
-  clsx as ac,
-  Dot as ad,
-  findAllByType as ae,
-  ErrorBar as af,
-  Layer as ag,
-  filterProps as ah,
-  Curve as ai,
-  interpolateNumber$2 as aj,
-  isNil$1 as ak,
-  hasClipDot as al,
-  LabelList as am,
-  getValueByDataKey as an,
-  uniqueId as ao,
-  Global as ap,
-  getCateCoordinateOfLine as aq,
-  generateCategoricalChart as ar,
-  XAxis as as,
-  YAxis as at,
-  formatAxisMap as au,
-  SearchFilterToolbar as av,
+  Popover as aa,
+  PopoverTrigger as ab,
+  PopoverContent as ac,
+  clsx as ad,
+  Dot as ae,
+  findAllByType as af,
+  ErrorBar as ag,
+  Layer as ah,
+  filterProps as ai,
+  Curve as aj,
+  interpolateNumber$2 as ak,
+  isNil$1 as al,
+  hasClipDot as am,
+  LabelList as an,
+  getValueByDataKey as ao,
+  uniqueId as ap,
+  Global as aq,
+  getCateCoordinateOfLine as ar,
+  generateCategoricalChart as as,
+  XAxis as at,
+  YAxis as au,
+  formatAxisMap as av,
   ResponsiveContainer as aw,
   CartesianGrid as ax,
   Tooltip as ay,

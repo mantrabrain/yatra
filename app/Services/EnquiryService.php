@@ -192,8 +192,17 @@ class EnquiryService
             $data['status'] = 'pending';
         }
 
-        // Create enquiry
-        $enquiryId = $this->enquiryRepository->create($data);
+        // Create enquiry. The repository throws when the INSERT is rejected;
+        // this endpoint is public, so turn that into the same friendly failure
+        // every other rejection returns instead of a 500 that echoes the raw
+        // database error back to the visitor.
+        try {
+            $enquiryId = $this->enquiryRepository->create($data);
+        } catch (\Throwable $e) {
+            error_log('Yatra: failed to create enquiry - ' . $e->getMessage());
+
+            return ['success' => false, 'message' => __('Failed to submit enquiry.', 'yatra')];
+        }
 
         if (!$enquiryId) {
             return ['success' => false, 'message' => __('Failed to submit enquiry.', 'yatra')];
@@ -340,8 +349,11 @@ class EnquiryService
     {
         // Allowed statuses for bulk updates. This list is mirrored in the admin UI.
         // 'completed' marks enquiries that have been fully handled, distinct from
-        // open/in-progress ones.
-        $validStatuses = ['pending', 'read', 'responded', 'completed', 'archived', 'spam', 'trash'];
+        // open/in-progress ones. 'closed' is the "no further action" end state the
+        // enquiry edit screen has always offered; it is accepted here too so the
+        // list's quick status actions and bulk actions can set it without the
+        // operator having to open each enquiry.
+        $validStatuses = ['pending', 'read', 'responded', 'completed', 'closed', 'archived', 'spam', 'trash'];
 
         if (!in_array($status, $validStatuses, true)) {
             return ['success' => false, 'affected' => 0, 'message' => __('Invalid status.', 'yatra')];

@@ -40,6 +40,9 @@ class BlockDataService
             'columns' => 3,
             'title' => 'Our Trips',
             'show_pagination' => true,
+            // Per-instance card layout. 'inherit' = use the site-wide setting.
+            'card_layout' => 'inherit',
+            'cardLayout' => '',
             'destinationIds' => [],
             'activityIds' => [],
             'categoryIds' => [],
@@ -187,6 +190,20 @@ class BlockDataService
         $atts['title'] = sanitize_text_field((string) ($atts['title'] ?? 'Our Trips'));
 
         $atts['show_pagination'] = self::coerceToBool($atts['show_pagination'] ?? true, true) ? 'yes' : 'no';
+
+        // Card layout override. Accept camelCase (Gutenberg block: cardLayout)
+        // and snake_case (shortcode: card_layout). Unknown/empty/"inherit" keeps
+        // 'inherit' so the template falls back to the site-wide Design setting.
+        $cardLayoutRaw = '';
+        if (isset($atts['cardLayout']) && is_string($atts['cardLayout']) && $atts['cardLayout'] !== '') {
+            $cardLayoutRaw = $atts['cardLayout'];
+        } elseif (isset($atts['card_layout']) && is_string($atts['card_layout']) && $atts['card_layout'] !== '') {
+            $cardLayoutRaw = $atts['card_layout'];
+        }
+        $cardLayoutRaw = strtolower(trim($cardLayoutRaw));
+        $atts['card_layout'] = in_array($cardLayoutRaw, ['standard', 'compact_mobile', 'compact_all'], true)
+            ? $cardLayoutRaw
+            : 'inherit';
 
         // Featured Priority (matches admin form: featured | new | limited; "none"/empty = no filter).
         // Accept both snake_case (shortcode) and camelCase (Gutenberg block attribute).

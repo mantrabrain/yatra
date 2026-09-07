@@ -135,7 +135,13 @@ class ItineraryPdfBuilder
             'trip_description'=> $trip ? (string) ($trip->description ?? $trip->content ?? '') : '',
             // Duration is duration_days/duration_nights (no `duration` column).
             'trip_duration'   => $trip
-                ? yatra_format_duration((int) ($trip->duration_days ?? 0), isset($trip->duration_nights) ? (int) $trip->duration_nights : null)
+                ? yatra_format_duration(
+                    (int) ($trip->duration_days ?? 0),
+                    isset($trip->duration_nights) ? (int) $trip->duration_nights : null,
+                    // Hour-based day tours: "8 hours" instead of "1 day". Absent
+                    // or NULL on every day-based trip, which keeps its wording.
+                    (int) ($trip->duration_hours ?? 0)
+                )
                 : '',
             'trip_difficulty' => $trip ? (string) ($trip->difficulty_name ?? '') : '',
             'trip_highlights' => $trip ? ($trip->highlights ?? $trip->trip_highlights ?? '') : '',

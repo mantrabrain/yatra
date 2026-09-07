@@ -97,8 +97,69 @@ class DepartureRepository extends BaseRepository
      */
     public function findAll(array $filters = []): array
     {
-
         $table = esc_sql($this->table);
+        [$where, $params] = $this->whereForAll($filters);
+
+        $query = "SELECT * FROM `{$table}` WHERE " . implode(' AND ', $where);
+        // id as a final tiebreaker: rows sharing a date + time would otherwise
+        // have no stable order, so a paginated list could repeat or skip them
+        // across pages.
+        $query .= " ORDER BY date ASC, time ASC, id ASC";
+
+        if (!empty($filters['per_page'])) {
+            $perPage = (int) $filters['per_page'];
+            $page = max(1, (int) ($filters['page'] ?? 1));
+            $offset = ($page - 1) * $perPage;
+            $query .= " LIMIT %d OFFSET %d";
+            $params[] = $perPage;
+            $params[] = $offset;
+        }
+
+        // Every dynamic value in this query goes through $params, so with no
+        // filters applied the SQL carries no placeholders at all — and calling
+        // prepare() on a placeholder-free query is what WordPress warns about
+        // ("The query argument of wpdb::prepare() must have a placeholder").
+        // Only prepare when there is something to bind.
+        $results = empty($params)
+            ? $this->wpdb->get_results($query, ARRAY_A)
+            : $this->wpdb->get_results($this->wpdb->prepare($query, ...$params), ARRAY_A);
+
+        return array_map(function ($row) {
+            return Departure::fromArray($row);
+        }, $results ?: []);
+    }
+
+    /**
+     * Count departures across all trips matching the SAME filters as findAll()
+     * (page / per_page are ignored). This is the true total behind a paginated
+     * list — sharing whereForAll() means the count can never drift from the
+     * rows findAll() returns.
+     *
+     * @param array $filters Same filters as findAll().
+     */
+    public function countAll(array $filters = []): int
+    {
+        $table = esc_sql($this->table);
+        [$where, $params] = $this->whereForAll($filters);
+
+        $query = "SELECT COUNT(*) FROM `{$table}` WHERE " . implode(' AND ', $where);
+
+        // Same prepare guard as findAll(): no placeholders when nothing is bound.
+        return (int) (empty($params)
+            ? $this->wpdb->get_var($query)
+            : $this->wpdb->get_var($this->wpdb->prepare($query, ...$params)));
+    }
+
+    /**
+     * WHERE fragments + prepare params shared by findAll() and countAll(), so
+     * the list and its total are always built from identical conditions.
+     *
+     * @param array $filters Filters: status, availability, date_from, date_to,
+     *                       source, include_past, past_only.
+     * @return array{0: string[], 1: array}
+     */
+    private function whereForAll(array $filters): array
+    {
         $where = ['1=1']; // Always true for base condition
         $params = [];
         
@@ -116,11 +177,16 @@ class DepartureRepository extends BaseRepository
                     OR (end_date IS NULL AND start_date IS NULL AND date < CURDATE())
                 )";
             } else {
-                $where[] = 'status = %s';
-                $params[] = $filters['status'];
+                $this->applyStatusClause((string) $filters['status'], $where, $params);
             }
         }
-        
+
+        // Independent capacity filter (see applyAvailabilityClause).
+        $this->applyAvailabilityClause($filters, $where);
+
+        // Free-text search on date / notes (see applySearchClause).
+        $this->applySearchClause($filters, $where, $params);
+
         // Date range filter - simple approach
         if (isset($filters['date_from']) && is_string($filters['date_from']) && trim($filters['date_from']) !== '') {
             $dateFrom = trim($filters['date_from']);
@@ -172,33 +238,7 @@ class DepartureRepository extends BaseRepository
             )";
         }
         
-        $query = "SELECT * FROM `{$table}` WHERE " . implode(' AND ', $where);
-        $query .= " ORDER BY date ASC, time ASC";
-        
-        if (!empty($filters['per_page'])) {
-            $perPage = (int) $filters['per_page'];
-            $page = max(1, (int) ($filters['page'] ?? 1));
-            $offset = ($page - 1) * $perPage;
-            $query .= " LIMIT %d OFFSET %d";
-            $params[] = $perPage;
-            $params[] = $offset;
-        }
-        
-        // Every dynamic value in this query goes through $params, so with no
-        // filters applied the SQL carries no placeholders at all — and calling
-        // prepare() on a placeholder-free query is what WordPress warns about
-        // ("The query argument of wpdb::prepare() must have a placeholder").
-        // Only prepare when there is something to bind.
-        $results = empty($params)
-            ? $this->wpdb->get_results($query, ARRAY_A)
-            : $this->wpdb->get_results($this->wpdb->prepare($query, ...$params), ARRAY_A);
-        
-        if ($this->wpdb->last_error) {
-            }
-        
-        return array_map(function ($row) {
-            return Departure::fromArray($row);
-        }, $results ?: []);
+        return [$where, $params];
     }
 
     /**
@@ -210,7 +250,45 @@ class DepartureRepository extends BaseRepository
      */
     public function findByTripId(int $tripId, array $filters = []): array
     {
+        $table = esc_sql($this->table);
+        [$where, $params] = $this->whereForTrip($tripId, $filters);
 
+        $query = "SELECT * FROM `{$table}` WHERE " . implode(' AND ', $where);
+        // id as a final tiebreaker so pagination over rows sharing a date + time
+        // is stable (see findAll()).
+        $query .= " ORDER BY date ASC, time ASC, id ASC";
+
+        if (!empty($filters['per_page'])) {
+            $perPage = (int) $filters['per_page'];
+            $page = max(1, (int) ($filters['page'] ?? 1));
+            $offset = ($page - 1) * $perPage;
+            $query .= " LIMIT %d OFFSET %d";
+            $params[] = $perPage;
+            $params[] = $offset;
+        }
+
+        $results = $this->wpdb->get_results(
+            $this->wpdb->prepare($query, ...$params),
+            ARRAY_A
+        );
+
+        return array_map(function ($row) {
+            return Departure::fromArray($row);
+        }, $results ?: []);
+    }
+
+    /**
+     * WHERE fragments + prepare params shared by findByTripId() and
+     * countByTripId(), so a trip's list and its total are always built from
+     * identical conditions. trip_id is always the first bound param.
+     *
+     * @param int   $tripId  Trip ID.
+     * @param array $filters Filters: status, availability, date_from, date_to,
+     *                       source, include_past, past_only.
+     * @return array{0: string[], 1: array}
+     */
+    private function whereForTrip(int $tripId, array $filters): array
+    {
         $table = esc_sql($this->table);
         $where = ['trip_id = %d'];
         $params = [$tripId];
@@ -229,11 +307,16 @@ class DepartureRepository extends BaseRepository
                     OR (end_date IS NULL AND start_date IS NULL AND date < CURDATE())
                 )";
             } else {
-                $where[] = 'status = %s';
-                $params[] = $filters['status'];
+                $this->applyStatusClause((string) $filters['status'], $where, $params);
             }
         }
-        
+
+        // Independent capacity filter (see applyAvailabilityClause).
+        $this->applyAvailabilityClause($filters, $where);
+
+        // Free-text search on date / notes (see applySearchClause).
+        $this->applySearchClause($filters, $where, $params);
+
         // Date range filter - check both start_date and date columns
         $columns = $this->wpdb->get_col("DESCRIBE {$table}");
         $hasStartDate = in_array('start_date', $columns, true);
@@ -299,26 +382,7 @@ class DepartureRepository extends BaseRepository
             )";
         }
         
-        $query = "SELECT * FROM `{$table}` WHERE " . implode(' AND ', $where);
-        $query .= " ORDER BY date ASC, time ASC";
-        
-        if (!empty($filters['per_page'])) {
-            $perPage = (int) $filters['per_page'];
-            $page = max(1, (int) ($filters['page'] ?? 1));
-            $offset = ($page - 1) * $perPage;
-            $query .= " LIMIT %d OFFSET %d";
-            $params[] = $perPage;
-            $params[] = $offset;
-        }
-        
-        $results = $this->wpdb->get_results(
-            $this->wpdb->prepare($query, ...$params),
-            ARRAY_A
-        );
-        
-        return array_map(function ($row) {
-            return Departure::fromArray($row);
-        }, $results ?: []);
+        return [$where, $params];
     }
 
     /**
@@ -352,40 +416,26 @@ class DepartureRepository extends BaseRepository
     }
 
     /**
-     * Count departures by trip ID
+     * Count departures for one trip matching the SAME filters as findByTripId()
+     * (page / per_page are ignored) — the true total behind a paginated list.
+     *
+     * Previously this kept its own, simpler WHERE (literal status = 'past'
+     * instead of the date-derived match, plain `date` columns instead of the
+     * start_date-aware range, no past_only), so it could disagree with the
+     * rows findByTripId() returned. Sharing whereForTrip() makes that
+     * impossible.
+     *
+     * @param int   $tripId  Trip ID.
+     * @param array $filters Same filters as findByTripId().
      */
     public function countByTripId(int $tripId, array $filters = []): int
     {
         $table = esc_sql($this->table);
-        $where = ['trip_id = %d'];
-        $params = [$tripId];
-        
-        if (!empty($filters['status']) && $filters['status'] !== 'all') {
-            $where[] = 'status = %s';
-            $params[] = $filters['status'];
-        }
-        
-        if (!empty($filters['date_from'])) {
-            $where[] = 'date >= %s';
-            $params[] = $filters['date_from'];
-        }
-        
-        if (!empty($filters['date_to'])) {
-            $where[] = 'date <= %s';
-            $params[] = $filters['date_to'];
-        }
-        
-        if (!empty($filters['source']) && $filters['source'] !== 'all') {
-            $where[] = 'source = %s';
-            $params[] = $filters['source'];
-        }
-        
-        if (isset($filters['include_past']) && !$filters['include_past']) {
-            $where[] = 'date >= CURDATE()';
-        }
-        
+        [$where, $params] = $this->whereForTrip($tripId, $filters);
+
         $query = "SELECT COUNT(*) FROM `{$table}` WHERE " . implode(' AND ', $where);
-        
+
+        // trip_id is always bound, so there is always a placeholder to prepare.
         return (int) $this->wpdb->get_var($this->wpdb->prepare($query, ...$params));
     }
 
@@ -724,6 +774,97 @@ class DepartureRepository extends BaseRepository
         );
         
         return $this->wpdb->rows_affected;
+    }
+
+    /**
+     * Add the stored-status clause for a list filter.
+     *
+     * 'upcoming' is INCLUSIVE of 'full': a departure at capacity is still a
+     * future departure. The status column conflates lifecycle with capacity
+     * (the cron overwrites 'upcoming' with 'full'), which made the Upcoming
+     * tab silently drop full departures. Capacity is its own dimension —
+     * filter it with the `availability` filter instead. 'full' remains
+     * matchable on its own so existing API consumers are unaffected.
+     *
+     * @param string $status   Requested status (never 'all' / 'past' here).
+     * @param array  $where    WHERE fragments (by reference).
+     * @param array  $params   Prepare params (by reference).
+     */
+    private function applyStatusClause(string $status, array &$where, array &$params): void
+    {
+        if ($status === 'upcoming') {
+            // Fixed literals — nothing user-supplied, so no placeholder needed.
+            $where[] = "status IN ('upcoming', 'full')";
+            return;
+        }
+
+        $where[] = 'status = %s';
+        $params[] = $status;
+    }
+
+    /**
+     * Independent capacity filter, derived from booked_count / max_capacity —
+     * the source of truth — rather than the stored status, which the daily
+     * cron can leave stale. max_capacity <= 0 means unlimited (never full).
+     *
+     *   available — has room (unbooked or partially booked)
+     *   partial   — some bookings, but not full
+     *   full      — at or over capacity
+     *
+     * Absent or unrecognised values add no clause, so existing callers and
+     * API consumers see no change (additive / backward compatible).
+     *
+     * @param array $filters Raw filters.
+     * @param array $where   WHERE fragments (by reference).
+     */
+    private function applyAvailabilityClause(array $filters, array &$where): void
+    {
+        $availability = isset($filters['availability']) ? (string) $filters['availability'] : '';
+
+        // Every branch is a fixed literal; the value only selects a branch.
+        switch ($availability) {
+            case 'available':
+                $where[] = '(max_capacity <= 0 OR booked_count < max_capacity)';
+                break;
+            case 'partial':
+                $where[] = '(booked_count > 0 AND (max_capacity <= 0 OR booked_count < max_capacity))';
+                break;
+            case 'full':
+                $where[] = '(max_capacity > 0 AND booked_count >= max_capacity)';
+                break;
+        }
+    }
+
+    /**
+     * Free-text search for the admin list ("Search by date or notes"): matches
+     * the departure date (start — `date` is kept in sync with start_date), the
+     * end date, or the notes. The term is bound through esc_like() and a %s
+     * placeholder, so `%` / `_` / quotes in it are literal and nothing is ever
+     * interpolated into SQL. A blank / whitespace-only term adds no clause.
+     *
+     * Lives in the shared WHERE builders, so a search narrows the rows, the
+     * pagination total and the tab counts identically.
+     *
+     * @param array $filters Raw filters.
+     * @param array $where   WHERE fragments (by reference).
+     * @param array $params  Prepare params (by reference).
+     */
+    private function applySearchClause(array $filters, array &$where, array &$params): void
+    {
+        $term = isset($filters['search']) ? trim((string) $filters['search']) : '';
+        if ($term === '') {
+            return;
+        }
+
+        $like = '%' . $this->wpdb->esc_like($term) . '%';
+
+        // DATE columns are cast explicitly so this is a plain string LIKE under
+        // every SQL mode (no implicit DATE/string coercion, which strict modes
+        // reject for some comparisons). NULL end_date / notes simply don't match.
+        $where[] = '(CAST(date AS CHAR) LIKE %s OR CAST(end_date AS CHAR) LIKE %s OR notes LIKE %s)';
+        $params[] = $like;
+        $params[] = $like;
+        $params[] = $like;
     }
 
     /**

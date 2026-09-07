@@ -352,9 +352,17 @@ class BookingSessionController extends BaseController
                     $total_amount = (float) $booking->total_amount;
 
                     if ($total_paid >= $total_amount) {
+                        // Fully paid. Respect the Auto-Confirm mode (same as every
+                        // other payment-completion path) — only confirm when the
+                        // mode is 'online' or 'all'; otherwise record the payment
+                        // and leave the booking pending for manual confirmation.
                         $prevStatus = (string) ($booking->status ?? 'pending');
-                        $bookingRepository->update($booking_id, ['status' => 'confirmed', 'payment_status' => 'paid']);
-                        \yatra_trigger_booking_confirmed((int) $booking_id, $prevStatus);
+                        if (\yatra_should_confirm_booking_on_payment(true, (int) $booking_id)) {
+                            $bookingRepository->update($booking_id, ['status' => 'confirmed', 'payment_status' => 'paid']);
+                            \yatra_trigger_booking_confirmed((int) $booking_id, $prevStatus, true);
+                        } else {
+                            $bookingRepository->update($booking_id, ['payment_status' => 'paid']);
+                        }
                     } else {
                         $bookingRepository->update($booking_id, ['payment_status' => 'partial']);
                     }
@@ -889,6 +897,9 @@ class BookingSessionController extends BaseController
             'featured_image' => $trip->featured_image,
             'duration_days' => (int) $trip->duration_days,
             'duration_nights' => (int) $trip->duration_nights,
+            // Hour-based day tours (0 on every day-based trip). Additive field:
+            // existing consumers keep reading duration_days/duration_nights.
+            'duration_hours' => (int) ($trip->duration_hours ?? 0),
             'difficulty_level' => $trip->difficulty_level,
             'min_travelers' => (int) ($trip->min_travelers ?: 1),
             'max_travelers' => (int) ($trip->max_travelers ?: 20),
@@ -1280,7 +1291,7 @@ class BookingSessionController extends BaseController
         // ========================================
         $settings = [
             'booking_confirmation' => \Yatra\Services\SettingsService::get('booking_confirmation', true),
-            'auto_confirm_bookings' => \Yatra\Services\SettingsService::get('auto_confirm_bookings', false),
+            'auto_confirm_mode' => \yatra_get_auto_confirm_mode(),
             'require_login' => \Yatra\Services\SettingsService::get('require_login', false),
             'allow_guest_checkout' => \Yatra\Services\SettingsService::get('allow_guest_checkout', true),
             'booking_expiry_hours' => (int) \Yatra\Services\SettingsService::get('booking_expiry_hours', 24),
@@ -2430,19 +2441,27 @@ class BookingSessionController extends BaseController
         // ========================================
         // DETERMINE BOOKING STATUS
         // ========================================
-        // Priority: 
-        // 1. auto_confirm_bookings setting (confirms ALL bookings automatically)
-        // 2. For pay_later: auto_confirm_pay_later setting
-        // 3. For bank_transfer: always pending until verified
-        
+        // Priority (Auto-Confirm mode: none | online | all):
+        // - 'all'    → confirm every booking here at checkout.
+        // - 'online' → confirm nothing at checkout; only a successful online
+        //              gateway payment confirms later (offline stays pending).
+        // - 'none'   → per-method: pay_later uses auto_confirm_pay_later,
+        //              bank_transfer stays pending, everything else pending.
+
         $booking_status = 'pending';
         $status_message = __('Booking received!', 'yatra');
-        
-        // Check if auto-confirm all bookings is enabled
-        if ($settings['auto_confirm_bookings']) {
-            // Auto-confirm is enabled - confirm immediately regardless of payment
+
+        $auto_confirm_mode = $settings['auto_confirm_mode'] ?? 'none';
+        if ($auto_confirm_mode === 'all') {
+            // Confirm every booking immediately, regardless of payment.
             $booking_status = 'confirmed';
             $status_message = __('Booking confirmed!', 'yatra');
+        } elseif ($auto_confirm_mode === 'online') {
+            // Only successful online payments auto-confirm (at payment
+            // completion). Leave the booking pending at checkout; offline
+            // methods (bank transfer, pay-later) stay pending for the operator.
+            $booking_status = 'pending';
+            $status_message = __('Booking received!', 'yatra');
         } elseif ($payment_gateway === 'pay_later') {
             // Pay Later: Check the specific pay_later auto-confirm setting
             if ($settings['auto_confirm_pay_later']) {
@@ -3073,15 +3092,16 @@ class BookingSessionController extends BaseController
             // the booking at pending/pending — only the payment row was written.
             // This now matches handle_successful_payment(): accumulate amount_paid,
             // recompute amount_due, set payment_status (paid vs partial), and
-            // confirm the booking (a deposit confirms too, consistent with Stripe).
+            // confirm the booking only when "Auto-Confirm Bookings" is on
+            // (consistent with every gateway).
             $newAmountPaid = (float) ($booking->amount_paid ?? 0) + $amount;
             $newAmountDue = max(0.0, (float) ($booking->total_amount ?? 0) - $newAmountPaid);
             $paymentStatus = $newAmountDue > 0.0 ? 'partial' : 'paid';
             $previousStatus = (string) ($booking->status ?? 'pending');
 
-            // Only auto-confirm when the operator allows it (or fully paid). A
-            // deposit / partial payment must not confirm when "Auto-Confirm
-            // Bookings" is off.
+            // Only auto-confirm when "Auto-Confirm Bookings" is on; otherwise the
+            // booking stays pending for the operator to confirm manually,
+            // regardless of a successful (full or partial) payment.
             $shouldConfirm = \yatra_should_confirm_booking_on_payment($newAmountDue <= 0.0, $bookingId);
 
             $bookingUpdate = [
@@ -3095,7 +3115,7 @@ class BookingSessionController extends BaseController
             $this->bookingRepository->update($bookingId, $bookingUpdate);
 
             if ($shouldConfirm && function_exists('yatra_trigger_booking_confirmed')) {
-                \yatra_trigger_booking_confirmed($bookingId, $previousStatus);
+                \yatra_trigger_booking_confirmed($bookingId, $previousStatus, true);
             }
 
             // Fire payment completed action
@@ -3443,7 +3463,7 @@ class BookingSessionController extends BaseController
             <p style="margin:0 0 8px;"><strong><?php esc_html_e('Trip', 'yatra'); ?>:</strong> <?php echo esc_html($trip->title); ?></p>
             <p style="margin:0 0 8px;"><strong><?php esc_html_e('Travel date', 'yatra'); ?>:</strong> <?php echo esc_html(date_i18n(get_option('date_format'), strtotime($travel_date))); ?></p>
             <p style="margin:0 0 8px;"><strong><?php esc_html_e('Duration', 'yatra'); ?>:</strong> <?php /* translators: 1: number of days, 2: number of nights. */
-echo esc_html(sprintf(__('%1$d days / %2$d nights', 'yatra'), (int) $trip->duration_days, (int) $trip->duration_nights)); ?></p>
+echo esc_html(yatra_format_duration((int) $trip->duration_days, (int) $trip->duration_nights, (int) ($trip->duration_hours ?? 0))); ?></p>
             <p style="margin:0;"><strong><?php esc_html_e('Travelers', 'yatra'); ?>:</strong> <?php echo esc_html((string) count($travelers)); ?></p>
         </div>
         <h3 style="font-size:16px;"><?php esc_html_e('Payment details', 'yatra'); ?></h3>

@@ -18,9 +18,14 @@ $yatra_deals_dp_overlay = true;
 if (function_exists('yatra_get_dynamic_pricing_display_flags')) {
     $yatra_deals_dp_overlay = !empty(yatra_get_dynamic_pricing_display_flags()['show_savings_badge']);
 }
+
+// Card layout: per-instance override (card_layout attr) or the site-wide setting.
+$yatra_listing_layout_class = \Yatra\Providers\FrontendAssetsProvider::listingLayoutClasses(
+    \Yatra\Providers\FrontendAssetsProvider::resolveListingLayout((string) ($atts['card_layout'] ?? ''))
+);
 ?>
 
-<div class="yatra-discount-shortcode">
+<div class="yatra-discount-shortcode<?php echo $yatra_listing_layout_class ? ' ' . esc_attr($yatra_listing_layout_class) : ''; ?>">
     <div class="yatra-discount-header">
         <h2 class="yatra-discount-title"><?php esc_html_e('Special Deals & Discounts', 'yatra'); ?></h2>
         <?php if (!empty($trips)): ?>

@@ -691,6 +691,18 @@ export const apiService = {
   respondToEnquiry: (id: string | number, data: any) =>
     apiClient.post(API_ENDPOINTS.ENQUIRY_RESPOND(id), data),
 
+  // Scheduled balance payments (Pro module)
+  getScheduledPayments: (params?: Record<string, any>) =>
+    apiClient.get(API_ENDPOINTS.SCHEDULED_PAYMENTS, { params }),
+  getScheduledPaymentsStats: () =>
+    apiClient.get(API_ENDPOINTS.SCHEDULED_PAYMENTS_STATS),
+  cancelScheduledPayment: (id: string | number) =>
+    apiClient.post(API_ENDPOINTS.SCHEDULED_PAYMENT_CANCEL(id), {}),
+  getOutstandingBalances: (params?: Record<string, any>) =>
+    apiClient.get(API_ENDPOINTS.SCHEDULED_PAYMENTS_OUTSTANDING, { params }),
+  sendBalancePaymentLink: (bookingId: string | number) =>
+    apiClient.post(API_ENDPOINTS.SCHEDULED_PAYMENT_SEND_LINK(bookingId), {}),
+
   // Google Calendar
   getGoogleCalendarSettings: () =>
     apiClient.get(API_ENDPOINTS.GOOGLE_CALENDAR_SETTINGS),

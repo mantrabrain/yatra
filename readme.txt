@@ -4,7 +4,7 @@ Tags: tour-booking, travel-booking, tour-operator, travel, travel-agency
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 3.0.14.2
+Stable tag: 3.0.15
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -140,7 +140,7 @@ Use the **block editor** or **classic shortcodes** to drop catalog widgets, sear
 
 **Shortcodes** (all accept string values as in the plugin defaults — use `yes` / `no` or `0` / `1` where noted):
 
-* **`[yatra_trip]`** — Trip listing. Alias: **`[yatra_tour]`**. Filters: `destination`, `activity`, `category` accept comma-separated classification IDs. Optional: `order`, `featured_priority` (`featured` / `new` / `limited`), `per_page`, `difficulty`, `price_min`, `price_max`, `duration_min`, `duration_max`, `search`, `columns`, `show_pagination`, `title`. Pagination: `trip_page`. Examples: `[yatra_trip]`, `[yatra_trip destination="44" activity="12"]`, `[yatra_trip featured_priority="new" per_page="6"]`.
+* **`[yatra_trip]`** — Trip listing. Alias: **`[yatra_tour]`**. Filters: `destination`, `activity`, `category` accept comma-separated classification IDs. Optional: `order`, `featured_priority` (`featured` / `new` / `limited`), `per_page`, `difficulty`, `price_min`, `price_max`, `duration_min`, `duration_max`, `search`, `columns`, `show_pagination`, `title`, `card_layout`. Pagination: `trip_page`. Examples: `[yatra_trip]`, `[yatra_trip destination="44" activity="12"]`, `[yatra_trip featured_priority="new" per_page="6"]`, `[yatra_trip card_layout="compact_all"]`.
 * **`[yatra_activity]`** — Activity listing cards.
 * **`[yatra_destination]`** — Destination showcase.
 * **`[yatra_trip_category]`** — Trip category cards.
@@ -150,6 +150,8 @@ Use the **block editor** or **classic shortcodes** to drop catalog widgets, sear
 * **`[yatra_discount_and_deals]`** — Discounted trips.
 
 **Empty-term filtering (`hide_empty`):** `[yatra_destination]`, `[yatra_activity]` and `[yatra_trip_category]` accept `hide_empty="yes"` to skip taxonomy terms that have zero published trips. Opt-in (default `no`).
+
+**Card layout (`card_layout`):** `[yatra_trip]` / `[yatra_tour]` and `[yatra_discount_and_deals]` accept `card_layout` to set how the trip cards look for that one listing, overriding the site-wide **Settings → Design → Listing Card Layout** default. Values: `inherit` (default — follow the site setting), `standard` (full card), `compact_mobile` (compact horizontal cards on phones only, unchanged on desktop), `compact_all` (compact everywhere). The compact card shows image, title, price and a **View Details** button. Each listing is independent, so different listings on the same page can use different layouts. Example: `[yatra_trip per_page="6" card_layout="compact_all"]`. The **Trip** block offers the same choice under **Trip Settings → Card layout**.
 
 **Note:** If you're migrating from an older build, `[yatra_cart]`, `[yatra_checkout]` and `[yatra_mini_cart]` are no longer registered — checkout and the booking flow now use Yatra's own front-end routes and templates. See **[docs.wpyatra.com](https://docs.wpyatra.com)** for full shortcode reference, URLs and page setup.
 
@@ -280,6 +282,28 @@ Pricing starts at **$99/yr** (Starter, sale) and goes up to **$599/yr** (Scale 1
 == Changelog ==
 
 The two most recent releases are listed below. For the complete version history, see [changelog.txt](https://plugins.svn.wordpress.org/yatra/trunk/changelog.txt).
+
+= 3.0.15 — 7 September 2026 =
+_With thanks to [Vista-Tours](https://vista-tours.de) for detailed testing and feedback._
+
+**Please read before updating — three things start happening that did not before:**
+* **Pre-trip reminder emails send again.** The reminder sweep was never scheduled and had no handler, and its booking query referenced a database column that does not exist, so no reminder has gone out. Both are fixed. Check the *Trip Reminder* template under Settings → Emails, or set *Booking Reminder (days)* to `0` to keep it off.
+* **Unpaid bookings are cancelled automatically** after *Settings → Booking → Booking Expiry (hours)* (default 24) — that setting previously did nothing at all. Only bookings created after you update are ever expired, so your existing pending bookings are never cancelled retroactively. Expiring a booking now also releases its departure seat. Set the hours to `0` to disable.
+* **Cancelling a booking now notifies your integrations.** `yatra_booking_cancelled` was never fired in-app, so Google Calendar kept cancelled bookings on the calendar and WhatsApp / webhook cancellation events never ran. Review those templates first.
+
+**New**
+* **Day trips show hours.** A single-day tour with a duration in hours now reads "8 hours" instead of "1 Day" everywhere — trip cards, hero, quick facts, availability dates, checkout, the confirmation page and email, saved trips, and the voucher / itinerary PDF.
+* **Configurable booking horizon.** *Settings → Booking → Booking horizon (months)* controls how far ahead customers can book (1–36, default 12); it was hard-coded to 12.
+* **Quick status changes for enquiries.** The Enquiries list's ⋮ menu gains Mark as Completed / Closed / Spam, so an enquiry can be handled without opening it.
+* **Auto-Confirm Bookings becomes a three-way choice** — don't auto-confirm, online payments only, or all.
+* **Compact listing card layout** for trip archives, shortcodes and the Trip block.
+
+**Fixed**
+* Departures: *Upcoming* no longer hides sold-out departures; capacity is a separate **Availability** filter; the list is genuinely paginated and its search box works.
+* Enquiries: the status tabs showed `0` for every count; the bulk *Mark as Completed* action silently did nothing; a submission containing a `subject` field returned a server error.
+* The confirmation email is sent when a gateway payment auto-confirms a booking, and *Resend → Booking confirmation* resends the right template.
+* Gateways honour the Auto-Confirm setting instead of always confirming.
+* The "Payment not completed" notice can now be translated.
 
 = 3.0.14.2 — 31 August 2026 =
 * **Fresh installs now create the trips table correctly:** a semicolon inside a column comment broke the `wp_yatra_trips` table creation during dbDelta, so a brand-new install could end up without the trips table — the tour list and sample-data import then failed. Existing sites were unaffected; updating recreates the table automatically.

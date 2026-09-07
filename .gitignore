@@ -27,3 +27,9 @@ yarn-error.log*
 .env
 .env.local
 
+# i18n
+# Intermediate JS catalog written by scripts/extract-js-pot.mjs and merged
+# into yatra.pot by `npm run makepot`, which then deletes it. Only yatra.pot
+# is the shipped template.
+i18n/languages/yatra-js.pot
+

@@ -41,6 +41,25 @@ class BookingCronService
     }
 
     /**
+     * Departure service, wired the same way BookingService wires it, so the
+     * expiry sweep releases inventory through exactly the same code path an
+     * admin cancellation uses.
+     */
+    private static function getDepartureService(): \Yatra\Services\DepartureService
+    {
+        static $service = null;
+        if ($service === null) {
+            $service = new \Yatra\Services\DepartureService(
+                new \Yatra\Repositories\DepartureRepository(),
+                new \Yatra\Repositories\BookingDepartureRepository(),
+                self::getBookingRepository(),
+                self::getTripRepository()
+            );
+        }
+        return $service;
+    }
+
+    /**
      * Register cron hooks
      */
     public static function register(): void
@@ -99,9 +118,13 @@ class BookingCronService
         $bookingRepository = self::getBookingRepository();
 
         // Calculate the target date (X days from now)
-        $target_date = date('Y-m-d', strtotime("+{$reminder_days} days"));
+        // Site-local for the same reason as the expiry threshold: travel dates
+        // are the operator's local dates, so near midnight a UTC-derived target
+        // picked the wrong day on any site with an offset.
+        $target_date = date('Y-m-d', current_time('timestamp') + ($reminder_days * DAY_IN_SECONDS));
 
-        // Get confirmed bookings with travel date matching the target
+        // Confirmed bookings — plus pending ones that have paid a deposit (see
+        // BookingRepository::getBookingsForReminder) — travelling on the target date
         $bookings = $bookingRepository->getBookingsForReminder($target_date);
 
         if (empty($bookings)) {
@@ -131,6 +154,30 @@ class BookingCronService
     {
         if (!wp_next_scheduled('yatra_booking_completion')) {
             wp_schedule_event(time(), 'daily', 'yatra_booking_completion');
+        }
+    }
+
+    /**
+     * Ensure the unpaid-booking expiry and pre-trip reminder sweeps are scheduled.
+     *
+     * Both events existed but nothing ever scheduled them or attached a
+     * callback: register() — which does both — is not called anywhere, so
+     * `Settings → Booking → Booking Expiry (hours)` never expired anything and
+     * the reminder email never went out on its own. Wired from CronHooks
+     * alongside the completion sweep.
+     *
+     * Expiry is guarded by an activation floor (see expirePendingBookings), so
+     * switching this on cannot retroactively cancel a site's existing pending
+     * bookings.
+     */
+    public static function registerMaintenanceCrons(): void
+    {
+        if (!wp_next_scheduled('yatra_booking_expiry')) {
+            wp_schedule_event(time(), 'hourly', 'yatra_booking_expiry');
+        }
+
+        if (!wp_next_scheduled('yatra_booking_reminder')) {
+            wp_schedule_event(time(), 'daily', 'yatra_booking_reminder');
         }
     }
 
@@ -256,18 +303,46 @@ class BookingCronService
             return; // Expiry disabled
         }
 
+        /**
+         * Allow disabling automatic expiry of unpaid bookings entirely.
+         *
+         * @param bool $enabled Default true.
+         */
+        if (!apply_filters('yatra_auto_expire_bookings', true)) {
+            return;
+        }
+
+        // Activation floor, mirroring the completion sweep: the first run only
+        // records "from here on". Without it, a site whose expiry cron starts
+        // running would cancel — and email about — every historical unpaid
+        // booking in one go.
+        $floorOption = 'yatra_booking_expiry_since';
+        $floor = (string) get_option($floorOption, '');
+        if ($floor === '') {
+            update_option($floorOption, current_time('mysql'));
+
+            return;
+        }
+
         $bookingRepository = self::getBookingRepository();
         $tripRepository = self::getTripRepository();
 
         // Calculate the expiry threshold
-        $expiry_threshold = date('Y-m-d H:i:s', strtotime("-{$expiry_hours} hours"));
+        // Site-local, because `created_at` is written with current_time('mysql').
+        // Deriving the threshold from PHP's clock (UTC in WordPress) compared a
+        // local timestamp against a UTC one, so a site at UTC-5 expired bookings
+        // five hours EARLY and a site at UTC+2 two hours late. Matches the
+        // current_time() basis the completion sweep above already uses.
+        $expiry_threshold = date('Y-m-d H:i:s', current_time('timestamp') - ($expiry_hours * HOUR_IN_SECONDS));
 
         // Get pending bookings that are older than the expiry threshold
-        $expired_bookings = $bookingRepository->getExpiredPendingBookings($expiry_threshold);
+        $expired_bookings = $bookingRepository->getExpiredPendingBookings($expiry_threshold, $floor);
 
         if (empty($expired_bookings)) {
             return;
         }
+
+        $departureService = self::getDepartureService();
 
         foreach ($expired_bookings as $booking) {
             // Update booking status to expired/cancelled
@@ -276,7 +351,41 @@ class BookingCronService
                 __('Booking expired due to non-payment', 'yatra')
             );
 
+            // Give the seat back. expireBooking() writes the row directly rather
+            // than going through BookingService::updateStatus(), which is what
+            // normally unlinks the departure and decrements its booked_count —
+            // so without this an expired booking held its seat forever and the
+            // departure slowly "sold out" to bookings nobody ever paid for.
+            try {
+                $departure = $departureService->getDepartureForBooking((int) $booking->id);
+                if ($departure && !empty($departure->id)) {
+                    $departureService->unlinkBookingFromDeparture((int) $booking->id, (int) $departure->id);
+                }
+            } catch (\Throwable $e) {
+                // Never let inventory bookkeeping stop the sweep.
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    error_log('[Yatra] expiry: releasing the departure seat failed - ' . $e->getMessage());
+                }
+            }
+
             do_action('yatra_booking_status_changed', (int) $booking->id, 'pending', 'cancelled');
+
+            // An expiry IS a cancellation, so announce it like one (Google
+            // Calendar, WhatsApp and the `booking.cancelled` webhook all listen
+            // here) …
+            if (function_exists('yatra_trigger_booking_cancelled')) {
+                \yatra_trigger_booking_cancelled((int) $booking->id, 'pending');
+            }
+
+            /**
+             * … and separately, that this particular cancellation was an
+             * automatic expiry. Distinct from `yatra_booking_cancelled` so an
+             * integration can tell "the customer never paid" apart from "someone
+             * cancelled this booking".
+             *
+             * @param int $bookingId Booking ID.
+             */
+            do_action('yatra_booking_expired', (int) $booking->id);
 
             // Get trip title for email
             $trip = $tripRepository->find($booking->trip_id);

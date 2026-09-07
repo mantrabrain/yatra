@@ -151,9 +151,14 @@ if (empty($entity_image)) {
 }
 
 yatra_get_header();
+
+// Trip-listing card layout (Settings → Design); follows the site-wide setting.
+$yatra_listing_layout_class = \Yatra\Providers\FrontendAssetsProvider::listingLayoutClasses(
+    \Yatra\Providers\FrontendAssetsProvider::resolveListingLayout()
+);
 ?>
 
-<div class="yatra-listing-page yatra-taxonomy-page yatra-<?php echo esc_attr($type); ?>-page">
+<div class="yatra-listing-page yatra-taxonomy-page yatra-<?php echo esc_attr($type); ?>-page<?php echo $yatra_listing_layout_class ? ' ' . esc_attr($yatra_listing_layout_class) : ''; ?>">
     
     <!-- Hero Section -->
     <div class="yatra-taxonomy-hero"<?php echo $entity_image ? ' style="background-image: url(' . esc_url($entity_image) . ');"' : ''; ?>>

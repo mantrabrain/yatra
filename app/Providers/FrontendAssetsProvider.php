@@ -31,6 +31,48 @@ class FrontendAssetsProvider
     }
 
     /**
+     * Resolve the effective trip-listing card layout for one listing.
+     *
+     * The site-wide Design setting (`frontend_listing_card_layout`) is the
+     * default; a shortcode/block may pass a per-instance override. Anything that
+     * is not a concrete layout (empty, "inherit", or an unknown value) falls
+     * back to the global setting, so existing shortcodes/blocks are unchanged.
+     *
+     * @param string $override Per-instance override (card_layout / cardLayout).
+     * @return string One of: standard | compact_mobile | compact_all.
+     */
+    public static function resolveListingLayout(string $override = ''): string
+    {
+        $override = strtolower(trim($override));
+        if (in_array($override, ['standard', 'compact_mobile', 'compact_all'], true)) {
+            return $override;
+        }
+
+        $global = \Yatra\Services\SettingsService::getString('frontend_listing_card_layout', 'standard');
+        return in_array($global, ['standard', 'compact_mobile', 'compact_all'], true) ? $global : 'standard';
+    }
+
+    /**
+     * Map a resolved layout to the container CSS class(es) the listing CSS keys
+     * off. Placed on the listing container (archive .yatra-listing-page, or the
+     * shortcode/block wrapper) so each listing can carry its own layout and an
+     * override never leaks into other listings on the same page.
+     *
+     * @param string $layout standard | compact_mobile | compact_all
+     * @return string Space-separated class list ('' for standard).
+     */
+    public static function listingLayoutClasses(string $layout): string
+    {
+        if ($layout === 'compact_mobile') {
+            return 'yatra-listing-compact';
+        }
+        if ($layout === 'compact_all') {
+            return 'yatra-listing-compact yatra-listing-compact--all';
+        }
+        return '';
+    }
+
+    /**
      * Register Font Awesome (optional) and common.css so block editor + shortcode styles can
      * depend on `yatra-common` (shared @keyframes: yatra-spin, yatra-shimmer, etc.).
      */

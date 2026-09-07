@@ -198,25 +198,58 @@ class TripAvailabilityController extends BaseController
     // =========================================================================
 
     /**
+     * Sanitised pagination for the departure list endpoints.
+     *
+     * Returns [page, per_page]. per_page is 0 when the caller did not ask for
+     * pagination, so the list keeps returning every matching row for
+     * consumers that never sent it (the previous behaviour); page is always
+     * >= 1. Only when per_page > 0 is a LIMIT / OFFSET window applied.
+     *
+     * @return array{0: int, 1: int}
+     */
+    private function paginationParams(WP_REST_Request $request): array
+    {
+        $perPage = max(0, (int) $request->get_param('per_page'));
+        $page = max(1, (int) $request->get_param('page'));
+
+        return [$page, $perPage];
+    }
+
+    /**
      * GET /trips/{trip_id}/departures
      */
     public function get_departures(WP_REST_Request $request): WP_REST_Response
     {
         $tripId = (int) $request->get_param('trip_id');
         $status = $request->get_param('status');
+        $availability = $request->get_param('availability');
+        $search = $request->get_param('search');
         $source = $request->get_param('source');
         $dateFrom = $request->get_param('date_from');
         $dateTo = $request->get_param('date_to');
         $includePast = $request->get_param('include_past') !== 'false';
-        
+
         $filters = [];
         if ($status) $filters['status'] = $status;
+        // Capacity is filtered independently of status (see DepartureRepository::applyAvailabilityClause).
+        if ($availability && in_array($availability, ['available', 'partial', 'full'], true)) $filters['availability'] = $availability;
+        // Free-text search on date / notes (see DepartureRepository::applySearchClause).
+        if (is_string($search) && trim($search) !== '') $filters['search'] = trim($search);
         if ($source) $filters['source'] = $source;
         if ($dateFrom && trim($dateFrom) !== '') $filters['date_from'] = $dateFrom;
         if ($dateTo && trim($dateTo) !== '') $filters['date_to'] = $dateTo;
         $filters['include_past'] = $includePast;
         
         try {
+            // Server-side pagination, only when the caller asks for it.
+            [$page, $perPage] = $this->paginationParams($request);
+            if ($perPage > 0) {
+                $filters['per_page'] = $perPage;
+                $filters['page'] = $page;
+            }
+            // True total for the SAME filters, independent of the page window —
+            // count($departures) was the size of the returned page, not the total.
+            $total = $this->departureService->countByTripId($tripId, $filters);
             $departures = $this->departureService->getByTripId($tripId, $filters);
             
             // Get trip information
@@ -346,7 +379,10 @@ class TripAvailabilityController extends BaseController
                     return $departureArray;
                 }, $departures),
                 'meta' => [
-                    'total' => count($departures),
+                    'total' => $total,
+                    'page' => $page,
+                    'per_page' => $perPage > 0 ? $perPage : $total,
+                    'total_pages' => $perPage > 0 ? max(1, (int) ceil($total / $perPage)) : 1,
                 ],
             ]);
         } catch (\Exception $e) {
@@ -606,19 +642,34 @@ class TripAvailabilityController extends BaseController
     public function get_all_departures(WP_REST_Request $request): WP_REST_Response
     {
         $status = $request->get_param('status');
+        $availability = $request->get_param('availability');
+        $search = $request->get_param('search');
         $source = $request->get_param('source');
         $dateFrom = $request->get_param('date_from');
         $dateTo = $request->get_param('date_to');
         $includePast = $request->get_param('include_past') !== 'false';
-        
+
         $filters = [];
         if ($status) $filters['status'] = $status;
+        // Capacity is filtered independently of status (see DepartureRepository::applyAvailabilityClause).
+        if ($availability && in_array($availability, ['available', 'partial', 'full'], true)) $filters['availability'] = $availability;
+        // Free-text search on date / notes (see DepartureRepository::applySearchClause).
+        if (is_string($search) && trim($search) !== '') $filters['search'] = trim($search);
         if ($source) $filters['source'] = $source;
         if ($dateFrom && trim($dateFrom) !== '') $filters['date_from'] = $dateFrom;
         if ($dateTo && trim($dateTo) !== '') $filters['date_to'] = $dateTo;
         $filters['include_past'] = $includePast;
         
         try {
+            // Server-side pagination, only when the caller asks for it.
+            [$page, $perPage] = $this->paginationParams($request);
+            if ($perPage > 0) {
+                $filters['per_page'] = $perPage;
+                $filters['page'] = $page;
+            }
+            // True total for the SAME filters, independent of the page window —
+            // count($processed) was the size of the returned page, not the total.
+            $total = $this->departureService->countAllDepartures($filters);
             // Get all departures (no trip filter)
             $departures = $this->departureService->getAllDepartures($filters);
             
@@ -764,7 +815,10 @@ class TripAvailabilityController extends BaseController
                 'success' => true,
                 'data' => $processed,
                 'meta' => [
-                    'total' => count($processed),
+                    'total' => $total,
+                    'page' => $page,
+                    'per_page' => $perPage > 0 ? $perPage : $total,
+                    'total_pages' => $perPage > 0 ? max(1, (int) ceil($total / $perPage)) : 1,
                 ],
             ]);
         } catch (\Exception $e) {
@@ -807,7 +861,11 @@ class TripAvailabilityController extends BaseController
     {
         $tripId = (int) $request->get_param('trip_id');
         $fromDate = $request->get_param('from_date') ?: date('Y-m-d');
-        $toDate = $request->get_param('to_date') ?: date('Y-m-d', strtotime('+12 months'));
+        // An explicit to_date always wins; only the default follows the
+        // configurable booking horizon (12 months unless changed). The default
+        // is counted from TODAY — not from from_date — exactly as before, so a
+        // client that sends only from_date gets the same window it always did.
+        $toDate = $request->get_param('to_date') ?: yatra_get_availability_horizon_date();
         
         try {
             $dates = $this->departureService->getAvailableDates($tripId, $fromDate, $toDate);

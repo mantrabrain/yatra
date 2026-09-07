@@ -343,6 +343,25 @@ class DepartureService
     }
 
     /**
+     * Count departures across all trips for the same filters as
+     * getAllDepartures() (pagination keys ignored) — the true total behind a
+     * paginated list.
+     */
+    public function countAllDepartures(array $filters = []): int
+    {
+        return $this->repository->countAll($filters);
+    }
+
+    /**
+     * Count departures for one trip for the same filters as getByTripId()
+     * (pagination keys ignored).
+     */
+    public function countByTripId(int $tripId, array $filters = []): int
+    {
+        return $this->repository->countByTripId($tripId, $filters);
+    }
+
+    /**
      * Get past departures by trip ID
      */
     public function getPastByTripId(int $tripId, array $filters = []): array
@@ -364,13 +383,16 @@ class DepartureService
      * 
      * @param int $tripId Trip ID
      * @param string $fromDate Start date (default: today)
-     * @param string $toDate End date (default: +12 months)
+     * @param string $toDate End date (default: today + the configurable booking horizon, 12 months unless changed)
      * @return array Available dates with pricing and capacity info
      */
     public function getAvailableDates(int $tripId, ?string $fromDate = null, ?string $toDate = null): array
     {
         $fromDate = $fromDate ?? date('Y-m-d');
-        $toDate = $toDate ?? date('Y-m-d', strtotime('+12 months'));
+        // Default counted from today (not $fromDate), exactly as the previous
+        // hard-coded '+12 months' was, so callers passing only a start date
+        // keep the same window.
+        $toDate = $toDate ?? yatra_get_availability_horizon_date();
         
         // Get all manual departures
         $manualDepartures = $this->repository->findByTripId($tripId, [

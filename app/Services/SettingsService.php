@@ -46,6 +46,8 @@ class SettingsService
         'frontend_primary_color' => '#3b82f6',
         /** Max width for Yatra trip/booking/listing containers (CSS length). Empty = theme.json / content width / filter. */
         'frontend_container_max_width' => '',
+        /** Trip listing card density: 'standard' | 'compact_mobile' | 'compact_all'. */
+        'frontend_listing_card_layout' => 'standard',
 
         // Booking
         'booking_base' => 'book',
@@ -56,6 +58,11 @@ class SettingsService
         'enable_guest_booking' => true,
         'booking_confirmation' => true,
         'auto_confirm_bookings' => false,
+        // Auto-confirm mode: none | online | all. Default 'online' (successful
+        // online payment => confirmed). Behaviour is resolved via
+        // yatra_get_auto_confirm_mode(), which uses the stored mode when set and
+        // otherwise derives from the legacy auto_confirm_bookings boolean.
+        'auto_confirm_mode' => 'online',
         'require_login' => false,
         'allow_guest_checkout' => true,
         // Hold guest bookings in `pending_verification` status until
@@ -75,6 +82,10 @@ class SettingsService
         // falling back to the per-trip cancellation_policy.
         'booking_expiry_hours' => 24,
         'booking_reminder_days' => 3,
+        // Storefront booking horizon in months. 12 is the value that was
+        // hard-coded before it became configurable, so a site that never
+        // touches it behaves exactly as before. See yatra_get_availability_horizon_months().
+        'availability_horizon_months' => 12,
         'allow_waitlist' => true,
         'waitlist_auto_confirm' => false,
         // Pro: when enabled, the single-trip date_specific mode renders a

@@ -30,8 +30,15 @@ if (!empty($atts['title'])) {
 } else {
     $display_title = __('Our Trips', 'yatra');
 }
+
+// Card layout: per-instance override (card_layout attr) falls back to the
+// site-wide Design setting. Class goes on this wrapper so this listing's layout
+// is independent of the global default and of other listings on the page.
+$yatra_listing_layout_class = \Yatra\Providers\FrontendAssetsProvider::listingLayoutClasses(
+    \Yatra\Providers\FrontendAssetsProvider::resolveListingLayout((string) ($atts['card_layout'] ?? ''))
+);
 ?>
-<div class="yatra-tour-shortcode" data-atts='<?php echo esc_attr(json_encode($atts)); ?>'>
+<div class="yatra-tour-shortcode<?php echo $yatra_listing_layout_class ? ' ' . esc_attr($yatra_listing_layout_class) : ''; ?>" data-atts='<?php echo esc_attr(json_encode($atts)); ?>'>
     <div class="yatra-tour-header">
         <h2 class="yatra-tour-title"><?php echo esc_html($display_title); ?></h2>
         <?php if (!empty($trip_items) && $total_found > 0) : ?>

@@ -813,9 +813,9 @@ class PaymentGatewayController extends BaseController
 
         $previousBookingStatus = (string) ($booking->status ?? 'pending');
 
-        // Only auto-confirm when the operator allows it (or the booking is now
-        // fully paid). A deposit / partial payment leaves the booking pending
-        // when "Auto-Confirm Bookings" is off, for the operator to confirm.
+        // Only auto-confirm when "Auto-Confirm Bookings" is on; otherwise the
+        // booking stays pending for the operator to confirm manually, regardless
+        // of a successful (full or partial) payment.
         $should_confirm = \yatra_should_confirm_booking_on_payment($new_amount_due <= 0, $bookingId);
 
         // Update booking
@@ -830,7 +830,7 @@ class PaymentGatewayController extends BaseController
         $this->bookingRepository->update($bookingId, $booking_update);
 
         if ($should_confirm) {
-            \yatra_trigger_booking_confirmed($bookingId, $previousBookingStatus);
+            \yatra_trigger_booking_confirmed($bookingId, $previousBookingStatus, true);
         }
 
         // Clear remaining payment session if this was a remaining payment
@@ -1253,7 +1253,10 @@ class PaymentGatewayController extends BaseController
                 (int) ($payment->trip_duration_days ?? ($trip->duration_days ?? 0)),
                 isset($payment->trip_duration_nights)
                     ? (int) $payment->trip_duration_nights
-                    : (isset($trip->duration_nights) ? (int) $trip->duration_nights : null)
+                    : (isset($trip->duration_nights) ? (int) $trip->duration_nights : null),
+                // Hour-based day tours: hours come from the loaded trip (the payment
+                // join carries only days/nights); a soft-deleted trip falls back to days.
+                (int) ($trip->duration_hours ?? 0)
             ),
             'trip_difficulty' => $trip ? ($trip->difficulty_name ?? '') : '',
             'departure_location' => $trip ? ($trip->departure_location ?? '') : '',

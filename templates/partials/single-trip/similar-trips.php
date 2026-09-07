@@ -48,13 +48,17 @@ if (!defined('ABSPATH')) {
                     // Duration
                     $duration_days = (int) ($similar_trip->duration_days ?? 0);
                     $duration_nights = (int) ($similar_trip->duration_nights ?? 0);
+                    $duration_hours = (int) ($similar_trip->duration_hours ?? 0);
                     $duration = [
-                        'has_duration' => $duration_days > 0,
-                        'formatted' => $duration_nights > 0
-                            /* translators: 1: number of days, 2: number of nights. */
-                            ? sprintf(_n('%1$d day %2$d night', '%1$d days %2$d nights', $duration_days, 'yatra'), $duration_days, $duration_nights)
-                            /* translators: %d: number of days. */
-                            : sprintf(_n('%d day', '%d days', $duration_days, 'yatra'), $duration_days)
+                        'has_duration' => $duration_days > 0 || $duration_hours > 0,
+                        // Hour-based day tour → "8 hours"; otherwise the day/night wording below.
+                        'formatted' => $duration_hours > 0
+                            ? yatra_format_duration(0, null, $duration_hours)
+                            : ($duration_nights > 0
+                                /* translators: 1: number of days, 2: number of nights. */
+                                ? sprintf(_n('%1$d day %2$d night', '%1$d days %2$d nights', $duration_days, 'yatra'), $duration_days, $duration_nights)
+                                /* translators: %d: number of days. */
+                                : sprintf(_n('%d day', '%d days', $duration_days, 'yatra'), $duration_days))
                     ];
                     
                     // Difficulty — resolve classification id to label + icon (same logic as Trip::getDifficulty / quick facts)

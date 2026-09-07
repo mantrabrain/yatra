@@ -54,6 +54,12 @@ final class EmailMergeTagRegistry
     public const EVENT_REVIEW_REQUEST = 'marketing.review_request';
     public const EVENT_CONSENT_REQUESTED = 'consent.requested';
     public const EVENT_ACCOUNT_EMAIL_VERIFICATION = 'account.email_verification';
+    // Account email change (CustomerService): the request goes to the NEW
+    // address with a confirmation link; the "changed" security notice goes to
+    // the OLD address. Pro seeds templates on these keys, so they must be
+    // registered here or the template editor rejects them ("Invalid event key").
+    public const EVENT_ACCOUNT_EMAIL_CHANGE_REQUEST = 'account.email_change_request';
+    public const EVENT_ACCOUNT_EMAIL_CHANGED = 'account.email_changed';
     public const EVENT_SCHEDULED_PAYMENT_REMINDER = 'scheduled.payment.reminder';
     public const EVENT_SCHEDULED_PAYMENT_SUCCEEDED = 'scheduled.payment.succeeded';
     public const EVENT_SCHEDULED_PAYMENT_FAILED = 'scheduled.payment.failed';
@@ -64,6 +70,13 @@ final class EmailMergeTagRegistry
      * booking context. Booking-context tags inherit this list so
      * the per-event whitelist stays in sync as events evolve.
      */
+    /** Customer-account emails: share the customer + intro/footer tags. */
+    private const ACCOUNT_CONTEXT_EVENTS = [
+        self::EVENT_ACCOUNT_EMAIL_VERIFICATION,
+        self::EVENT_ACCOUNT_EMAIL_CHANGE_REQUEST,
+        self::EVENT_ACCOUNT_EMAIL_CHANGED,
+    ];
+
     private const BOOKING_CONTEXT_EVENTS = [
         self::EVENT_BOOKING_CREATED,
         self::EVENT_BOOKING_CONFIRMED,
@@ -202,10 +215,8 @@ final class EmailMergeTagRegistry
                 'events' => array_merge(
                     $bookingContextEvents,
                     $enquiryContextEvents,
-                    [
-                        self::EVENT_ACCOUNT_EMAIL_VERIFICATION,
-                        self::EVENT_BOOKING_ABANDONED_RECOVERY,
-                    ]
+                    self::ACCOUNT_CONTEXT_EVENTS,
+                    [self::EVENT_BOOKING_ABANDONED_RECOVERY]
                 ),
             ],
             'customer_first_name' => [
@@ -216,7 +227,7 @@ final class EmailMergeTagRegistry
                 'sample' => 'John',
                 'events' => array_merge(
                     $bookingContextEvents,
-                    [self::EVENT_ACCOUNT_EMAIL_VERIFICATION]
+                    self::ACCOUNT_CONTEXT_EVENTS
                 ),
             ],
             'customer_last_name' => [
@@ -236,10 +247,8 @@ final class EmailMergeTagRegistry
                 'events' => array_merge(
                     $bookingContextEvents,
                     $enquiryContextEvents,
-                    [
-                        self::EVENT_ACCOUNT_EMAIL_VERIFICATION,
-                        self::EVENT_BOOKING_ABANDONED_RECOVERY,
-                    ]
+                    self::ACCOUNT_CONTEXT_EVENTS,
+                    [self::EVENT_BOOKING_ABANDONED_RECOVERY]
                 ),
             ],
             'customer_phone' => [
@@ -760,18 +769,27 @@ final class EmailMergeTagRegistry
             'verification_link' => [
                 'key' => 'verification_link',
                 'label' => 'Verification Link',
-                'description' => 'Magic link the customer opens to verify their email.',
+                'description' => 'Magic link the customer opens to verify their email, or to confirm a requested new address.',
                 'category' => self::CATEGORY_ACCOUNT,
                 'sample' => $verificationSampleLink,
-                'events' => [self::EVENT_ACCOUNT_EMAIL_VERIFICATION],
+                // Not offered for the "changed" notice — that email carries no link.
+                'events' => [self::EVENT_ACCOUNT_EMAIL_VERIFICATION, self::EVENT_ACCOUNT_EMAIL_CHANGE_REQUEST],
+            ],
+            'new_email' => [
+                'key' => 'new_email',
+                'label' => 'New Email Address',
+                'description' => 'The address the customer asked to switch their account to.',
+                'category' => self::CATEGORY_ACCOUNT,
+                'sample' => 'alex.new@example.com',
+                'events' => [self::EVENT_ACCOUNT_EMAIL_CHANGE_REQUEST, self::EVENT_ACCOUNT_EMAIL_CHANGED],
             ],
             'intro_paragraph' => [
                 'key' => 'intro_paragraph',
                 'label' => 'Intro Paragraph',
-                'description' => 'Opening sentence (registration / resend variant).',
+                'description' => 'Opening sentence, set by the sender for each account email (verification, change request, changed notice).',
                 'category' => self::CATEGORY_ACCOUNT,
                 'sample' => 'Thank you for registering. Click the button in this email to verify your address.',
-                'events' => [self::EVENT_ACCOUNT_EMAIL_VERIFICATION],
+                'events' => self::ACCOUNT_CONTEXT_EVENTS,
             ],
             'footer_note' => [
                 'key' => 'footer_note',
@@ -779,7 +797,7 @@ final class EmailMergeTagRegistry
                 'description' => 'Disclaimer for unintended recipients.',
                 'category' => self::CATEGORY_ACCOUNT,
                 'sample' => 'If you did not create an account, you can ignore this email.',
-                'events' => [self::EVENT_ACCOUNT_EMAIL_VERIFICATION],
+                'events' => self::ACCOUNT_CONTEXT_EVENTS,
             ],
             'expiry_notice_html' => [
                 'key' => 'expiry_notice_html',

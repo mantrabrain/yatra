@@ -837,6 +837,8 @@ interface SettingsData {
   frontend_primary_color: string;
   /** CSS max width for Yatra containers; empty = follow theme / theme.json */
   frontend_container_max_width: string;
+  /** Trip listing card density: "standard" | "compact_mobile" | "compact_all" */
+  frontend_listing_card_layout: string;
 
   // Google Calendar Settings
   google_calendar_client_id?: string;
@@ -859,6 +861,7 @@ interface SettingsData {
   // Booking Settings
   booking_confirmation: boolean;
   auto_confirm_bookings: boolean;
+  auto_confirm_mode: "none" | "online" | "all";
   require_login: boolean;
   allow_guest_checkout: boolean;
   require_guest_email_verification: boolean;
@@ -995,6 +998,8 @@ interface SettingsData {
   enable_wishlist?: boolean;
   /** Keep sold-out departure dates visible on the storefront (default true) */
   show_sold_out?: boolean;
+  /** How many months ahead customers can see and book (1–36, default 12) */
+  availability_horizon_months?: number;
 
   // Review Settings
   enable_reviews: boolean;
@@ -2730,6 +2735,7 @@ const Settings: React.FC = () => {
       time_format: "H:i",
       frontend_primary_color: "#3b82f6",
       frontend_container_max_width: "",
+      frontend_listing_card_layout: "standard",
       // Search & Listing — defaults match current behaviour (all fields shown,
       // mobile filters expanded) so existing sites are unchanged.
       search_show_keyword: true,
@@ -2741,6 +2747,7 @@ const Settings: React.FC = () => {
       collapse_filters_on_mobile: false,
       booking_confirmation: true,
       auto_confirm_bookings: false,
+      auto_confirm_mode: "online",
       require_login: false,
       allow_guest_checkout: true,
       require_guest_email_verification: false,
@@ -2976,6 +2983,7 @@ const Settings: React.FC = () => {
       booking_base: "book",
       enable_wishlist: false,
       show_sold_out: true,
+      availability_horizon_months: 12,
       use_booking_page: false,
       booking_page_id: 0,
       terms_page_id: 0,
@@ -4553,6 +4561,150 @@ const Settings: React.FC = () => {
                   autoComplete="off"
                 />
               </FormField>
+
+              <FormField
+                id="frontend_listing_card_layout"
+                label={__("Listing card layout", "yatra")}
+                description={__(
+                  "How trip cards appear in listings and search results. Compact shows a dense card — image, title, price and a View Details button only — so several trips fit per screen. Ideal for phones. Existing sites keep the Standard card.",
+                  "yatra",
+                )}
+              >
+                <div
+                  role="radiogroup"
+                  aria-label={__("Listing card layout", "yatra")}
+                  className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl"
+                >
+                  {(
+                    [
+                      {
+                        value: "standard",
+                        label: __("Standard", "yatra"),
+                        sub: __("Full card (default)", "yatra"),
+                        svg: (
+                          <svg
+                            viewBox="0 0 160 100"
+                            className="w-full h-full"
+                            fill="none"
+                          >
+                            <rect x="46" y="6" width="68" height="88" rx="6" fill="#ffffff" stroke="#cbd5e1" strokeWidth="2" />
+                            <rect x="52" y="12" width="56" height="30" rx="3" fill="#60a5fa" />
+                            <rect x="52" y="49" width="44" height="5" rx="2.5" fill="#94a3b8" />
+                            <rect x="52" y="59" width="34" height="3" rx="1.5" fill="#cbd5e1" />
+                            <rect x="52" y="66" width="50" height="3" rx="1.5" fill="#e2e8f0" />
+                            <rect x="52" y="73" width="50" height="3" rx="1.5" fill="#e2e8f0" />
+                            <rect x="52" y="82" width="18" height="6" rx="2" fill="#475569" />
+                            <rect x="86" y="81" width="22" height="8" rx="3" fill="#3b82f6" />
+                          </svg>
+                        ),
+                      },
+                      {
+                        value: "compact_mobile",
+                        label: __("Compact — mobile", "yatra"),
+                        sub: __("Dense on phones · desktop unchanged", "yatra"),
+                        svg: (
+                          <svg
+                            viewBox="0 0 160 100"
+                            className="w-full h-full"
+                            fill="none"
+                          >
+                            <rect x="50" y="4" width="60" height="92" rx="9" fill="#ffffff" stroke="#cbd5e1" strokeWidth="2" />
+                            <rect x="72" y="8" width="16" height="3" rx="1.5" fill="#e2e8f0" />
+                            {[0, 26, 52].map((dy) => (
+                              <g key={dy} transform={`translate(0,${dy})`}>
+                                <rect x="56" y="16" width="48" height="22" rx="3" fill="#f1f5f9" />
+                                <rect x="59" y="19" width="16" height="16" rx="2" fill="#60a5fa" />
+                                <rect x="79" y="21" width="20" height="3" rx="1.5" fill="#94a3b8" />
+                                <rect x="79" y="27" width="12" height="2.5" rx="1.25" fill="#cbd5e1" />
+                                <rect x="79" y="32" width="9" height="3" rx="1.5" fill="#475569" />
+                                <rect x="93" y="31.5" width="6" height="4" rx="1.5" fill="#3b82f6" />
+                              </g>
+                            ))}
+                          </svg>
+                        ),
+                      },
+                      {
+                        value: "compact_all",
+                        label: __("Compact — everywhere", "yatra"),
+                        sub: __("Dense on mobile & desktop", "yatra"),
+                        svg: (
+                          <svg
+                            viewBox="0 0 160 100"
+                            className="w-full h-full"
+                            fill="none"
+                          >
+                            <rect x="10" y="12" width="98" height="58" rx="4" fill="#ffffff" stroke="#cbd5e1" strokeWidth="2" />
+                            <rect x="51" y="70" width="16" height="8" fill="#cbd5e1" />
+                            <rect x="39" y="78" width="40" height="4" rx="2" fill="#cbd5e1" />
+                            {[0, 24].map((dy) => (
+                              <g key={dy} transform={`translate(0,${dy})`}>
+                                <rect x="16" y="18" width="86" height="20" rx="3" fill="#f1f5f9" />
+                                <rect x="19" y="21" width="14" height="14" rx="2" fill="#60a5fa" />
+                                <rect x="37" y="23" width="34" height="3" rx="1.5" fill="#94a3b8" />
+                                <rect x="37" y="29" width="20" height="2.5" rx="1.25" fill="#cbd5e1" />
+                                <rect x="86" y="27" width="12" height="6" rx="2" fill="#3b82f6" />
+                              </g>
+                            ))}
+                            <rect x="120" y="26" width="30" height="62" rx="5" fill="#ffffff" stroke="#cbd5e1" strokeWidth="2" />
+                            {[0, 18, 36].map((dy) => (
+                              <g key={dy} transform={`translate(0,${dy})`}>
+                                <rect x="124" y="32" width="22" height="14" rx="2" fill="#f1f5f9" />
+                                <rect x="126" y="34" width="10" height="10" rx="1.5" fill="#60a5fa" />
+                                <rect x="138" y="36" width="7" height="2" rx="1" fill="#94a3b8" />
+                                <rect x="138" y="40" width="5" height="2" rx="1" fill="#cbd5e1" />
+                              </g>
+                            ))}
+                          </svg>
+                        ),
+                      },
+                    ] as const
+                  ).map((opt) => {
+                    const selected =
+                      (formData.frontend_listing_card_layout || "standard") ===
+                      opt.value;
+                    return (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        role="radio"
+                        aria-checked={selected}
+                        onClick={() =>
+                          handleFieldChange({
+                            target: {
+                              name: "frontend_listing_card_layout",
+                              id: "frontend_listing_card_layout",
+                              value: opt.value,
+                              type: "text",
+                            },
+                          } as React.ChangeEvent<HTMLInputElement>)
+                        }
+                        className={`relative rounded-lg border-2 p-2.5 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+                          selected
+                            ? "border-blue-600 ring-1 ring-blue-600 bg-blue-50/60 dark:bg-blue-900/20"
+                            : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                        }`}
+                      >
+                        <div className="aspect-[8/5] w-full overflow-hidden rounded-md bg-gray-50 dark:bg-gray-800/60">
+                          {opt.svg}
+                        </div>
+                        <div className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+                          {opt.label}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          {opt.sub}
+                        </div>
+                        {selected && (
+                          <span className="absolute top-2 right-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-white">
+                            <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor">
+                              <path d="M16.7 5.3a1 1 0 010 1.4l-7 7a1 1 0 01-1.4 0l-3-3a1 1 0 011.4-1.4L9 11.6l6.3-6.3a1 1 0 011.4 0z" />
+                            </svg>
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </FormField>
             </div>
           </div>
         );
@@ -5967,28 +6119,80 @@ const Settings: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
-                <input
-                  type="checkbox"
-                  id="auto_confirm_bookings"
-                  checked={formData.auto_confirm_bookings}
-                  name="auto_confirm_bookings"
-                  onChange={handleFieldChange}
-                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <div className="flex-1">
-                  <Label
-                    htmlFor="auto_confirm_bookings"
-                    className="font-medium cursor-pointer"
-                  >
-                    {__("Auto-Confirm Bookings", "yatra")}
-                  </Label>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {__(
-                      "Automatically confirm bookings without manual approval",
-                      "yatra",
-                    )}
-                  </p>
+              <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                <div className="font-medium">
+                  {__("Auto-Confirm Bookings", "yatra")}
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 mb-2">
+                  {__(
+                    "Choose when a booking is automatically set to Confirmed. Offline methods (bank transfer, pay later) stay pending until you confirm them.",
+                    "yatra",
+                  )}
+                </p>
+                <div role="radiogroup" className="flex flex-col gap-2">
+                  {[
+                    {
+                      value: "none",
+                      label: __("Don't auto-confirm", "yatra"),
+                      sub: __(
+                        "Every booking stays Pending until you confirm it manually.",
+                        "yatra",
+                      ),
+                    },
+                    {
+                      value: "online",
+                      label: __("Auto-confirm online payments only", "yatra"),
+                      sub: __(
+                        "When an online payment (Stripe, PayPal, Razorpay…) pays the balance in full, the booking is confirmed. Deposits/partial payments and offline methods stay Pending.",
+                        "yatra",
+                      ),
+                    },
+                    {
+                      value: "all",
+                      label: __("Auto-confirm all bookings", "yatra"),
+                      sub: __(
+                        "Every booking is confirmed at checkout, whether or not it was paid.",
+                        "yatra",
+                      ),
+                    },
+                  ].map((opt) => (
+                    <label
+                      key={opt.value}
+                      htmlFor={`auto_confirm_mode_${opt.value}`}
+                      className="flex items-start gap-2 cursor-pointer"
+                    >
+                      <input
+                        type="radio"
+                        id={`auto_confirm_mode_${opt.value}`}
+                        name="auto_confirm_mode"
+                        value={opt.value}
+                        checked={
+                          (formData.auto_confirm_mode || "none") === opt.value
+                        }
+                        onChange={() =>
+                          setFormData((prev) =>
+                            prev
+                              ? {
+                                  ...prev,
+                                  auto_confirm_mode:
+                                    opt.value as SettingsData["auto_confirm_mode"],
+                                  // Keep the legacy boolean in sync for any
+                                  // external reader (all → true, otherwise false).
+                                  auto_confirm_bookings: opt.value === "all",
+                                }
+                              : prev,
+                          )
+                        }
+                        className="mt-0.5 w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <div className="flex-1">
+                        <span className="font-medium text-sm">{opt.label}</span>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                          {opt.sub}
+                        </p>
+                      </div>
+                    </label>
+                  ))}
                 </div>
               </div>
 
@@ -6102,6 +6306,27 @@ const Settings: React.FC = () => {
                     )}
                   </p>
                 </div>
+              </div>
+
+              <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                <FormField
+                  id="availability_horizon_months"
+                  label={__("Booking horizon (months)", "yatra")}
+                  description={__(
+                    "How far ahead customers can see and book dates on the storefront calendar — 1 to 36 months (default 12). A trip whose Available To date is earlier stops there. Long horizons make flexible-booking trips (no dates or rules configured) load more dates per page.",
+                    "yatra",
+                  )}
+                >
+                  <Input
+                    id="availability_horizon_months"
+                    type="number"
+                    value={formData.availability_horizon_months ?? 12}
+                    name="availability_horizon_months"
+                    onChange={handleFieldChange}
+                    min="1"
+                    max="36"
+                  />
+                </FormField>
               </div>
 
               <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">

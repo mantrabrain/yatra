@@ -526,15 +526,22 @@ class TripValidator
 
         // Hour-based duration only applies to single-day tours. Clamp to a sane
         // day-length range, and never let a multi-day / flexible trip carry
-        // hours — otherwise the Google Calendar module would build a short timed
-        // event instead of the correct multi-day span. Only enforced when both
-        // fields are present in the payload (the trip form always sends both).
+        // hours — otherwise the front end would show "8 hours" for a multi-day
+        // trip and the Google Calendar module would build a short timed event
+        // instead of the correct multi-day span.
+        //
+        // `trip_type` settles it when the payload carries it (the trip form
+        // always sends both). A partial update that omits `trip_type` is caught
+        // by the duration_days fallback below, so hours can never be stored
+        // against a multi-day span.
         if (array_key_exists('duration_hours', $sanitized)) {
             $sanitized['duration_hours'] = max(0, min(24, (int) $sanitized['duration_hours']));
-            if (
-                array_key_exists('trip_type', $sanitized)
-                && $sanitized['trip_type'] !== 'single_day'
-            ) {
+            $isMultiDayType = array_key_exists('trip_type', $sanitized)
+                && $sanitized['trip_type'] !== 'single_day';
+            $isMultiDaySpan = array_key_exists('duration_days', $sanitized)
+                && (int) $sanitized['duration_days'] > 1;
+
+            if ($isMultiDayType || $isMultiDaySpan) {
                 $sanitized['duration_hours'] = 0;
             }
         }

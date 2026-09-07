@@ -27,7 +27,11 @@ class DiscountAndDealsShortcode extends BaseShortcode
             'show_time_left' => 'yes',
             'show_pagination' => 'yes',
             'show_filters' => 'no',
-            'title' => 'Special Deals & Discounts'
+            'title' => 'Special Deals & Discounts',
+            // Per-instance card layout override. 'inherit' (default) = use the
+            // site-wide Settings → Design "Listing Card Layout".
+            // Also accepts: standard | compact_mobile | compact_all.
+            'card_layout' => 'inherit'
         ]);
     }
 

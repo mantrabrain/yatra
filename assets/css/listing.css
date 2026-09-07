@@ -3493,3 +3493,194 @@ span.yatra-pagination-btn.disabled {
     line-height: 1.5;
 }
 
+
+/* ============================================================
+   Trip listing — Compact card layout
+   Settings → Frontend Theme → "Listing card layout".
+   Opt-in; the default "standard" card is left untouched.
+     .yatra-listing-compact       → compact on mobile (both compact modes)
+     .yatra-listing-compact--all  → compact on desktop too (compact_all)
+   The class is placed on the LISTING CONTAINER (.yatra-listing-page for the
+   archive/taxonomy, .yatra-tour-shortcode / .yatra-discount-shortcode for the
+   shortcode + Gutenberg block), NOT on <body>. That lets each listing resolve
+   its own layout: the site-wide Design setting is the default, and an
+   individual shortcode/block can override it (card_layout / cardLayout attr).
+   The compact card intentionally shows only: image, title, price,
+   and the "View Details" button — everything else is hidden for density.
+   ============================================================ */
+
+/* --- Compact on mobile (<=768px): compact_mobile AND compact_all --- */
+@media (max-width: 768px) {
+    /* Force a single column so each compact card becomes a full-width
+       horizontal row — covers every trip-card grid wrapper:
+         .yatra-trip-grid     → archive / taxonomy
+         .yatra-tour-grid     → [yatra_trip]/[yatra_tour] shortcode + Tour block
+         .yatra-discount-grid → discount-and-deals shortcode */
+    .yatra-listing-compact .yatra-trip-grid,
+    .yatra-listing-compact .yatra-tour-grid,
+    .yatra-listing-compact .yatra-discount-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px;
+    }
+    .yatra-listing-compact .yatra-trip-card {
+        display: grid !important;
+        grid-template-columns: 116px minmax(0, 1fr) !important;
+        align-items: stretch;
+        gap: 0;
+        overflow: hidden;
+        /* Neutralise the Grid/List view toggle so Compact stays compact whether
+           the visitor is in grid OR list view (list-view forces min-height:240). */
+        min-height: 0 !important;
+        max-height: none !important;
+        flex-direction: initial !important;
+    }
+    .yatra-listing-compact .yatra-trip-card-image {
+        height: 100% !important;
+        min-height: 118px !important;
+        width: auto !important;
+        min-width: 0 !important;
+        aspect-ratio: auto !important;
+        border-radius: 0;
+        align-self: stretch;
+    }
+    /* Keep the image overlays readable on the small thumbnail. */
+    .yatra-listing-compact .yatra-discount-badge {
+        font-size: 0.65rem;
+        padding: 2px 6px;
+    }
+    .yatra-listing-compact .yatra-favorite-btn {
+        width: 26px;
+        height: 26px;
+    }
+    .yatra-listing-compact .yatra-trip-card-image img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover;
+    }
+    .yatra-listing-compact .yatra-trip-content {
+        padding: 10px 12px !important;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 0;
+    }
+    .yatra-listing-compact .yatra-trip-title {
+        font-size: 0.95rem;
+        line-height: 1.3;
+        margin: 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .yatra-listing-compact .yatra-trip-destinations,
+    .yatra-listing-compact .yatra-trip-card-meta,
+    .yatra-listing-compact .yatra-trip-short-description,
+    .yatra-listing-compact .yatra-trip-stats-row,
+    .yatra-listing-compact .yatra-trip-traveler-types,
+    .yatra-listing-compact .yatra-trip-activities,
+    .yatra-listing-compact .yatra-trip-categories-compact,
+    .yatra-listing-compact .yatra-difficulty-overlay,
+    .yatra-listing-compact .yatra-group-discount-badge,
+    .yatra-listing-compact .yatra-trip-listing-dp-urgency {
+        display: none !important;
+    }
+    .yatra-listing-compact .yatra-trip-footer {
+        margin-top: auto;
+        display: flex;
+        /* The base mobile footer is flex-direction:column — force a single row
+           so price and the button sit side by side in the compact card. */
+        flex-direction: row !important;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: space-between;
+        align-self: stretch;
+        gap: 8px;
+        padding: 0 !important;
+        border: 0 !important;
+    }
+    .yatra-listing-compact .yatra-trip-card-price { margin: 0 !important; width: auto !important; align-items: flex-start; }
+    .yatra-listing-compact .yatra-card-view-btn { flex: 0 0 auto; }
+    .yatra-listing-compact .yatra-trip-price { font-size: 1rem; }
+    .yatra-listing-compact .yatra-card-view-btn {
+        padding: 6px 10px !important;
+        font-size: 0.8rem;
+        white-space: nowrap;
+    }
+}
+
+/* --- Compact on desktop too (>=769px): compact_all only.
+       Respects the visitor's Grid/List view toggle:
+         • Grid view → the multi-column grid is kept, cards are just shorter
+         • List view → compact horizontal rows (list-view supplies the row)
+       The density trimming (hiding the extra blocks) applies to both. --- */
+@media (min-width: 769px) {
+    /* Density — identical in grid and list. */
+    .yatra-listing-compact--all .yatra-trip-content {
+        gap: 8px;
+        min-width: 0;
+        padding: 14px 16px !important;
+    }
+    .yatra-listing-compact--all .yatra-trip-title {
+        font-size: 1.05rem;
+        line-height: 1.3;
+        margin: 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .yatra-listing-compact--all .yatra-trip-destinations,
+    .yatra-listing-compact--all .yatra-trip-card-meta,
+    .yatra-listing-compact--all .yatra-trip-short-description,
+    .yatra-listing-compact--all .yatra-trip-stats-row,
+    .yatra-listing-compact--all .yatra-trip-traveler-types,
+    .yatra-listing-compact--all .yatra-trip-activities,
+    .yatra-listing-compact--all .yatra-trip-categories-compact,
+    .yatra-listing-compact--all .yatra-difficulty-overlay,
+    .yatra-listing-compact--all .yatra-group-discount-badge,
+    .yatra-listing-compact--all .yatra-trip-listing-dp-urgency {
+        display: none !important;
+    }
+    .yatra-listing-compact--all .yatra-trip-footer {
+        margin-top: auto;
+        display: flex;
+        flex-direction: row !important;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding-top: 4px !important;
+        border: 0 !important;
+    }
+    .yatra-listing-compact--all .yatra-trip-card-price { margin: 0 !important; width: auto !important; }
+    .yatra-listing-compact--all .yatra-card-view-btn { flex: 0 0 auto; white-space: nowrap; }
+
+    /* GRID view (DEFAULT) → a shorter vertical card. Grid-agnostic: applies to
+       every wrapper (archive grid, shortcode/block .yatra-tour-grid, and
+       .yatra-discount-grid) since none of them except the archive list-view
+       needs the horizontal row. */
+    .yatra-listing-compact--all .yatra-trip-card-image {
+        height: 160px !important;
+        aspect-ratio: auto !important;
+    }
+
+    /* LIST view (archive only) → compact horizontal row overrides the vertical
+       default. The Grid/List toggle exists only on .yatra-trip-grid, so the
+       shortcode/block/discount grids always keep the compact vertical card. */
+    .yatra-listing-compact--all .yatra-trip-grid.list-view .yatra-trip-card {
+        min-height: 0 !important;
+        max-height: none !important;
+    }
+    .yatra-listing-compact--all .yatra-trip-grid.list-view .yatra-trip-card-image {
+        height: 160px !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        aspect-ratio: auto !important;
+        align-self: stretch;
+    }
+    .yatra-listing-compact--all .yatra-trip-grid.list-view .yatra-trip-content {
+        padding: 16px 18px !important;
+        justify-content: flex-start;
+    }
+}

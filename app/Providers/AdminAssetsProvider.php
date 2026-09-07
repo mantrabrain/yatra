@@ -440,6 +440,18 @@ class AdminAssetsProvider
                     true
                 );
 
+                // The bundle calls the global wp.i18n.__() (it never ships its
+                // own copy), and scripts/extract-js-pot.mjs writes every admin
+                // string's `#:` reference as this bundle's path precisely so
+                // WordPress's md5(handle src) JSON lookup matches. This call is
+                // the missing last link: it tells WordPress to load
+                // i18n/languages/yatra-{locale}-{md5}.json (or the copy under
+                // WP_LANG_DIR/plugins) for the admin UI. Without it, translated
+                // admin strings never reach the SPA. Mirrors FrontendAssetsProvider.
+                if (function_exists('wp_set_script_translations')) {
+                    wp_set_script_translations('yatra-admin', 'yatra', YATRA_PLUGIN_PATH . 'i18n/languages');
+                }
+
                 // Localize script data
                 wp_localize_script('yatra-admin', 'yatraAdmin', $localized_data);
 

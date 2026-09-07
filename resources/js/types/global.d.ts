@@ -43,6 +43,8 @@ declare global {
       whatsappEnabled?: boolean;
       channelManagerEnabled?: boolean;
       webhooksEnabled?: boolean;
+      /** Pro "Scheduled Payments" module — drives the Payments submenu. */
+      scheduledPaymentsEnabled?: boolean;
       // Brand / chrome
       brandName?: string;
       brandPrimaryColor?: string;

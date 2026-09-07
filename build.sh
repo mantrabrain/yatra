@@ -98,6 +98,9 @@ phpmd.xml.dist
 .env
 .env.*
 *.log
+# i18n intermediate written by scripts/extract-js-pot.mjs; merged into yatra.pot
+# by `npm run makepot` and deleted — but a failed run can leave it behind.
+i18n/languages/yatra-js.pot
 .DS_Store
 Thumbs.db
 # Source maps & Vite metadata (optional for support; omit from distribution zip)

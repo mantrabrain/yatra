@@ -57,7 +57,15 @@ yatra_get_header();
          style="display:none;"></div>
 <?php endif; ?>
 
-<div class="yatra-listing-page yatra-trip-listing" id="yatra-trip-listing-root">
+<?php
+// Trip-listing card layout (Settings → Design). The archive follows the
+// site-wide setting; the class is placed on this container so the listing CSS
+// can key off it (see assets/css/listing.css "Compact card layout").
+$yatra_listing_layout_class = \Yatra\Providers\FrontendAssetsProvider::listingLayoutClasses(
+    \Yatra\Providers\FrontendAssetsProvider::resolveListingLayout()
+);
+?>
+<div class="yatra-listing-page yatra-trip-listing<?php echo $yatra_listing_layout_class ? ' ' . esc_attr($yatra_listing_layout_class) : ''; ?>" id="yatra-trip-listing-root">
     <!-- Trip Search Shortcode - replaces hardcoded search UI -->
     <div class="yatra-trip-listing-search-wrap">
         <?php
