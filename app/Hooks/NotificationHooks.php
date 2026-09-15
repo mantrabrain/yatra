@@ -62,6 +62,14 @@ class NotificationHooks
             }
         }
         
+        // A manually recorded payment (PaymentService) fires this same action
+        // with `send_emails` => false when an operator opted out via the
+        // `yatra_send_manual_payment_emails` filter; the event still reaches
+        // every other listener (automations, webhooks, …).
+        if (isset($paymentData['send_emails']) && !$paymentData['send_emails']) {
+            return;
+        }
+
         if (!empty($paymentData)) {
             NotificationService::sendPaymentCompletedNotification($paymentData);
         }

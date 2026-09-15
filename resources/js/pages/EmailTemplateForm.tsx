@@ -1,6 +1,21 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { __ } from "../lib/i18n";
+import { __, sprintf } from "../lib/i18n";
+import { MultiSelect } from "../components/ui/multi-select";
+import { SearchableSelect } from "../components/ui/searchable-select";
+import {
+  decodeTargets,
+  describeTargets,
+  encodeTargets,
+  hasTargets,
+  useTripTargets,
+  type TripTargets,
+} from "../hooks/useTripTargets";
+import { EmailOverrideCreateModal } from "../components/email/EmailOverrideCreateModal";
+import {
+  fetchEmailTemplates,
+  resolveEmailTemplatesForTrip,
+} from "../api/email-automation-api";
 import { useToast } from "../components/ui/toast";
 import {
   Card,
@@ -140,6 +155,11 @@ const EmailTemplateForm: React.FC = () => {
     event_key: "",
     is_active: true,
   });
+  // Trip-specific overrides (Pro Email Automation). `targets` is only sent
+  // for override rows; `previewTrip` feeds preview / test with a real trip.
+  const [targets, setTargets] = useState<TripTargets>({});
+  const [previewTrip, setPreviewTrip] = useState<number | null>(null);
+  const [overrideModalOpen, setOverrideModalOpen] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [previewData, setPreviewData] = useState<PreviewData | null>(null);
   const [testEmail, setTestEmail] = useState("");
@@ -178,6 +198,62 @@ const EmailTemplateForm: React.FC = () => {
 
   // System templates own their trigger event; everything else may choose one.
   const isSystemTemplate = Boolean((templateData as any)?.is_system);
+  const overridesSupported =
+    !isCoreSettingsEdit &&
+    !!(window as any).yatraAdmin?.emailTemplateOverridesEnabled;
+  const overrideOf = String((templateData as any)?.overrides ?? "");
+  const isOverride = overridesSupported && overrideOf !== "";
+  const isOverridableGlobal =
+    overridesSupported &&
+    !isOverride &&
+    Boolean((templateData as any)?.overridable);
+  // Global list (for the override's parent name, the global's override strip
+  // and the picker labels). Cached with the Templates tab.
+  const { data: allTemplatesData } = useQuery({
+    queryKey: ["email-templates"],
+    queryFn: () => fetchEmailTemplates(),
+    enabled: overridesSupported && !isCreateMode,
+  });
+  const allTemplates = useMemo(
+    () => (Array.isArray(allTemplatesData) ? (allTemplatesData as any[]) : []),
+    [allTemplatesData],
+  );
+  const parentTemplate = useMemo(
+    () => allTemplates.find((t) => t.template_key === overrideOf) || null,
+    [allTemplates, overrideOf],
+  );
+  const myOverrides = useMemo(
+    () =>
+      allTemplates
+        .filter(
+          (t) =>
+            t.overrides && t.overrides === (templateData as any)?.template_key,
+        )
+        .sort((a, b) => (a.priority || 0) - (b.priority || 0)),
+    [allTemplates, templateData],
+  );
+  const { options: tripTargetOptions } = useTripTargets(
+    overridesSupported && (isOverride || isOverridableGlobal),
+  );
+  const tripOptions = useMemo(
+    () =>
+      tripTargetOptions
+        .filter((o) => String(o.value).startsWith("trip:"))
+        .map((o) => ({
+          id: Number(String(o.value).slice(5)),
+          label: o.label.replace(/^[^:]+: /, ""),
+        })),
+    [tripTargetOptions],
+  );
+  // "Check a trip": which template the chosen trip would actually get.
+  const { data: tripResolution } = useQuery({
+    queryKey: ["email-templates-resolve", previewTrip],
+    queryFn: () => resolveEmailTemplatesForTrip(previewTrip as number),
+    enabled:
+      overridesSupported &&
+      !!previewTrip &&
+      (isOverride || isOverridableGlobal),
+  });
 
   // Event-scoped variables: the sidebar re-fetches whenever the
   // operator switches the trigger event so the "Available
@@ -245,9 +321,16 @@ const EmailTemplateForm: React.FC = () => {
       category: String(t.category ?? "booking"),
       subject: String(t.subject ?? ""),
       body: String(t.body ?? ""),
-      event_key: String(t.event_key ?? ""),
+      // An override's own event_key is stored empty; show (and fetch
+      // variables for) the global template's event instead.
+      event_key: String(t.effective_event_key || t.event_key || ""),
       is_active: Boolean(t.is_active ?? true),
     });
+    setTargets(
+      t.overrides && t.targets && typeof t.targets === "object"
+        ? (t.targets as TripTargets)
+        : {},
+    );
   }, [templateData]);
 
   useEffect(() => {
@@ -364,7 +447,7 @@ const EmailTemplateForm: React.FC = () => {
 
   const previewMutation = useMutation({
     mutationFn: async () => {
-      return previewEmailTemplate(id as string);
+      return previewEmailTemplate(id as string, previewTrip);
     },
     onSuccess: (data) => {
       setPreviewData(data);
@@ -399,7 +482,7 @@ const EmailTemplateForm: React.FC = () => {
 
   const testMutation = useMutation({
     mutationFn: async (email: string) => {
-      return sendEmailTemplateTest(id as string, email);
+      return sendEmailTemplateTest(id as string, email, previewTrip);
     },
     onSuccess: () => {
       showToast(__("Test email sent successfully"), "success");
@@ -429,8 +512,27 @@ const EmailTemplateForm: React.FC = () => {
       showToast(__("Subject line is required"), "error");
       return;
     }
+    if (isOverride && !hasTargets(targets)) {
+      showToast(
+        __(
+          "An override needs at least one trip, category or trip type — or delete it to use the global template.",
+          "yatra",
+        ),
+        "error",
+      );
+      return;
+    }
 
-    saveMutation.mutate(formData);
+    saveMutation.mutate(
+      isOverride
+        ? // event_key is not sent: an override always fires on its global's event.
+          ({
+            ...formData,
+            event_key: undefined,
+            targets,
+          } as unknown as typeof formData)
+        : formData,
+    );
   };
 
   const copyVariable = (variable: string) => {
@@ -631,6 +733,31 @@ const EmailTemplateForm: React.FC = () => {
                         "yatra",
                       )
                   : String(templateData?.name ?? "")}
+              {isOverride && (
+                <span className="ml-2 inline-flex items-center gap-1 text-xs align-middle">
+                  <span className="px-1.5 py-0.5 rounded font-medium bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300">
+                    {__("Override", "yatra")}
+                  </span>
+                  <span className="text-gray-400">
+                    {__("of global template", "yatra")}
+                  </span>
+                  {parentTemplate ? (
+                    <a
+                      href={`admin.php?page=yatra&subpage=email-automation&tab=templates&action=edit&id=${parentTemplate.id}`}
+                      className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+                    >
+                      {parentTemplate.name}
+                    </a>
+                  ) : (
+                    <span>{overrideOf}</span>
+                  )}
+                </span>
+              )}
+              {isOverridableGlobal && (
+                <span className="ml-2 px-1.5 py-0.5 rounded text-xs font-medium align-middle bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                  {__("Global", "yatra")}
+                </span>
+              )}
             </p>
           </div>
         </div>
@@ -694,6 +821,116 @@ const EmailTemplateForm: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Form */}
         <div className="lg:col-span-2 space-y-6">
+          {isOverride && (
+            <div
+              className="rounded-lg border border-purple-300 dark:border-purple-800 overflow-hidden"
+              data-testid="override-applies-to"
+            >
+              <div className="px-4 py-2.5 bg-purple-50 dark:bg-purple-900/20 text-sm font-semibold text-purple-800 dark:text-purple-200">
+                {__("Applies to", "yatra")}{" "}
+                <span className="font-normal text-purple-600 dark:text-purple-300">
+                  {__(
+                    "— bookings on these trips get this override instead of the global template",
+                    "yatra",
+                  )}
+                </span>
+              </div>
+              <div className="p-4 space-y-3">
+                <MultiSelect
+                  value={encodeTargets(targets)}
+                  onChange={(vals) => setTargets(decodeTargets(vals))}
+                  options={tripTargetOptions}
+                  placeholder={__(
+                    "Search trips, categories, trip types…",
+                    "yatra",
+                  )}
+                />
+                {!hasTargets(targets) && (
+                  <p className="text-xs text-red-600">
+                    {__(
+                      "Pick at least one trip, category or trip type.",
+                      "yatra",
+                    )}
+                  </p>
+                )}
+                <ul className="text-xs text-gray-500 dark:text-gray-400 list-disc pl-5 space-y-0.5">
+                  <li>
+                    {__(
+                      "Any match applies. A trip in a sub-category also matches its parent category.",
+                      "yatra",
+                    )}
+                  </li>
+                  <li>
+                    {__(
+                      "When several overrides match one trip, the most specific wins — trip › category › trip type — then the priority order in the Override templates list.",
+                      "yatra",
+                    )}
+                  </li>
+                  <li>
+                    {__(
+                      "Trips that match no override keep the global template. Switching this override off does the same for its trips.",
+                      "yatra",
+                    )}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          )}
+          {isOverridableGlobal && (
+            <div
+              className="flex flex-wrap items-start gap-3 rounded-lg border border-purple-300 dark:border-purple-800 bg-purple-50 dark:bg-purple-900/20 px-4 py-3 text-sm text-purple-900 dark:text-purple-200"
+              data-testid="global-overrides-strip"
+            >
+              <div className="flex-1">
+                {myOverrides.length === 0
+                  ? __(
+                      "No overrides yet. Every trip gets this template. Add an override to give some trips different wording.",
+                      "yatra",
+                    )
+                  : sprintf(
+                      __(
+                        "This global template has %d override(s) with their own wording. Changes you make here don't change them; every other trip gets this template.",
+                        "yatra",
+                      ),
+                      myOverrides.length,
+                    )}
+                {myOverrides.length > 0 && (
+                  <ul className="mt-1 space-y-0.5">
+                    {myOverrides.map((o) => (
+                      <li
+                        key={o.id}
+                        className="flex flex-wrap items-center gap-2"
+                      >
+                        <a
+                          href={`admin.php?page=yatra&subpage=email-automation&tab=templates&action=edit&id=${o.id}`}
+                          className="font-medium text-blue-700 dark:text-blue-300 hover:underline"
+                        >
+                          {o.name}
+                        </a>
+                        <span className="text-xs text-purple-700 dark:text-purple-300">
+                          {describeTargets(o.targets, tripTargetOptions)}
+                        </span>
+                        {!o.is_active && (
+                          <span className="text-xs text-amber-700 dark:text-amber-300">
+                            {__("(off)", "yatra")}
+                          </span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setOverrideModalOpen(true)}
+                data-testid="add-override-from-global"
+              >
+                {__("+ Add override", "yatra")}
+              </Button>
+            </div>
+          )}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
@@ -756,7 +993,9 @@ const EmailTemplateForm: React.FC = () => {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   {__("Trigger Event")}
                 </label>
-                {Boolean(templateData?.is_system) || isCoreSettingsEdit ? (
+                {Boolean(templateData?.is_system) ||
+                isCoreSettingsEdit ||
+                isOverride ? (
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <span className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
@@ -764,7 +1003,12 @@ const EmailTemplateForm: React.FC = () => {
                         {formData.event_key || "-"}
                       </span>
                       <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {__("System templates cannot change events")}
+                        {isOverride
+                          ? __(
+                              "Same as the global template — an override can't change when it is sent, only what it says",
+                              "yatra",
+                            )
+                          : __("System templates cannot change events")}
                       </span>
                     </div>
                     {formData.event_key && (
@@ -1169,6 +1413,115 @@ const EmailTemplateForm: React.FC = () => {
             </CardContent>
           </Card>
 
+          {/* One trip dropdown for the editor: preview, test AND "which
+              template does this trip get". It is NEVER saved — the saved
+              targeting is the Applies-to block. */}
+          {!isCreateMode &&
+            !isCoreSettingsEdit &&
+            overridesSupported &&
+            (isOverride || isOverridableGlobal) && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">
+                    {__("Try it with a real trip", "yatra")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <div data-testid="preview-trip">
+                    <SearchableSelect
+                      value={previewTrip ? String(previewTrip) : ""}
+                      onChange={(value) =>
+                        setPreviewTrip(value ? Number(value) : null)
+                      }
+                      options={tripOptions.map((t) => ({
+                        value: String(t.id),
+                        label: t.label,
+                      }))}
+                      placeholder={__("Sample data (no trip)", "yatra")}
+                      searchPlaceholder={__("Search trips…", "yatra")}
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    {__(
+                      "Not saved. Preview and Send Test Email use this trip's real name, link and sample booking data. Which trips actually get this template is set in “Applies to”.",
+                      "yatra",
+                    )}
+                  </p>
+                  {previewTrip && tripResolution && (
+                    <div
+                      className="text-sm rounded-md border border-dashed border-gray-300 dark:border-gray-600 px-3 py-2"
+                      data-testid="check-trip-result"
+                    >
+                      <span className="text-gray-500">
+                        {__("This trip's customers get:", "yatra")}
+                      </span>{" "}
+                      {(() => {
+                        const parentKey = isOverride
+                          ? overrideOf
+                          : String((templateData as any)?.template_key || "");
+                        const hit = tripResolution.resolved[parentKey];
+                        if (isOverride) {
+                          if (hit?.id === Number(id)) {
+                            return (
+                              <span className="px-1.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300">
+                                {__("this override", "yatra")}
+                                {hit?.reason ? ` · ${hit.reason}` : ""}
+                              </span>
+                            );
+                          }
+                          const noBodyYet = !String(
+                            (templateData as any)?.body || "",
+                          ).trim()
+                            ? " — " +
+                              __(
+                                "this override has no body yet, so it is skipped",
+                                "yatra",
+                              )
+                            : "";
+                          if (hit) {
+                            return (
+                              <span className="text-amber-700 dark:text-amber-300">
+                                {sprintf(
+                                  __("“%1$s” (%2$s)", "yatra"),
+                                  hit.name,
+                                  hit.reason,
+                                )}
+                                {noBodyYet}
+                              </span>
+                            );
+                          }
+                          return (
+                            <span className="text-gray-700 dark:text-gray-300">
+                              {sprintf(
+                                __("the global template (%s)", "yatra"),
+                                parentTemplate?.name || overrideOf,
+                              )}
+                              {noBodyYet}
+                            </span>
+                          );
+                        }
+                        return hit ? (
+                          <span className="text-amber-700 dark:text-amber-300">
+                            {sprintf(
+                              __(
+                                "the override “%1$s” (%2$s), not this template",
+                                "yatra",
+                              ),
+                              hit.name,
+                              hit.reason,
+                            )}
+                          </span>
+                        ) : (
+                          <span className="px-1.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300">
+                            {__("this template", "yatra")}
+                          </span>
+                        );
+                      })()}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
           {/* Test Email - Only show in edit mode */}
           {!isCreateMode && !isCoreSettingsEdit && (
             <Card>
@@ -1526,6 +1879,14 @@ const EmailTemplateForm: React.FC = () => {
           setFormData({ ...formData, subject, body })
         }
       />
+      {isOverridableGlobal && templateData && (
+        <EmailOverrideCreateModal
+          isOpen={overrideModalOpen}
+          onClose={() => setOverrideModalOpen(false)}
+          globals={[templateData as any]}
+          parent={templateData as any}
+        />
+      )}
     </div>
   );
 };

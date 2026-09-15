@@ -1262,7 +1262,12 @@ class TripService extends BaseService
      */
     public function countDeparturesByDate(int $tripId, string $date): int
     {
-        return $this->repository->countDeparturesByDate($tripId, $date);
+        // The December 2025 service/controller refactor moved this query to
+        // TripAvailabilityRepository::countAvailableDeparturesByDate() but left
+        // this call pointing at TripRepository, where no such method exists —
+        // so the storefront's date-pricing request (fired whenever a customer
+        // picks a date) has returned a fatal 500 ever since.
+        return $this->availabilityRepository->countAvailableDeparturesByDate($tripId, $date);
     }
 
     /**

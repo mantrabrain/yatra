@@ -85,6 +85,15 @@ class PaymentService
             return ['success' => false, 'message' => __('Booking not found.', 'yatra')];
         }
 
+        // The payments table's status column is an enum; a value outside it
+        // (the admin form used to offer "partial") was stored as '' on lenient
+        // MySQL and rejected outright on strict mode — either way the payment
+        // never counted towards the booking. Refuse it up front instead.
+        $data = self::normalizeStatus($data);
+        if (isset($data['status']) && !self::isValidStatus($data['status'])) {
+            return ['success' => false, 'message' => __('Invalid status.', 'yatra')];
+        }
+
         // A payment recorded by hand carries no currency, and both the payments and
         // bookings tables declare `currency char(3) DEFAULT 'USD'` — so on a Euro
         // store a manual payment was saved as USD and listed with a dollar sign
@@ -111,24 +120,12 @@ class PaymentService
         $totalPaid = $this->paymentRepository->getTotalPaidForBooking((int) $data['booking_id']);
         $this->bookingRepository->updateAmountPaid((int) $data['booking_id'], $totalPaid);
 
-        // Notify the customer AND the admin that a payment was received — mirrors
-        // the automated online-payment notifications, which this manual-entry
-        // path otherwise skips. Only when the entry represents money actually
-        // received (a completed payment); pending/failed/refunded records don't
-        // trigger a "payment received" email. Respects the payment-email template
-        // toggles (via sendIfEnabled) and is filterable so operators can opt out.
-        $status = strtolower(trim((string) ($data['status'] ?? '')));
-        $isReceived = in_array($status, ['completed', 'paid', 'succeeded'], true);
-        if (
-            $isReceived
-            && (bool) apply_filters('yatra_send_manual_payment_emails', true, (int) $data['booking_id'], $data)
-        ) {
-            NotificationService::sendPaymentCompletedNotification([
-                'booking_id' => (int) $data['booking_id'],
-                'amount' => (float) ($data['amount'] ?? 0),
-                'payment_method' => (string) ($data['gateway'] ?? ($data['payment_method'] ?? '')),
-                'transaction_id' => (string) ($data['transaction_id'] ?? ''),
-            ]);
+        // A payment recorded as completed is money actually received: dispatch
+        // it exactly like a gateway capture (emails + payment.received /
+        // payment.partial_received automations, webhooks, …). Pending / failed /
+        // refunded records are bookkeeping only.
+        if (($data['status'] ?? '') === 'completed') {
+            $this->dispatchPaymentCompleted((int) $paymentId, $data);
         }
 
         return [
@@ -136,6 +133,76 @@ class PaymentService
             'payment_id' => $paymentId,
             'message' => __('Payment recorded successfully.', 'yatra'),
         ];
+    }
+
+    /**
+     * Statuses the payments table accepts (its `status` enum).
+     */
+    public static function isValidStatus(string $status): bool
+    {
+        return in_array($status, ['pending', 'completed', 'failed', 'refunded', 'cancelled'], true);
+    }
+
+    /**
+     * A null / blank status means "not specified": drop the key so the table
+     * default (create) or the current value (update) applies, instead of the
+     * repository writing '' into the enum column. Otherwise lower-case it.
+     *
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    private static function normalizeStatus(array $data): array
+    {
+        if (!array_key_exists('status', $data)) {
+            return $data;
+        }
+        $status = strtolower(trim((string) $data['status']));
+        if ($status === '') {
+            unset($data['status']);
+        } else {
+            $data['status'] = $status;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Fire `yatra_payment_completed` for a manually recorded payment.
+     *
+     * Same action and array payload the gateways fire after a capture, so the
+     * existing listeners do the rest: core sends the customer/admin "payment
+     * received" emails (NotificationHooks), Pro Email Automation fires
+     * `payment.partial_received` or `payment.received` from the booking's
+     * remaining balance, webhooks / WhatsApp deliver the matching event, and
+     * Scheduled Payments retires pending charges when this settles the balance.
+     * Called only when a payment BECOMES completed, never on a re-save, so
+     * nothing is sent twice. The pre-existing `yatra_send_manual_payment_emails`
+     * filter still lets an operator keep the emails off; the event itself is
+     * always fired.
+     *
+     * @param array<string, mixed> $data The payment row (or the create payload).
+     */
+    private function dispatchPaymentCompleted(int $paymentId, array $data): void
+    {
+        $bookingId = (int) ($data['booking_id'] ?? 0);
+        if ($bookingId <= 0) {
+            return;
+        }
+
+        $sendEmails = (bool) apply_filters('yatra_send_manual_payment_emails', true, $bookingId, $data);
+        $gateway = (string) ($data['gateway'] ?? ($data['payment_method'] ?? ''));
+
+        do_action('yatra_payment_completed', [
+            'booking_id' => $bookingId,
+            'payment_id' => $paymentId,
+            'amount' => (float) ($data['amount'] ?? 0),
+            'currency' => (string) ($data['currency'] ?? SettingsService::getCurrency()),
+            'gateway' => $gateway,
+            'payment_method' => $gateway,
+            'transaction_id' => (string) ($data['transaction_id'] ?? ''),
+            'source' => 'manual',
+            'send_emails' => $sendEmails,
+        ]);
     }
 
     /**
@@ -153,6 +220,11 @@ class PaymentService
             return ['success' => false, 'message' => __('Payment not found.', 'yatra')];
         }
 
+        $data = self::normalizeStatus($data);
+        if (isset($data['status']) && !self::isValidStatus($data['status'])) {
+            return ['success' => false, 'message' => __('Invalid status.', 'yatra')];
+        }
+
         $updated = $this->paymentRepository->update($id, $data);
 
         if (!$updated) {
@@ -162,6 +234,15 @@ class PaymentService
         // Recalculate booking amount paid
         $totalPaid = $this->paymentRepository->getTotalPaidForBooking((int) $payment->booking_id);
         $this->bookingRepository->updateAmountPaid((int) $payment->booking_id, $totalPaid);
+
+        // Edited from pending/failed/… to completed → the money has now been
+        // received; dispatch once, on that transition only.
+        $wasCompleted = (string) ($payment->status ?? '') === 'completed';
+        $isCompleted = (string) ($data['status'] ?? $payment->status ?? '') === 'completed';
+        if ($isCompleted && !$wasCompleted) {
+            $updatedRow = $this->paymentRepository->find($id);
+            $this->dispatchPaymentCompleted($id, $updatedRow ? (array) $updatedRow : array_merge((array) $payment, $data));
+        }
 
         return [
             'success' => true,
@@ -199,6 +280,11 @@ class PaymentService
         // Recalculate booking amount paid
         $totalPaid = $this->paymentRepository->getTotalPaidForBooking((int) $payment->booking_id);
         $this->bookingRepository->updateAmountPaid((int) $payment->booking_id, $totalPaid);
+
+        // "Mark as Completed" on a pending payment = the money arrived.
+        if ($status === 'completed' && (string) ($payment->status ?? '') !== 'completed') {
+            $this->dispatchPaymentCompleted($id, (array) $payment);
+        }
 
         return [
             'success' => true,

@@ -8,6 +8,8 @@
  */
 
 import { formatYatraMoney } from "../lib/currency-display";
+import { apiClient } from "../lib/api-client";
+import { API_ENDPOINTS } from "../lib/api-endpoints";
 
 interface TaxDetails {
   tax_amount: number;
@@ -56,9 +58,11 @@ class TaxService {
    */
   async loadTaxSettings(): Promise<void> {
     try {
-      const response = await fetch("/wp-json/yatra/v1/settings");
-      const settings = await response.json();
-      this.taxSettings = settings;
+      // Through the shared client so the REST nonce is sent — a bare fetch()
+      // was answered with 401 on every admin booking form, so tax settings
+      // never actually loaded here.
+      const settings = await apiClient.get(API_ENDPOINTS.SETTINGS);
+      this.taxSettings = (settings as any)?.data ?? settings;
     } catch (error) {
       console.error("Failed to load tax settings:", error);
     }

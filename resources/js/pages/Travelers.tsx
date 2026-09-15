@@ -53,6 +53,8 @@ interface FormConfig {
     description: string;
     enabled: boolean;
     fields: FormField[];
+    /** Pro: per-trip versions of the form, each with its own field list. */
+    conditions?: { fields?: FormField[] }[];
   };
 }
 
@@ -126,12 +128,16 @@ const Travelers: React.FC = () => {
         };
   });
 
-  // Fetch form configuration for dynamic columns
+  // Fetch form configuration for dynamic columns. The global (unscoped)
+  // config, conditions included — this list spans every trip, so a column is
+  // shown for any traveler field ANY trip's form version can ask.
   const { data: formConfigData } = useQuery({
-    queryKey: ["booking-form-config"],
+    queryKey: ["booking-form-config", "global"],
     queryFn: async () => {
-      const result = await apiService.getSettings("booking_form");
-      return result.success ? result.data?.booking_form_config : null;
+      const result = await apiService.getBookingFormConfig();
+      return (
+        result?.data?.booking_form_config || result?.booking_form_config || null
+      );
     },
   });
 
@@ -181,12 +187,27 @@ const Travelers: React.FC = () => {
       return [];
     }
 
-    // Get enabled fields from form config, sorted by order
-    const enabledFields = formConfig.traveler_form.fields
-      .filter(
-        (field) => field.enabled && !EXCLUDED_DYNAMIC_FIELDS.includes(field.id),
-      )
-      .sort((a, b) => (a.order || 0) - (b.order || 0));
+    // Global fields first (in their order), then any field that only exists
+    // in a per-trip version of the form (Pro conditions), de-duplicated by id.
+    const seen = new Set<string>();
+    const allFields: FormField[] = [];
+    const add = (fields?: FormField[]) =>
+      (fields || []).forEach((field) => {
+        if (!seen.has(field.id)) {
+          seen.add(field.id);
+          allFields.push(field);
+        }
+      });
+    add(
+      [...formConfig.traveler_form.fields].sort(
+        (a, b) => (a.order || 0) - (b.order || 0),
+      ),
+    );
+    (formConfig.traveler_form.conditions || []).forEach((c) => add(c.fields));
+
+    const enabledFields = allFields.filter(
+      (field) => field.enabled && !EXCLUDED_DYNAMIC_FIELDS.includes(field.id),
+    );
 
     return enabledFields.map((field) => ({
       id: field.id,

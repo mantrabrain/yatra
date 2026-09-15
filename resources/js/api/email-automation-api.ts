@@ -17,9 +17,73 @@ export type EmailPreviewPayload = {
 };
 
 export async function fetchEmailTemplates(): Promise<unknown[]> {
-  const raw = await apiClient.get(API_ENDPOINTS.EMAIL_TEMPLATES);
+  // The list is rendered client-side in full (no server paging in the UI);
+  // ask for everything so trip-specific overrides never fall off page 1.
+  const raw = await apiClient.get(API_ENDPOINTS.EMAIL_TEMPLATES, {
+    params: { per_page: 500 },
+  });
   const unwrapped = unwrapApiPayload<unknown>(raw);
   return Array.isArray(unwrapped) ? unwrapped : [];
+}
+
+/** Trip targeting of an override template (mirrors the Pro `settings.targets`). */
+export type EmailTemplateTargets = {
+  trips?: number[];
+  categories?: number[];
+  trip_types?: string[];
+};
+
+/**
+ * Create a trip-specific override of a global template (Pro Email
+ * Automation). Same event and merge tags; used instead of the global
+ * template for bookings on the targeted trips.
+ */
+export async function createEmailTemplateOverride(
+  parentId: string | number,
+  data: {
+    targets: EmailTemplateTargets;
+    name?: string;
+    description?: string;
+    copy?: boolean;
+  },
+): Promise<unknown> {
+  return apiClient.post(API_ENDPOINTS.EMAIL_TEMPLATE_OVERRIDE(parentId), data);
+}
+
+export async function reorderEmailTemplateOverrides(
+  parentKey: string,
+  ids: number[],
+): Promise<unknown> {
+  return apiClient.post(API_ENDPOINTS.EMAIL_TEMPLATE_OVERRIDES_REORDER, {
+    parent_key: parentKey,
+    ids,
+  });
+}
+
+export type EmailTemplateResolution = {
+  trip: { id: number; trip_type: string; categories: number[] };
+  resolved: Record<
+    string,
+    {
+      id: number;
+      template_key: string;
+      name: string;
+      specificity: number;
+      reason: string;
+    } | null
+  >;
+  overridable: string[];
+};
+
+/** "View as a trip": which template each overridable email uses for a trip. */
+export async function resolveEmailTemplatesForTrip(
+  tripId: number,
+): Promise<EmailTemplateResolution> {
+  return unwrapApiPayload<EmailTemplateResolution>(
+    await apiClient.get(API_ENDPOINTS.EMAIL_TEMPLATE_RESOLVE, {
+      params: { trip_id: tripId },
+    }),
+  );
 }
 
 export async function fetchEmailTemplate(
@@ -97,10 +161,11 @@ export async function duplicateEmailTemplate(id: number): Promise<unknown> {
 
 export async function previewEmailTemplate(
   id: string | number,
+  tripId?: number | null,
 ): Promise<EmailPreviewPayload> {
   const response = await apiClient.post(
     API_ENDPOINTS.EMAIL_TEMPLATE_PREVIEW(id),
-    {},
+    tripId ? { trip_id: tripId } : {},
   );
   return unwrapApiPayload<EmailPreviewPayload>(response);
 }
@@ -108,8 +173,12 @@ export async function previewEmailTemplate(
 export async function sendEmailTemplateTest(
   id: string | number,
   email: string,
+  tripId?: number | null,
 ): Promise<unknown> {
-  return apiClient.post(API_ENDPOINTS.EMAIL_TEMPLATE_TEST(id), { email });
+  return apiClient.post(API_ENDPOINTS.EMAIL_TEMPLATE_TEST(id), {
+    email,
+    ...(tripId ? { trip_id: tripId } : {}),
+  });
 }
 
 export async function fetchEmailSequences(): Promise<unknown[]> {

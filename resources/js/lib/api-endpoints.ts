@@ -92,6 +92,8 @@ export const API_ENDPOINTS = {
   // Settings
   SETTINGS: "/settings",
   SETTINGS_GROUP: (group: string) => `/settings?group=${group}`,
+  // Booking form config, optionally resolved for one trip (Pro form conditions)
+  SETTINGS_BOOKING_FORM: "/settings/booking-form",
   SETTINGS_PAGES: "/settings/pages",
   SETTINGS_FLUSH_REWRITE_RULES: "/settings/flush-rewrite-rules",
   SETTINGS_CHECK_SHORTCODE: (pageId: string | number) =>
@@ -236,6 +238,11 @@ export const API_ENDPOINTS = {
   EMAIL_TEMPLATE_DUPLICATE: (id: string | number) =>
     `/email-templates/${id}/duplicate`,
   EMAIL_TEMPLATE_VARIABLES: "/email-templates/variables",
+  // Trip-specific overrides of a global template (Pro Email Automation)
+  EMAIL_TEMPLATE_OVERRIDE: (id: string | number) =>
+    `/email-templates/${id}/override`,
+  EMAIL_TEMPLATE_OVERRIDES_REORDER: "/email-templates/overrides/reorder",
+  EMAIL_TEMPLATE_RESOLVE: "/email-templates/resolve",
   EMAIL_TEMPLATE_EVENTS: "/email-templates/events",
   EMAIL_SEQUENCES: "/email-sequences",
   EMAIL_SEQUENCE_GET: (id: string | number) => `/email-sequences/${id}`,

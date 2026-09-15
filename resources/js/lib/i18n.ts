@@ -36,11 +36,13 @@ declare global {
       translations?: Record<string, string>;
       locale?: string;
       emailAutomationEnabled?: boolean;
+      emailTemplateOverridesEnabled?: boolean;
       tripConsentEnabled?: boolean;
       additionalServicesEnabled?: boolean;
       abandonedBookingRecoveryEnabled?: boolean;
       dynamicPricingEnabled?: boolean;
       dynamicFormFieldEnabled?: boolean;
+      bookingFormConditionsEnabled?: boolean;
       advancedDiscountEnabled?: boolean;
       showGoogleCalendarSettingsUI?: boolean;
       showMailchimpSettingsUI?: boolean;

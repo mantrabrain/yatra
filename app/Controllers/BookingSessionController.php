@@ -1376,7 +1376,11 @@ class BookingSessionController extends BaseController
         // The default config has every section enabled, so on existing/un-customised
         // sites $contact_enabled and $traveler_enabled are both true and the logic
         // below behaves exactly as before — only disabled sections change anything.
-        $form_config      = function_exists('yatra_get_booking_form_config') ? yatra_get_booking_form_config() : [];
+        // Scoped to the trip being booked — the same config the checkout
+        // rendered, so a field hidden for this trip is never treated as required.
+        $form_config      = function_exists('yatra_get_booking_form_config')
+            ? yatra_get_booking_form_config($trip_id > 0 ? (int) $trip_id : null)
+            : [];
         $contact_enabled  = !isset($form_config['contact_form']['enabled']) || (bool) $form_config['contact_form']['enabled'];
         $traveler_enabled = !isset($form_config['traveler_form']['enabled']) || (bool) $form_config['traveler_form']['enabled'];
 

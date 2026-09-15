@@ -1413,12 +1413,13 @@ class BookingService
         switch ($emailType) {
             case 'confirmation':
                 // Resend the email that matches the booking's CURRENT state so it
-                // is identical to the automated one. A confirmed booking gets the
+                // is identical to the automated one. A confirmed booking (or a
+                // completed one — it was confirmed before it travelled) gets the
                 // "booking confirmed" email (status_confirmed context → the
                 // `booking_confirmed` / booking.confirmed template); anything
                 // still pending gets the initial "booking received" email
                 // (booking_created context → the `booking_confirmation` template).
-                if ((string) ($booking->status ?? '') === 'confirmed') {
+                if (in_array((string) ($booking->status ?? ''), ['confirmed', 'completed'], true)) {
                     $this->sendBookingConfirmedEmail($bookingId);
                 } else {
                     $this->sendBookingConfirmationEmail($bookingId);

@@ -189,6 +189,14 @@ class PaymentController extends BaseController
         
         try {
             $payment = $this->paymentService->createPayment($data);
+
+            // The service reports validation failures (unknown booking, invalid
+            // status) as ['success' => false]; answering 201 made the admin form
+            // redirect as if the payment had been saved.
+            if (is_array($payment) && isset($payment['success']) && !$payment['success']) {
+                return new WP_REST_Response($payment, 400);
+            }
+
             return new WP_REST_Response($payment, 201);
         } catch (\Exception $e) {
             return new WP_Error('payment_creation_failed', $e->getMessage(), ['status' => 400]);
@@ -208,6 +216,10 @@ class PaymentController extends BaseController
             
             if (!$payment) {
                 return new WP_Error('payment_not_found', 'Payment not found', ['status' => 404]);
+            }
+
+            if (is_array($payment) && isset($payment['success']) && !$payment['success']) {
+                return new WP_REST_Response($payment, 400);
             }
 
             return new WP_REST_Response($payment, 200);

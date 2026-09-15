@@ -698,6 +698,19 @@ export type UnifiedEmailTemplate = {
   variables: string[];
   created_at?: string;
   updated_at?: string;
+  /**
+   * Pro Email Automation trip-specific overrides. `overrides` is the global
+   * template's key when this row is an override ("" otherwise); `targets`
+   * says which trips it applies to; `priority` orders overrides of the same
+   * global template; `effective_event_key` is the event the row fires on
+   * (an override's own event_key is stored empty).
+   */
+  overrides?: string;
+  /** True when this global template may have trip-specific overrides. */
+  overridable?: boolean;
+  targets?: { trips?: number[]; categories?: number[]; trip_types?: string[] };
+  priority?: number;
+  effective_event_key?: string;
 };
 
 export type BuildLocalTemplateRowsOptions = {

@@ -136,11 +136,16 @@ class NotificationService
      *
      *   1. a balance is genuinely still outstanding on the booking,
      *   2. deposits / partial payments are switched on at all, and
-     *   3. the operator has enabled the separate part-payment template.
+     *   3. the operator has enabled the separate part-payment template —
+     *      either the free "Partial Payment Received" toggle, or (Pro Email
+     *      Automation) the active "Partial Payment Received" DB template. On a
+     *      Pro site the Email → Templates switch only writes the Pro row, so
+     *      the free toggle stays at its default and must not be the sole gate.
      */
     private static function paymentTemplateTypeFor(object $booking): string
     {
         $full = TransactionalEmailTemplateService::TYPE_PAYMENT_CONFIRMATION;
+        $partial = TransactionalEmailTemplateService::TYPE_PARTIAL_PAYMENT_RECEIVED;
 
         // Nothing left to pay → this is the full-payment confirmation.
         if ((float) ($booking->amount_due ?? 0) <= 0) {
@@ -151,11 +156,10 @@ class NotificationService
             return $full;
         }
 
-        if (!SettingsService::isEnabled('email_template_partial_payment')) {
-            return $full;
-        }
+        $partialEnabled = SettingsService::isEnabled('email_template_partial_payment')
+            || (bool) apply_filters('yatra_pro_email_automation_owns_transactional_type', false, $partial);
 
-        return TransactionalEmailTemplateService::TYPE_PARTIAL_PAYMENT_RECEIVED;
+        return $partialEnabled ? $partial : $full;
     }
 
     /**

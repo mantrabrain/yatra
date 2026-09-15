@@ -330,17 +330,22 @@ class SettingsService
     
     /**
      * Get booking form configuration (merged with defaults)
-     * 
+     *
+     * @param int|null $tripId Trip being booked. When given, Pro's Dynamic Form
+     *                         Field module resolves each section's per-trip
+     *                         conditions for that trip (title, description and
+     *                         field list); without it the full config is
+     *                         returned, conditions included (the Settings editor).
      * @return array
      */
-    public static function getBookingFormConfig(): array
+    public static function getBookingFormConfig(?int $tripId = null): array
     {
         $saved_config = self::get('booking_form_config', []);
         $default_config = self::getDefaultBookingFormConfig();
         
         // If no saved config, return defaults (Pro may filter)
         if (empty($saved_config)) {
-            return apply_filters('yatra_booking_form_config', $default_config);
+            return apply_filters('yatra_booking_form_config', $default_config, $tripId);
         }
 
         // Merge saved over defaults. IMPORTANT: `fields` is a positional list,
@@ -432,7 +437,7 @@ class SettingsService
             }
         }
 
-        return apply_filters('yatra_booking_form_config', $merged);
+        return apply_filters('yatra_booking_form_config', $merged, $tripId);
     }
 
     private static function isEmailIdentityKey(string $key): bool

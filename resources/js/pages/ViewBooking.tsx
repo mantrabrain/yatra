@@ -56,7 +56,25 @@ interface FormFieldConfig {
   enabled: boolean;
   order: number;
   section?: string;
+  options?: { value: string; label: string }[];
 }
+
+/**
+ * Dropdown answers are stored as the option VALUE (e.g. "spouse"); show the
+ * option's label from the form the trip used ("Spouse/Partner") when we have
+ * it, otherwise the raw value as before.
+ */
+const optionLabel = (
+  field: FormFieldConfig | undefined,
+  value: unknown,
+): string => {
+  const raw = String(value ?? "");
+  if (field?.type === "select" && Array.isArray(field.options)) {
+    const match = field.options.find((o) => String(o.value) === raw);
+    if (match?.label) return match.label;
+  }
+  return raw;
+};
 
 interface FormSectionConfig {
   title: string;
@@ -78,44 +96,6 @@ const ViewBooking: React.FC = () => {
     const params = new URLSearchParams(window.location.search);
     return params.get("id") ? parseInt(params.get("id") || "0") : null;
   }, []);
-
-  // Fetch booking form configuration for dynamic field labels
-  const { data: formConfig } = useQuery<BookingFormConfig>({
-    queryKey: ["booking-form-config"],
-    queryFn: async () => {
-      const response = await apiService.getSettings();
-      return (
-        response?.data?.booking_form_config ||
-        response?.booking_form_config ||
-        null
-      );
-    },
-  });
-
-  // Get enabled traveler fields from config
-  const travelerFields = useMemo(() => {
-    if (!formConfig?.traveler_form?.fields) return [];
-    return formConfig.traveler_form.fields
-      .filter((field) => field.enabled)
-      .sort((a, b) => a.order - b.order);
-  }, [formConfig]);
-
-  // Get enabled emergency contact fields
-  const emergencyFields = useMemo(() => {
-    if (!formConfig?.emergency_contact_form?.fields) return [];
-    return formConfig.emergency_contact_form.fields
-      .filter((field) => field.enabled)
-      .sort((a, b) => a.order - b.order);
-  }, [formConfig]);
-
-  // Get enabled contact (lead traveler) fields — used to label and format the
-  // country / nationality / address / custom contact fields in the summary.
-  const contactFields = useMemo(() => {
-    if (!formConfig?.contact_form?.fields) return [];
-    return formConfig.contact_form.fields
-      .filter((field) => field.enabled)
-      .sort((a, b) => a.order - b.order);
-  }, [formConfig]);
 
   // Helper to get field label by ID
   const getFieldLabel = (
@@ -221,6 +201,48 @@ const ViewBooking: React.FC = () => {
     },
     enabled: !!bookingId && can("yatra_view_bookings"),
   });
+
+  // Fetch booking form configuration for dynamic field labels, resolved for
+  // this booking's trip so per-trip form versions (Pro conditions) label the
+  // fields the customer actually saw. Waits for the booking to know its trip.
+  const bookingTripId = booking?.trip_id ? Number(booking.trip_id) : null;
+  const { data: formConfig } = useQuery<BookingFormConfig>({
+    queryKey: ["booking-form-config", bookingTripId],
+    queryFn: async () => {
+      const response = await apiService.getBookingFormConfig(bookingTripId);
+      return (
+        response?.data?.booking_form_config ||
+        response?.booking_form_config ||
+        null
+      );
+    },
+    enabled: !!booking,
+  });
+
+  // Get enabled traveler fields from config
+  const travelerFields = useMemo(() => {
+    if (!formConfig?.traveler_form?.fields) return [];
+    return formConfig.traveler_form.fields
+      .filter((field) => field.enabled)
+      .sort((a, b) => a.order - b.order);
+  }, [formConfig]);
+
+  // Get enabled emergency contact fields
+  const emergencyFields = useMemo(() => {
+    if (!formConfig?.emergency_contact_form?.fields) return [];
+    return formConfig.emergency_contact_form.fields
+      .filter((field) => field.enabled)
+      .sort((a, b) => a.order - b.order);
+  }, [formConfig]);
+
+  // Get enabled contact (lead traveler) fields — used to label and format the
+  // country / nationality / address / custom contact fields in the summary.
+  const contactFields = useMemo(() => {
+    if (!formConfig?.contact_form?.fields) return [];
+    return formConfig.contact_form.fields
+      .filter((field) => field.enabled)
+      .sort((a, b) => a.order - b.order);
+  }, [formConfig]);
 
   // Fetch consent status for this booking (only if Pro is active)
   const isPro = !!(window as any).yatraAdmin?.isPro;
@@ -895,6 +917,79 @@ const ViewBooking: React.FC = () => {
               </CardContent>
             </Card>
 
+            {/* Payments recorded against this booking (gateway captures and
+                manual entries). Only completed rows count towards Amount
+                Paid — a pending row is money expected, not received. */}
+            {Array.isArray(booking.payments) && booking.payments.length > 0 && (
+              <Card data-testid="booking-payments-card">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">
+                    {__("Payments", "yatra")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="divide-y divide-gray-100 dark:divide-gray-800">
+                    {booking.payments.map((payment: any) => {
+                      const status = String(
+                        payment.status || payment.payment_status || "pending",
+                      );
+                      const statusClass =
+                        status === "completed"
+                          ? "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400"
+                          : status === "pending"
+                            ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400"
+                            : status === "refunded"
+                              ? "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400"
+                              : "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400";
+                      const statusLabel: Record<string, string> = {
+                        completed: __("Completed", "yatra"),
+                        pending: __("Pending", "yatra"),
+                        failed: __("Failed", "yatra"),
+                        refunded: __("Refunded", "yatra"),
+                        cancelled: __("Cancelled", "yatra"),
+                      };
+                      return (
+                        <div
+                          key={payment.id}
+                          className="py-2 flex items-start justify-between gap-3 text-sm"
+                        >
+                          <div className="min-w-0">
+                            <div className="font-medium text-gray-900 dark:text-white">
+                              {formatPrice(
+                                Number(payment.amount || 0),
+                                payment.currency || booking.currency,
+                              )}
+                              <span className="ml-2 font-normal text-gray-500 dark:text-gray-400">
+                                {payment.payment_method_label ||
+                                  payment.gateway ||
+                                  ""}
+                              </span>
+                            </div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                              {payment.payment_date
+                                ? formatDate(payment.payment_date)
+                                : ""}
+                              {payment.transaction_id
+                                ? ` · ${payment.transaction_id}`
+                                : ""}
+                              {payment.payment_number
+                                ? ` · ${payment.payment_number}`
+                                : ""}
+                            </div>
+                          </div>
+                          <span
+                            className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium whitespace-nowrap ${statusClass}`}
+                          >
+                            {statusLabel[status] || status}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Customer Information */}
             <Card>
               <CardHeader className="pb-2">
@@ -961,7 +1056,7 @@ const ViewBooking: React.FC = () => {
                         const display =
                           field?.type === "country"
                             ? getCountryName(String(value))
-                            : String(value);
+                            : optionLabel(field, value);
                         return (
                           <div key={fieldId}>
                             <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
@@ -1111,6 +1206,18 @@ const ViewBooking: React.FC = () => {
                                 displayValue = getCountryName(fieldValue);
                               }
 
+                              // Dropdown answers: option label instead of value.
+                              // The label is the operator's own text, so it is
+                              // shown as written (no title-casing).
+                              let asWritten = false;
+                              if (fieldConfig?.type === "select") {
+                                displayValue = optionLabel(
+                                  fieldConfig,
+                                  fieldValue,
+                                );
+                                asWritten = displayValue !== String(fieldValue);
+                              }
+
                               return (
                                 <div
                                   key={fieldId}
@@ -1124,7 +1231,7 @@ const ViewBooking: React.FC = () => {
                                     {label}
                                   </div>
                                   <div
-                                    className={`text-sm text-gray-900 dark:text-white ${fieldId === "passport" ? "font-mono" : ""} capitalize`}
+                                    className={`text-sm text-gray-900 dark:text-white ${fieldId === "passport" ? "font-mono" : ""} ${asWritten ? "" : "capitalize"}`}
                                   >
                                     {displayValue}
                                   </div>
@@ -1170,13 +1277,22 @@ const ViewBooking: React.FC = () => {
                         )
                         .map(([fieldId, fieldValue]) => {
                           const label = getFieldLabel(fieldId, emergencyFields);
+                          const emergencyField = emergencyFields.find(
+                            (f) => f.id === fieldId,
+                          );
+                          const emergencyDisplay = optionLabel(
+                            emergencyField,
+                            fieldValue,
+                          );
                           return (
                             <div key={fieldId}>
                               <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
                                 {label}
                               </div>
-                              <div className="text-sm font-medium text-gray-900 dark:text-white capitalize">
-                                {String(fieldValue)}
+                              <div
+                                className={`text-sm font-medium text-gray-900 dark:text-white ${emergencyDisplay !== String(fieldValue) ? "" : "capitalize"}`}
+                              >
+                                {emergencyDisplay}
                               </div>
                             </div>
                           );

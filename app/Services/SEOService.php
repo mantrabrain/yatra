@@ -631,6 +631,44 @@ class SEOService
     }
 
     /**
+     * The page's language as WordPress reports it, reduced to what hreflang
+     * and Open Graph accept: language + optional region (`de-DE`, `en-US`,
+     * `ca`). Read at render time through get_locale()/the `locale` filter, so
+     * a German install, WPML and Polylang per-page languages all resolve
+     * correctly. WordPress variant locales such as `de_DE_formal` ("Deutsch
+     * (Sie)") or `pt_PT_ao90` carry a third segment that is not a region —
+     * Google ignores an hreflang like `de-DE-formal` and Facebook rejects
+     * `de_DE_formal` — so only the first two segments are kept. Falls back to
+     * `en-US` when WP has no locale, which keeps existing English sites
+     * byte-identical.
+     */
+    private function languageTag(): string
+    {
+        $locale = (string) get_locale();
+        if ($locale === '') {
+            $locale = str_replace('-', '_', (string) get_bloginfo('language'));
+        }
+
+        $parts = preg_split('/[_-]/', $locale) ?: [];
+        $language = strtolower((string) ($parts[0] ?? ''));
+        if (!preg_match('/^[a-z]{2,3}$/', $language)) {
+            return 'en-US';
+        }
+
+        $region = strtoupper((string) ($parts[1] ?? ''));
+
+        return preg_match('/^[A-Z]{2}$/', $region) ? $language . '-' . $region : $language;
+    }
+
+    /**
+     * Same language in Open Graph form (`de_DE`, `en_US`).
+     */
+    private function ogLocale(): string
+    {
+        return str_replace('-', '_', $this->languageTag());
+    }
+
+    /**
      * Output basic meta tags
      */
     private function outputBasicMetaTags(): void
@@ -649,7 +687,7 @@ class SEOService
      */
     private function outputOpenGraphTags(): void
     {
-        echo '<meta property="og:locale" content="en_US">' . "\n";
+        echo '<meta property="og:locale" content="' . esc_attr($this->ogLocale()) . '">' . "\n";
         echo '<meta property="og:site_name" content="' . esc_attr(get_bloginfo('name')) . '">' . "\n";
         echo '<meta property="og:title" content="' . esc_attr($this->seoData['title']) . '">' . "\n";
         echo '<meta property="og:description" content="' . esc_attr($this->truncateText($this->seoData['description'], 160)) . '">' . "\n";
@@ -696,7 +734,7 @@ class SEOService
         echo '<meta name="author" content="' . esc_attr($this->seoData['author']) . '">' . "\n";
         echo '<meta name="publisher" content="' . esc_attr($this->seoData['publisher']) . '">' . "\n";
         echo '<meta name="lastmod" content="' . esc_attr($this->seoData['modified_time']) . '">' . "\n";
-        echo '<link rel="alternate" hreflang="en-US" href="' . esc_url($this->seoData['url']) . '">' . "\n";
+        echo '<link rel="alternate" hreflang="' . esc_attr($this->languageTag()) . '" href="' . esc_url($this->seoData['url']) . '">' . "\n";
         echo '<meta name="revisit-after" content="7 days">' . "\n";
         echo '<meta name="distribution" content="global">' . "\n";
         echo '<meta name="rating" content="general">' . "\n";
@@ -820,7 +858,7 @@ class SEOService
             ],
             'dateModified' => $this->seoData['modified_time'],
             'datePublished' => $this->seoData['published_time'],
-            'inLanguage' => 'en-US',
+            'inLanguage' => $this->languageTag(),
             'isPartOf' => [
                 '@type' => 'WebSite',
                 'name' => get_bloginfo('name'),

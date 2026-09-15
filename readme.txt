@@ -283,7 +283,7 @@ Pricing starts at **$99/yr** (Starter, sale) and goes up to **$599/yr** (Scale 1
 
 The two most recent releases are listed below. For the complete version history, see [changelog.txt](https://plugins.svn.wordpress.org/yatra/trunk/changelog.txt).
 
-= 3.0.15 — 7 September 2026 =
+= 3.0.15 — 15 September 2026 =
 _With thanks to [Vista-Tours](https://vista-tours.de) for detailed testing and feedback._
 
 **Please read before updating — three things start happening that did not before:**
@@ -297,8 +297,16 @@ _With thanks to [Vista-Tours](https://vista-tours.de) for detailed testing and f
 * **Quick status changes for enquiries.** The Enquiries list's ⋮ menu gains Mark as Completed / Closed / Spam, so an enquiry can be handled without opening it.
 * **Auto-Confirm Bookings becomes a three-way choice** — don't auto-confirm, online payments only, or all.
 * **Compact listing card layout** for trip archives, shortcodes and the Trip block.
+* **Per-trip booking forms and per-trip email templates (with Yatra Pro).** Settings → Booking Form gains a **Conditions** button (Pro Dynamic Form Field) so selected trips, categories or trip types can use their own version of each form; Email → Templates gains **Override templates** (Pro Email Automation) — a trip-specific version of any booking email, sent *instead of* the global one. The free plugin ships the editors, a trip-aware `GET /settings/booking-form?trip_id=` endpoint, `trip_id` in every booking email's merge variables, and the `yatra_booking_form_config( $config, $tripId )` filter; without Pro nothing changes.
+* **Payments card on the booking detail** listing every payment recorded against the booking (amount, method, date, reference, status).
 
 **Fixed**
+* **A manually recorded payment now counts.** *Payments → Add New Payment* defaulted to *Pending* and offered a *Partial* status the database does not have, so a deposit recorded by hand never increased the booking's paid amount, never reduced the balance and triggered nothing. The form now defaults to **Completed**, *Partial* is gone, and a payment that becomes Completed (recorded, edited or *Mark as Completed*) fires `yatra_payment_completed` exactly like an online payment — payment-received emails, Pro `payment.partial_received` / `payment.received` automations, webhooks and WhatsApp — once per payment.
+* **Partial payments used the wrong email on Pro sites.** With the Pro *Partial Payment Received* template switched on, a deposit still went out as the full *Payment Received* email (`payment.received`); the chooser only honoured the free plugin's own toggle. It now honours the active Pro template, so a payment that leaves a balance sends the partial template and event.
+* **Language metadata followed the plugin, not the site.** Trip and listing pages printed `og:locale="en_US"`, `hreflang="en-US"` and `inLanguage="en-US"` on every site; they now follow the WordPress locale (`de_DE` / `de-DE` on a German site, including *Deutsch (Sie)*).
+* **Empty 360° tour and video modals were injected into every page** by `tour-viewer.js` / `video-player.js` (an empty `h3.yatra-tour-viewer-title` on the homepage, for example). Both are now built on first use only. YouTube *Shorts* URLs now embed correctly.
+* *Resend → Booking confirmation* on a **completed** booking sends the "Booking confirmed" email, not the pending-wording one.
+* Booking Form settings are now sanitised on save (the structured sanitiser was unreachable); the storefront date-pricing request no longer returns HTTP 500 on trips with date-specific departures; Edit Booking no longer hits a 401 loading tax settings.
 * **Duration (Hours) can now be saved.** The trip form showed the field for single-day tours but never included it in the save request, so the value was dropped and the field reloaded empty — the new hours display could not be used. Switching a trip back to multi-day now clears any stored hours rather than leaving a stale value.
 * Departures: *Upcoming* no longer hides sold-out departures; capacity is a separate **Availability** filter; the list is genuinely paginated and its search box works.
 * Enquiries: the status tabs showed `0` for every count; the bulk *Mark as Completed* action silently did nothing; a submission containing a `subject` field returned a server error.

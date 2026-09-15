@@ -316,6 +316,24 @@ class SettingsController extends BaseController
             ],
         ]);
 
+        // Booking form config, optionally resolved for one trip (Pro form
+        // conditions). Readable by anyone who can view bookings, so the
+        // booking detail screen can label the fields a trip actually asked.
+        register_rest_route($namespace, '/' . $base . '/booking-form', [
+            [
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => [$this, 'get_booking_form_config'],
+                'permission_callback' => [$this, 'check_booking_form_permission'],
+                'args' => [
+                    'trip_id' => [
+                        'type' => 'integer',
+                        'required' => false,
+                        'sanitize_callback' => 'absint',
+                    ],
+                ],
+            ],
+        ]);
+
         // Get WordPress pages for booking page selection
         register_rest_route($namespace, '/' . $base . '/pages', [
             [
@@ -399,6 +417,41 @@ class SettingsController extends BaseController
             return false;
         }
         return current_user_can('yatra_manage_settings');
+    }
+
+    /**
+     * The booking form config is needed to label booking data, so it is
+     * readable by booking staff, not only settings managers.
+     */
+    public function check_booking_form_permission(?WP_REST_Request $request = null): bool
+    {
+        if (!is_user_logged_in()) {
+            return false;
+        }
+        return current_user_can('yatra_manage_settings')
+            || current_user_can('yatra_view_bookings')
+            || current_user_can('yatra_edit_bookings');
+    }
+
+    /**
+     * GET /settings/booking-form[?trip_id=N]
+     *
+     * Without trip_id: the full config exactly as the Settings screen sees it.
+     * With trip_id: the config as that trip's checkout renders it — Pro form
+     * conditions resolved (no Pro / no conditions → identical to the global).
+     */
+    public function get_booking_form_config(WP_REST_Request $request)
+    {
+        try {
+            $trip_id = (int) $request->get_param('trip_id');
+
+            return $this->success_response([
+                'booking_form_config' => \Yatra\Services\SettingsService::getBookingFormConfig($trip_id > 0 ? $trip_id : null),
+                'trip_id' => $trip_id > 0 ? $trip_id : null,
+            ]);
+        } catch (\Exception $e) {
+            return $this->error_response($e->getMessage(), 500);
+        }
     }
 
     /**
@@ -768,6 +821,17 @@ class SettingsController extends BaseController
             return $filtered_value;
         }
 
+        // The booking-form config has its own structured sanitiser (field type
+        // and width whitelists, locked core fields, text-block content, per-trip
+        // conditions). It must run BEFORE the generic
+        // is_array($default) branch below: that branch only text-sanitises
+        // values and was catching this key first — because its default is [] —
+        // so the structured sanitiser further down was never reached and any
+        // shape at all was stored.
+        if ($key === 'booking_form_config') {
+            return is_array($value) ? $this->sanitize_booking_form_config($value) : [];
+        }
+
         // Handle null values - use default
         if ($value === null) {
             return $default;
@@ -932,13 +996,6 @@ class SettingsController extends BaseController
                 // Handle nested array structure for gateway configs
                 if (is_array($value)) {
                     return $this->sanitize_gateway_configs($value);
-                }
-                return [];
-            }
-            if ($key === 'booking_form_config') {
-                // Handle nested array structure for booking form config
-                if (is_array($value)) {
-                    return $this->sanitize_booking_form_config($value);
                 }
                 return [];
             }
@@ -1169,97 +1226,192 @@ class SettingsController extends BaseController
     {
         $sanitized = [];
         $allowed_form_types = ['contact_form', 'emergency_contact_form', 'traveler_form'];
-        $allowed_field_types = ['text', 'email', 'tel', 'date', 'select', 'country', 'textarea', 'checkbox', 'number', 'text_block'];
-        $allowed_widths = ['full', 'half', 'third'];
-        
+
         foreach ($config as $form_type => $form_config) {
             if (!in_array($form_type, $allowed_form_types, true)) {
                 continue;
             }
-            
+
             $sanitized[$form_type] = [
                 'title' => isset($form_config['title']) ? sanitize_text_field($form_config['title']) : '',
                 'description' => isset($form_config['description']) ? sanitize_text_field($form_config['description']) : '',
                 'enabled' => isset($form_config['enabled']) ? (bool) $form_config['enabled'] : true,
-                'fields' => [],
+                'fields' => $this->sanitize_booking_form_fields($form_config['fields'] ?? null, $form_type),
             ];
-            
-            if (!empty($form_config['fields']) && is_array($form_config['fields'])) {
-                foreach ($form_config['fields'] as $field) {
-                    if (!is_array($field) || empty($field['id'])) {
-                        continue;
-                    }
-                    
-                    $sanitized_field = [
-                        'id' => sanitize_key($field['id']),
-                        'type' => in_array($field['type'] ?? 'text', $allowed_field_types, true) ? $field['type'] : 'text',
-                        'label' => isset($field['label']) ? sanitize_text_field($field['label']) : '',
-                        'placeholder' => isset($field['placeholder']) ? sanitize_text_field($field['placeholder']) : '',
-                        'required' => isset($field['required']) ? (bool) $field['required'] : false,
-                        'enabled' => isset($field['enabled']) ? (bool) $field['enabled'] : true,
-                        'order' => isset($field['order']) ? (int) $field['order'] : 0,
-                        'width' => in_array($field['width'] ?? 'full', $allowed_widths, true) ? ($field['width'] ?? 'full') : 'full',
-                        'locked' => isset($field['locked']) ? (bool) $field['locked'] : false,
-                    ];
-                    
-                    // Handle optional section
-                    if (!empty($field['section'])) {
-                        $sanitized_field['section'] = sanitize_key($field['section']);
-                    }
 
-                    // Per-traveler targeting — Traveler section only. Whitelist
-                    // the allowed values; only persist the non-default "lead" so
-                    // other sections and existing configs stay byte-identical.
-                    if (
-                        $form_type === 'traveler_form'
-                        && ($field['applies_to'] ?? 'all') === 'lead'
-                    ) {
-                        $sanitized_field['applies_to'] = 'lead';
-                    }
-                    
-                    // Handle options for select fields
-                    if ($sanitized_field['type'] === 'select' && !empty($field['options']) && is_array($field['options'])) {
-                        $sanitized_field['options'] = [];
-                        foreach ($field['options'] as $option) {
-                            if (is_array($option) && isset($option['value'])) {
-                                $sanitized_field['options'][] = [
-                                    'value' => sanitize_key($option['value']),
-                                    'label' => isset($option['label']) ? sanitize_text_field($option['label']) : $option['value'],
-                                ];
-                            }
-                        }
-                    }
-
-                    // A text block is display-only content placed between fields:
-                    // keep its (safe-HTML) content, and it can never be required.
-                    if ($sanitized_field['type'] === 'text_block') {
-                        $sanitized_field['content'] = isset($field['content']) ? wp_kses_post($field['content']) : '';
-                        $sanitized_field['required'] = false;
-                    }
-
-                    // Phone fields: the country-code selector is ON by default.
-                    // Only persist the non-default `false`, so existing configs
-                    // (which never carried this key) stay byte-identical and read
-                    // back as ON.
-                    if (
-                        $sanitized_field['type'] === 'tel'
-                        && array_key_exists('show_country_code', $field)
-                        && !$field['show_country_code']
-                    ) {
-                        $sanitized_field['show_country_code'] = false;
-                    }
-
-                    $sanitized[$form_type]['fields'][] = $sanitized_field;
-                }
-                
-                // Sort fields by order
-                usort($sanitized[$form_type]['fields'], function($a, $b) {
-                    return ($a['order'] ?? 0) - ($b['order'] ?? 0);
-                });
+            // Per-trip form conditions (Pro Dynamic Form Field): each condition
+            // is a complete alternative version of this section — its own
+            // title, description and field list — used on the trips it names.
+            // Only persisted when there is at least one, so configs saved
+            // without the feature stay byte-identical.
+            $conditions = $this->sanitize_booking_form_conditions($form_config['conditions'] ?? null, $form_type);
+            if ($conditions !== []) {
+                $sanitized[$form_type]['conditions'] = $conditions;
             }
         }
-        
+
         return apply_filters('yatra_save_booking_form_config', $sanitized, $config);
+    }
+
+    /**
+     * Sanitise one section's field list (global fields or a condition's fields).
+     *
+     * @param mixed $fields
+     * @return array<int, array<string, mixed>>
+     */
+    private function sanitize_booking_form_fields($fields, string $form_type): array
+    {
+        $allowed_field_types = ['text', 'email', 'tel', 'date', 'select', 'country', 'textarea', 'checkbox', 'number', 'text_block'];
+        $allowed_widths = ['full', 'half', 'third'];
+        $sanitized = [];
+
+        if (empty($fields) || !is_array($fields)) {
+            return $sanitized;
+        }
+
+        foreach ($fields as $field) {
+            if (!is_array($field) || empty($field['id'])) {
+                continue;
+            }
+
+            $sanitized_field = [
+                'id' => sanitize_key($field['id']),
+                'type' => in_array($field['type'] ?? 'text', $allowed_field_types, true) ? $field['type'] : 'text',
+                'label' => isset($field['label']) ? sanitize_text_field($field['label']) : '',
+                'placeholder' => isset($field['placeholder']) ? sanitize_text_field($field['placeholder']) : '',
+                'required' => isset($field['required']) ? (bool) $field['required'] : false,
+                'enabled' => isset($field['enabled']) ? (bool) $field['enabled'] : true,
+                'order' => isset($field['order']) ? (int) $field['order'] : 0,
+                'width' => in_array($field['width'] ?? 'full', $allowed_widths, true) ? ($field['width'] ?? 'full') : 'full',
+            ];
+
+            // Only persist `locked` when set: every reader treats a missing key
+            // as unlocked, and configs saved before this sanitiser ran never
+            // carried a `locked => false`, so they stay byte-identical.
+            if (!empty($field['locked'])) {
+                $sanitized_field['locked'] = true;
+            }
+
+            // Handle optional section
+            if (!empty($field['section'])) {
+                $sanitized_field['section'] = sanitize_key($field['section']);
+            }
+
+            // Per-traveler targeting — Traveler section only. Whitelist
+            // the allowed values; only persist the non-default "lead" so
+            // other sections and existing configs stay byte-identical.
+            if (
+                $form_type === 'traveler_form'
+                && ($field['applies_to'] ?? 'all') === 'lead'
+            ) {
+                $sanitized_field['applies_to'] = 'lead';
+            }
+
+            // Handle options for select fields
+            if ($sanitized_field['type'] === 'select' && !empty($field['options']) && is_array($field['options'])) {
+                $sanitized_field['options'] = [];
+                foreach ($field['options'] as $option) {
+                    if (is_array($option) && isset($option['value'])) {
+                        $sanitized_field['options'][] = [
+                            'value' => sanitize_key($option['value']),
+                            'label' => isset($option['label']) ? sanitize_text_field($option['label']) : $option['value'],
+                        ];
+                    }
+                }
+            }
+
+            // A text block is display-only content placed between fields:
+            // keep its (safe-HTML) content, and it can never be required.
+            if ($sanitized_field['type'] === 'text_block') {
+                $sanitized_field['content'] = isset($field['content']) ? wp_kses_post($field['content']) : '';
+                $sanitized_field['required'] = false;
+            }
+
+            // Phone fields: the country-code selector is ON by default.
+            // Only persist the non-default `false`, so existing configs
+            // (which never carried this key) stay byte-identical and read
+            // back as ON.
+            if (
+                $sanitized_field['type'] === 'tel'
+                && array_key_exists('show_country_code', $field)
+                && !$field['show_country_code']
+            ) {
+                $sanitized_field['show_country_code'] = false;
+            }
+
+            $sanitized[] = $sanitized_field;
+        }
+
+        // Sort fields by order
+        usort($sanitized, function ($a, $b) {
+            return ($a['order'] ?? 0) - ($b['order'] ?? 0);
+        });
+
+        return $sanitized;
+    }
+
+    /**
+     * Sanitise a section's per-trip conditions. A condition without any
+     * target (trip, category or trip type) can never match and is dropped.
+     *
+     * @param mixed $conditions
+     * @return array<int, array<string, mixed>>
+     */
+    private function sanitize_booking_form_conditions($conditions, string $form_type): array
+    {
+        if (empty($conditions) || !is_array($conditions)) {
+            return [];
+        }
+
+        $allowed_trip_types = ['single_day', 'multi_day', 'flexible'];
+        $sanitized = [];
+        $n = 0;
+
+        foreach ($conditions as $condition) {
+            if (!is_array($condition)) {
+                continue;
+            }
+            $n++;
+
+            $raw_targets = is_array($condition['targets'] ?? null) ? $condition['targets'] : [];
+            $targets = [];
+            foreach (['trips', 'categories'] as $selector) {
+                $ids = array_values(array_unique(array_filter(
+                    array_map('intval', is_array($raw_targets[$selector] ?? null) ? $raw_targets[$selector] : []),
+                    static function ($id) {
+                        return $id > 0;
+                    }
+                )));
+                if ($ids !== []) {
+                    $targets[$selector] = $ids;
+                }
+            }
+            $types = array_values(array_unique(array_filter(
+                array_map(static function ($t) {
+                    return sanitize_key((string) $t);
+                }, is_array($raw_targets['trip_types'] ?? null) ? $raw_targets['trip_types'] : []),
+                static function ($t) use ($allowed_trip_types) {
+                    return in_array($t, $allowed_trip_types, true);
+                }
+            )));
+            if ($types !== []) {
+                $targets['trip_types'] = $types;
+            }
+            if ($targets === []) {
+                continue;
+            }
+
+            $id = sanitize_key((string) ($condition['id'] ?? ''));
+            $sanitized[] = [
+                'id' => $id !== '' ? $id : 'condition_' . $n,
+                'targets' => $targets,
+                'title' => isset($condition['title']) ? sanitize_text_field($condition['title']) : '',
+                'description' => isset($condition['description']) ? sanitize_text_field($condition['description']) : '',
+                'fields' => $this->sanitize_booking_form_fields($condition['fields'] ?? null, $form_type),
+            ];
+        }
+
+        return $sanitized;
     }
 
     /**

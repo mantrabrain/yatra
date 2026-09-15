@@ -6,6 +6,7 @@ import {
   fetchEmailLogs,
   fetchEmailSequences,
   updateEmailSequenceStatus,
+  fetchEmailTemplates,
 } from "../api/email-automation-api";
 import { useToast } from "../components/ui/toast";
 import {
@@ -94,9 +95,7 @@ const EmailSequencesList: React.FC = () => {
   });
 
   // Shared dialog rather than the browser's native confirm().
-  const [sequenceToDelete, setSequenceToDelete] = useState<number | null>(
-    null,
-  );
+  const [sequenceToDelete, setSequenceToDelete] = useState<number | null>(null);
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
@@ -363,6 +362,38 @@ const EmailLogsList: React.FC = () => {
     queryFn: () => fetchEmailLogs({ page, per_page: perPage }),
     enabled: isEmailAutomationModuleEnabled(),
   });
+  // Template names for the log rows: an override's key is machine-generated
+  // ("booking_confirmation__ov_…"), so show "Global name · Override name".
+  const { data: templatesForNames } = useQuery({
+    queryKey: ["email-templates"],
+    queryFn: () => fetchEmailTemplates(),
+    enabled: isEmailAutomationModuleEnabled(),
+  });
+  const templateLabel = useCallback(
+    (key: string | null | undefined): string => {
+      if (!key) return "—";
+      const list = Array.isArray(templatesForNames)
+        ? (templatesForNames as any[])
+        : [];
+      const row = list.find((t) => t.template_key === key);
+      if (!row) {
+        // A deleted override: derive its global template from the key
+        // ("booking_confirmation__ov_1a2b3c4d") so the log stays readable.
+        const m = key.match(/^(.+)__ov_[a-z0-9]+$/);
+        if (m) {
+          const parent = list.find((t) => t.template_key === m[1]);
+          return `${parent?.name || m[1]} · ${__("Override (deleted)", "yatra")}`;
+        }
+        return key;
+      }
+      if (row.overrides) {
+        const parent = list.find((t) => t.template_key === row.overrides);
+        return `${parent?.name || row.overrides} · ${__("Override", "yatra")}: ${row.name}`;
+      }
+      return row.name || key;
+    },
+    [templatesForNames],
+  );
 
   const logs = (logsData?.items ?? []) as EmailLog[];
   const totalItems = logsData?.total ?? 0;
@@ -459,8 +490,11 @@ const EmailLogsList: React.FC = () => {
                     <td className="px-4 py-3 text-sm text-gray-900 dark:text-white max-w-xs truncate">
                       {log.subject}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
-                      {log.template_key}
+                    <td
+                      className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400"
+                      title={log.template_key}
+                    >
+                      {templateLabel(log.template_key)}
                     </td>
                     <td className="px-4 py-3">
                       <Badge
@@ -926,7 +960,7 @@ const EmailAutomation: React.FC = () => {
               {automationReady && (
                 <p className="mb-6 text-sm text-gray-600 dark:text-gray-400">
                   {__(
-                    "Customer booking, payment, cancellation, and trip-reminder emails use the matching template when its body is filled; otherwise the free plugin defaults or settings HTML apply. Admin: New Booking sends when that template has a body (plain-text admin notices from checkout and notifications are skipped to avoid duplicates). Other booking.created templates send in addition to the customer email. Booking Confirmed uses the “Booking Confirmed” row when a booking moves to confirmed; Trip Completed uses its template instead of the generic completed email when the body is filled.",
+                    "Customer booking, payment, cancellation, and trip-reminder emails use the matching template when its body is filled; otherwise the free plugin defaults or settings HTML apply. Admin: New Booking sends when that template has a body (plain-text admin notices from checkout and notifications are skipped to avoid duplicates). Other booking.created templates send in addition to the customer email. Booking Confirmed uses the “Booking Confirmed” row when a booking moves to confirmed; Trip Completed uses its template instead of the generic completed email when the body is filled. Override templates replace their global template for the trips they target and are never sent in addition to it.",
                     "yatra",
                   )}
                 </p>

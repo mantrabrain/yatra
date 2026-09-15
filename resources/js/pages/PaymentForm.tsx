@@ -30,7 +30,7 @@ interface PaymentFormData {
   booking_id: string;
   amount: string;
   payment_method: string;
-  payment_status: "pending" | "completed" | "failed" | "refunded" | "partial";
+  payment_status: "pending" | "completed" | "failed" | "refunded";
   payment_date: string;
   transaction_id: string;
   notes: string;
@@ -43,7 +43,10 @@ const PaymentForm: React.FC = () => {
     booking_id: "",
     amount: "",
     payment_method: "Credit Card",
-    payment_status: "pending",
+    // A payment recorded by hand is money already received. Only completed
+    // payments count towards the booking's paid amount / balance and trigger
+    // the "payment received" emails and events, so that is the default.
+    payment_status: "completed",
     payment_date: todayYmd(),
     transaction_id: "",
     notes: "",
@@ -514,22 +517,22 @@ const PaymentForm: React.FC = () => {
                       )
                     }
                   >
-                    <option value="pending">{__("Pending", "yatra")}</option>
                     <option value="completed">
                       {__("Completed", "yatra")}
                     </option>
-                    <option value="partial">{__("Partial", "yatra")}</option>
+                    <option value="pending">{__("Pending", "yatra")}</option>
                     <option value="failed">{__("Failed", "yatra")}</option>
                     <option value="refunded">{__("Refunded", "yatra")}</option>
                   </Select>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     {formData.payment_status === "completed" &&
-                      __("Payment has been successfully processed.", "yatra")}
-                    {formData.payment_status === "pending" &&
-                      __("Payment is pending confirmation.", "yatra")}
-                    {formData.payment_status === "partial" &&
                       __(
-                        "Partial payment recorded. Balance may be pending.",
+                        "Money received. Counts towards the booking's paid amount and remaining balance, and sends the payment-received emails (partial or full, depending on what is still due).",
+                        "yatra",
+                      )}
+                    {formData.payment_status === "pending" &&
+                      __(
+                        "Expected but not received yet. Does not change the booking's balance and sends nothing — mark it Completed when the money arrives.",
                         "yatra",
                       )}
                     {formData.payment_status === "failed" &&

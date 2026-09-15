@@ -1,9 +1,9 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-DBpaCd1d.js","../../../dist/js/react-vendor-Dl45l0PD.js","../css/react-vendor.css","../../../dist/js/index-0YqMQ0Gb.js","../css/index.css","../../../dist/js/BuildItineraryModal-D8GW2shT.js","../../../dist/js/ProFeature-CePwv7Zz.js","../../../dist/js/Settings-C5RvnmMN.js","../../../dist/js/Team-B54OTO-X.js","../../../dist/js/Reports-De6Gle2r.js","../../../dist/js/DiscountForm-nCjvGJdl.js","../../../dist/js/ApplicableTripSelector-CHN35zYj.js","../../../dist/js/Itinerary-M1YQJyHW.js","../../../dist/js/RecurringRuleForm-CY2V3hrG.js","./Whatsapp.js","../../../dist/js/module-skeleton-CVRJFm3S.js","../../../dist/js/ChannelManager-DlVc6c3Q.js","../../../dist/js/Webhooks-D1I7BQBl.js","../../../dist/js/ScheduledPayments-DjPvvjyg.js","../../../dist/js/TripConsentForm-B0A0u_AZ.js","../../../dist/js/BookingForm-G9U_E5X6.js","../../../dist/js/ViewBooking-y8Yi0hz5.js","../../../dist/js/AvailabilityForm-amQiiorh.js","../../../dist/js/DynamicPricing-DqBKxV9L.js","../../../dist/js/RuleTypeSelectionModal-Ds4T3wir.js","../../../dist/js/toggle-BtCbKaBk.js","../../../dist/js/DynamicPricingRuleForm-D3TUrfP2.js","../../../dist/js/AiAssistant-CHD_pLzt.js","../../../dist/js/AbandonedRecovery-X976JBuk.js","../../../dist/js/WhiteLabel-BeDkf1e9.js"])))=>i.map(i=>d[i]);
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-tYqd0a--.js","../../../dist/js/react-vendor-BJn7BIDO.js","../css/react-vendor.css","../../../dist/js/index-CH-UeeqR.js","../css/index.css","../../../dist/js/BuildItineraryModal-Dc-IObiC.js","../../../dist/js/ProFeature-CoknA3cp.js","../../../dist/js/Settings-B2qDy-3v.js","../../../dist/js/Team-BKam8pDN.js","../../../dist/js/Reports-CrPrqhsM.js","../../../dist/js/DiscountForm-BTh3UQWx.js","../../../dist/js/ApplicableTripSelector-DATjt5hg.js","../../../dist/js/Itinerary-B51OPTS8.js","../../../dist/js/RecurringRuleForm-Cqv2cbJU.js","./Whatsapp.js","../../../dist/js/module-skeleton-_pm14M7g.js","../../../dist/js/ChannelManager-BC4qM78i.js","../../../dist/js/Webhooks-BVWPQrRC.js","../../../dist/js/ScheduledPayments-D6SuU6pk.js","../../../dist/js/TripConsentForm-CAl-wHRC.js","../../../dist/js/BookingForm-DvQk4uBk.js","../../../dist/js/ViewBooking-CVs-Shqy.js","../../../dist/js/AvailabilityForm-DGL4UC_6.js","../../../dist/js/DynamicPricing-CM_zxrI5.js","../../../dist/js/RuleTypeSelectionModal-CQ-cb9q0.js","../../../dist/js/toggle-BZSHgkC-.js","../../../dist/js/DynamicPricingRuleForm-C5k92h6w.js","../../../dist/js/AiAssistant-cc-9i8HW.js","../../../dist/js/AbandonedRecovery-C3Eo0alU.js","../../../dist/js/WhiteLabel-CchtPIJy.js"])))=>i.map(i=>d[i]);
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key2, value) => key2 in obj ? __defProp(obj, key2, { enumerable: true, configurable: true, writable: true, value }) : obj[key2] = value;
 var __publicField = (obj, key2, value) => __defNormalProp(obj, typeof key2 !== "symbol" ? key2 + "" : key2, value);
-import { r as reactExports, j as jsxRuntimeExports, W as Wrench, N as Network, M as MessageCircle, S as Sparkles, R as RotateCcw, P as Puzzle, a as MessageSquare, b as Plane, B as BadgePercent, c as Route, F as FileSignature, K as Key, d as Mail, C as Crown, A as Activity, L as List, T as TrendingUp, e as Tag, f as FolderTree, U as Users, g as CircleUser, h as Package, i as CreditCard, k as FileText, l as Settings$1, m as BarChart3, n as Star, o as CalendarDays, p as CalendarClock, q as Calendar$1, s as MapPin, t as LayoutDashboard, u as useQuery, v as useQueryClient, w as useMutation, Z as Zap, x as Webhook, y as ChevronDown, z as ChevronRight, D as ArrowLeft, G as Gift, E as Loader2, H as Sun, I as Moon, J as User, O as RefreshCw, Q as Inbox, V as AlertTriangle, X as ExternalLink, Y as isObjectLike_1, _ as _baseGetTag, $ as isArray_1, a0 as _MapCache, a1 as getDefaultExportFromCjs, a2 as _Symbol, a3 as isObject$5, a4 as isFunction, a5 as reactIsExports, a6 as React, a7 as _Stack, a8 as _baseIsEqual, a9 as isObject_1, aa as keys_1, ab as isLength_1, ac as _isIndex, ad as isArguments_1, ae as _Set, af as _setToArray, ag as _SetCache, ah as _cacheHas, ai as _arrayPush, aj as isArrayLike_1, ak as _baseUnary, al as _getNative, am as eq_1, an as _root, ao as isEqual, ap as Animate, aq as _overArg, ar as _arraySome, as as Clock, at as DollarSign, au as ArrowRight, av as Shield, aw as CheckCircle, ax as Plus, ay as X, az as reactDomExports, aA as AlertCircle, aB as Check, aC as Wand2, aD as ChevronLeft, aE as CheckCircle2, aF as HelpCircle, aG as Info, aH as Copy, aI as MoreVertical, aJ as Columns, aK as PenSquare, aL as ArrowUp, aM as ArrowDown, aN as Archive, aO as Trash2, aP as Search, aQ as ArrowUpDown, aR as Eye, aS as Upload, aT as Image, aU as ReactQuill, aV as Pen, aW as Save, aX as CircleDollarSign, aY as Undo2, aZ as Phone, a_ as PauseCircle, a$ as ShieldX, b0 as ShieldOff, b1 as Globe, b2 as Award, b3 as Database, b4 as Folder, b5 as Mountain, b6 as UserCheck, b7 as Download, b8 as Server, b9 as XCircle, ba as Video, bb as Lock, bc as GripVertical, bd as ChevronUp, be as Play, bf as ClipboardCopy, bg as Ban, bh as Bell, bi as Heart, bj as Scissors, bk as Send, bl as Filter, bm as ArrowUpRight, bn as ClipboardCheck, bo as PenTool, bp as Camera, bq as BarChart$1, br as Megaphone, bs as GitBranch, bt as Pause, bu as Settings2, bv as Code, bw as Bug, bx as EyeOff, by as QueryClient, bz as client, bA as QueryClientProvider } from "../../../dist/js/react-vendor-Dl45l0PD.js";
-import { a as apiClient, A as API_ENDPOINTS, u as useToast, _ as __, b as apiService, n as normalizeCurrencyPosition, t as toDateValue, f as formatYatraMoney, r as readYatraCurrencyPositionFromWindow, s as sprintf, c as brandName, d as formatDateForInput, I as Input, e as formatDate$1, g as todayYmd, S as SearchableSelect, h as getCurrencySymbol, i as getCountryName, j as ajaxService, T as ToastProvider, E as ErrorBoundary } from "../../../dist/js/index-0YqMQ0Gb.js";
+import { r as reactExports, j as jsxRuntimeExports, W as Wrench, N as Network, M as MessageCircle, S as Sparkles, R as RotateCcw, P as Puzzle, a as MessageSquare, b as Plane, B as BadgePercent, c as Route, F as FileSignature, K as Key, d as Mail, C as Crown, A as Activity, L as List, T as TrendingUp, e as Tag, f as FolderTree, U as Users, g as CircleUser, h as Package, i as CreditCard, k as FileText, l as Settings$1, m as BarChart3, n as Star, o as CalendarDays, p as CalendarClock, q as Calendar$1, s as MapPin, t as LayoutDashboard, u as useQuery, v as useQueryClient, w as useMutation, Z as Zap, x as Webhook, y as ChevronDown, z as ChevronRight, D as ArrowLeft, G as Gift, E as Loader2, H as Sun, I as Moon, J as User, O as RefreshCw, Q as Inbox, V as AlertTriangle, X as ExternalLink, Y as isObjectLike_1, _ as _baseGetTag, $ as isArray_1, a0 as _MapCache, a1 as getDefaultExportFromCjs, a2 as _Symbol, a3 as isObject$5, a4 as isFunction, a5 as reactIsExports, a6 as React, a7 as _Stack, a8 as _baseIsEqual, a9 as isObject_1, aa as keys_1, ab as isLength_1, ac as _isIndex, ad as isArguments_1, ae as _Set, af as _setToArray, ag as _SetCache, ah as _cacheHas, ai as _arrayPush, aj as isArrayLike_1, ak as _baseUnary, al as _getNative, am as eq_1, an as _root, ao as isEqual, ap as Animate, aq as _overArg, ar as _arraySome, as as Clock, at as DollarSign, au as ArrowRight, av as Shield, aw as CheckCircle, ax as Plus, ay as X, az as reactDomExports, aA as AlertCircle, aB as Check, aC as Wand2, aD as ChevronLeft, aE as CheckCircle2, aF as HelpCircle, aG as Info, aH as Copy, aI as MoreVertical, aJ as Columns, aK as PenSquare, aL as ArrowUp, aM as ArrowDown, aN as Archive, aO as Trash2, aP as Search, aQ as ArrowUpDown, aR as Eye, aS as Upload, aT as Image, aU as ReactQuill, aV as Pen, aW as Save, aX as CircleDollarSign, aY as Undo2, aZ as Phone, a_ as PauseCircle, a$ as ShieldX, b0 as ShieldOff, b1 as Globe, b2 as Award, b3 as Database, b4 as Folder, b5 as Mountain, b6 as UserCheck, b7 as Download, b8 as Server, b9 as XCircle, ba as Video, bb as Lock, bc as GripVertical, bd as ChevronUp, be as Play, bf as ClipboardCopy, bg as Ban, bh as Bell, bi as Heart, bj as Scissors, bk as Send, bl as Filter, bm as ArrowUpRight, bn as ClipboardCheck, bo as PenTool, bp as Camera, bq as BarChart$1, br as Megaphone, bs as Compass, bt as GitBranch, bu as Pause, bv as Settings2, bw as Code, bx as Bug, by as EyeOff, bz as QueryClient, bA as client, bB as QueryClientProvider } from "../../../dist/js/react-vendor-BJn7BIDO.js";
+import { a as apiClient, A as API_ENDPOINTS, u as useToast, _ as __, b as apiService, n as normalizeCurrencyPosition, t as toDateValue, f as formatYatraMoney, r as readYatraCurrencyPositionFromWindow, s as sprintf, c as brandName, d as formatDateForInput, I as Input, e as formatDate$1, g as todayYmd, S as SearchableSelect, h as getCurrencySymbol, i as getCountryName, j as ajaxService, T as ToastProvider, E as ErrorBoundary } from "../../../dist/js/index-CH-UeeqR.js";
 const scriptRel = "modulepreload";
 const assetsURL = function(dep, importerUrl) {
   return new URL(dep, importerUrl).href;
@@ -57398,7 +57398,10 @@ const PaymentForm = () => {
     booking_id: "",
     amount: "",
     payment_method: "Credit Card",
-    payment_status: "pending",
+    // A payment recorded by hand is money already received. Only completed
+    // payments count towards the booking's paid amount / balance and trigger
+    // the "payment received" emails and events, so that is the default.
+    payment_status: "completed",
     payment_date: todayYmd(),
     transaction_id: "",
     notes: ""
@@ -57821,19 +57824,20 @@ const PaymentForm = () => {
                   e.target.value
                 ),
                 children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "pending", children: __("Pending", "yatra") }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "completed", children: __("Completed", "yatra") }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "partial", children: __("Partial", "yatra") }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "pending", children: __("Pending", "yatra") }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "failed", children: __("Failed", "yatra") }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "refunded", children: __("Refunded", "yatra") })
                 ]
               }
             ),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-gray-500 dark:text-gray-400", children: [
-              formData.payment_status === "completed" && __("Payment has been successfully processed.", "yatra"),
-              formData.payment_status === "pending" && __("Payment is pending confirmation.", "yatra"),
-              formData.payment_status === "partial" && __(
-                "Partial payment recorded. Balance may be pending.",
+              formData.payment_status === "completed" && __(
+                "Money received. Counts towards the booking's paid amount and remaining balance, and sends the payment-received emails (partial or full, depending on what is still due).",
+                "yatra"
+              ),
+              formData.payment_status === "pending" && __(
+                "Expected but not received yet. Does not change the booking's balance and sends nothing — mark it Completed when the money arrives.",
                 "yatra"
               ),
               formData.payment_status === "failed" && __(
@@ -67036,11 +67040,11 @@ const Travelers = () => {
     };
   });
   const { data: formConfigData } = useQuery({
-    queryKey: ["booking-form-config"],
+    queryKey: ["booking-form-config", "global"],
     queryFn: async () => {
       var _a2;
-      const result = await apiService.getSettings("booking_form");
-      return result.success ? (_a2 = result.data) == null ? void 0 : _a2.booking_form_config : null;
+      const result = await apiService.getBookingFormConfig();
+      return ((_a2 = result == null ? void 0 : result.data) == null ? void 0 : _a2.booking_form_config) || (result == null ? void 0 : result.booking_form_config) || null;
     }
   });
   const [availableTrips, setAvailableTrips] = reactExports.useState([]);
@@ -67075,9 +67079,23 @@ const Travelers = () => {
     if (!((_a2 = formConfig == null ? void 0 : formConfig.traveler_form) == null ? void 0 : _a2.fields)) {
       return [];
     }
-    const enabledFields = formConfig.traveler_form.fields.filter(
+    const seen2 = /* @__PURE__ */ new Set();
+    const allFields = [];
+    const add2 = (fields) => (fields || []).forEach((field) => {
+      if (!seen2.has(field.id)) {
+        seen2.add(field.id);
+        allFields.push(field);
+      }
+    });
+    add2(
+      [...formConfig.traveler_form.fields].sort(
+        (a2, b) => (a2.order || 0) - (b.order || 0)
+      )
+    );
+    (formConfig.traveler_form.conditions || []).forEach((c2) => add2(c2.fields));
+    const enabledFields = allFields.filter(
       (field) => field.enabled && !EXCLUDED_DYNAMIC_FIELDS.includes(field.id)
-    ).sort((a2, b) => (a2.order || 0) - (b.order || 0));
+    );
     return enabledFields.map((field) => ({
       id: field.id,
       label: field.label,
@@ -70336,9 +70354,27 @@ const TripConsent = () => {
   ] });
 };
 async function fetchEmailTemplates() {
-  const raw = await apiClient.get(API_ENDPOINTS.EMAIL_TEMPLATES);
+  const raw = await apiClient.get(API_ENDPOINTS.EMAIL_TEMPLATES, {
+    params: { per_page: 500 }
+  });
   const unwrapped = unwrapApiPayload(raw);
   return Array.isArray(unwrapped) ? unwrapped : [];
+}
+async function createEmailTemplateOverride(parentId, data) {
+  return apiClient.post(API_ENDPOINTS.EMAIL_TEMPLATE_OVERRIDE(parentId), data);
+}
+async function reorderEmailTemplateOverrides(parentKey, ids) {
+  return apiClient.post(API_ENDPOINTS.EMAIL_TEMPLATE_OVERRIDES_REORDER, {
+    parent_key: parentKey,
+    ids
+  });
+}
+async function resolveEmailTemplatesForTrip(tripId) {
+  return unwrapApiPayload(
+    await apiClient.get(API_ENDPOINTS.EMAIL_TEMPLATE_RESOLVE, {
+      params: { trip_id: tripId }
+    })
+  );
 }
 async function fetchEmailTemplate(id) {
   return unwrapApiPayload(
@@ -70367,15 +70403,18 @@ async function deleteEmailTemplate(id) {
 async function duplicateEmailTemplate(id) {
   return apiClient.post(API_ENDPOINTS.EMAIL_TEMPLATE_DUPLICATE(id));
 }
-async function previewEmailTemplate(id) {
+async function previewEmailTemplate(id, tripId) {
   const response = await apiClient.post(
     API_ENDPOINTS.EMAIL_TEMPLATE_PREVIEW(id),
-    {}
+    tripId ? { trip_id: tripId } : {}
   );
   return unwrapApiPayload(response);
 }
-async function sendEmailTemplateTest(id, email) {
-  return apiClient.post(API_ENDPOINTS.EMAIL_TEMPLATE_TEST(id), { email });
+async function sendEmailTemplateTest(id, email, tripId) {
+  return apiClient.post(API_ENDPOINTS.EMAIL_TEMPLATE_TEST(id), {
+    email,
+    ...tripId ? { trip_id: tripId } : {}
+  });
 }
 async function fetchEmailSequences() {
   const raw = await apiClient.get(API_ENDPOINTS.EMAIL_SEQUENCES);
@@ -71876,6 +71915,456 @@ const EmailPreviewModal = ({
     ] })
   }
 );
+const MultiSelect = ({
+  value,
+  onChange,
+  options: options2,
+  placeholder = __("Select options...", "yatra"),
+  searchPlaceholder = __("Search...", "yatra"),
+  className = "",
+  error = false,
+  disabled = false
+}) => {
+  const [isOpen, setIsOpen] = reactExports.useState(false);
+  const [searchTerm, setSearchTerm] = reactExports.useState("");
+  const containerRef = reactExports.useRef(null);
+  const searchInputRef = reactExports.useRef(null);
+  const filteredOptions = options2.filter(
+    (option) => option.label.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  const selectedOptions = options2.filter(
+    (opt) => value.some((v) => String(v) === String(opt.value))
+  );
+  reactExports.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (containerRef.current && !containerRef.current.contains(event.target)) {
+        setIsOpen(false);
+        setSearchTerm("");
+      }
+    };
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      setTimeout(() => {
+        var _a;
+        (_a = searchInputRef.current) == null ? void 0 : _a.focus();
+      }, 100);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
+  const handleToggle = (optionValue) => {
+    const isSelected = value.some((v) => String(v) === String(optionValue));
+    if (isSelected) {
+      onChange(value.filter((v) => String(v) !== String(optionValue)));
+    } else {
+      onChange([...value, optionValue]);
+    }
+  };
+  const handleRemove = (optionValue, e) => {
+    e.stopPropagation();
+    onChange(value.filter((v) => String(v) !== String(optionValue)));
+  };
+  const handleClearAll = (e) => {
+    e.stopPropagation();
+    onChange([]);
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    "div",
+    {
+      ref: containerRef,
+      className: `relative ${className}`,
+      style: { zIndex: isOpen ? 9999 : "auto" },
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            onClick: () => !disabled && setIsOpen(!isOpen),
+            className: `flex min-h-11 w-full rounded-md border-2 ${error ? "border-red-500" : "border-gray-300 dark:border-gray-600"} bg-white dark:bg-gray-800 px-3 py-2 text-base ring-offset-white cursor-pointer focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:ring-offset-gray-900 dark:focus-within:ring-blue-400 transition-colors ${disabled ? "opacity-50 cursor-not-allowed" : ""}`,
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 flex flex-wrap gap-1.5 items-center", children: selectedOptions.length > 0 ? selectedOptions.map((option) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "span",
+                {
+                  className: "inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 text-sm",
+                  children: [
+                    option.label,
+                    !disabled && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "button",
+                      {
+                        type: "button",
+                        onClick: (e) => handleRemove(option.value, e),
+                        className: "hover:bg-blue-200 dark:hover:bg-blue-800 rounded-full p-0.5",
+                        children: /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-3 h-3" })
+                      }
+                    )
+                  ]
+                },
+                option.value
+              )) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-500 dark:text-gray-400", children: placeholder }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 ml-2", children: [
+                value.length > 0 && !disabled && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: handleClearAll,
+                    className: "p-0.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded",
+                    "aria-label": __("Clear all", "yatra"),
+                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4 text-gray-400" })
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  ChevronDown,
+                  {
+                    className: `w-4 h-4 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`
+                  }
+                )
+              ] })
+            ]
+          }
+        ),
+        isOpen && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute z-[9999] w-full mt-1 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-72 overflow-visible", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 border-b border-gray-200 dark:border-gray-700", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Input,
+              {
+                ref: searchInputRef,
+                type: "text",
+                placeholder: searchPlaceholder,
+                value: searchTerm,
+                onChange: (e) => setSearchTerm(e.target.value),
+                className: "pl-8 h-9",
+                onClick: (e) => e.stopPropagation()
+              }
+            )
+          ] }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-h-52 overflow-y-auto", children: filteredOptions.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-3 py-3 text-sm text-gray-500 dark:text-gray-400 text-center", children: __("No options found", "yatra") }) : filteredOptions.map((option) => {
+            const isSelected = value.some(
+              (v) => String(v) === String(option.value)
+            );
+            return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "button",
+              {
+                type: "button",
+                onClick: () => handleToggle(option.value),
+                className: `w-full px-3 py-2.5 text-left text-sm flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${isSelected ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400" : "text-gray-900 dark:text-white"}`,
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: option.label }),
+                  isSelected && /* @__PURE__ */ jsxRuntimeExports.jsx(Check, { className: "w-4 h-4 text-blue-600 dark:text-blue-400" })
+                ]
+              },
+              option.value
+            );
+          }) }),
+          value.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "px-3 py-2 border-t border-gray-200 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400", children: [
+            value.length,
+            " ",
+            value.length === 1 ? __("selected", "yatra") : __("selected", "yatra")
+          ] })
+        ] })
+      ]
+    }
+  );
+};
+const TRIP_TYPE_OPTIONS = [
+  { value: "single_day", label: __("Single Day Trip", "yatra") },
+  { value: "multi_day", label: __("Multi-Day Trip", "yatra") }
+];
+const encodeTargets = (t) => [
+  ...((t == null ? void 0 : t.trip_types) ?? []).map((v) => `type:${v}`),
+  ...((t == null ? void 0 : t.categories) ?? []).map((id) => `category:${id}`),
+  ...((t == null ? void 0 : t.trips) ?? []).map((id) => `trip:${id}`)
+];
+const decodeTargets = (values) => {
+  const out = {};
+  values.forEach((raw) => {
+    const [kind, rest] = String(raw).split(":", 2);
+    if (kind === "trip" && Number(rest) > 0) {
+      (out.trips || (out.trips = [])).push(Number(rest));
+    } else if (kind === "category" && Number(rest) > 0) {
+      (out.categories || (out.categories = [])).push(Number(rest));
+    } else if (kind === "type" && rest) {
+      (out.trip_types || (out.trip_types = [])).push(rest);
+    }
+  });
+  return out;
+};
+const hasTargets = (t) => {
+  var _a, _b, _c;
+  return !!t && ((((_a = t.trips) == null ? void 0 : _a.length) ?? 0) > 0 || (((_b = t.categories) == null ? void 0 : _b.length) ?? 0) > 0 || (((_c = t.trip_types) == null ? void 0 : _c.length) ?? 0) > 0);
+};
+const flattenCategories = (nodes, depth = 0) => nodes.flatMap((c2) => [
+  {
+    value: `category:${c2.id}`,
+    label: `${__("Category", "yatra")}: ${"— ".repeat(depth)}${c2.name}`
+  },
+  ...Array.isArray(c2.subcategories) ? flattenCategories(c2.subcategories, depth + 1) : []
+]);
+const useTripTargets = (enabled) => {
+  const trips = useQuery({
+    queryKey: ["booking-form-conditions", "trips"],
+    queryFn: async () => {
+      const res = await apiService.getTrips({
+        per_page: 500,
+        orderby: "title",
+        order: "ASC"
+      });
+      const list = Array.isArray(res == null ? void 0 : res.data) ? res.data : Array.isArray(res) ? res : [];
+      return list.filter((t) => t && t.id && t.status !== "trash").map((t) => ({
+        value: `trip:${t.id}`,
+        label: `${__("Trip", "yatra")}: ${t.title || `#${t.id}`}`
+      }));
+    },
+    enabled,
+    staleTime: 5 * 60 * 1e3
+  });
+  const categories = useQuery({
+    queryKey: ["booking-form-conditions", "categories"],
+    queryFn: async () => {
+      const res = await apiClient.get("/trip-categories", {
+        params: {
+          per_page: 100,
+          hierarchical: true,
+          orderby: "name",
+          order: "ASC"
+        }
+      });
+      const list = Array.isArray(res == null ? void 0 : res.data) ? res.data : Array.isArray(res) ? res : [];
+      return flattenCategories(list);
+    },
+    enabled,
+    staleTime: 5 * 60 * 1e3
+  });
+  const options2 = reactExports.useMemo(
+    () => [
+      ...TRIP_TYPE_OPTIONS.map((t) => ({
+        value: `type:${t.value}`,
+        label: `${__("Trip type", "yatra")}: ${t.label}`
+      })),
+      ...categories.data ?? [],
+      ...trips.data ?? []
+    ],
+    [trips.data, categories.data]
+  );
+  return { options: options2, isLoading: trips.isLoading || categories.isLoading };
+};
+const describeTargets = (t, options2) => {
+  const names = encodeTargets(t).map((v) => {
+    var _a;
+    const opt = options2.find((o) => String(o.value) === v);
+    if (opt) return opt.label.replace(/^[^:]+: /, "");
+    const [kind, rest] = v.split(":", 2);
+    if (kind === "type") {
+      return ((_a = TRIP_TYPE_OPTIONS.find((x2) => x2.value === rest)) == null ? void 0 : _a.label) || rest;
+    }
+    return kind === "trip" ? sprintf(__("Trip #%s", "yatra"), rest) : sprintf(__("Category #%s", "yatra"), rest);
+  });
+  return names.join(", ");
+};
+const EmailOverrideCreateModal = ({ isOpen, onClose, globals, parent }) => {
+  const { showToast } = useToast();
+  const queryClient2 = useQueryClient();
+  const [parentId, setParentId] = reactExports.useState("");
+  const [targets, setTargets] = reactExports.useState({});
+  const [name, setName] = reactExports.useState("");
+  const [nameTouched, setNameTouched] = reactExports.useState(false);
+  const [copy2, setCopy] = reactExports.useState(true);
+  const { options: options2 } = useTripTargets(isOpen);
+  reactExports.useEffect(() => {
+    var _a;
+    if (!isOpen) return;
+    setParentId(parent ? String(parent.id) : String(((_a = globals[0]) == null ? void 0 : _a.id) ?? ""));
+    setTargets({});
+    setName("");
+    setNameTouched(false);
+    setCopy(true);
+  }, [isOpen, parent, globals]);
+  const selectedParent = reactExports.useMemo(
+    () => globals.find((g) => String(g.id) === parentId) || parent || null,
+    [globals, parentId, parent]
+  );
+  const suggestedName = reactExports.useMemo(() => {
+    if (!selectedParent) return "";
+    const where = describeTargets(targets, options2);
+    return where ? `${selectedParent.name} — ${where}` : "";
+  }, [selectedParent, targets, options2]);
+  const createMutation = useMutation({
+    mutationFn: async () => {
+      if (!selectedParent)
+        throw new Error(__("Pick a global template.", "yatra"));
+      const response = await createEmailTemplateOverride(
+        selectedParent.id,
+        {
+          targets,
+          name: (nameTouched ? name : suggestedName).trim(),
+          copy: copy2
+        }
+      );
+      if (response && response.success === false) {
+        throw new Error(
+          response.message || __("Failed to create override.", "yatra")
+        );
+      }
+      return response;
+    },
+    onSuccess: (response) => {
+      var _a;
+      queryClient2.invalidateQueries({ queryKey: ["email-templates"] });
+      const newId = (_a = response == null ? void 0 : response.data) == null ? void 0 : _a.id;
+      showToast(
+        __("Override created — now edit the wording.", "yatra"),
+        "success"
+      );
+      onClose();
+      if (newId) {
+        window.location.href = `admin.php?page=yatra&subpage=email-automation&tab=templates&action=edit&id=${newId}`;
+      }
+    },
+    onError: (error) => {
+      showToast(
+        (error == null ? void 0 : error.message) || __("Failed to create override.", "yatra"),
+        "error"
+      );
+    }
+  });
+  const canSubmit = !!selectedParent && hasTargets(targets) && !createMutation.isPending;
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    Modal,
+    {
+      isOpen,
+      onClose,
+      size: "md",
+      title: parent ? sprintf(__("Add an override of “%s”", "yatra"), parent.name) : __("Add an override", "yatra"),
+      description: __(
+        "Same event, same merge tags, your own wording. Bookings on the trips you pick get this override; every other booking keeps the global template.",
+        "yatra"
+      ),
+      footer: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-end gap-2 w-full", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "button", variant: "outline", onClick: onClose, children: __("Cancel", "yatra") }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button,
+          {
+            type: "button",
+            disabled: !canSubmit,
+            onClick: () => createMutation.mutate(),
+            "data-testid": "override-create-submit",
+            children: createMutation.isPending ? __("Creating…", "yatra") : __("Create & edit →", "yatra")
+          }
+        )
+      ] }),
+      children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", "data-testid": "override-create-modal", children: [
+        !parent && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { className: "text-sm font-medium", children: __("Override which global template?", "yatra") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-1", "data-testid": "override-parent", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            SearchableSelect,
+            {
+              value: parentId,
+              onChange: (value) => setParentId(value),
+              options: globals.map((g) => ({
+                value: String(g.id),
+                label: `${g.name} · ${g.event_key}`
+              })),
+              placeholder: __("Pick a global template…", "yatra"),
+              searchPlaceholder: __("Search templates…", "yatra")
+            }
+          ) })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { className: "text-sm font-medium", children: __("Use this override for", "yatra") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            MultiSelect,
+            {
+              value: encodeTargets(targets),
+              onChange: (vals) => setTargets(decodeTargets(vals)),
+              options: options2,
+              placeholder: __("Search trips, categories, trip types…", "yatra"),
+              className: "mt-1"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 mt-1", children: __(
+            "Trips, whole categories (sub-categories included) or a trip type. You can change this later.",
+            "yatra"
+          ) })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { className: "text-sm font-medium", children: __("Name", "yatra") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Input,
+            {
+              value: nameTouched ? name : suggestedName,
+              onChange: (e) => {
+                setNameTouched(true);
+                setName(e.target.value);
+              },
+              placeholder: selectedParent ? `${selectedParent.name} — …` : __("Name", "yatra"),
+              className: "mt-1",
+              "data-testid": "override-name"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 mt-1", children: __(
+            "Suggested from what you picked; shown in the list and in Email logs.",
+            "yatra"
+          ) })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { className: "text-sm font-medium", children: __("Start from", "yatra") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-1 space-y-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "label",
+              {
+                className: `flex items-start gap-3 p-3 rounded-lg border cursor-pointer ${copy2 ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20" : "border-gray-200 dark:border-gray-700"}`,
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "input",
+                    {
+                      type: "radio",
+                      name: "override-start",
+                      checked: copy2,
+                      onChange: () => setCopy(true),
+                      className: "mt-1"
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "block text-sm font-medium", children: __("A copy of the global template", "yatra") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "block text-xs text-gray-500", children: __(
+                      "Recommended — edit only the parts that differ.",
+                      "yatra"
+                    ) })
+                  ] })
+                ]
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "label",
+              {
+                className: `flex items-start gap-3 p-3 rounded-lg border cursor-pointer ${!copy2 ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20" : "border-gray-200 dark:border-gray-700"}`,
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "input",
+                    {
+                      type: "radio",
+                      name: "override-start",
+                      checked: !copy2,
+                      onChange: () => setCopy(false),
+                      className: "mt-1"
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "block text-sm font-medium", children: __("A blank template", "yatra") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "block text-xs text-gray-500", children: __(
+                      "Start from scratch with the same merge tags. It stays unused until it has a body.",
+                      "yatra"
+                    ) })
+                  ] })
+                ]
+              }
+            )
+          ] })
+        ] })
+      ] })
+    }
+  );
+};
 const EMAIL_TEMPLATE_VISIBLE_COLUMNS_DEFAULT = {
   name: true,
   event: true,
@@ -71949,6 +72438,7 @@ const EmailTemplatesList = ({
   automationModuleActive,
   settingsBridge
 }) => {
+  var _a;
   const queryClient2 = useQueryClient();
   const { showToast } = useToast();
   const [searchTerm, setSearchTerm] = reactExports.useState("");
@@ -71979,6 +72469,24 @@ const EmailTemplatesList = ({
       JSON.stringify(newVisibleColumns)
     );
   };
+  const overridesSupported = automationModuleActive && !!((_a = window.yatraAdmin) == null ? void 0 : _a.emailTemplateOverridesEnabled);
+  const [section, setSection] = reactExports.useState("global");
+  const [parentFilter, setParentFilter] = reactExports.useState("");
+  const [asTrip, setAsTrip] = reactExports.useState(null);
+  const [overrideModal, setOverrideModal] = reactExports.useState({ open: false, parent: null });
+  const { options: tripTargetOptions } = useTripTargets(overridesSupported);
+  const tripOptions = reactExports.useMemo(
+    () => tripTargetOptions.filter((o) => String(o.value).startsWith("trip:")).map((o) => ({
+      id: Number(String(o.value).slice(5)),
+      label: o.label.replace(/^[^:]+: /, "")
+    })),
+    [tripTargetOptions]
+  );
+  const { data: resolution } = useQuery({
+    queryKey: ["email-templates-resolve", asTrip],
+    queryFn: () => resolveEmailTemplatesForTrip(asTrip),
+    enabled: overridesSupported && !!asTrip
+  });
   const { data: templatesData, isLoading: apiLoading } = useQuery({
     queryKey: ["email-templates"],
     queryFn: () => fetchEmailTemplates(),
@@ -71998,8 +72506,66 @@ const EmailTemplatesList = ({
       isModuleActive
     });
   }, [automationModuleActive, settingsBridge]);
-  const templates = automationModuleActive ? apiTemplates : localTemplates;
+  const allTemplates = automationModuleActive ? apiTemplates : localTemplates;
+  const overrideTemplates = reactExports.useMemo(
+    () => overridesSupported ? allTemplates.filter((t) => !!t.overrides) : [],
+    [allTemplates, overridesSupported]
+  );
+  const globalTemplates = reactExports.useMemo(
+    () => overridesSupported ? allTemplates.filter((t) => !t.overrides) : allTemplates,
+    [allTemplates, overridesSupported]
+  );
+  const templates = overridesSupported && section === "override" ? overrideTemplates : globalTemplates;
+  const globalByKey = reactExports.useMemo(() => {
+    const m = /* @__PURE__ */ new Map();
+    globalTemplates.forEach((t) => m.set(t.template_key, t));
+    return m;
+  }, [globalTemplates]);
+  const overridesByParent = reactExports.useMemo(() => {
+    const m = /* @__PURE__ */ new Map();
+    overrideTemplates.forEach((t) => {
+      const k2 = t.overrides || "";
+      m.set(k2, [...m.get(k2) || [], t]);
+    });
+    m.forEach(
+      (arr) => arr.sort(
+        (a2, b) => (a2.priority || 0) - (b.priority || 0) || Number(a2.id) - Number(b.id)
+      )
+    );
+    return m;
+  }, [overrideTemplates]);
   const isLoading = automationModuleActive ? apiLoading : false;
+  const reorderMutation = useMutation({
+    mutationFn: ({ parentKey, ids }) => reorderEmailTemplateOverrides(parentKey, ids),
+    onSuccess: () => {
+      queryClient2.invalidateQueries({ queryKey: ["email-templates"] });
+      queryClient2.invalidateQueries({ queryKey: ["email-templates-resolve"] });
+    },
+    onError: (error) => {
+      showToast(
+        (error == null ? void 0 : error.message) || __("Failed to reorder overrides", "yatra"),
+        "error"
+      );
+    }
+  });
+  const moveOverride = (t, delta) => {
+    const siblings = overridesByParent.get(t.overrides || "") || [];
+    const ids = siblings.map((x2) => Number(x2.id));
+    const i = ids.indexOf(Number(t.id));
+    const j = i + delta;
+    if (i < 0 || j < 0 || j >= ids.length) return;
+    [ids[i], ids[j]] = [ids[j], ids[i]];
+    reorderMutation.mutate({ parentKey: t.overrides || "", ids });
+  };
+  const sentForTrip = (t) => {
+    var _a2;
+    if (!asTrip || !resolution) return null;
+    if (t.overrides) {
+      return ((_a2 = resolution.resolved[t.overrides]) == null ? void 0 : _a2.id) === Number(t.id) ? "hit" : "dim";
+    }
+    if (!resolution.overridable.includes(t.template_key)) return null;
+    return resolution.resolved[t.template_key] ? "dim" : "hit";
+  };
   const toggleMutation = useMutation({
     mutationFn: async ({
       id,
@@ -72105,9 +72671,9 @@ const EmailTemplatesList = ({
     [templates]
   );
   const events = reactExports.useMemo(() => {
-    var _a;
+    var _a2;
     if (automationModuleActive) {
-      return ((_a = window.yatraAdmin) == null ? void 0 : _a.emailEvents) || [];
+      return ((_a2 = window.yatraAdmin) == null ? void 0 : _a2.emailEvents) || [];
     }
     return [...new Set(EMAIL_TEMPLATES_CATALOG.map((e) => e.event_key))].map(
       (key2) => ({ key: key2, name: key2 })
@@ -72120,9 +72686,10 @@ const EmailTemplatesList = ({
       const matchesSearch = !searchTerm || t.name.toLowerCase().includes(q) || (t.description || "").toLowerCase().includes(q) || (t.subject || "").toLowerCase().includes(q) || bodyPlain.includes(q);
       const matchesCategory = categoryFilter === "all" || t.category === categoryFilter;
       const matchesRecipient = recipientFilter === "all" || getEffectiveRecipientType(t) === recipientFilter;
-      const matchesEvent = eventFilter === "all" || t.event_key === eventFilter;
+      const matchesEvent = eventFilter === "all" || (t.effective_event_key || t.event_key) === eventFilter;
+      const matchesParent = !parentFilter || section !== "override" || t.overrides === parentFilter;
       const matchesStatus = statusFilter === "all" || statusFilter === "active" && t.is_active || statusFilter === "inactive" && !t.is_active;
-      return matchesSearch && matchesCategory && matchesRecipient && matchesEvent && matchesStatus;
+      return matchesSearch && matchesCategory && matchesRecipient && matchesEvent && matchesStatus && matchesParent;
     });
   }, [
     templates,
@@ -72130,7 +72697,9 @@ const EmailTemplatesList = ({
     categoryFilter,
     recipientFilter,
     eventFilter,
-    statusFilter
+    statusFilter,
+    parentFilter,
+    section
   ]);
   const totalFilteredItems = filteredTemplates.length;
   const totalPages = Math.ceil(totalFilteredItems / itemsPerPage);
@@ -72275,17 +72844,113 @@ const EmailTemplatesList = ({
                 children: template.name
               }
             ),
-            template.is_system ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400", children: __("System") }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400", children: __("Custom") })
+            template.overrides ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400", children: __("Override", "yatra") }) : template.is_system ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400", children: overridesSupported ? __("Global", "yatra") : __("System") }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400", children: __("Custom") }),
+            (() => {
+              var _a2, _b, _c;
+              const mark = sentForTrip(template);
+              const tripName = ((_a2 = tripOptions.find((t) => t.id === asTrip)) == null ? void 0 : _a2.label) || "";
+              if (mark === "hit") {
+                return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  "span",
+                  {
+                    className: "ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
+                    "data-testid": "sent-for-trip",
+                    children: [
+                      sprintf(__("sent for %s", "yatra"), tripName),
+                      template.overrides && ((_b = resolution == null ? void 0 : resolution.resolved[template.overrides]) == null ? void 0 : _b.reason) ? ` · ${(_c = resolution.resolved[template.overrides]) == null ? void 0 : _c.reason}` : ""
+                    ]
+                  }
+                );
+              }
+              if (mark === "dim" && !template.overrides) {
+                const ov = resolution == null ? void 0 : resolution.resolved[template.template_key];
+                return /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300", children: sprintf(
+                  __("overridden for %1$s → %2$s", "yatra"),
+                  tripName,
+                  (ov == null ? void 0 : ov.name) || ""
+                ) });
+              }
+              return null;
+            })(),
+            template.overrides && !template.is_active && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300", children: __("off — its trips get the global template", "yatra") }),
+            template.overrides && template.is_active && !String(template.body || "").trim() && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300", children: __(
+              "no body yet — its trips get the global template",
+              "yatra"
+            ) })
           ] })
         ] });
       }
     },
+    ...overridesSupported && section === "override" ? [
+      {
+        key: "overrides_of",
+        label: __("Overrides", "yatra"),
+        visible: true,
+        render: (template) => {
+          const parent = globalByKey.get(template.overrides || "");
+          const siblings = overridesByParent.get(template.overrides || "") || [];
+          const pos = siblings.findIndex((x2) => x2.id === template.id) + 1;
+          return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                type: "button",
+                className: "text-blue-600 dark:text-blue-400 hover:underline font-medium text-left",
+                onClick: () => parent && handleEdit(parent),
+                children: (parent == null ? void 0 : parent.name) || template.overrides
+              }
+            ),
+            siblings.length > 1 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-400", children: sprintf(
+              __("priority %1$d of %2$d", "yatra"),
+              pos,
+              siblings.length
+            ) })
+          ] });
+        }
+      },
+      {
+        key: "applies_to",
+        label: __("Applies to", "yatra"),
+        visible: true,
+        render: (template) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-purple-700 dark:text-purple-300", children: describeTargets(template.targets, tripTargetOptions) || "—" })
+      }
+    ] : [],
+    ...overridesSupported && section === "global" ? [
+      {
+        key: "overrides_count",
+        label: __("Overrides", "yatra"),
+        visible: true,
+        render: (template) => {
+          const n = (overridesByParent.get(template.template_key) || []).length;
+          if (!n) {
+            return /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-400", children: template.overridable ? __("none", "yatra") : "—" });
+          }
+          return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "button",
+            {
+              type: "button",
+              className: "text-sm text-purple-700 dark:text-purple-300 hover:underline inline-flex items-center gap-1",
+              onClick: () => {
+                setSection("override");
+                setParentFilter(template.template_key);
+              },
+              "data-testid": "overrides-count",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Compass, { className: "w-3.5 h-3.5" }),
+                n === 1 ? __("1 override →", "yatra") : sprintf(__("%d overrides →", "yatra"), n)
+              ]
+            }
+          );
+        }
+      }
+    ] : [],
     {
       key: "event",
       label: __("Event"),
       visible: visibleColumns.event,
       render: (template) => {
-        const eventInfo = events.find((e) => e.key === template.event_key);
+        const eventKey = template.effective_event_key || template.event_key;
+        const eventInfo = events.find((e) => e.key === eventKey);
         return /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "span",
           {
@@ -72293,7 +72958,7 @@ const EmailTemplatesList = ({
             title: (eventInfo == null ? void 0 : eventInfo.description) || "",
             children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(Zap, { className: "w-3 h-3" }),
-              formatEventKey(template.event_key)
+              formatEventKey(eventKey)
             ]
           }
         );
@@ -72315,7 +72980,9 @@ const EmailTemplatesList = ({
     {
       key: "body_preview",
       label: __("Body"),
-      visible: visibleColumns.body_preview,
+      // Hidden in the Override section: those rows are about targeting, so the
+      // Template / Overrides / Applies to columns get the room instead.
+      visible: visibleColumns.body_preview && !(overridesSupported && section === "override"),
       render: (template) => {
         const preview = plainTextEmailPreview(template.body || "");
         return /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -72331,13 +72998,17 @@ const EmailTemplatesList = ({
     {
       key: "description",
       label: __("Description"),
-      visible: visibleColumns.description,
+      // Hidden in the Override section: those rows are about targeting, so the
+      // Template / Overrides / Applies to columns get the room instead.
+      visible: visibleColumns.description && !(overridesSupported && section === "override"),
       render: (template) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-gray-600 dark:text-gray-400 line-clamp-1", children: template.description || "-" })
     },
     {
       key: "category",
       label: __("Category"),
-      visible: visibleColumns.category,
+      // Hidden in the Override section: those rows are about targeting, so the
+      // Template / Overrides / Applies to columns get the room instead.
+      visible: visibleColumns.category && !(overridesSupported && section === "override"),
       render: (template) => {
         const CategoryIcon = categoryIcons[template.category] || Mail;
         return /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300", children: [
@@ -72349,7 +73020,9 @@ const EmailTemplatesList = ({
     {
       key: "recipient_type",
       label: __("Recipient"),
-      visible: visibleColumns.recipient_type,
+      // Hidden in the Override section: those rows are about targeting, so the
+      // Template / Overrides / Applies to columns get the room instead.
+      visible: visibleColumns.recipient_type && !(overridesSupported && section === "override"),
       render: (template) => {
         const effectiveRecipient = getEffectiveRecipientType(template);
         const toEmail = template.to_email || "";
@@ -72400,6 +73073,29 @@ const EmailTemplatesList = ({
     }
   ];
   const actions = [
+    ...overridesSupported ? [
+      {
+        key: "add_override",
+        label: __("Add override…", "yatra"),
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Compass, { className: "w-4 h-4" }),
+        onClick: (template) => setOverrideModal({ open: true, parent: template }),
+        condition: (template) => !template.overrides && !!template.overridable && isApiTemplate(template)
+      },
+      {
+        key: "override_up",
+        label: __("Higher priority", "yatra"),
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-4 h-4" }),
+        onClick: (template) => moveOverride(template, -1),
+        condition: (template) => !!template.overrides && (overridesByParent.get(template.overrides) || []).length > 1
+      },
+      {
+        key: "override_down",
+        label: __("Lower priority", "yatra"),
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-4 h-4" }),
+        onClick: (template) => moveOverride(template, 1),
+        condition: (template) => !!template.overrides && (overridesByParent.get(template.overrides) || []).length > 1
+      }
+    ] : [],
     {
       key: "preview",
       label: __("Preview", "yatra"),
@@ -72464,17 +73160,97 @@ const EmailTemplatesList = ({
       "Templates backed by site settings can be edited here. Rows for Yatra Pro Email Automation or optional modules stay visible with their on/off state; open a View only row to inspect content, or enable Pro or the module to edit HTML and unlock automation.",
       "yatra"
     ) }),
-    automationModuleActive && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex justify-end", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-      Button,
-      {
-        onClick: handleCreate,
-        className: "bg-blue-600 hover:bg-blue-700 text-white",
-        children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4 mr-2" }),
-          __("Create Template")
-        ]
-      }
-    ) }),
+    overridesSupported && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", "data-testid": "template-sections", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "inline-flex rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "button",
+          {
+            type: "button",
+            onClick: () => {
+              setSection("global");
+              setParentFilter("");
+            },
+            "aria-pressed": section === "global",
+            className: `inline-flex items-center gap-2 px-4 h-10 text-sm font-medium ${section === "global" ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300" : "bg-white text-gray-600 dark:bg-gray-800 dark:text-gray-300"}`,
+            "data-testid": "section-global",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Globe, { className: "w-4 h-4" }),
+              __("Global templates", "yatra"),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs px-1.5 py-0.5 rounded bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300", children: globalTemplates.length })
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "button",
+          {
+            type: "button",
+            onClick: () => setSection("override"),
+            "aria-pressed": section === "override",
+            className: `inline-flex items-center gap-2 px-4 h-10 text-sm font-medium border-l border-gray-300 dark:border-gray-600 ${section === "override" ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300" : "bg-white text-gray-600 dark:bg-gray-800 dark:text-gray-300"}`,
+            "data-testid": "section-override",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Compass, { className: "w-4 h-4" }),
+              __("Override templates", "yatra"),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300", children: overrideTemplates.length })
+            ]
+          }
+        )
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: section === "global" ? __(
+        "One template per event, sent to every trip unless an override applies. Editing a global template never changes its overrides.",
+        "yatra"
+      ) : __(
+        "Trip-specific versions of a global template. Same event and merge tags as the template they override; used only for bookings on the trips they name. Everything else keeps the global template.",
+        "yatra"
+      ) })
+    ] }),
+    automationModuleActive && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center justify-between gap-3", children: [
+      overridesSupported ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center gap-2 text-sm", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-500", children: __("View as a trip:", "yatra") }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-72", "data-testid": "view-as-trip", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          SearchableSelect,
+          {
+            value: asTrip ? String(asTrip) : "",
+            onChange: (value) => setAsTrip(value ? Number(value) : null),
+            options: tripOptions.map((t) => ({
+              value: String(t.id),
+              label: t.label
+            })),
+            placeholder: __("— none (show everything) —", "yatra"),
+            searchPlaceholder: __("Search trips…", "yatra")
+          }
+        ) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-400", children: asTrip ? __(
+          "Highlighted rows are exactly what this trip's customers receive.",
+          "yatra"
+        ) : __(
+          "Pick a trip to highlight exactly what that trip's customers receive.",
+          "yatra"
+        ) })
+      ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", {}),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-2", children: overridesSupported && section === "override" ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        Button,
+        {
+          onClick: () => setOverrideModal({ open: true, parent: null }),
+          className: "bg-blue-600 hover:bg-blue-700 text-white",
+          "data-testid": "add-override",
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4 mr-2" }),
+            __("Add override", "yatra")
+          ]
+        }
+      ) : /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        Button,
+        {
+          onClick: handleCreate,
+          className: "bg-blue-600 hover:bg-blue-700 text-white",
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4 mr-2" }),
+            __("Create Template")
+          ]
+        }
+      ) })
+    ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-12 gap-4 items-center", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "lg:col-span-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" }),
@@ -72488,7 +73264,21 @@ const EmailTemplatesList = ({
           }
         )
       ] }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "lg:col-span-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "lg:col-span-2", children: overridesSupported && section === "override" ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        Select,
+        {
+          value: parentFilter,
+          onChange: (e) => setParentFilter(e.target.value),
+          className: "w-full",
+          "data-testid": "parent-filter",
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: __("Overrides of: any", "yatra") }),
+            globalTemplates.filter(
+              (g) => (overridesByParent.get(g.template_key) || []).length > 0
+            ).map((g) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: g.template_key, children: sprintf(__("Overrides of: %s", "yatra"), g.name) }, g.template_key))
+          ]
+        }
+      ) : /* @__PURE__ */ jsxRuntimeExports.jsxs(
         Select,
         {
           value: categoryFilter,
@@ -72565,11 +73355,12 @@ const EmailTemplatesList = ({
         columns,
         actions,
         isLoading,
-        emptyText: __("No templates found"),
-        emptyDescription: __(
-          "Create your first email template to get started."
-        ),
-        onCreateClick: automationModuleActive ? handleCreate : void 0,
+        emptyText: overridesSupported && section === "override" ? __("No overrides yet", "yatra") : __("No templates found"),
+        emptyDescription: overridesSupported && section === "override" ? __(
+          "Every trip gets the global templates. Use “Add override” here or “Add override…” on a global template.",
+          "yatra"
+        ) : __("Create your first email template to get started."),
+        onCreateClick: automationModuleActive ? overridesSupported && section === "override" ? () => setOverrideModal({ open: true, parent: null }) : handleCreate : void 0,
         getItemId: (template) => template.id,
         capability: "yatra_manage_emails",
         skeletonRows: 5,
@@ -72590,6 +73381,15 @@ const EmailTemplatesList = ({
         itemName: __("templates")
       }
     ) }),
+    overridesSupported && /* @__PURE__ */ jsxRuntimeExports.jsx(
+      EmailOverrideCreateModal,
+      {
+        isOpen: overrideModal.open,
+        onClose: () => setOverrideModal({ open: false, parent: null }),
+        globals: globalTemplates.filter((g) => !!g.overridable),
+        parent: overrideModal.parent
+      }
+    ),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       EmailPreviewModal,
       {
@@ -72629,9 +73429,7 @@ const EmailSequencesList = () => {
     queryFn: () => fetchEmailSequences(),
     enabled: isEmailAutomationModuleEnabled()
   });
-  const [sequenceToDelete, setSequenceToDelete] = reactExports.useState(
-    null
-  );
+  const [sequenceToDelete, setSequenceToDelete] = reactExports.useState(null);
   const deleteMutation = useMutation({
     mutationFn: async (id) => {
       return await deleteEmailSequence(id);
@@ -72836,6 +73634,32 @@ const EmailLogsList = () => {
     queryFn: () => fetchEmailLogs({ page, per_page: perPage }),
     enabled: isEmailAutomationModuleEnabled()
   });
+  const { data: templatesForNames } = useQuery({
+    queryKey: ["email-templates"],
+    queryFn: () => fetchEmailTemplates(),
+    enabled: isEmailAutomationModuleEnabled()
+  });
+  const templateLabel = reactExports.useCallback(
+    (key2) => {
+      if (!key2) return "—";
+      const list = Array.isArray(templatesForNames) ? templatesForNames : [];
+      const row = list.find((t) => t.template_key === key2);
+      if (!row) {
+        const m = key2.match(/^(.+)__ov_[a-z0-9]+$/);
+        if (m) {
+          const parent = list.find((t) => t.template_key === m[1]);
+          return `${(parent == null ? void 0 : parent.name) || m[1]} · ${__("Override (deleted)", "yatra")}`;
+        }
+        return key2;
+      }
+      if (row.overrides) {
+        const parent = list.find((t) => t.template_key === row.overrides);
+        return `${(parent == null ? void 0 : parent.name) || row.overrides} · ${__("Override", "yatra")}: ${row.name}`;
+      }
+      return row.name || key2;
+    },
+    [templatesForNames]
+  );
   const logs = (logsData == null ? void 0 : logsData.items) ?? [];
   const totalItems = (logsData == null ? void 0 : logsData.total) ?? 0;
   const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
@@ -72873,7 +73697,14 @@ const EmailLogsList = () => {
                 /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-500 dark:text-gray-400", children: log2.recipient_email })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-3 text-sm text-gray-900 dark:text-white max-w-xs truncate", children: log2.subject }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-3 text-sm text-gray-500 dark:text-gray-400", children: log2.template_key }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "td",
+                {
+                  className: "px-4 py-3 text-sm text-gray-500 dark:text-gray-400",
+                  title: log2.template_key,
+                  children: templateLabel(log2.template_key)
+                }
+              ),
               /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
                 Badge,
                 {
@@ -73166,7 +73997,7 @@ const EmailAutomation = () => {
         ) }),
         activeTab === "templates" && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
           automationReady && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mb-6 text-sm text-gray-600 dark:text-gray-400", children: __(
-            "Customer booking, payment, cancellation, and trip-reminder emails use the matching template when its body is filled; otherwise the free plugin defaults or settings HTML apply. Admin: New Booking sends when that template has a body (plain-text admin notices from checkout and notifications are skipped to avoid duplicates). Other booking.created templates send in addition to the customer email. Booking Confirmed uses the “Booking Confirmed” row when a booking moves to confirmed; Trip Completed uses its template instead of the generic completed email when the body is filled.",
+            "Customer booking, payment, cancellation, and trip-reminder emails use the matching template when its body is filled; otherwise the free plugin defaults or settings HTML apply. Admin: New Booking sends when that template has a body (plain-text admin notices from checkout and notifications are skipped to avoid duplicates). Other booking.created templates send in addition to the customer email. Booking Confirmed uses the “Booking Confirmed” row when a booking moves to confirmed; Trip Completed uses its template instead of the generic completed email when the body is filled. Override templates replace their global template for the trips they target and are never sent in addition to it.",
             "yatra"
           ) }),
           !emailMgr.ready && !automationReady ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex justify-center py-16", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "h-10 w-10 animate-spin text-gray-400" }) }) : /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -73484,7 +74315,7 @@ const EmailPreview = ({ html }) => {
   );
 };
 const EmailTemplateForm = () => {
-  var _a, _b, _c;
+  var _a, _b, _c, _d;
   const { id, isCreateMode, coreTemplateSlug, coreReadOnlyParam } = reactExports.useMemo(() => {
     const params = new URLSearchParams(window.location.search);
     const templateId = params.get("id");
@@ -73537,6 +74368,9 @@ const EmailTemplateForm = () => {
     event_key: "",
     is_active: true
   });
+  const [targets, setTargets] = reactExports.useState({});
+  const [previewTrip, setPreviewTrip] = reactExports.useState(null);
+  const [overrideModalOpen, setOverrideModalOpen] = reactExports.useState(false);
   const [showPreview, setShowPreview] = reactExports.useState(false);
   const [previewData, setPreviewData] = reactExports.useState(null);
   const [testEmail, setTestEmail] = reactExports.useState("");
@@ -73567,6 +74401,44 @@ const EmailTemplateForm = () => {
     enabled: Boolean(id) && !isCoreSettingsEdit
   });
   const isSystemTemplate = Boolean(templateData == null ? void 0 : templateData.is_system);
+  const overridesSupported = !isCoreSettingsEdit && !!((_a = window.yatraAdmin) == null ? void 0 : _a.emailTemplateOverridesEnabled);
+  const overrideOf = String((templateData == null ? void 0 : templateData.overrides) ?? "");
+  const isOverride = overridesSupported && overrideOf !== "";
+  const isOverridableGlobal = overridesSupported && !isOverride && Boolean(templateData == null ? void 0 : templateData.overridable);
+  const { data: allTemplatesData } = useQuery({
+    queryKey: ["email-templates"],
+    queryFn: () => fetchEmailTemplates(),
+    enabled: overridesSupported && !isCreateMode
+  });
+  const allTemplates = reactExports.useMemo(
+    () => Array.isArray(allTemplatesData) ? allTemplatesData : [],
+    [allTemplatesData]
+  );
+  const parentTemplate = reactExports.useMemo(
+    () => allTemplates.find((t) => t.template_key === overrideOf) || null,
+    [allTemplates, overrideOf]
+  );
+  const myOverrides = reactExports.useMemo(
+    () => allTemplates.filter(
+      (t) => t.overrides && t.overrides === (templateData == null ? void 0 : templateData.template_key)
+    ).sort((a2, b) => (a2.priority || 0) - (b.priority || 0)),
+    [allTemplates, templateData]
+  );
+  const { options: tripTargetOptions } = useTripTargets(
+    overridesSupported && (isOverride || isOverridableGlobal)
+  );
+  const tripOptions = reactExports.useMemo(
+    () => tripTargetOptions.filter((o) => String(o.value).startsWith("trip:")).map((o) => ({
+      id: Number(String(o.value).slice(5)),
+      label: o.label.replace(/^[^:]+: /, "")
+    })),
+    [tripTargetOptions]
+  );
+  const { data: tripResolution } = useQuery({
+    queryKey: ["email-templates-resolve", previewTrip],
+    queryFn: () => resolveEmailTemplatesForTrip(previewTrip),
+    enabled: overridesSupported && !!previewTrip && (isOverride || isOverridableGlobal)
+  });
   const { data: variablesData } = useQuery({
     queryKey: ["email-variables", formData.event_key || ""],
     queryFn: () => fetchEmailTemplateVariables(formData.event_key || ""),
@@ -73608,9 +74480,14 @@ const EmailTemplateForm = () => {
       category: String(t.category ?? "booking"),
       subject: String(t.subject ?? ""),
       body: String(t.body ?? ""),
-      event_key: String(t.event_key ?? ""),
+      // An override's own event_key is stored empty; show (and fetch
+      // variables for) the global template's event instead.
+      event_key: String(t.effective_event_key || t.event_key || ""),
       is_active: Boolean(t.is_active ?? true)
     });
+    setTargets(
+      t.overrides && t.targets && typeof t.targets === "object" ? t.targets : {}
+    );
   }, [templateData]);
   reactExports.useEffect(() => {
     if (!isCoreSettingsEdit || !settings2 || !coreDef) return;
@@ -73706,7 +74583,7 @@ const EmailTemplateForm = () => {
   });
   const previewMutation = useMutation({
     mutationFn: async () => {
-      return previewEmailTemplate(id);
+      return previewEmailTemplate(id, previewTrip);
     },
     onSuccess: (data) => {
       setPreviewData(data);
@@ -73738,7 +74615,7 @@ const EmailTemplateForm = () => {
   });
   const testMutation = useMutation({
     mutationFn: async (email) => {
-      return sendEmailTemplateTest(id, email);
+      return sendEmailTemplateTest(id, email, previewTrip);
     },
     onSuccess: () => {
       showToast(__("Test email sent successfully"), "success");
@@ -73765,7 +74642,26 @@ const EmailTemplateForm = () => {
       showToast(__("Subject line is required"), "error");
       return;
     }
-    saveMutation.mutate(formData);
+    if (isOverride && !hasTargets(targets)) {
+      showToast(
+        __(
+          "An override needs at least one trip, category or trip type — or delete it to use the global template.",
+          "yatra"
+        ),
+        "error"
+      );
+      return;
+    }
+    saveMutation.mutate(
+      isOverride ? (
+        // event_key is not sent: an override always fires on its global's event.
+        {
+          ...formData,
+          event_key: void 0,
+          targets
+        }
+      ) : formData
+    );
   };
   const copyVariable = (variable) => {
     var _a2;
@@ -73905,13 +74801,28 @@ const EmailTemplateForm = () => {
             /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { className: "w-6 h-6 text-blue-500" }),
             isCreateMode ? __("Create Email Template") : isCoreViewMode ? __("View email template", "yatra") : __("Edit Email Template")
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-500 dark:text-gray-400 mt-1", children: isCreateMode ? __("Create a new custom email template") : isCoreSettingsEdit ? isCoreViewMode ? __(
-            "This template uses site settings. Enable Yatra Pro and the required module to edit subject and HTML body.",
-            "yatra"
-          ) : __(
-            "Core customer email (saved with site settings). From address is set under Email → Delivery.",
-            "yatra"
-          ) : String((templateData == null ? void 0 : templateData.name) ?? "") })
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-gray-500 dark:text-gray-400 mt-1", children: [
+            isCreateMode ? __("Create a new custom email template") : isCoreSettingsEdit ? isCoreViewMode ? __(
+              "This template uses site settings. Enable Yatra Pro and the required module to edit subject and HTML body.",
+              "yatra"
+            ) : __(
+              "Core customer email (saved with site settings). From address is set under Email → Delivery.",
+              "yatra"
+            ) : String((templateData == null ? void 0 : templateData.name) ?? ""),
+            isOverride && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "ml-2 inline-flex items-center gap-1 text-xs align-middle", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "px-1.5 py-0.5 rounded font-medium bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300", children: __("Override", "yatra") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-400", children: __("of global template", "yatra") }),
+              parentTemplate ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "a",
+                {
+                  href: `admin.php?page=yatra&subpage=email-automation&tab=templates&action=edit&id=${parentTemplate.id}`,
+                  className: "text-blue-600 dark:text-blue-400 hover:underline font-medium",
+                  children: parentTemplate.name
+                }
+              ) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: overrideOf })
+            ] }),
+            isOverridableGlobal && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2 px-1.5 py-0.5 rounded text-xs font-medium align-middle bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300", children: __("Global", "yatra") })
+          ] })
         ] })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
@@ -73953,6 +74864,106 @@ const EmailTemplateForm = () => {
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-3 gap-6", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "lg:col-span-2 space-y-6", children: [
+        isOverride && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            className: "rounded-lg border border-purple-300 dark:border-purple-800 overflow-hidden",
+            "data-testid": "override-applies-to",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "px-4 py-2.5 bg-purple-50 dark:bg-purple-900/20 text-sm font-semibold text-purple-800 dark:text-purple-200", children: [
+                __("Applies to", "yatra"),
+                " ",
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-normal text-purple-600 dark:text-purple-300", children: __(
+                  "— bookings on these trips get this override instead of the global template",
+                  "yatra"
+                ) })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 space-y-3", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  MultiSelect,
+                  {
+                    value: encodeTargets(targets),
+                    onChange: (vals) => setTargets(decodeTargets(vals)),
+                    options: tripTargetOptions,
+                    placeholder: __(
+                      "Search trips, categories, trip types…",
+                      "yatra"
+                    )
+                  }
+                ),
+                !hasTargets(targets) && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-red-600", children: __(
+                  "Pick at least one trip, category or trip type.",
+                  "yatra"
+                ) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "text-xs text-gray-500 dark:text-gray-400 list-disc pl-5 space-y-0.5", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: __(
+                    "Any match applies. A trip in a sub-category also matches its parent category.",
+                    "yatra"
+                  ) }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: __(
+                    "When several overrides match one trip, the most specific wins — trip › category › trip type — then the priority order in the Override templates list.",
+                    "yatra"
+                  ) }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: __(
+                    "Trips that match no override keep the global template. Switching this override off does the same for its trips.",
+                    "yatra"
+                  ) })
+                ] })
+              ] })
+            ]
+          }
+        ),
+        isOverridableGlobal && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            className: "flex flex-wrap items-start gap-3 rounded-lg border border-purple-300 dark:border-purple-800 bg-purple-50 dark:bg-purple-900/20 px-4 py-3 text-sm text-purple-900 dark:text-purple-200",
+            "data-testid": "global-overrides-strip",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+                myOverrides.length === 0 ? __(
+                  "No overrides yet. Every trip gets this template. Add an override to give some trips different wording.",
+                  "yatra"
+                ) : sprintf(
+                  __(
+                    "This global template has %d override(s) with their own wording. Changes you make here don't change them; every other trip gets this template.",
+                    "yatra"
+                  ),
+                  myOverrides.length
+                ),
+                myOverrides.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { className: "mt-1 space-y-0.5", children: myOverrides.map((o) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  "li",
+                  {
+                    className: "flex flex-wrap items-center gap-2",
+                    children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        "a",
+                        {
+                          href: `admin.php?page=yatra&subpage=email-automation&tab=templates&action=edit&id=${o.id}`,
+                          className: "font-medium text-blue-700 dark:text-blue-300 hover:underline",
+                          children: o.name
+                        }
+                      ),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-purple-700 dark:text-purple-300", children: describeTargets(o.targets, tripTargetOptions) }),
+                      !o.is_active && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-amber-700 dark:text-amber-300", children: __("(off)", "yatra") })
+                    ]
+                  },
+                  o.id
+                )) })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Button,
+                {
+                  type: "button",
+                  variant: "outline",
+                  size: "sm",
+                  onClick: () => setOverrideModalOpen(true),
+                  "data-testid": "add-override-from-global",
+                  children: __("+ Add override", "yatra")
+                }
+              )
+            ]
+          }
+        ),
         /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "flex items-center justify-between", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: __("Template Details") }),
@@ -74005,15 +75016,18 @@ const EmailTemplateForm = () => {
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1", children: __("Trigger Event") }),
-              Boolean(templateData == null ? void 0 : templateData.is_system) || isCoreSettingsEdit ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+              Boolean(templateData == null ? void 0 : templateData.is_system) || isCoreSettingsEdit || isOverride ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800", children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx(Zap, { className: "w-4 h-4" }),
                     formData.event_key || "-"
                   ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-500 dark:text-gray-400", children: __("System templates cannot change events") })
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-500 dark:text-gray-400", children: isOverride ? __(
+                    "Same as the global template — an override can't change when it is sent, only what it says",
+                    "yatra"
+                  ) : __("System templates cannot change events") })
                 ] }),
-                formData.event_key && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-indigo-800 dark:text-indigo-300", children: ((_a = events.find((e) => e.key === formData.event_key)) == null ? void 0 : _a.description) || "" }) })
+                formData.event_key && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-indigo-800 dark:text-indigo-300", children: ((_b = events.find((e) => e.key === formData.event_key)) == null ? void 0 : _b.description) || "" }) })
               ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs(
                   "button",
@@ -74024,9 +75038,9 @@ const EmailTemplateForm = () => {
                     children: [
                       formData.event_key ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx(Zap, { className: "w-4 h-4 text-blue-500" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-medium text-gray-900 dark:text-white", children: ((_b = events.find(
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-medium text-gray-900 dark:text-white", children: ((_c = events.find(
                           (e) => e.key === formData.event_key
-                        )) == null ? void 0 : _b.name) || formData.event_key })
+                        )) == null ? void 0 : _c.name) || formData.event_key })
                       ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { className: "w-4 h-4 text-gray-400" }),
                         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-gray-500 dark:text-gray-400", children: __("No Event (Sequence Only)") })
@@ -74307,6 +75321,82 @@ const EmailTemplateForm = () => {
             ] })
           ] })
         ] }),
+        !isCreateMode && !isCoreSettingsEdit && overridesSupported && (isOverride || isOverridableGlobal) && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base", children: __("Try it with a real trip", "yatra") }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { "data-testid": "preview-trip", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+              SearchableSelect,
+              {
+                value: previewTrip ? String(previewTrip) : "",
+                onChange: (value) => setPreviewTrip(value ? Number(value) : null),
+                options: tripOptions.map((t) => ({
+                  value: String(t.id),
+                  label: t.label
+                })),
+                placeholder: __("Sample data (no trip)", "yatra"),
+                searchPlaceholder: __("Search trips…", "yatra")
+              }
+            ) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500", children: __(
+              "Not saved. Preview and Send Test Email use this trip's real name, link and sample booking data. Which trips actually get this template is set in “Applies to”.",
+              "yatra"
+            ) }),
+            previewTrip && tripResolution && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "div",
+              {
+                className: "text-sm rounded-md border border-dashed border-gray-300 dark:border-gray-600 px-3 py-2",
+                "data-testid": "check-trip-result",
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-500", children: __("This trip's customers get:", "yatra") }),
+                  " ",
+                  (() => {
+                    const parentKey = isOverride ? overrideOf : String((templateData == null ? void 0 : templateData.template_key) || "");
+                    const hit = tripResolution.resolved[parentKey];
+                    if (isOverride) {
+                      if ((hit == null ? void 0 : hit.id) === Number(id)) {
+                        return /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "px-1.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300", children: [
+                          __("this override", "yatra"),
+                          (hit == null ? void 0 : hit.reason) ? ` · ${hit.reason}` : ""
+                        ] });
+                      }
+                      const noBodyYet = !String(
+                        (templateData == null ? void 0 : templateData.body) || ""
+                      ).trim() ? " — " + __(
+                        "this override has no body yet, so it is skipped",
+                        "yatra"
+                      ) : "";
+                      if (hit) {
+                        return /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-amber-700 dark:text-amber-300", children: [
+                          sprintf(
+                            __("“%1$s” (%2$s)", "yatra"),
+                            hit.name,
+                            hit.reason
+                          ),
+                          noBodyYet
+                        ] });
+                      }
+                      return /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-gray-700 dark:text-gray-300", children: [
+                        sprintf(
+                          __("the global template (%s)", "yatra"),
+                          (parentTemplate == null ? void 0 : parentTemplate.name) || overrideOf
+                        ),
+                        noBodyYet
+                      ] });
+                    }
+                    return hit ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-amber-700 dark:text-amber-300", children: sprintf(
+                      __(
+                        "the override “%1$s” (%2$s), not this template",
+                        "yatra"
+                      ),
+                      hit.name,
+                      hit.reason
+                    ) }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "px-1.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300", children: __("this template", "yatra") });
+                  })()
+                ]
+              }
+            )
+          ] })
+        ] }),
         !isCreateMode && !isCoreSettingsEdit && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "flex items-center gap-2", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(Send, { className: "w-5 h-5 text-blue-500" }),
@@ -74451,7 +75541,7 @@ const EmailTemplateForm = () => {
                   ]
                 }
               ),
-              formData.event_key && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 italic", children: ((_c = events.find((e) => e.key === formData.event_key)) == null ? void 0 : _c.description) || "" })
+              formData.event_key && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 italic", children: ((_d = events.find((e) => e.key === formData.event_key)) == null ? void 0 : _d.description) || "" })
             ] }),
             isCreateMode ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between", children: [
@@ -74532,6 +75622,15 @@ const EmailTemplateForm = () => {
         currentSubject: formData.subject,
         currentBody: formData.body,
         onAccept: ({ subject, body }) => setFormData({ ...formData, subject, body })
+      }
+    ),
+    isOverridableGlobal && templateData && /* @__PURE__ */ jsxRuntimeExports.jsx(
+      EmailOverrideCreateModal,
+      {
+        isOpen: overrideModalOpen,
+        onClose: () => setOverrideModalOpen(false),
+        globals: [templateData],
+        parent: templateData
       }
     )
   ] });
@@ -77719,28 +78818,28 @@ const License = () => {
     ] }) }) })
   ] });
 };
-const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-DBpaCd1d.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
-const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-C5RvnmMN.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
-const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-B54OTO-X.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
-const Reports = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Reports-De6Gle2r.js"), true ? __vite__mapDeps([9,1,2,3,4]) : void 0, import.meta.url));
-const DiscountForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DiscountForm-nCjvGJdl.js"), true ? __vite__mapDeps([10,1,2,3,4,11]) : void 0, import.meta.url));
-const Itinerary = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Itinerary-M1YQJyHW.js"), true ? __vite__mapDeps([12,1,2,3,4,5]) : void 0, import.meta.url));
-const RecurringRuleForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/RecurringRuleForm-CY2V3hrG.js"), true ? __vite__mapDeps([13,1,2,3,4]) : void 0, import.meta.url));
+const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-tYqd0a--.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
+const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-B2qDy-3v.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
+const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-BKam8pDN.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
+const Reports = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Reports-CrPrqhsM.js"), true ? __vite__mapDeps([9,1,2,3,4]) : void 0, import.meta.url));
+const DiscountForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DiscountForm-BTh3UQWx.js"), true ? __vite__mapDeps([10,1,2,3,4,11]) : void 0, import.meta.url));
+const Itinerary = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Itinerary-B51OPTS8.js"), true ? __vite__mapDeps([12,1,2,3,4,5]) : void 0, import.meta.url));
+const RecurringRuleForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/RecurringRuleForm-Cqv2cbJU.js"), true ? __vite__mapDeps([13,1,2,3,4]) : void 0, import.meta.url));
 const Whatsapp = reactExports.lazy(() => __vitePreload(() => import("./Whatsapp.js"), true ? __vite__mapDeps([14,1,2,3,4,15]) : void 0, import.meta.url));
-const ChannelManager = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ChannelManager-DlVc6c3Q.js"), true ? __vite__mapDeps([16,1,2,3,4,15]) : void 0, import.meta.url));
-const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Webhooks-D1I7BQBl.js"), true ? __vite__mapDeps([17,1,2,3,4,15]) : void 0, import.meta.url));
-const ScheduledPayments = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ScheduledPayments-DjPvvjyg.js"), true ? __vite__mapDeps([18,1,2,3,4]) : void 0, import.meta.url));
-const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-B0A0u_AZ.js"), true ? __vite__mapDeps([19,1,2,3,4,11]) : void 0, import.meta.url));
-const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-G9U_E5X6.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
-const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-y8Yi0hz5.js"), true ? __vite__mapDeps([21,1,2,3,4]) : void 0, import.meta.url));
-const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-amQiiorh.js"), true ? __vite__mapDeps([22,1,2,3,4]) : void 0, import.meta.url));
-const DynamicPricing = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DynamicPricing-DqBKxV9L.js"), true ? __vite__mapDeps([23,1,2,24,3,4,25]) : void 0, import.meta.url));
+const ChannelManager = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ChannelManager-BC4qM78i.js"), true ? __vite__mapDeps([16,1,2,3,4,15]) : void 0, import.meta.url));
+const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Webhooks-BVWPQrRC.js"), true ? __vite__mapDeps([17,1,2,3,4,15]) : void 0, import.meta.url));
+const ScheduledPayments = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ScheduledPayments-D6SuU6pk.js"), true ? __vite__mapDeps([18,1,2,3,4]) : void 0, import.meta.url));
+const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-CAl-wHRC.js"), true ? __vite__mapDeps([19,1,2,3,4,11]) : void 0, import.meta.url));
+const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-DvQk4uBk.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
+const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-CVs-Shqy.js"), true ? __vite__mapDeps([21,1,2,3,4]) : void 0, import.meta.url));
+const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-DGL4UC_6.js"), true ? __vite__mapDeps([22,1,2,3,4]) : void 0, import.meta.url));
+const DynamicPricing = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DynamicPricing-CM_zxrI5.js"), true ? __vite__mapDeps([23,1,2,24,3,4,25]) : void 0, import.meta.url));
 const DynamicPricingRuleForm = reactExports.lazy(
-  () => __vitePreload(() => import("../../../dist/js/DynamicPricingRuleForm-D3TUrfP2.js"), true ? __vite__mapDeps([26,1,2,3,4,24]) : void 0, import.meta.url)
+  () => __vitePreload(() => import("../../../dist/js/DynamicPricingRuleForm-C5k92h6w.js"), true ? __vite__mapDeps([26,1,2,3,4,24]) : void 0, import.meta.url)
 );
-const AiAssistant = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AiAssistant-CHD_pLzt.js"), true ? __vite__mapDeps([27,1,2,3,4,15]) : void 0, import.meta.url));
-const AbandonedRecovery = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AbandonedRecovery-X976JBuk.js"), true ? __vite__mapDeps([28,1,2,3,4,25]) : void 0, import.meta.url));
-const WhiteLabel = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/WhiteLabel-BeDkf1e9.js"), true ? __vite__mapDeps([29,1,2,3,4,15]) : void 0, import.meta.url));
+const AiAssistant = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AiAssistant-cc-9i8HW.js"), true ? __vite__mapDeps([27,1,2,3,4,15]) : void 0, import.meta.url));
+const AbandonedRecovery = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AbandonedRecovery-C3Eo0alU.js"), true ? __vite__mapDeps([28,1,2,3,4,25]) : void 0, import.meta.url));
+const WhiteLabel = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/WhiteLabel-CchtPIJy.js"), true ? __vite__mapDeps([29,1,2,3,4,15]) : void 0, import.meta.url));
 const PageLoadingFallback = () => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-1/3" }),
@@ -78029,74 +79128,80 @@ if (rootElement) {
   }
 }
 export {
-  isModuleActive as $,
+  Switch as $,
   Alert as A,
   Button as B,
   Card as C,
   DatePicker as D,
-  postInsertBookingShortcode as E,
-  postFlushRewriteRules as F,
-  fetchBookingPageShortcodeStatus as G,
+  CardFooter as E,
+  PremiumUpgradeDialog as F,
+  buildYatraAccountViewUrl as G,
   HelpText as H,
   IconPicker as I,
-  fetchPaymentGatewayDefinitions as J,
-  fetchWordPressPages as K,
+  navigateMenu as J,
+  saveSettings as K,
   LocationPicker as L,
   Modal as M,
-  Skeleton as N,
-  Table as O,
+  buildYatraListingPublicUrl as N,
+  postInsertBookingShortcode as O,
   PageHeader as P,
-  Tooltip$1 as Q,
+  postFlushRewriteRules as Q,
   RichTextEditor as R,
   Select as S,
   TimePicker as T,
-  Pagination as U,
-  Switch as V,
-  setUserCaps as W,
-  canCap as X,
-  BookingStatusChart as Y,
-  BookingsOverviewChart as Z,
-  isProPluginActive as _,
+  fetchBookingPageShortcodeStatus as U,
+  fetchPaymentGatewayDefinitions as V,
+  fetchWordPressPages as W,
+  Skeleton as X,
+  Table as Y,
+  Tooltip$1 as Z,
+  Pagination as _,
   isAiModuleEnabled as a,
-  BulkActionToolbar as a0,
-  IconSelector as a1,
-  useNavigate as a2,
-  Table$1 as a3,
-  TableHeader as a4,
-  TableRow as a5,
-  TableHead as a6,
-  TableBody as a7,
-  TableCell as a8,
-  SearchFilterToolbar as a9,
-  useWordPressMedia as aA,
-  MenuIcon as aB,
-  ICON_MAP as aC,
-  Popover as aa,
-  PopoverTrigger as ab,
-  PopoverContent as ac,
-  clsx as ad,
-  Dot as ae,
-  findAllByType as af,
-  ErrorBar as ag,
-  Layer as ah,
-  filterProps as ai,
-  Curve as aj,
-  interpolateNumber$2 as ak,
-  isNil$1 as al,
-  hasClipDot as am,
-  LabelList as an,
-  getValueByDataKey as ao,
-  uniqueId as ap,
-  Global as aq,
-  getCateCoordinateOfLine as ar,
-  generateCategoricalChart as as,
-  XAxis as at,
-  YAxis as au,
-  formatAxisMap as av,
-  ResponsiveContainer as aw,
-  CartesianGrid as ax,
-  Tooltip as ay,
-  DEFAULT_MENU_ITEMS as az,
+  setUserCaps as a0,
+  canCap as a1,
+  BookingStatusChart as a2,
+  BookingsOverviewChart as a3,
+  isProPluginActive as a4,
+  isModuleActive as a5,
+  BulkActionToolbar as a6,
+  IconSelector as a7,
+  useNavigate as a8,
+  Table$1 as a9,
+  YAxis as aA,
+  formatAxisMap as aB,
+  ResponsiveContainer as aC,
+  CartesianGrid as aD,
+  Tooltip as aE,
+  DEFAULT_MENU_ITEMS as aF,
+  useWordPressMedia as aG,
+  MenuIcon as aH,
+  ICON_MAP as aI,
+  TableHeader as aa,
+  TableRow as ab,
+  TableHead as ac,
+  TableBody as ad,
+  TableCell as ae,
+  SearchFilterToolbar as af,
+  Popover as ag,
+  PopoverTrigger as ah,
+  PopoverContent as ai,
+  clsx as aj,
+  Dot as ak,
+  findAllByType as al,
+  ErrorBar as am,
+  Layer as an,
+  filterProps as ao,
+  Curve as ap,
+  interpolateNumber$2 as aq,
+  isNil$1 as ar,
+  hasClipDot as as,
+  LabelList as at,
+  getValueByDataKey as au,
+  uniqueId as av,
+  Global as aw,
+  getCateCoordinateOfLine as ax,
+  generateCategoricalChart as ay,
+  XAxis as az,
   isAiReady as b,
   aiApi as c,
   CardContent as d,
@@ -78109,18 +79214,18 @@ export {
   ConfirmationDialog as k,
   buildYatraSinglePublicUrls as l,
   isWordPressPlainPermalink as m,
-  prepareWordPressMediaFrameOpen as n,
-  fetchSettings as o,
+  MultiSelect as n,
+  prepareWordPressMediaFrameOpen as o,
   parseItineraryText as p,
-  unwrapApiPayload as q,
-  ConditionalRender as r,
-  CardFooter as s,
-  PremiumUpgradeDialog as t,
+  fetchSettings as q,
+  unwrapApiPayload as r,
+  Label as s,
+  useTripTargets as t,
   usePermissions as u,
-  Label as v,
-  buildYatraAccountViewUrl as w,
-  navigateMenu as x,
-  saveSettings as y,
-  buildYatraListingPublicUrl as z
+  describeTargets as v,
+  decodeTargets as w,
+  encodeTargets as x,
+  hasTargets as y,
+  ConditionalRender as z
 };
 //# sourceMappingURL=app.js.map

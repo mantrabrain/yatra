@@ -31,7 +31,9 @@ if (!defined('ABSPATH')) {
 $is_dynamic_form_enabled = apply_filters('yatra_dynamic_form_field_enabled', false);
 
 // Get form configuration - returns default config if module disabled, custom config if enabled
-$form_config = yatra_get_booking_form_config();
+// Scoped to the trip being booked, so a field or section limited to certain
+// trips (Pro) is neither rendered nor required here.
+$form_config = yatra_get_booking_form_config(!empty($trip_id) ? (int) $trip_id : null);
 
 
 // Country list — pulls from the canonical FormatHelper source so every

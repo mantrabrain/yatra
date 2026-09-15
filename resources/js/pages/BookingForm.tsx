@@ -181,11 +181,13 @@ const BookingForm: React.FC = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Fetch booking form configuration
+  // Fetch booking form configuration, resolved for the selected trip so a
+  // per-trip form version (Pro conditions) shows the right fields here too.
+  const selectedTripId = formData.trip_id ? Number(formData.trip_id) : null;
   const { data: formConfig } = useQuery<BookingFormConfig>({
-    queryKey: ["booking-form-config"],
+    queryKey: ["booking-form-config", selectedTripId],
     queryFn: async () => {
-      const response = await apiService.getSettings();
+      const response = await apiService.getBookingFormConfig(selectedTripId);
       return (
         response?.data?.booking_form_config ||
         response?.booking_form_config ||
@@ -1634,7 +1636,10 @@ const BookingForm: React.FC = () => {
                                   field.placeholder ||
                                   __("Select Country", "yatra")
                                 }
-                                searchPlaceholder={__("Search country", "yatra")}
+                                searchPlaceholder={__(
+                                  "Search country",
+                                  "yatra",
+                                )}
                               />
                             ) : field.type === "textarea" ? (
                               <textarea

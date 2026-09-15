@@ -31,6 +31,21 @@
     }
 
     init() {
+      // Nothing is built here on purpose. The modal markup (and its
+      // empty <h3 class="yatra-tour-viewer-title">) used to be injected
+      // into <body> as soon as this script loaded — on every page,
+      // including ones with no 360° tour. It is now created on the
+      // first view() call, so pages that never open a tour never get
+      // the extra DOM.
+    }
+
+    /**
+     * Build the modal once, on first use.
+     */
+    ensureModal() {
+      if (this.modal) {
+        return;
+      }
       this.createModal();
       this.attachEventListeners();
     }
@@ -128,6 +143,7 @@
       }
 
       this.currentTour = tour;
+      this.ensureModal();
       
       // Set title
       const titleElement = this.modal.querySelector('.yatra-tour-viewer-title');
@@ -148,6 +164,9 @@
     }
 
     close() {
+      if (!this.modal) {
+        return; // never opened on this page
+      }
       this.modal.style.display = 'none';
       document.body.style.overflow = '';
       
@@ -162,6 +181,9 @@
     }
 
     toggleFullscreen() {
+      if (!this.modal) {
+        return;
+      }
       const wrapper = this.modal.querySelector('.yatra-tour-viewer-wrapper');
       
       if (!document.fullscreenElement) {

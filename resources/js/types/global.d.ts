@@ -29,12 +29,16 @@ declare global {
       // window.yatraAdmin singleton so downstream components can read
       // them synchronously without re-querying.
       emailAutomationEnabled: boolean;
+      /** Pro build resolves trip-specific email template overrides. */
+      emailTemplateOverridesEnabled?: boolean;
       tripConsentEnabled: boolean;
       additionalServicesEnabled: boolean;
       abandonedBookingRecoveryEnabled: boolean;
       dynamicPricingEnabled: boolean;
       flexiblePaymentsEnabled?: boolean;
       dynamicFormFieldEnabled?: boolean;
+      /** Pro build supports per-trip booking form conditions. */
+      bookingFormConditionsEnabled?: boolean;
       customLandingPagesModuleEnabled?: boolean;
       showGoogleCalendarSettingsUI?: boolean;
       advancedDiscountEnabled?: boolean;

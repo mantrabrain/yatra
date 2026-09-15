@@ -572,6 +572,12 @@ export const apiService = {
     apiClient.get(
       group ? API_ENDPOINTS.SETTINGS_GROUP(group) : API_ENDPOINTS.SETTINGS,
     ),
+  // Booking form config as a trip's checkout renders it (per-trip conditions
+  // resolved). Without tripId: the global config, conditions included.
+  getBookingFormConfig: (tripId?: number | null) =>
+    apiClient.get(API_ENDPOINTS.SETTINGS_BOOKING_FORM, {
+      params: tripId ? { trip_id: tripId } : undefined,
+    }),
 
   // Notices
   getNotices: () => apiClient.get(API_ENDPOINTS.NOTICES),

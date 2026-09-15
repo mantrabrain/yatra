@@ -894,8 +894,17 @@ final class EmailMergeTagRegistry
             if (!is_array($section) || (isset($section['enabled']) && !$section['enabled'])) {
                 continue;
             }
-            foreach (($section['fields'] ?? []) as $field) {
-                if (empty($field['enabled']) || empty($field['id'])) {
+            // Fields the section can ask on ANY trip: the global list plus every
+            // per-trip condition's list (Pro) — a field that only a "Trekking"
+            // version of the form asks still needs its merge tag.
+            $fields = is_array($section['fields'] ?? null) ? $section['fields'] : [];
+            foreach ((array) ($section['conditions'] ?? []) as $condition) {
+                if (is_array($condition) && is_array($condition['fields'] ?? null)) {
+                    $fields = array_merge($fields, $condition['fields']);
+                }
+            }
+            foreach ($fields as $field) {
+                if (!is_array($field) || empty($field['enabled']) || empty($field['id'])) {
                     continue;
                 }
                 // Text blocks are display-only content, not inputs — they hold no

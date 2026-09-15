@@ -55,20 +55,27 @@ function yatra_reviews_enabled(): bool
  * 
  * @return array
  */
-function yatra_get_booking_form_config(): array
+/**
+ * @param int|null $tripId Trip being booked. Pass it from every checkout-side
+ *                         caller so per-trip field visibility (Pro) applies to
+ *                         rendering, the AJAX re-render and server validation
+ *                         alike. Omit it where the whole config is wanted.
+ */
+function yatra_get_booking_form_config(?int $tripId = null): array
 {
     // Check if Dynamic Form Field module is enabled via Pro plugin
     $is_dynamic_enabled = apply_filters('yatra_dynamic_form_field_enabled', false);
     
     if ($is_dynamic_enabled) {
         // Pro module is active — merged config from options (filtered in SettingsService::getBookingFormConfig)
-        return SettingsService::getBookingFormConfig();
+        return SettingsService::getBookingFormConfig($tripId);
     }
 
     // Module off: still allow filters to adjust defaults (tests / edge integrations)
     return apply_filters(
         'yatra_booking_form_config',
-        SettingsService::getDefaultBookingFormConfig()
+        SettingsService::getDefaultBookingFormConfig(),
+        $tripId
     );
 }
 

@@ -1005,6 +1005,9 @@ class TransactionalEmailTemplateService
             'booking_reference' => (string) ($booking->reference ?? ''),
             'booking_id' => (string) $bookingId,
             'booking_url' => $bookingId > 0 ? home_url('/my-account/bookings/' . $bookingId) : home_url('/'),
+            // Trip context for per-trip template selection (Pro overrides) and
+            // for {{trip_id}}; "0" when the booking has no trip.
+            'trip_id' => (string) (int) ($booking->trip_id ?? 0),
             'trip_name' => (string) ($booking->trip_title ?? ''),
             'trip_url' => !empty($booking->trip_slug)
                 ? home_url('/' . SettingsService::getTripBase() . '/' . rawurlencode((string) $booking->trip_slug) . '/')

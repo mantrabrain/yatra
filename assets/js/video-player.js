@@ -26,6 +26,20 @@
     }
 
     init() {
+      // Nothing is built here on purpose. The modal markup used to be
+      // injected into <body> as soon as this script loaded — on every
+      // page, including ones with no video. It is now created on the
+      // first play() call, so pages that never play a video never get
+      // the extra DOM.
+    }
+
+    /**
+     * Build the modal once, on first use.
+     */
+    ensureModal() {
+      if (this.modal) {
+        return;
+      }
       this.createModal();
       this.attachEventListeners();
     }
@@ -105,6 +119,7 @@
 
       
       this.currentVideo = video;
+      this.ensureModal();
       
       // Determine the embed URL
       let embedUrl = '';
@@ -167,7 +182,8 @@
         /youtube\.com\/watch\?v=([^&]+)/,
         /youtube\.com\/embed\/([^?]+)/,
         /youtu\.be\/([^?]+)/,
-        /youtube\.com\/v\/([^?]+)/
+        /youtube\.com\/v\/([^?]+)/,
+        /youtube\.com\/shorts\/([^?&]+)/
       ];
       
       for (const pattern of patterns) {
@@ -189,6 +205,9 @@
     }
 
     close() {
+      if (!this.modal) {
+        return; // never opened on this page
+      }
       this.modal.style.display = 'none';
       document.body.style.overflow = '';
       
