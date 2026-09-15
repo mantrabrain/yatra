@@ -2223,7 +2223,10 @@ const TripForm: React.FC = () => {
           : "multi_day")) as "single_day" | "multi_day" | "flexible",
       duration_days: tripData.duration_days?.toString() || "",
       duration_nights: tripData.duration_nights?.toString() || "",
-      duration_hours: tripData.duration_hours?.toString() || "",
+      // 0 / null both mean "not hour-based" — show an empty field, not "0".
+      duration_hours: tripData.duration_hours
+        ? String(tripData.duration_hours)
+        : "",
       available_from: tripData.available_from || "",
       available_to: tripData.available_to || "",
       booking_window_days: tripData.booking_window_days?.toString() || "",
@@ -3324,6 +3327,18 @@ const TripForm: React.FC = () => {
         duration_nights: data.duration_nights
           ? parseInt(data.duration_nights)
           : null,
+        // Hour-based day tours. This key was missing from the payload, so the
+        // Duration (Hours) field could never be saved: the form kept the value,
+        // the request dropped it, and the field reloaded empty. Send 0 (never
+        // null) when the field is blank — the validator treats null as "not
+        // provided" and would leave a stale hours value on a trip switched
+        // back to multi-day, which the storefront would then show as hours.
+        duration_hours:
+          data.duration_hours !== "" &&
+          data.duration_hours != null &&
+          !isNaN(parseInt(data.duration_hours))
+            ? parseInt(data.duration_hours)
+            : 0,
         available_from: data.available_from || null,
         available_to: data.available_to || null,
         booking_window_days: data.booking_window_days

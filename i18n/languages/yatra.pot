@@ -2,14 +2,14 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Yatra - Travel Booking & Tour Operator Software 3.1.0\n"
+"Project-Id-Version: Yatra - Travel Booking & Tour Operator Software 3.0.15\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/yatra\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-07T09:34:31+00:00\n"
+"POT-Creation-Date: 2026-09-15T02:04:07+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
@@ -516,7 +516,7 @@ msgstr ""
 msgid "15% off when departure is within 7 days (set Max Days Before = 7)."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8216
+# Source: resources/js/pages/TripForm.tsx:8231
 #: assets/admin/dist/js/app.js
 msgid "160 characters max. Include location, duration, and key features."
 msgstr ""
@@ -572,7 +572,7 @@ msgstr ""
 msgid "30-day revenue comparison with and without dynamic pricing"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6811
+# Source: resources/js/pages/TripForm.tsx:6826
 #: assets/admin/dist/js/app.js
 msgid "360° Virtual Tour URL"
 msgstr ""
@@ -642,12 +642,12 @@ msgstr ""
 msgid "A brief description of this category and who it applies to"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4173
+# Source: resources/js/pages/TripForm.tsx:4188
 #: assets/admin/dist/js/app.js
 msgid "A brief summary that appears in listings. Recommended: 100-150 characters for best results."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4006, resources/js/pages/Trips.tsx:1764
+# Source: resources/js/pages/TripForm.tsx:4021, resources/js/pages/Trips.tsx:1764
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:31161
 msgid "A catchy title that describes your trip. Recommended: 50-60 characters for best SEO results."
@@ -1029,7 +1029,7 @@ msgstr ""
 msgid "Access token is valid!"
 msgstr ""
 
-# Source: resources/js/components/ai/BuildItineraryModal.tsx:386, resources/js/pages/TripForm.tsx:6178
+# Source: resources/js/components/ai/BuildItineraryModal.tsx:386, resources/js/pages/TripForm.tsx:6193
 #: assets/admin/dist/js/app.js
 #: includes/helpers.php:713
 #: templates/listing-trip.php:505
@@ -1039,12 +1039,12 @@ msgstr ""
 msgid "Accommodation"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6241
+# Source: resources/js/pages/TripForm.tsx:6256
 #: assets/admin/dist/js/app.js
 msgid "Accommodation Details"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6187
+# Source: resources/js/pages/TripForm.tsx:6202
 #: assets/admin/dist/js/app.js
 msgid "Accommodation Type"
 msgstr ""
@@ -1108,7 +1108,7 @@ msgstr ""
 msgid "Activate Module"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:7847
+# Source: resources/js/pages/TripForm.tsx:7862
 #: assets/admin/dist/js/app.js
 msgid "Activate module"
 msgstr ""
@@ -1209,7 +1209,7 @@ msgstr ""
 msgid "Activity Photos"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6546
+# Source: resources/js/pages/TripForm.tsx:6561
 #: assets/admin/dist/js/app.js
 msgid "Activity Types"
 msgstr ""
@@ -1235,7 +1235,7 @@ msgstr ""
 msgid "Activity updated successfully"
 msgstr ""
 
-# Source: resources/js/pages/AvailabilityForm.tsx:649, resources/js/pages/RecurringRuleForm.tsx:276, resources/js/pages/RecurringRuleForm.tsx:278, resources/js/pages/TripForm.tsx:9481
+# Source: resources/js/pages/AvailabilityForm.tsx:649, resources/js/pages/RecurringRuleForm.tsx:276, resources/js/pages/RecurringRuleForm.tsx:278, resources/js/pages/TripForm.tsx:9496
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/RecurringRuleForm-CY2V3hrG.js:313
 #: assets/dist/js/RecurringRuleForm-CY2V3hrG.js:315
@@ -1268,7 +1268,7 @@ msgstr ""
 msgid "Add Category"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8821
+# Source: resources/js/pages/TripForm.tsx:8836
 #: assets/admin/dist/js/app.js
 msgid "Add Custom Tab"
 msgstr ""
@@ -1292,7 +1292,7 @@ msgstr ""
 msgid "Add Difficulty Level"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:7193
+# Source: resources/js/pages/TripForm.tsx:7208
 #: assets/admin/dist/js/app.js
 msgid "Add Download"
 msgstr ""
@@ -1308,7 +1308,7 @@ msgstr ""
 msgid "Add Excluded Item"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8399
+# Source: resources/js/pages/TripForm.tsx:8414
 #: assets/admin/dist/js/app.js
 msgid "Add FAQ"
 msgstr ""
@@ -1325,7 +1325,7 @@ msgstr ""
 msgid "Add First Step"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5764
+# Source: resources/js/pages/TripForm.tsx:5779
 #: assets/admin/dist/js/app.js
 msgid "Add First Time Slot"
 msgstr ""
@@ -1335,12 +1335,12 @@ msgstr ""
 msgid "Add Heading"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4470, resources/js/pages/TripForm.tsx:9440
+# Source: resources/js/pages/TripForm.tsx:4485, resources/js/pages/TripForm.tsx:9455
 #: assets/admin/dist/js/app.js
 msgid "Add Highlight"
 msgstr ""
 
-# Source: resources/js/components/ui/media-upload.tsx:262, resources/js/pages/TripForm.tsx:6758
+# Source: resources/js/components/ui/media-upload.tsx:262, resources/js/pages/TripForm.tsx:6773
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:51222
 msgid "Add Image"
@@ -1357,7 +1357,7 @@ msgstr ""
 msgid "Add Item"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5421, resources/js/pages/TripForm.tsx:9594, resources/js/pages/TripForm.tsx:9626
+# Source: resources/js/pages/TripForm.tsx:5436, resources/js/pages/TripForm.tsx:9609, resources/js/pages/TripForm.tsx:9641
 #: assets/admin/dist/js/app.js
 msgid "Add Landmark"
 msgstr ""
@@ -1494,7 +1494,7 @@ msgstr ""
 msgid "Add Paragraph"
 msgstr ""
 
-# Source: resources/js/pages/AvailabilityForm.tsx:1279, resources/js/pages/RecurringRuleForm.tsx:1193, resources/js/pages/RecurringRuleForm.tsx:1829, resources/js/pages/TripForm.tsx:7453
+# Source: resources/js/pages/AvailabilityForm.tsx:1279, resources/js/pages/RecurringRuleForm.tsx:1193, resources/js/pages/RecurringRuleForm.tsx:1829, resources/js/pages/TripForm.tsx:7468
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/AvailabilityForm-amQiiorh.js:1031
 #: assets/dist/js/RecurringRuleForm-CY2V3hrG.js:1048
@@ -1548,7 +1548,7 @@ msgstr ""
 msgid "Add Terms"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5738
+# Source: resources/js/pages/TripForm.tsx:5753
 #: assets/admin/dist/js/app.js
 msgid "Add Time Slot"
 msgstr ""
@@ -1620,7 +1620,7 @@ msgstr ""
 msgid "Add a channel first, then come back here to map your trips to it."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6814
+# Source: resources/js/pages/TripForm.tsx:6829
 #: assets/admin/dist/js/app.js
 msgid "Add a link to an interactive 360° virtual tour if available"
 msgstr ""
@@ -1717,7 +1717,7 @@ msgstr ""
 msgid "Add channel"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6633
+# Source: resources/js/pages/TripForm.tsx:6648
 #: assets/admin/dist/js/app.js
 msgid "Add custom attributes for advanced filtering and search capabilities."
 msgstr ""
@@ -1776,12 +1776,12 @@ msgstr ""
 msgid "Add included item..."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4400
+# Source: resources/js/pages/TripForm.tsx:4415
 #: assets/admin/dist/js/app.js
 msgid "Add key highlights that make your trip special. These will be displayed prominently on your trip page."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4456
+# Source: resources/js/pages/TripForm.tsx:4471
 #: assets/admin/dist/js/app.js
 msgid "Add key selling points like \"Private guide\", \"All meals included\", or \"Skip-the-line tickets\""
 msgstr ""
@@ -1792,7 +1792,7 @@ msgstr ""
 msgid "Add mapping"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5714
+# Source: resources/js/pages/TripForm.tsx:5729
 #: assets/admin/dist/js/app.js
 msgid "Add multiple departure times for customers to choose from."
 msgstr ""
@@ -1827,7 +1827,7 @@ msgstr ""
 msgid "Add new item type"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5370
+# Source: resources/js/pages/TripForm.tsx:5385
 #: assets/admin/dist/js/app.js
 msgid "Add notable landmarks or points of interest visited during this trip"
 msgstr ""
@@ -1856,7 +1856,7 @@ msgstr ""
 msgid "Add photos to showcase this activity"
 msgstr ""
 
-# Source: resources/js/pages/RecurringRuleForm.tsx:1133, resources/js/pages/TripForm.tsx:7404
+# Source: resources/js/pages/RecurringRuleForm.tsx:1133, resources/js/pages/TripForm.tsx:7419
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/RecurringRuleForm-CY2V3hrG.js:999
 msgid "Add pricing for traveler categories. Categories are managed in Traveler Categories page."
@@ -1891,7 +1891,7 @@ msgstr ""
 msgid "Add this to your OAuth client under \"Authorized redirect URIs\" in"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:2827
+# Source: resources/js/pages/TripForm.tsx:2830
 #: assets/admin/dist/js/app.js
 msgid "Add to Gallery"
 msgstr ""
@@ -1914,7 +1914,7 @@ msgstr ""
 msgid "Add traveler categories and define discount ranges for each category."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6775
+# Source: resources/js/pages/TripForm.tsx:6790
 #: assets/admin/dist/js/app.js
 msgid "Add video content to showcase your trip visually"
 msgstr ""
@@ -1925,7 +1925,7 @@ msgstr ""
 msgid "Add videos to showcase this activity"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6667
+# Source: resources/js/pages/TripForm.tsx:6682
 #: assets/admin/dist/js/app.js
 msgid "Add visual content, videos, stories, and testimonials to showcase your trip"
 msgstr ""
@@ -2155,7 +2155,7 @@ msgstr ""
 msgid "Admin: Scheduled payment failed"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:4145, resources/js/pages/TripForm.tsx:8896
+# Source: resources/js/pages/Settings.tsx:4145, resources/js/pages/TripForm.tsx:8911
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/Settings-C5RvnmMN.js:3068
 msgid "Advanced"
@@ -2179,7 +2179,7 @@ msgstr ""
 msgid "Advanced Discount module"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:2659
+# Source: resources/js/pages/TripForm.tsx:2662
 #: assets/admin/dist/js/app.js
 msgid "Advanced Settings"
 msgstr ""
@@ -2222,7 +2222,7 @@ msgstr ""
 msgid "Age Range"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5957
+# Source: resources/js/pages/TripForm.tsx:5972
 #: assets/admin/dist/js/app.js
 msgid "Age Restrictions"
 msgstr ""
@@ -2430,7 +2430,7 @@ msgstr ""
 msgid "All actions"
 msgstr ""
 
-# Source: resources/js/pages/AvailabilityForm.tsx:1304, resources/js/pages/RecurringRuleForm.tsx:1218, resources/js/pages/RecurringRuleForm.tsx:1847, resources/js/pages/TripForm.tsx:7480
+# Source: resources/js/pages/AvailabilityForm.tsx:1304, resources/js/pages/RecurringRuleForm.tsx:1218, resources/js/pages/RecurringRuleForm.tsx:1847, resources/js/pages/TripForm.tsx:7495
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/AvailabilityForm-amQiiorh.js:1052
 #: assets/dist/js/RecurringRuleForm-CY2V3hrG.js:1072
@@ -2550,7 +2550,7 @@ msgstr ""
 msgid "Allow customers to pay a portion now and the rest later"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5696
+# Source: resources/js/pages/TripForm.tsx:5711
 #: assets/admin/dist/js/app.js
 msgid "Allow customers to select from multiple departure times (e.g., Morning, Afternoon, Evening tours)"
 msgstr ""
@@ -2628,7 +2628,7 @@ msgstr ""
 msgid "An error occurred while fetching the rule data"
 msgstr ""
 
-# Source: resources/js/hooks/useItineraryFormSave.ts:605, resources/js/pages/AvailabilityForm.tsx:589, resources/js/pages/TripForm.tsx:3537
+# Source: resources/js/hooks/useItineraryFormSave.ts:605, resources/js/pages/AvailabilityForm.tsx:589, resources/js/pages/TripForm.tsx:3552
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:53692
 #: assets/dist/js/AvailabilityForm-amQiiorh.js:455
@@ -2712,12 +2712,12 @@ msgstr ""
 msgid "Analytics"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8377
+# Source: resources/js/pages/TripForm.tsx:8392
 #: assets/admin/dist/js/app.js
 msgid "Answer"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8338
+# Source: resources/js/pages/TripForm.tsx:8353
 #: assets/admin/dist/js/app.js
 msgid "Answer common questions to build trust and reduce support inquiries. FAQs also help with SEO."
 msgstr ""
@@ -2934,7 +2934,7 @@ msgstr ""
 msgid "Approve"
 msgstr ""
 
-# Source: resources/js/pages/ReviewForm.tsx:495, resources/js/pages/Reviews.tsx:196, resources/js/pages/Reviews.tsx:514, resources/js/pages/Reviews.tsx:601, resources/js/pages/TripForm.tsx:8870, resources/js/pages/Trips.tsx:476, resources/js/pages/Trips.tsx:876, resources/js/pages/Trips.tsx:1553, resources/js/pages/ViewReview.tsx:114
+# Source: resources/js/pages/ReviewForm.tsx:495, resources/js/pages/Reviews.tsx:196, resources/js/pages/Reviews.tsx:514, resources/js/pages/Reviews.tsx:601, resources/js/pages/TripForm.tsx:8885, resources/js/pages/Trips.tsx:476, resources/js/pages/Trips.tsx:876, resources/js/pages/Trips.tsx:1553, resources/js/pages/ViewReview.tsx:114
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:30098
 #: assets/admin/dist/js/app.js:30434
@@ -2953,7 +2953,7 @@ msgstr ""
 msgid "April"
 msgstr ""
 
-# Source: resources/js/components/shared/BulkActionToolbar.tsx:332, resources/js/pages/TripForm.tsx:9071, resources/js/pages/Trips.tsx:901, resources/js/pages/Trips.tsx:1416
+# Source: resources/js/components/shared/BulkActionToolbar.tsx:332, resources/js/pages/TripForm.tsx:9086, resources/js/pages/Trips.tsx:901, resources/js/pages/Trips.tsx:1416
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:29799
 #: assets/admin/dist/js/app.js:30454
@@ -2967,7 +2967,7 @@ msgstr ""
 msgid "Archive Items"
 msgstr ""
 
-# Source: resources/js/pages/Enquiries.tsx:498, resources/js/pages/TripConsent.tsx:342, resources/js/pages/TripConsent.tsx:386, resources/js/pages/TripConsentForm.tsx:993, resources/js/pages/TripForm.tsx:8875, resources/js/pages/Trips.tsx:466, resources/js/pages/Trips.tsx:881, resources/js/pages/Trips.tsx:1554
+# Source: resources/js/pages/Enquiries.tsx:498, resources/js/pages/TripConsent.tsx:342, resources/js/pages/TripConsent.tsx:386, resources/js/pages/TripConsentForm.tsx:993, resources/js/pages/TripForm.tsx:8890, resources/js/pages/Trips.tsx:466, resources/js/pages/Trips.tsx:881, resources/js/pages/Trips.tsx:1554
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:30090
 #: assets/admin/dist/js/app.js:30439
@@ -3480,7 +3480,7 @@ msgstr ""
 msgid "At least one weekday must be selected"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6936, resources/js/pages/TripForm.tsx:6946
+# Source: resources/js/pages/TripForm.tsx:6951, resources/js/pages/TripForm.tsx:6961
 #: assets/admin/dist/js/app.js
 msgid "Attach files to this trip and control who can access them."
 msgstr ""
@@ -3621,12 +3621,12 @@ msgstr ""
 msgid "Auto-Confirm Bookings"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8576
+# Source: resources/js/pages/TripForm.tsx:8591
 #: assets/admin/dist/js/app.js
 msgid "Auto-Disable Date"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8557
+# Source: resources/js/pages/TripForm.tsx:8572
 #: assets/admin/dist/js/app.js
 msgid "Auto-Enable Date"
 msgstr ""
@@ -3678,7 +3678,7 @@ msgstr ""
 msgid "Auto-fill trip with AI"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8962
+# Source: resources/js/pages/TripForm.tsx:8977
 #: assets/admin/dist/js/app.js
 msgid "Auto-fill with AI"
 msgstr ""
@@ -3777,7 +3777,7 @@ msgstr ""
 msgid "Automatically detect when a booking is abandoned during checkout."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8526
+# Source: resources/js/pages/TripForm.tsx:8541
 #: assets/admin/dist/js/app.js
 msgid "Automatically enable or disable trip availability based on seasonal dates"
 msgstr ""
@@ -3788,7 +3788,7 @@ msgstr ""
 msgid "Automatically generate availability dates based on patterns"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8472
+# Source: resources/js/pages/TripForm.tsx:8487
 #: assets/admin/dist/js/app.js
 msgid "Automatically publish or unpublish your trip on specific dates"
 msgstr ""
@@ -3842,7 +3842,7 @@ msgstr ""
 msgid "Availability"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:2564, resources/js/pages/TripForm.tsx:5434
+# Source: resources/js/pages/TripForm.tsx:2567, resources/js/pages/TripForm.tsx:5449
 #: assets/admin/dist/js/app.js
 msgid "Availability & Booking"
 msgstr ""
@@ -3859,7 +3859,7 @@ msgstr ""
 msgid "Availability Management"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5458
+# Source: resources/js/pages/TripForm.tsx:5473
 #: assets/admin/dist/js/app.js
 msgid "Availability Period"
 msgstr ""
@@ -3917,12 +3917,12 @@ msgstr ""
 msgid "Available Capacity"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5468
+# Source: resources/js/pages/TripForm.tsx:5483
 #: assets/admin/dist/js/app.js
 msgid "Available From"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5490
+# Source: resources/js/pages/TripForm.tsx:5505
 #: assets/admin/dist/js/app.js
 msgid "Available To"
 msgstr ""
@@ -4233,7 +4233,7 @@ msgstr ""
 msgid "Base price per person for generated departures (optional)"
 msgstr ""
 
-# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:127, resources/js/pages/ActivityForm.tsx:393, resources/js/pages/AttributeForm.tsx:703, resources/js/pages/CategoryForm.tsx:467, resources/js/pages/DestinationForm.tsx:398, resources/js/pages/DifficultyLevelForm.tsx:309, resources/js/pages/DiscountForm.tsx:1193, resources/js/pages/ItemForm.tsx:304, resources/js/pages/ItemTypeForm.tsx:363, resources/js/pages/RecurringRuleForm.tsx:626, resources/js/pages/TripForm.tsx:3966
+# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:127, resources/js/pages/ActivityForm.tsx:393, resources/js/pages/AttributeForm.tsx:703, resources/js/pages/CategoryForm.tsx:467, resources/js/pages/DestinationForm.tsx:398, resources/js/pages/DifficultyLevelForm.tsx:309, resources/js/pages/DiscountForm.tsx:1193, resources/js/pages/ItemForm.tsx:304, resources/js/pages/ItemTypeForm.tsx:363, resources/js/pages/RecurringRuleForm.tsx:626, resources/js/pages/TripForm.tsx:3981
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:33393
 #: assets/admin/dist/js/app.js:34707
@@ -4281,7 +4281,7 @@ msgstr ""
 msgid "Below is the signing secret for "
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8176
+# Source: resources/js/pages/TripForm.tsx:8191
 #: assets/admin/dist/js/app.js
 msgid "Best for search engines: 50-60 characters. Include main keywords."
 msgstr ""
@@ -4477,7 +4477,7 @@ msgstr ""
 msgid "Booking / checkout form"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6131
+# Source: resources/js/pages/TripForm.tsx:6146
 #: assets/admin/dist/js/app.js
 msgid "Booking Availability"
 msgstr ""
@@ -4622,7 +4622,7 @@ msgstr ""
 msgid "Booking Page Settings"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5951
+# Source: resources/js/pages/TripForm.tsx:5966
 #: assets/admin/dist/js/app.js
 msgid "Booking Policies"
 msgstr ""
@@ -4654,7 +4654,7 @@ msgstr ""
 msgid "Booking URL:"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5515
+# Source: resources/js/pages/TripForm.tsx:5530
 #: assets/admin/dist/js/app.js
 msgid "Booking Window (Days in Advance)"
 msgstr ""
@@ -4983,7 +4983,7 @@ msgstr ""
 msgid "Build custom consent forms with conditional logic and required fields."
 msgstr ""
 
-# Source: resources/js/pages/Itinerary.tsx:1703, resources/js/pages/TripForm.tsx:8079
+# Source: resources/js/pages/Itinerary.tsx:1703, resources/js/pages/TripForm.tsx:8094
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/Itinerary-M1YQJyHW.js:1152
 msgid "Build with AI"
@@ -4995,7 +4995,7 @@ msgstr ""
 msgid "Build your complete itinerary with activities, meals, and accommodations"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8006
+# Source: resources/js/pages/TripForm.tsx:8021
 #: assets/admin/dist/js/app.js
 msgid "Build your day-by-day itinerary and list what's included/excluded to set clear expectations."
 msgstr ""
@@ -5202,7 +5202,7 @@ msgstr ""
 msgid "Campaign Name"
 msgstr ""
 
-# Source: resources/js/components/Tools.tsx:3191, resources/js/components/ai/AiEmailTemplateModal.tsx:102, resources/js/components/ai/AiEmailTemplateModal.tsx:274, resources/js/components/ai/AutoFillTripModal.tsx:321, resources/js/components/ai/AutoFillTripModal.tsx:649, resources/js/components/ai/BuildItineraryModal.tsx:169, resources/js/components/ai/BuildItineraryModal.tsx:712, resources/js/components/ai/BuildItineraryModal.tsx:723, resources/js/components/ai/CreateTripWithAiWizard.tsx:419, resources/js/components/ai/CreateTripWithAiWizard.tsx:955, resources/js/components/availability/RecurringRules.tsx:643, resources/js/components/availability/RecurringRules.tsx:662, resources/js/components/availability/RecurringRules.tsx:959, resources/js/components/email/EmailTemplatesList.tsx:954, resources/js/components/itinerary/DayConflictDialog.tsx:75, resources/js/components/modals/RuleTypeSelectionModal.tsx:101, resources/js/components/shared/BulkActionToolbar.tsx:339, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1163, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1332, resources/js/components/trips/TripsTable.tsx:218, resources/js/components/ui/confirmation-dialog.tsx:94, resources/js/pages/AbandonedRecoveryEmailForm.tsx:337, resources/js/pages/Activities.tsx:554, resources/js/pages/Activities.tsx:598, resources/js/pages/ActivityForm.tsx:682, resources/js/pages/AdditionalServices.tsx:372, resources/js/pages/AttributeForm.tsx:1180, resources/js/pages/Attributes.tsx:581, resources/js/pages/Attributes.tsx:624, resources/js/pages/Availability.tsx:1075, resources/js/pages/Availability.tsx:1140, resources/js/pages/AvailabilityForm.tsx:1693, resources/js/pages/BookingForm.tsx:2139, resources/js/pages/Bookings.tsx:1159, resources/js/pages/Categories.tsx:981, resources/js/pages/CategoryForm.tsx:826, resources/js/pages/ChannelManager.tsx:634, resources/js/pages/ChannelManager.tsx:1844, resources/js/pages/ChannelManager.tsx:2224, resources/js/pages/CustomerForm.tsx:1024, resources/js/pages/Customers.tsx:896, resources/js/pages/DepartureForm.tsx:404, resources/js/pages/DepartureRecurringRuleForm.tsx:418, resources/js/pages/Departures.tsx:1441, resources/js/pages/DestinationForm.tsx:688, resources/js/pages/Destinations.tsx:419, resources/js/pages/DifficultyLevelForm.tsx:524, resources/js/pages/DifficultyLevels.tsx:593, resources/js/pages/DiscountForm.tsx:2699, resources/js/pages/Discounts.tsx:981, resources/js/pages/Discounts.tsx:1092, resources/js/pages/DynamicPricingRuleForm.tsx:1486, resources/js/pages/DynamicPricingRuleForm.tsx:1498, resources/js/pages/EmailAutomation.tsx:344, resources/js/pages/Enquiries.tsx:958, resources/js/pages/Enquiries.tsx:1007, resources/js/pages/Enquiries.tsx:1053, resources/js/pages/ItemForm.tsx:491, resources/js/pages/ItemTypeForm.tsx:577, resources/js/pages/ItemTypes.tsx:715, resources/js/pages/ItemTypes.tsx:815, resources/js/pages/Items.tsx:692, resources/js/pages/Items.tsx:784, resources/js/pages/ItineraryForm.tsx:1159, resources/js/pages/PastDepartures.tsx:288, resources/js/pages/PaymentForm.tsx:562, resources/js/pages/Payments.tsx:770, resources/js/pages/RecurringRuleForm.tsx:2618, resources/js/pages/RecurringRulesPage.tsx:439, resources/js/pages/RecurringRulesPage.tsx:458, resources/js/pages/RecurringRulesPage.tsx:656, resources/js/pages/ReviewForm.tsx:558, resources/js/pages/Reviews.tsx:471, resources/js/pages/Settings.tsx:1944, resources/js/pages/Settings.tsx:2475, resources/js/pages/Team.tsx:955, resources/js/pages/Team.tsx:1038, resources/js/pages/Team.tsx:1104, resources/js/pages/Team.tsx:1318, resources/js/pages/Team.tsx:1586, resources/js/pages/Team.tsx:2131, resources/js/pages/Team.tsx:2402, resources/js/pages/Team.tsx:2885, resources/js/pages/Team.tsx:2935, resources/js/pages/Team.tsx:2983, resources/js/pages/Team.tsx:3484, resources/js/pages/Team.tsx:3505, resources/js/pages/TravelerCategories.tsx:644, resources/js/pages/TravelerCategoryForm.tsx:899, resources/js/pages/Travelers.tsx:625, resources/js/pages/TripConsent.tsx:364, resources/js/pages/TripForm.tsx:9475, resources/js/pages/TripForm.tsx:9582, resources/js/pages/TripForm.tsx:9610, resources/js/pages/Trips.tsx:1733, resources/js/pages/Trips.tsx:1863, resources/js/pages/ViewEnquiry.tsx:527, resources/js/pages/Webhooks.tsx:663, resources/js/pages/Webhooks.tsx:1468, resources/js/pages/Webhooks.tsx:1918, resources/js/pages/Webhooks.tsx:2571, resources/js/pages/Whatsapp.tsx:1294, resources/js/pages/Whatsapp.tsx:1513, resources/js/pages/account/Profile.tsx:455, resources/js/pages/account/Profile.tsx:585
+# Source: resources/js/components/Tools.tsx:3191, resources/js/components/ai/AiEmailTemplateModal.tsx:102, resources/js/components/ai/AiEmailTemplateModal.tsx:274, resources/js/components/ai/AutoFillTripModal.tsx:321, resources/js/components/ai/AutoFillTripModal.tsx:649, resources/js/components/ai/BuildItineraryModal.tsx:169, resources/js/components/ai/BuildItineraryModal.tsx:712, resources/js/components/ai/BuildItineraryModal.tsx:723, resources/js/components/ai/CreateTripWithAiWizard.tsx:419, resources/js/components/ai/CreateTripWithAiWizard.tsx:955, resources/js/components/availability/RecurringRules.tsx:643, resources/js/components/availability/RecurringRules.tsx:662, resources/js/components/availability/RecurringRules.tsx:959, resources/js/components/email/EmailTemplatesList.tsx:954, resources/js/components/itinerary/DayConflictDialog.tsx:75, resources/js/components/modals/RuleTypeSelectionModal.tsx:101, resources/js/components/shared/BulkActionToolbar.tsx:339, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1163, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1332, resources/js/components/trips/TripsTable.tsx:218, resources/js/components/ui/confirmation-dialog.tsx:94, resources/js/pages/AbandonedRecoveryEmailForm.tsx:337, resources/js/pages/Activities.tsx:554, resources/js/pages/Activities.tsx:598, resources/js/pages/ActivityForm.tsx:682, resources/js/pages/AdditionalServices.tsx:372, resources/js/pages/AttributeForm.tsx:1180, resources/js/pages/Attributes.tsx:581, resources/js/pages/Attributes.tsx:624, resources/js/pages/Availability.tsx:1075, resources/js/pages/Availability.tsx:1140, resources/js/pages/AvailabilityForm.tsx:1693, resources/js/pages/BookingForm.tsx:2139, resources/js/pages/Bookings.tsx:1159, resources/js/pages/Categories.tsx:981, resources/js/pages/CategoryForm.tsx:826, resources/js/pages/ChannelManager.tsx:634, resources/js/pages/ChannelManager.tsx:1844, resources/js/pages/ChannelManager.tsx:2224, resources/js/pages/CustomerForm.tsx:1024, resources/js/pages/Customers.tsx:896, resources/js/pages/DepartureForm.tsx:404, resources/js/pages/DepartureRecurringRuleForm.tsx:418, resources/js/pages/Departures.tsx:1441, resources/js/pages/DestinationForm.tsx:688, resources/js/pages/Destinations.tsx:419, resources/js/pages/DifficultyLevelForm.tsx:524, resources/js/pages/DifficultyLevels.tsx:593, resources/js/pages/DiscountForm.tsx:2699, resources/js/pages/Discounts.tsx:981, resources/js/pages/Discounts.tsx:1092, resources/js/pages/DynamicPricingRuleForm.tsx:1486, resources/js/pages/DynamicPricingRuleForm.tsx:1498, resources/js/pages/EmailAutomation.tsx:344, resources/js/pages/Enquiries.tsx:958, resources/js/pages/Enquiries.tsx:1007, resources/js/pages/Enquiries.tsx:1053, resources/js/pages/ItemForm.tsx:491, resources/js/pages/ItemTypeForm.tsx:577, resources/js/pages/ItemTypes.tsx:715, resources/js/pages/ItemTypes.tsx:815, resources/js/pages/Items.tsx:692, resources/js/pages/Items.tsx:784, resources/js/pages/ItineraryForm.tsx:1159, resources/js/pages/PastDepartures.tsx:288, resources/js/pages/PaymentForm.tsx:562, resources/js/pages/Payments.tsx:770, resources/js/pages/RecurringRuleForm.tsx:2618, resources/js/pages/RecurringRulesPage.tsx:439, resources/js/pages/RecurringRulesPage.tsx:458, resources/js/pages/RecurringRulesPage.tsx:656, resources/js/pages/ReviewForm.tsx:558, resources/js/pages/Reviews.tsx:471, resources/js/pages/Settings.tsx:1944, resources/js/pages/Settings.tsx:2475, resources/js/pages/Team.tsx:955, resources/js/pages/Team.tsx:1038, resources/js/pages/Team.tsx:1104, resources/js/pages/Team.tsx:1318, resources/js/pages/Team.tsx:1586, resources/js/pages/Team.tsx:2131, resources/js/pages/Team.tsx:2402, resources/js/pages/Team.tsx:2885, resources/js/pages/Team.tsx:2935, resources/js/pages/Team.tsx:2983, resources/js/pages/Team.tsx:3484, resources/js/pages/Team.tsx:3505, resources/js/pages/TravelerCategories.tsx:644, resources/js/pages/TravelerCategoryForm.tsx:899, resources/js/pages/Travelers.tsx:625, resources/js/pages/TripConsent.tsx:364, resources/js/pages/TripForm.tsx:9490, resources/js/pages/TripForm.tsx:9597, resources/js/pages/TripForm.tsx:9625, resources/js/pages/Trips.tsx:1733, resources/js/pages/Trips.tsx:1863, resources/js/pages/ViewEnquiry.tsx:527, resources/js/pages/Webhooks.tsx:663, resources/js/pages/Webhooks.tsx:1468, resources/js/pages/Webhooks.tsx:1918, resources/js/pages/Webhooks.tsx:2571, resources/js/pages/Whatsapp.tsx:1294, resources/js/pages/Whatsapp.tsx:1513, resources/js/pages/account/Profile.tsx:455, resources/js/pages/account/Profile.tsx:585
 #: assets/admin/dist/js/app.js
 #: app/Providers/FrontendAssetsProvider.php:350
 #: templates/partials/booking-content.php:180
@@ -5333,7 +5333,7 @@ msgstr ""
 msgid "Cancel scheduled payment?"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6098, resources/js/pages/TripForm.tsx:6102
+# Source: resources/js/pages/TripForm.tsx:6113, resources/js/pages/TripForm.tsx:6117
 #: assets/admin/dist/js/app.js
 #: templates/partials/availability-card.php:302
 #: templates/partials/availability-card.php:307
@@ -5454,7 +5454,7 @@ msgstr ""
 msgid "Capacity"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5574
+# Source: resources/js/pages/TripForm.tsx:5589
 #: assets/admin/dist/js/app.js
 msgid "Capacity & Travelers"
 msgstr ""
@@ -5523,12 +5523,12 @@ msgstr ""
 msgid "Categories"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:2623, resources/js/pages/TripForm.tsx:6378
+# Source: resources/js/pages/TripForm.tsx:2626, resources/js/pages/TripForm.tsx:6393
 #: assets/admin/dist/js/app.js
 msgid "Categories & Attributes"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6402
+# Source: resources/js/pages/TripForm.tsx:6417
 #: assets/admin/dist/js/app.js
 msgid "Categories & Classification"
 msgstr ""
@@ -5641,7 +5641,7 @@ msgstr ""
 msgid "Change"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:7121
+# Source: resources/js/pages/TripForm.tsx:7136
 #: assets/admin/dist/js/app.js
 msgid "Change File"
 msgstr ""
@@ -6056,7 +6056,7 @@ msgstr ""
 msgid "Clearly mention what's NOT included to avoid confusion"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4851
+# Source: resources/js/pages/TripForm.tsx:4866
 #: assets/admin/dist/js/app.js
 msgid "Click \"Add New Destination\""
 msgstr ""
@@ -6260,7 +6260,7 @@ msgstr ""
 msgid "Clone to edit"
 msgstr ""
 
-# Source: resources/js/components/ai/AiEmailTemplateModal.tsx:166, resources/js/components/ai/AutoFillTripModal.tsx:514, resources/js/components/ai/BuildItineraryModal.tsx:295, resources/js/components/ai/BuildItineraryModal.tsx:765, resources/js/components/ai/BuildItineraryModal.tsx:774, resources/js/components/ai/CreateTripWithAiWizard.tsx:833, resources/js/components/email/EmailPreviewModal.tsx:46, resources/js/components/shared/ApplicableTripSelector.tsx:303, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1229, resources/js/components/ui/alert.tsx:58, resources/js/components/ui/icon-picker.tsx:583, resources/js/components/ui/toast.tsx:180, resources/js/pages/AbandonedRecovery.tsx:1445, resources/js/pages/Departures.tsx:1361, resources/js/pages/EmailAutomation.tsx:592, resources/js/pages/Team.tsx:1586, resources/js/pages/Team.tsx:2210, resources/js/pages/TripConsent.tsx:1062, resources/js/pages/TripForm.tsx:9508, resources/js/pages/Webhooks.tsx:3073
+# Source: resources/js/components/ai/AiEmailTemplateModal.tsx:166, resources/js/components/ai/AutoFillTripModal.tsx:514, resources/js/components/ai/BuildItineraryModal.tsx:295, resources/js/components/ai/BuildItineraryModal.tsx:765, resources/js/components/ai/BuildItineraryModal.tsx:774, resources/js/components/ai/CreateTripWithAiWizard.tsx:833, resources/js/components/email/EmailPreviewModal.tsx:46, resources/js/components/shared/ApplicableTripSelector.tsx:303, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1229, resources/js/components/ui/alert.tsx:58, resources/js/components/ui/icon-picker.tsx:583, resources/js/components/ui/toast.tsx:180, resources/js/pages/AbandonedRecovery.tsx:1445, resources/js/pages/Departures.tsx:1361, resources/js/pages/EmailAutomation.tsx:592, resources/js/pages/Team.tsx:1586, resources/js/pages/Team.tsx:2210, resources/js/pages/TripConsent.tsx:1062, resources/js/pages/TripForm.tsx:9523, resources/js/pages/Webhooks.tsx:3073
 #: assets/admin/dist/js/app.js
 #: templates/partials/single-trip/sticky-sidebar.php:255
 #: assets/admin/dist/js/app.js:28075
@@ -6408,7 +6408,7 @@ msgstr ""
 msgid "Comma-separated keywords for the trip archive page. Include relevant travel and booking keywords."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8243
+# Source: resources/js/pages/TripForm.tsx:8258
 #: assets/admin/dist/js/app.js
 msgid "Comma-separated keywords. Include location, activities, and travel terms."
 msgstr ""
@@ -6484,7 +6484,7 @@ msgstr ""
 msgid "Company Phone"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8210
+# Source: resources/js/pages/TripForm.tsx:8225
 #: assets/admin/dist/js/app.js
 msgid "Compelling description that includes key travel terms..."
 msgstr ""
@@ -6926,7 +6926,7 @@ msgstr ""
 msgid "Consent form updated successfully"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4229
+# Source: resources/js/pages/TripForm.tsx:4244
 #: assets/admin/dist/js/app.js
 msgid "Consider adding more details (recommended: 100-150 characters)"
 msgstr ""
@@ -7033,7 +7033,7 @@ msgstr ""
 msgid "Controls what happens when both a Discount (coupon or group discount) and a Dynamic Pricing rule could apply to the same booking. The control only takes effect when both the Advanced Discount and Dynamic Pricing modules are turned on."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:7167
+# Source: resources/js/pages/TripForm.tsx:7182
 #: assets/admin/dist/js/app.js
 msgid "Controls whether this file appears and is available for download on the trip page. When disabled, the file is completely hidden from users."
 msgstr ""
@@ -7060,7 +7060,7 @@ msgstr ""
 msgid "Converted"
 msgstr ""
 
-# Source: resources/js/pages/AvailabilityForm.tsx:877, resources/js/pages/AvailabilityForm.tsx:958, resources/js/pages/RecurringRuleForm.tsx:2281, resources/js/pages/RecurringRuleForm.tsx:2373, resources/js/pages/TripForm.tsx:4942
+# Source: resources/js/pages/AvailabilityForm.tsx:877, resources/js/pages/AvailabilityForm.tsx:958, resources/js/pages/RecurringRuleForm.tsx:2281, resources/js/pages/RecurringRuleForm.tsx:2373, resources/js/pages/TripForm.tsx:4957
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/AvailabilityForm-amQiiorh.js:703
 #: assets/dist/js/AvailabilityForm-amQiiorh.js:768
@@ -7069,12 +7069,12 @@ msgstr ""
 msgid "Coordinates set"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4969, resources/js/pages/TripForm.tsx:5230
+# Source: resources/js/pages/TripForm.tsx:4984, resources/js/pages/TripForm.tsx:5245
 #: assets/admin/dist/js/app.js
 msgid "Coords Set"
 msgstr ""
 
-# Source: resources/js/components/shared/Table.tsx:373, resources/js/pages/Team.tsx:3111, resources/js/pages/TripForm.tsx:3900, resources/js/pages/Webhooks.tsx:2068, resources/js/pages/Webhooks.tsx:3237, resources/js/pages/Whatsapp.tsx:798, resources/js/pages/Whatsapp.tsx:845
+# Source: resources/js/components/shared/Table.tsx:373, resources/js/pages/Team.tsx:3111, resources/js/pages/TripForm.tsx:3915, resources/js/pages/Webhooks.tsx:2068, resources/js/pages/Webhooks.tsx:3237, resources/js/pages/Whatsapp.tsx:798, resources/js/pages/Whatsapp.tsx:845
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:29212
 #: assets/admin/dist/js/Whatsapp.js:646
@@ -7110,7 +7110,7 @@ msgstr ""
 msgid "Copy"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4142
+# Source: resources/js/pages/TripForm.tsx:4157
 #: assets/admin/dist/js/app.js
 msgid "Copy URL"
 msgstr ""
@@ -7128,7 +7128,7 @@ msgstr ""
 msgid "Copy coupon code"
 msgstr ""
 
-# Source: resources/js/components/shared/Table.tsx:378, resources/js/pages/TripForm.tsx:3905
+# Source: resources/js/components/shared/Table.tsx:378, resources/js/pages/TripForm.tsx:3920
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:29215
 msgid "Copy details"
@@ -7377,7 +7377,7 @@ msgstr ""
 msgid "Create Campaign"
 msgstr ""
 
-# Source: resources/js/pages/AvailabilityForm.tsx:1255, resources/js/pages/CategoryForm.tsx:816, resources/js/pages/RecurringRuleForm.tsx:1166, resources/js/pages/TravelerCategoryForm.tsx:889, resources/js/pages/TripForm.tsx:7428
+# Source: resources/js/pages/AvailabilityForm.tsx:1255, resources/js/pages/CategoryForm.tsx:816, resources/js/pages/RecurringRuleForm.tsx:1166, resources/js/pages/TravelerCategoryForm.tsx:889, resources/js/pages/TripForm.tsx:7443
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:36576
 #: assets/admin/dist/js/app.js:59667
@@ -7415,7 +7415,7 @@ msgstr ""
 msgid "Create Destination"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4876
+# Source: resources/js/pages/TripForm.tsx:4891
 #: assets/admin/dist/js/app.js
 msgid "Create Destinations"
 msgstr ""
@@ -7677,7 +7677,7 @@ msgstr ""
 msgid "Create a ticket above to get started."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6574
+# Source: resources/js/pages/TripForm.tsx:6589
 #: assets/admin/dist/js/app.js
 msgid "Create activities here"
 msgstr ""
@@ -7714,7 +7714,7 @@ msgstr ""
 msgid "Create calendar events for new bookings"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6461
+# Source: resources/js/pages/TripForm.tsx:6476
 #: assets/admin/dist/js/app.js
 msgid "Create categories here"
 msgstr ""
@@ -7737,7 +7737,7 @@ msgstr ""
 msgid "Create detailed day-by-day itineraries with activities, meals, accommodation, transportation, and more. Build professional trip schedules that help travelers understand the complete experience."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6529
+# Source: resources/js/pages/TripForm.tsx:6544
 #: assets/admin/dist/js/app.js
 msgid "Create difficulty levels here"
 msgstr ""
@@ -7909,7 +7909,7 @@ msgstr ""
 msgid "Created Date"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:9543
+# Source: resources/js/pages/TripForm.tsx:9558
 #: assets/admin/dist/js/app.js
 msgid "Created by"
 msgstr ""
@@ -8069,12 +8069,12 @@ msgstr ""
 msgid "Custom"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6630
+# Source: resources/js/pages/TripForm.tsx:6645
 #: assets/admin/dist/js/app.js
 msgid "Custom Attributes"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8699, resources/js/pages/TripForm.tsx:8764
+# Source: resources/js/pages/TripForm.tsx:8714, resources/js/pages/TripForm.tsx:8779
 #: assets/admin/dist/js/app.js
 msgid "Custom Content"
 msgstr ""
@@ -8557,7 +8557,7 @@ msgstr ""
 msgid "Day Title:"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5670
+# Source: resources/js/pages/TripForm.tsx:5685
 #: assets/admin/dist/js/app.js
 msgid "Day Tour Time Settings"
 msgstr ""
@@ -8709,7 +8709,7 @@ msgstr ""
 msgid "Default Currency"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5869, resources/js/pages/TripForm.tsx:5907
+# Source: resources/js/pages/TripForm.tsx:5884, resources/js/pages/TripForm.tsx:5922
 #: assets/admin/dist/js/app.js
 msgid "Default Departure Time"
 msgstr ""
@@ -8744,7 +8744,7 @@ msgstr ""
 msgid "Default country code"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5922
+# Source: resources/js/pages/TripForm.tsx:5937
 #: assets/admin/dist/js/app.js
 msgid "Default departure time for trips without specific availability dates."
 msgstr ""
@@ -8761,7 +8761,7 @@ msgstr ""
 msgid "Default model"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:7747
+# Source: resources/js/pages/TripForm.tsx:7762
 #: assets/admin/dist/js/app.js
 msgid "Default price (used on page load)"
 msgstr ""
@@ -9190,7 +9190,7 @@ msgstr ""
 msgid "Delete selected mappings?"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8644
+# Source: resources/js/pages/TripForm.tsx:8659
 #: assets/admin/dist/js/app.js
 msgid "Delete tab"
 msgstr ""
@@ -9506,22 +9506,22 @@ msgstr ""
 msgid "Deposit"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:7814
+# Source: resources/js/pages/TripForm.tsx:7829
 #: assets/admin/dist/js/app.js
 msgid "Deposit & Payment Terms"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:7884
+# Source: resources/js/pages/TripForm.tsx:7899
 #: assets/admin/dist/js/app.js
 msgid "Deposit & Payment Terms (Pro feature, disabled)"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:7897
+# Source: resources/js/pages/TripForm.tsx:7912
 #: assets/admin/dist/js/app.js
 msgid "Deposit Amount"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:4824, resources/js/pages/TripForm.tsx:7925
+# Source: resources/js/pages/Settings.tsx:4824, resources/js/pages/TripForm.tsx:7940
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/Settings-C5RvnmMN.js:3768
 msgid "Deposit Percentage"
@@ -9580,7 +9580,7 @@ msgstr ""
 msgid "Describe what happens during this entry..."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6869
+# Source: resources/js/pages/TripForm.tsx:6884
 #: assets/admin/dist/js/app.js
 msgid "Describe what makes this trip unique and special..."
 msgstr ""
@@ -9602,7 +9602,7 @@ msgstr ""
 msgid "Describe what this service includes..."
 msgstr ""
 
-# Source: resources/js/components/email/EmailTemplatesList.tsx:625, resources/js/components/email/EmailTemplatesList.tsx:757, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:320, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1143, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1312, resources/js/pages/Activities.tsx:133, resources/js/pages/Activities.tsx:684, resources/js/pages/Activities.tsx:827, resources/js/pages/ActivityForm.tsx:475, resources/js/pages/AdditionalServicesForm.tsx:430, resources/js/pages/AttributeForm.tsx:786, resources/js/pages/Attributes.tsx:464, resources/js/pages/Attributes.tsx:751, resources/js/pages/Categories.tsx:650, resources/js/pages/Categories.tsx:1109, resources/js/pages/CategoryForm.tsx:548, resources/js/pages/DestinationForm.tsx:480, resources/js/pages/Destinations.tsx:500, resources/js/pages/Destinations.tsx:648, resources/js/pages/DifficultyLevelForm.tsx:388, resources/js/pages/DifficultyLevels.tsx:120, resources/js/pages/DifficultyLevels.tsx:703, resources/js/pages/DiscountForm.tsx:1285, resources/js/pages/EmailSequenceForm.tsx:455, resources/js/pages/EmailTemplateForm.tsx:737, resources/js/pages/ItemForm.tsx:415, resources/js/pages/ItemTypeForm.tsx:452, resources/js/pages/ItemTypes.tsx:373, resources/js/pages/ItemTypes.tsx:563, resources/js/pages/Items.tsx:336, resources/js/pages/Items.tsx:539, resources/js/pages/TravelerCategories.tsx:512, resources/js/pages/TravelerCategories.tsx:756, resources/js/pages/TravelerCategoryForm.tsx:550, resources/js/pages/TripConsentForm.tsx:951, resources/js/pages/TripForm.tsx:4251, resources/js/pages/TripForm.tsx:7027, resources/js/pages/Webhooks.tsx:1524, resources/js/pages/Whatsapp.tsx:1717
+# Source: resources/js/components/email/EmailTemplatesList.tsx:625, resources/js/components/email/EmailTemplatesList.tsx:757, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:320, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1143, resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:1312, resources/js/pages/Activities.tsx:133, resources/js/pages/Activities.tsx:684, resources/js/pages/Activities.tsx:827, resources/js/pages/ActivityForm.tsx:475, resources/js/pages/AdditionalServicesForm.tsx:430, resources/js/pages/AttributeForm.tsx:786, resources/js/pages/Attributes.tsx:464, resources/js/pages/Attributes.tsx:751, resources/js/pages/Categories.tsx:650, resources/js/pages/Categories.tsx:1109, resources/js/pages/CategoryForm.tsx:548, resources/js/pages/DestinationForm.tsx:480, resources/js/pages/Destinations.tsx:500, resources/js/pages/Destinations.tsx:648, resources/js/pages/DifficultyLevelForm.tsx:388, resources/js/pages/DifficultyLevels.tsx:120, resources/js/pages/DifficultyLevels.tsx:703, resources/js/pages/DiscountForm.tsx:1285, resources/js/pages/EmailSequenceForm.tsx:455, resources/js/pages/EmailTemplateForm.tsx:737, resources/js/pages/ItemForm.tsx:415, resources/js/pages/ItemTypeForm.tsx:452, resources/js/pages/ItemTypes.tsx:373, resources/js/pages/ItemTypes.tsx:563, resources/js/pages/Items.tsx:336, resources/js/pages/Items.tsx:539, resources/js/pages/TravelerCategories.tsx:512, resources/js/pages/TravelerCategories.tsx:756, resources/js/pages/TravelerCategoryForm.tsx:550, resources/js/pages/TripConsentForm.tsx:951, resources/js/pages/TripForm.tsx:4266, resources/js/pages/TripForm.tsx:7042, resources/js/pages/Webhooks.tsx:1524, resources/js/pages/Whatsapp.tsx:1717
 #: assets/admin/dist/js/app.js
 #: templates/partials/single-trip/content-location.php:91
 #: templates/pdf/invoice.php:174
@@ -9681,7 +9681,7 @@ msgstr ""
 msgid "Destination"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4824
+# Source: resources/js/pages/TripForm.tsx:4839
 #. translators: %s: numeric destination ID, used as a fallback when the destination has no name.
 #: assets/admin/dist/js/app.js
 msgid "Destination #%s"
@@ -9739,7 +9739,7 @@ msgstr ""
 msgid "Destination(s)"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:386, resources/js/pages/Destinations.tsx:425, resources/js/pages/TripForm.tsx:4807
+# Source: resources/js/components/Layout.tsx:386, resources/js/pages/Destinations.tsx:425, resources/js/pages/TripForm.tsx:4822
 #: assets/admin/dist/js/app.js
 #: app/Providers/FrontendAssetsProvider.php:1130
 #: templates/listing-trip.php:417
@@ -9818,7 +9818,7 @@ msgstr ""
 msgid "Difficulty"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6481, resources/js/pages/ViewDeparture.tsx:611
+# Source: resources/js/pages/TripForm.tsx:6496, resources/js/pages/ViewDeparture.tsx:611
 #: assets/admin/dist/js/app.js
 #: templates/listing-trip.php:286
 #: assets/admin/dist/js/app.js:64246
@@ -9894,7 +9894,7 @@ msgstr ""
 msgid "Direction"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6161
+# Source: resources/js/pages/TripForm.tsx:6176
 #: assets/admin/dist/js/app.js
 msgid "Disable Booking Calendar"
 msgstr ""
@@ -9912,7 +9912,7 @@ msgstr ""
 msgid "Disable module"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:1405, resources/js/pages/ChannelManager.tsx:568, resources/js/pages/Reports.tsx:1829, resources/js/pages/TripForm.tsx:8805, resources/js/pages/Whatsapp.tsx:1224, resources/js/pages/Whatsapp.tsx:1685
+# Source: resources/js/components/Layout.tsx:1405, resources/js/pages/ChannelManager.tsx:568, resources/js/pages/Reports.tsx:1829, resources/js/pages/TripForm.tsx:8820, resources/js/pages/Whatsapp.tsx:1224, resources/js/pages/Whatsapp.tsx:1685
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:5239
 #: assets/admin/dist/js/Whatsapp.js:936
@@ -10109,7 +10109,7 @@ msgstr ""
 msgid "Discount:"
 msgstr ""
 
-# Source: resources/js/pages/AvailabilityForm.tsx:1189, resources/js/pages/AvailabilityForm.tsx:1455, resources/js/pages/TripForm.tsx:7363, resources/js/pages/TripForm.tsx:7697
+# Source: resources/js/pages/AvailabilityForm.tsx:1189, resources/js/pages/AvailabilityForm.tsx:1455, resources/js/pages/TripForm.tsx:7378, resources/js/pages/TripForm.tsx:7712
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/AvailabilityForm-amQiiorh.js:961
 #: assets/dist/js/AvailabilityForm-amQiiorh.js:1157
@@ -10215,7 +10215,7 @@ msgstr ""
 msgid "Do not sync"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:9577
+# Source: resources/js/pages/TripForm.tsx:9592
 #: assets/admin/dist/js/app.js
 msgid "Do you want to use this revision? This will replace all current form data with the revision data."
 msgstr ""
@@ -10332,7 +10332,7 @@ msgstr ""
 msgid "Downloading…"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:2611, resources/js/pages/TripForm.tsx:6932, resources/js/pages/TripForm.tsx:6944, resources/js/pages/TripForm.tsx:8749, resources/js/pages/account/BookingDetails.tsx:882, resources/js/pages/account/Documents.tsx:22, resources/js/pages/account/Documents.tsx:116, resources/js/pages/account/Documents.tsx:159
+# Source: resources/js/pages/TripForm.tsx:2614, resources/js/pages/TripForm.tsx:6947, resources/js/pages/TripForm.tsx:6959, resources/js/pages/TripForm.tsx:8764, resources/js/pages/account/BookingDetails.tsx:882, resources/js/pages/account/Documents.tsx:22, resources/js/pages/account/Documents.tsx:116, resources/js/pages/account/Documents.tsx:159
 #: assets/admin/dist/js/app.js
 #: core/Premium.php:409
 #: core/Premium.php:537
@@ -10345,12 +10345,12 @@ msgstr ""
 msgid "Downloads"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6921
+# Source: resources/js/pages/TripForm.tsx:6936
 #: assets/admin/dist/js/app.js
 msgid "Downloads module is not enabled."
 msgstr ""
 
-# Source: resources/js/components/trips/TripsFilters.tsx:54, resources/js/components/trips/TripsTable.tsx:86, resources/js/pages/Activities.tsx:486, resources/js/pages/Activities.tsx:637, resources/js/pages/Activities.tsx:928, resources/js/pages/ActivityForm.tsx:527, resources/js/pages/AdditionalServices.tsx:325, resources/js/pages/AdditionalServices.tsx:393, resources/js/pages/AdditionalServices.tsx:670, resources/js/pages/AdditionalServicesForm.tsx:585, resources/js/pages/AttributeForm.tsx:1049, resources/js/pages/Attributes.tsx:412, resources/js/pages/Attributes.tsx:520, resources/js/pages/Attributes.tsx:662, resources/js/pages/Categories.tsx:440, resources/js/pages/Categories.tsx:748, resources/js/pages/Categories.tsx:1018, resources/js/pages/Categories.tsx:1090, resources/js/pages/CategoryForm.tsx:643, resources/js/pages/DestinationForm.tsx:533, resources/js/pages/Destinations.tsx:383, resources/js/pages/Destinations.tsx:455, resources/js/pages/Destinations.tsx:754, resources/js/pages/DifficultyLevelForm.tsx:465, resources/js/pages/DifficultyLevels.tsx:366, resources/js/pages/DifficultyLevels.tsx:626, resources/js/pages/DifficultyLevels.tsx:674, resources/js/pages/DiscountForm.tsx:2624, resources/js/pages/Discounts.tsx:238, resources/js/pages/Discounts.tsx:325, resources/js/pages/Discounts.tsx:593, resources/js/pages/EmailAutomation.tsx:194, resources/js/pages/EmailSequenceForm.tsx:431, resources/js/pages/EmailSequenceForm.tsx:899, resources/js/pages/ItemForm.tsx:455, resources/js/pages/ItemTypeForm.tsx:541, resources/js/pages/ItemTypes.tsx:212, resources/js/pages/ItemTypes.tsx:436, resources/js/pages/ItemTypes.tsx:855, resources/js/pages/Items.tsx:227, resources/js/pages/Items.tsx:398, resources/js/pages/Items.tsx:837, resources/js/pages/Itinerary.tsx:1331, resources/js/pages/Itinerary.tsx:1351, resources/js/pages/Itinerary.tsx:1395, resources/js/pages/Itinerary.tsx:1526, resources/js/pages/ItineraryForm.tsx:1120, resources/js/pages/TravelerCategories.tsx:180, resources/js/pages/TravelerCategories.tsx:681, resources/js/pages/TravelerCategories.tsx:737, resources/js/pages/TravelerCategoryForm.tsx:861, resources/js/pages/TripConsent.tsx:341, resources/js/pages/TripConsent.tsx:385, resources/js/pages/TripConsentForm.tsx:992, resources/js/pages/TripForm.tsx:8866, resources/js/pages/Trips.tsx:461, resources/js/pages/Trips.tsx:872, resources/js/pages/Trips.tsx:1551
+# Source: resources/js/components/trips/TripsFilters.tsx:54, resources/js/components/trips/TripsTable.tsx:86, resources/js/pages/Activities.tsx:486, resources/js/pages/Activities.tsx:637, resources/js/pages/Activities.tsx:928, resources/js/pages/ActivityForm.tsx:527, resources/js/pages/AdditionalServices.tsx:325, resources/js/pages/AdditionalServices.tsx:393, resources/js/pages/AdditionalServices.tsx:670, resources/js/pages/AdditionalServicesForm.tsx:585, resources/js/pages/AttributeForm.tsx:1049, resources/js/pages/Attributes.tsx:412, resources/js/pages/Attributes.tsx:520, resources/js/pages/Attributes.tsx:662, resources/js/pages/Categories.tsx:440, resources/js/pages/Categories.tsx:748, resources/js/pages/Categories.tsx:1018, resources/js/pages/Categories.tsx:1090, resources/js/pages/CategoryForm.tsx:643, resources/js/pages/DestinationForm.tsx:533, resources/js/pages/Destinations.tsx:383, resources/js/pages/Destinations.tsx:455, resources/js/pages/Destinations.tsx:754, resources/js/pages/DifficultyLevelForm.tsx:465, resources/js/pages/DifficultyLevels.tsx:366, resources/js/pages/DifficultyLevels.tsx:626, resources/js/pages/DifficultyLevels.tsx:674, resources/js/pages/DiscountForm.tsx:2624, resources/js/pages/Discounts.tsx:238, resources/js/pages/Discounts.tsx:325, resources/js/pages/Discounts.tsx:593, resources/js/pages/EmailAutomation.tsx:194, resources/js/pages/EmailSequenceForm.tsx:431, resources/js/pages/EmailSequenceForm.tsx:899, resources/js/pages/ItemForm.tsx:455, resources/js/pages/ItemTypeForm.tsx:541, resources/js/pages/ItemTypes.tsx:212, resources/js/pages/ItemTypes.tsx:436, resources/js/pages/ItemTypes.tsx:855, resources/js/pages/Items.tsx:227, resources/js/pages/Items.tsx:398, resources/js/pages/Items.tsx:837, resources/js/pages/Itinerary.tsx:1331, resources/js/pages/Itinerary.tsx:1351, resources/js/pages/Itinerary.tsx:1395, resources/js/pages/Itinerary.tsx:1526, resources/js/pages/ItineraryForm.tsx:1120, resources/js/pages/TravelerCategories.tsx:180, resources/js/pages/TravelerCategories.tsx:681, resources/js/pages/TravelerCategories.tsx:737, resources/js/pages/TravelerCategoryForm.tsx:861, resources/js/pages/TripConsent.tsx:341, resources/js/pages/TripConsent.tsx:385, resources/js/pages/TripConsentForm.tsx:992, resources/js/pages/TripForm.tsx:8881, resources/js/pages/Trips.tsx:461, resources/js/pages/Trips.tsx:872, resources/js/pages/Trips.tsx:1551
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:30086
 #: assets/admin/dist/js/app.js:30430
@@ -10496,7 +10496,7 @@ msgstr ""
 msgid "Dropdown to filter trips by price range."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6321
+# Source: resources/js/pages/TripForm.tsx:6336
 #: assets/admin/dist/js/app.js
 msgid "Dropoff Location"
 msgstr ""
@@ -10522,7 +10522,7 @@ msgstr ""
 msgid "Due:"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:3106
+# Source: resources/js/pages/TripForm.tsx:3109
 #: assets/admin/dist/js/app.js
 msgid "Dummy data filled"
 msgstr ""
@@ -10580,17 +10580,17 @@ msgstr ""
 msgid "Duration"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4622
+# Source: resources/js/pages/TripForm.tsx:4637
 #: assets/admin/dist/js/app.js
 msgid "Duration (Days)"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4725
+# Source: resources/js/pages/TripForm.tsx:4740
 #: assets/admin/dist/js/app.js
 msgid "Duration (Hours)"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4678
+# Source: resources/js/pages/TripForm.tsx:4693
 #: assets/admin/dist/js/app.js
 msgid "Duration (Nights)"
 msgstr ""
@@ -10647,7 +10647,7 @@ msgstr ""
 msgid "Dynamic Pricing only — if a Dynamic Pricing rule fires, ignore the discount"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6974
+# Source: resources/js/pages/TripForm.tsx:6989
 #: assets/admin/dist/js/app.js
 msgid "E.g. Packing list, itinerary PDF, waiver form..."
 msgstr ""
@@ -10687,7 +10687,7 @@ msgstr ""
 msgid "Each traveler in the booking will receive their own consent form to sign individually."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5478
+# Source: resources/js/pages/TripForm.tsx:5493
 #: assets/admin/dist/js/app.js
 msgid "Earliest date this trip becomes available for booking"
 msgstr ""
@@ -11280,7 +11280,7 @@ msgstr ""
 msgid "Enable Measurement Protocol"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5693
+# Source: resources/js/pages/TripForm.tsx:5708
 #: assets/admin/dist/js/app.js
 msgid "Enable Multiple Time Slots"
 msgstr ""
@@ -11357,7 +11357,7 @@ msgstr ""
 msgid "Enable scheduled balance payments"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8550
+# Source: resources/js/pages/TripForm.tsx:8565
 #: assets/admin/dist/js/app.js
 msgid "Enable seasonal auto-management"
 msgstr ""
@@ -11428,7 +11428,7 @@ msgstr ""
 msgid "Enable this form section"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8687
+# Source: resources/js/pages/TripForm.tsx:8702
 #: assets/admin/dist/js/app.js
 msgid "Enable this tab to select an icon"
 msgstr ""
@@ -11445,7 +11445,7 @@ msgstr ""
 msgid "Enable wishlist (saved trips)"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:1404, resources/js/pages/ChannelManager.tsx:567, resources/js/pages/ChannelManager.tsx:1095, resources/js/pages/Modules.tsx:525, resources/js/pages/Reports.tsx:1828, resources/js/pages/TripConsentForm.tsx:1208, resources/js/pages/TripForm.tsx:7162, resources/js/pages/TripForm.tsx:8804
+# Source: resources/js/components/Layout.tsx:1404, resources/js/pages/ChannelManager.tsx:567, resources/js/pages/ChannelManager.tsx:1095, resources/js/pages/Modules.tsx:525, resources/js/pages/Reports.tsx:1828, resources/js/pages/TripConsentForm.tsx:1208, resources/js/pages/TripForm.tsx:7177, resources/js/pages/TripForm.tsx:8819
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:5239
 #: assets/admin/dist/js/app.js:66810
@@ -11511,13 +11511,13 @@ msgstr ""
 msgid "End time must be after start time"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5218, resources/js/pages/ViewDeparture.tsx:603
+# Source: resources/js/pages/TripForm.tsx:5233, resources/js/pages/ViewDeparture.tsx:603
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:64239
 msgid "Ending Location"
 msgstr ""
 
-# Source: resources/js/pages/AvailabilityForm.tsx:949, resources/js/pages/RecurringRuleForm.tsx:2364, resources/js/pages/TripForm.tsx:5193
+# Source: resources/js/pages/AvailabilityForm.tsx:949, resources/js/pages/RecurringRuleForm.tsx:2364, resources/js/pages/TripForm.tsx:5208
 #: assets/admin/dist/js/app.js
 #: app/Controllers/TripController.php:2165
 #: app/Controllers/TripController.php:2176
@@ -11598,7 +11598,7 @@ msgstr ""
 msgid "Enquiry Not Found"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6139
+# Source: resources/js/pages/TripForm.tsx:6154
 #: assets/admin/dist/js/app.js
 msgid "Enquiry Only Mode"
 msgstr ""
@@ -11714,7 +11714,7 @@ msgstr ""
 msgid "Enter activity name"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8384
+# Source: resources/js/pages/TripForm.tsx:8399
 #: assets/admin/dist/js/app.js
 msgid "Enter answer..."
 msgstr ""
@@ -11767,7 +11767,7 @@ msgstr ""
 msgid "Enter country"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8711
+# Source: resources/js/pages/TripForm.tsx:8726
 #: assets/admin/dist/js/app.js
 msgid "Enter custom content for this tab..."
 msgstr ""
@@ -11785,7 +11785,7 @@ msgstr ""
 msgid "Enter destination name"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4853
+# Source: resources/js/pages/TripForm.tsx:4868
 #: assets/admin/dist/js/app.js
 msgid "Enter destination name and details"
 msgstr ""
@@ -11871,7 +11871,7 @@ msgstr ""
 msgid "Enter postal code"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8372
+# Source: resources/js/pages/TripForm.tsx:8387
 #: assets/admin/dist/js/app.js
 msgid "Enter question..."
 msgstr ""
@@ -11937,17 +11937,17 @@ msgstr ""
 msgid "Enter the magnitude (positive). Direction is derived automatically: scarce inventory / high demand → markup, plenty / low demand → discount."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:9595
+# Source: resources/js/pages/TripForm.tsx:9610
 #: assets/admin/dist/js/app.js
 msgid "Enter the name of the landmark or point of interest"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4661
+# Source: resources/js/pages/TripForm.tsx:4676
 #: assets/admin/dist/js/app.js
 msgid "Enter the number of days for your trip"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4704
+# Source: resources/js/pages/TripForm.tsx:4719
 #: assets/admin/dist/js/app.js
 msgid "Enter the number of nights (typically days - 1)"
 msgstr ""
@@ -12111,7 +12111,7 @@ msgstr ""
 msgid "Error Loading Itinerary"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:3850, resources/js/pages/Trips.tsx:1648
+# Source: resources/js/pages/TripForm.tsx:3865, resources/js/pages/Trips.tsx:1648
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:31062
 msgid "Error Loading Trips"
@@ -12272,12 +12272,12 @@ msgstr ""
 msgid "Error: "
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4219
+# Source: resources/js/pages/TripForm.tsx:4234
 #: assets/admin/dist/js/app.js
 msgid "Escape to paradise with our 7-day Bali beach retreat..."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4267
+# Source: resources/js/pages/TripForm.tsx:4282
 #: assets/admin/dist/js/app.js
 msgid "Escape to paradise with our 7-day Bali beach retreat... Or describe your single day trip experience..."
 msgstr ""
@@ -12489,7 +12489,7 @@ msgstr ""
 msgid "Example: Increase price for hot trips, decrease for slow"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:9659
+# Source: resources/js/pages/TripForm.tsx:9674
 #: assets/admin/dist/js/app.js
 msgid "Examples: Famous monuments, natural landmarks, historical sites, viewpoints, or points of interest that travelers will visit during this trip."
 msgstr ""
@@ -12627,7 +12627,7 @@ msgstr ""
 msgid "Extra plugin-side diagnostics. When on, Yatra object cache is bypassed (same as when WP_DEBUG is true in wp-config)."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8308, resources/js/pages/TripForm.tsx:8351, resources/js/pages/TripForm.tsx:8752
+# Source: resources/js/pages/TripForm.tsx:8323, resources/js/pages/TripForm.tsx:8366, resources/js/pages/TripForm.tsx:8767
 #: assets/admin/dist/js/app.js
 #: templates/partials/single-trip/content-faq.php:40
 msgid "FAQ"
@@ -13195,7 +13195,7 @@ msgstr ""
 msgid "Failed to load trip categories"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:1903, resources/js/pages/TripForm.tsx:3941
+# Source: resources/js/pages/TripForm.tsx:1903, resources/js/pages/TripForm.tsx:3956
 #: assets/admin/dist/js/app.js
 msgid "Failed to load trip data"
 msgstr ""
@@ -13638,7 +13638,7 @@ msgstr ""
 msgid "Failsafe — admins are always exempt"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5633
+# Source: resources/js/pages/TripForm.tsx:5648
 #: assets/admin/dist/js/app.js
 msgid "Fallback Settings"
 msgstr ""
@@ -13649,7 +13649,7 @@ msgstr ""
 msgid "Family-friendly"
 msgstr ""
 
-# Source: resources/js/components/trips/TripsTable.tsx:140, resources/js/pages/TripForm.tsx:6608, resources/js/pages/Trips.tsx:1076
+# Source: resources/js/components/trips/TripsTable.tsx:140, resources/js/pages/TripForm.tsx:6623, resources/js/pages/Trips.tsx:1076
 #: assets/admin/dist/js/app.js
 #: templates/shortcodes/activity.php:112
 #: templates/shortcodes/destination.php:104
@@ -13660,12 +13660,12 @@ msgstr ""
 msgid "Featured"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4284, resources/js/pages/TripForm.tsx:4321
+# Source: resources/js/pages/TripForm.tsx:4299, resources/js/pages/TripForm.tsx:4336
 #: assets/admin/dist/js/app.js
 msgid "Featured Image"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6594
+# Source: resources/js/pages/TripForm.tsx:6609
 #: assets/admin/dist/js/app.js
 #: assets/dist/blocks/tour.js:332
 msgid "Featured Priority"
@@ -13754,7 +13754,7 @@ msgstr ""
 msgid "Fields ship in the JSON body of the POST under their original keys — nested structure is preserved (e.g. customer.email arrives as data.customer.email, not flattened)."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:7075
+# Source: resources/js/pages/TripForm.tsx:7090
 #: assets/admin/dist/js/app.js
 msgid "File"
 msgstr ""
@@ -13764,12 +13764,12 @@ msgstr ""
 msgid "File URL or attachment path"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8930
+# Source: resources/js/pages/TripForm.tsx:8945
 #: assets/admin/dist/js/app.js
 msgid "Fill Dummy Data"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8927
+# Source: resources/js/pages/TripForm.tsx:8942
 #: assets/admin/dist/js/app.js
 msgid "Fill form with dummy data"
 msgstr ""
@@ -14053,7 +14053,7 @@ msgstr ""
 msgid "For each trip you want to sell on that OTA, link it to its counterpart product on their side. One trip can map to many channels with different prices and inventory rules."
 msgstr ""
 
-# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:479, resources/js/pages/TripForm.tsx:5103
+# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:479, resources/js/pages/TripForm.tsx:5118
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:52201
 msgid ""
@@ -14178,7 +14178,7 @@ msgstr ""
 msgid "Free-text field to search by trip name or keyword."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8299
+# Source: resources/js/pages/TripForm.tsx:8314
 #: assets/admin/dist/js/app.js
 #: templates/partials/single-trip/content-faq.php:41
 msgid "Frequently Asked Questions"
@@ -14194,7 +14194,7 @@ msgstr ""
 msgid "Friday"
 msgstr ""
 
-# Source: resources/js/pages/TravelerCategories.tsx:241, resources/js/pages/TripForm.tsx:7524, resources/js/pages/TripForm.tsx:7635, resources/js/pages/account/Profile.tsx:626
+# Source: resources/js/pages/TravelerCategories.tsx:241, resources/js/pages/TripForm.tsx:7539, resources/js/pages/TripForm.tsx:7650, resources/js/pages/account/Profile.tsx:626
 #: assets/admin/dist/js/app.js
 #: templates/listing-activity.php:246
 #: templates/partials/single-trip/content-sidebar.php:79
@@ -14293,7 +14293,7 @@ msgstr ""
 msgid "Frontend Display Settings"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8601
+# Source: resources/js/pages/TripForm.tsx:8616
 #: assets/admin/dist/js/app.js
 msgid "Frontend Tabs Management"
 msgstr ""
@@ -14363,7 +14363,7 @@ msgstr ""
 msgid "GET deliveries send the payload as a ?payload=<json> query parameter (URL-encoded). The HMAC signature is then computed over an empty body — receivers should reconstruct the signed string as `timestamp + '.' + ''`. Only use GET when the receiver explicitly requires it."
 msgstr ""
 
-# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:413, resources/js/pages/TripForm.tsx:5038, resources/js/pages/TripForm.tsx:5308
+# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:413, resources/js/pages/TripForm.tsx:5053, resources/js/pages/TripForm.tsx:5323
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:52135
 msgid "GPS Coordinates"
@@ -14416,7 +14416,7 @@ msgstr ""
 msgid "General enquiry"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5560
+# Source: resources/js/pages/TripForm.tsx:5575
 #: assets/admin/dist/js/app.js
 msgid "General notes about when this trip is typically available"
 msgstr ""
@@ -14457,7 +14457,7 @@ msgstr ""
 msgid "Generate a day-by-day itinerary using AI, grounded in this trip's facts."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8956
+# Source: resources/js/pages/TripForm.tsx:8971
 #: assets/admin/dist/js/app.js
 msgid "Generate description, itinerary, included items, SEO meta, and more — from this trip's facts."
 msgstr ""
@@ -14521,7 +14521,7 @@ msgstr ""
 msgid "Generating…"
 msgstr ""
 
-# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:491, resources/js/pages/TripForm.tsx:5115
+# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:491, resources/js/pages/TripForm.tsx:5130
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:52213
 msgid "Geolocation is not supported by your browser"
@@ -14671,7 +14671,7 @@ msgstr ""
 msgid "Go to Modules →"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4846
+# Source: resources/js/pages/TripForm.tsx:4861
 #: assets/admin/dist/js/app.js
 msgid "Go to Yatra → Destinations in your WordPress admin"
 msgstr ""
@@ -14748,7 +14748,7 @@ msgstr ""
 msgid "Google Pay (Payment Request Button)"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8266
+# Source: resources/js/pages/TripForm.tsx:8281
 #: assets/admin/dist/js/app.js
 msgid "Google Search Result Preview"
 msgstr ""
@@ -14906,7 +14906,7 @@ msgstr ""
 msgid "Guide"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8909
+# Source: resources/js/pages/TripForm.tsx:8924
 #: assets/admin/dist/js/app.js
 msgid "Guided tour feature coming soon!"
 msgstr ""
@@ -15062,7 +15062,7 @@ msgstr ""
 msgid "Hidden"
 msgstr ""
 
-# Source: resources/js/components/ai/AutoFillTripModal.tsx:703, resources/js/pages/TripForm.tsx:4093
+# Source: resources/js/components/ai/AutoFillTripModal.tsx:703, resources/js/pages/TripForm.tsx:4108
 #: assets/admin/dist/js/app.js
 msgid "Hide"
 msgstr ""
@@ -15154,17 +15154,17 @@ msgstr ""
 msgid "Higher cap once visitor signals booking intent."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:9445
+# Source: resources/js/pages/TripForm.tsx:9460
 #: assets/admin/dist/js/app.js
 msgid "Highlight Text"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6858
+# Source: resources/js/pages/TripForm.tsx:6873
 #: assets/admin/dist/js/app.js
 msgid "Highlight the unique selling points and what sets this trip apart from others"
 msgstr ""
 
-# Source: resources/js/components/ai/AutoFillTripModal.tsx:158, resources/js/pages/TripForm.tsx:4412
+# Source: resources/js/components/ai/AutoFillTripModal.tsx:158, resources/js/pages/TripForm.tsx:4427
 #: assets/admin/dist/js/app.js
 msgid "Highlights"
 msgstr ""
@@ -15312,7 +15312,7 @@ msgstr ""
 msgid "How many recent turns the AI sees for context."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:7216
+# Source: resources/js/pages/TripForm.tsx:7231
 #: assets/admin/dist/js/app.js
 msgid "How much does it cost?"
 msgstr ""
@@ -15345,7 +15345,7 @@ msgstr ""
 msgid "How should these days land?"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6388
+# Source: resources/js/pages/TripForm.tsx:6403
 #: assets/admin/dist/js/app.js
 msgid "How should travelers find this trip?"
 msgstr ""
@@ -15407,7 +15407,7 @@ msgstr ""
 msgid "How trip cards appear in listings and search results. Compact shows a dense card — image, title, price and a View Details button only — so several trips fit per screen. Ideal for phones. Existing sites keep the Standard card."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8130
+# Source: resources/js/pages/TripForm.tsx:8145
 #: assets/admin/dist/js/app.js
 msgid "How will people find & trust this trip?"
 msgstr ""
@@ -15604,7 +15604,7 @@ msgstr ""
 msgid "Important"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8746
+# Source: resources/js/pages/TripForm.tsx:8761
 #: assets/admin/dist/js/app.js
 msgid "Important Info"
 msgstr ""
@@ -15695,7 +15695,7 @@ msgstr ""
 msgid "Include sensitive fields (medical, dietary, notes)"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8740
+# Source: resources/js/pages/TripForm.tsx:8755
 #: assets/admin/dist/js/app.js
 #: templates/partials/booking-content.php:696
 #: templates/partials/pricing-summary.php:118
@@ -15710,7 +15710,7 @@ msgstr ""
 msgid "Included Items"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8039
+# Source: resources/js/pages/TripForm.tsx:8054
 #: assets/admin/dist/js/app.js
 msgid "Included/Excluded"
 msgstr ""
@@ -16293,7 +16293,7 @@ msgstr ""
 msgid "Itineraries"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:439, resources/js/components/Layout.tsx:447, resources/js/pages/TripForm.tsx:8026, resources/js/pages/TripForm.tsx:8737, resources/js/pages/account/Documents.tsx:16, resources/js/pages/account/Documents.tsx:128
+# Source: resources/js/components/Layout.tsx:439, resources/js/components/Layout.tsx:447, resources/js/pages/TripForm.tsx:8041, resources/js/pages/TripForm.tsx:8752, resources/js/pages/account/Documents.tsx:16, resources/js/pages/account/Documents.tsx:128
 #: assets/admin/dist/js/app.js
 #: templates/partials/single-trip/content-itinerary.php:9
 #: templates/partials/single-trip/content-itinerary.php:10
@@ -16398,7 +16398,7 @@ msgstr ""
 msgid "Keep it"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:9463
+# Source: resources/js/pages/TripForm.tsx:9478
 #: assets/admin/dist/js/app.js
 msgid "Keep it short and impactful. Examples: \"All meals included\", \"Skip-the-line tickets\", \"Free airport transfer\""
 msgstr ""
@@ -16443,7 +16443,7 @@ msgstr ""
 msgid "Key Features"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5367
+# Source: resources/js/pages/TripForm.tsx:5382
 #: assets/admin/dist/js/app.js
 msgid "Key Landmarks / Points of Interest"
 msgstr ""
@@ -16478,7 +16478,7 @@ msgstr ""
 msgid "LIMITED TIME"
 msgstr ""
 
-# Source: resources/js/pages/AttributeForm.tsx:904, resources/js/pages/Settings.tsx:1689, resources/js/pages/TravelerCategories.tsx:697, resources/js/pages/TripConsentForm.tsx:1152, resources/js/pages/TripConsentForm.tsx:1267, resources/js/pages/TripForm.tsx:5806
+# Source: resources/js/pages/AttributeForm.tsx:904, resources/js/pages/Settings.tsx:1689, resources/js/pages/TravelerCategories.tsx:697, resources/js/pages/TripConsentForm.tsx:1152, resources/js/pages/TripConsentForm.tsx:1267, resources/js/pages/TripForm.tsx:5821
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:58777
 #: assets/admin/dist/js/app.js:76571
@@ -16492,7 +16492,7 @@ msgstr ""
 msgid "Label is required"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:9634
+# Source: resources/js/pages/TripForm.tsx:9649
 #: assets/admin/dist/js/app.js
 msgid "Landmark Name"
 msgstr ""
@@ -16673,7 +16673,7 @@ msgstr ""
 msgid "Latest bookings that were started but not completed"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5500
+# Source: resources/js/pages/TripForm.tsx:5515
 #: assets/admin/dist/js/app.js
 msgid "Latest date this trip is available for booking"
 msgstr ""
@@ -16689,7 +16689,7 @@ msgstr ""
 msgid "Latest failure"
 msgstr ""
 
-# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:520, resources/js/pages/TripForm.tsx:5142, resources/js/pages/TripForm.tsx:5319
+# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:520, resources/js/pages/TripForm.tsx:5157, resources/js/pages/TripForm.tsx:5334
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:52243
 msgid "Latitude"
@@ -16855,7 +16855,7 @@ msgstr ""
 msgid "Legal pages (Booking UI)"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8054
+# Source: resources/js/pages/TripForm.tsx:8069
 #: assets/admin/dist/js/app.js
 msgid "Let AI draft a day-by-day plan with real activity blocks — you can edit each day after."
 msgstr ""
@@ -16901,7 +16901,7 @@ msgstr ""
 msgid "Licensed To"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8413
+# Source: resources/js/pages/TripForm.tsx:8428
 #: assets/admin/dist/js/app.js
 msgid "Lifecycle Management"
 msgstr ""
@@ -16936,7 +16936,7 @@ msgstr ""
 msgid "Limited"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6612
+# Source: resources/js/pages/TripForm.tsx:6627
 #: assets/admin/dist/js/app.js
 #: app/Services/NoticeService.php:190
 #: assets/dist/blocks/tour.js:342
@@ -17051,12 +17051,12 @@ msgstr ""
 msgid "Loading bookings…"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6496
+# Source: resources/js/pages/TripForm.tsx:6511
 #: assets/admin/dist/js/app.js
 msgid "Loading difficulty levels..."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4327
+# Source: resources/js/pages/TripForm.tsx:4342
 #: assets/admin/dist/js/app.js
 msgid "Loading image..."
 msgstr ""
@@ -17090,7 +17090,7 @@ msgstr ""
 msgid "Loading reviews..."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:9519
+# Source: resources/js/pages/TripForm.tsx:9534
 #: assets/admin/dist/js/app.js
 msgid "Loading revisions..."
 msgstr ""
@@ -17131,7 +17131,7 @@ msgstr ""
 msgid "Loading…"
 msgstr ""
 
-# Source: resources/js/pages/Customers.tsx:467, resources/js/pages/Customers.tsx:519, resources/js/pages/Customers.tsx:646, resources/js/pages/TripForm.tsx:8743, resources/js/pages/ViewReview.tsx:402
+# Source: resources/js/pages/Customers.tsx:467, resources/js/pages/Customers.tsx:519, resources/js/pages/Customers.tsx:646, resources/js/pages/TripForm.tsx:8758, resources/js/pages/ViewReview.tsx:402
 #: assets/admin/dist/js/app.js
 #: templates/partials/single-trip/content-location.php:11
 #: templates/partials/single-trip/content-location.php:12
@@ -17139,12 +17139,12 @@ msgstr ""
 msgid "Location"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4767
+# Source: resources/js/pages/TripForm.tsx:4782
 #: assets/admin/dist/js/app.js
 msgid "Location & Geography"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:2537
+# Source: resources/js/pages/TripForm.tsx:2540
 #: assets/admin/dist/js/app.js
 msgid "Location & Route"
 msgstr ""
@@ -17155,31 +17155,31 @@ msgstr ""
 msgid "Location & Time"
 msgstr ""
 
-# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:455, resources/js/pages/TripForm.tsx:5079
+# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:455, resources/js/pages/TripForm.tsx:5094
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:52180
 msgid "Location access denied. Please allow location access in your browser."
 msgstr ""
 
-# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:449, resources/js/pages/TripForm.tsx:5073
+# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:449, resources/js/pages/TripForm.tsx:5088
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:52174
 msgid "Location access requires HTTPS. This feature will work on your live HTTPS site."
 msgstr ""
 
-# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:462, resources/js/pages/TripForm.tsx:5086
+# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:462, resources/js/pages/TripForm.tsx:5101
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:52187
 msgid "Location information is unavailable. Please try again."
 msgstr ""
 
-# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:468, resources/js/pages/TripForm.tsx:5092
+# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:468, resources/js/pages/TripForm.tsx:5107
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:52193
 msgid "Location request timed out. Please try again."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4935, resources/js/pages/TripForm.tsx:5203
+# Source: resources/js/pages/TripForm.tsx:4950, resources/js/pages/TripForm.tsx:5218
 #: assets/admin/dist/js/app.js
 msgid "Location set"
 msgstr ""
@@ -17235,7 +17235,7 @@ msgstr ""
 msgid "Longest wait (hrs)"
 msgstr ""
 
-# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:537, resources/js/pages/TripForm.tsx:5159, resources/js/pages/TripForm.tsx:5337
+# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:537, resources/js/pages/TripForm.tsx:5174, resources/js/pages/TripForm.tsx:5352
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:52265
 msgid "Longitude"
@@ -17518,7 +17518,7 @@ msgstr ""
 msgid "Manage trip difficulty levels and their ordering"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8603
+# Source: resources/js/pages/TripForm.tsx:8618
 #: assets/admin/dist/js/app.js
 msgid "Manage which tabs appear on the trip single page and in what order. Enable or disable tabs, customize labels, and reorder them."
 msgstr ""
@@ -17577,13 +17577,13 @@ msgstr ""
 msgid "Manual"
 msgstr ""
 
-# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:551, resources/js/pages/TripForm.tsx:5176
+# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:551, resources/js/pages/TripForm.tsx:5191
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:52281
 msgid "Manual coordinate entry. These will be auto-filled when you select a location from the map above."
 msgstr ""
 
-# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:415, resources/js/pages/TripForm.tsx:5040
+# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:415, resources/js/pages/TripForm.tsx:5055
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:52138
 msgid "Manual override"
@@ -17688,7 +17688,7 @@ msgstr ""
 msgid "Mark as Active"
 msgstr ""
 
-# Source: resources/js/pages/Reviews.tsx:306, resources/js/pages/TripForm.tsx:9039
+# Source: resources/js/pages/Reviews.tsx:306, resources/js/pages/TripForm.tsx:9054
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:44739
 msgid "Mark as Approved"
@@ -17893,7 +17893,7 @@ msgstr ""
 msgid "Maximum %d media items allowed"
 msgstr ""
 
-# Source: resources/js/pages/TravelerCategoryForm.tsx:625, resources/js/pages/TripForm.tsx:5990
+# Source: resources/js/pages/TravelerCategoryForm.tsx:625, resources/js/pages/TripForm.tsx:6005
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:59424
 msgid "Maximum Age"
@@ -17934,7 +17934,7 @@ msgstr ""
 msgid "Maximum Price Increase (%)"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5608
+# Source: resources/js/pages/TripForm.tsx:5623
 #: assets/admin/dist/js/app.js
 msgid "Maximum Travelers"
 msgstr ""
@@ -18036,7 +18036,7 @@ msgstr ""
 msgid "Meal Packages"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6210
+# Source: resources/js/pages/TripForm.tsx:6225
 #: assets/admin/dist/js/app.js
 msgid "Meal Plan"
 msgstr ""
@@ -18092,12 +18092,12 @@ msgstr ""
 msgid "Media %d"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6657
+# Source: resources/js/pages/TripForm.tsx:6672
 #: assets/admin/dist/js/app.js
 msgid "Media & Content"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:2601
+# Source: resources/js/pages/TripForm.tsx:2604
 #: assets/admin/dist/js/app.js
 msgid "Media & Gallery"
 msgstr ""
@@ -18108,7 +18108,7 @@ msgstr ""
 msgid "Media Gallery"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:2871, resources/js/pages/TripForm.tsx:2984
+# Source: resources/js/pages/TripForm.tsx:2874, resources/js/pages/TripForm.tsx:2987
 #: assets/admin/dist/js/app.js
 msgid "Media library not available. Please ensure you are logged in as admin."
 msgstr ""
@@ -18208,7 +18208,7 @@ msgstr ""
 msgid "Message logs"
 msgstr ""
 
-# Source: resources/js/pages/ActivityForm.tsx:576, resources/js/pages/CategoryForm.tsx:722, resources/js/pages/DestinationForm.tsx:582, resources/js/pages/TripForm.tsx:8189, resources/js/pages/TripForm.tsx:8193
+# Source: resources/js/pages/ActivityForm.tsx:576, resources/js/pages/CategoryForm.tsx:722, resources/js/pages/DestinationForm.tsx:582, resources/js/pages/TripForm.tsx:8204, resources/js/pages/TripForm.tsx:8208
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:33562
 #: assets/admin/dist/js/app.js:34877
@@ -18216,7 +18216,7 @@ msgstr ""
 msgid "Meta Description"
 msgstr ""
 
-# Source: resources/js/pages/ActivityForm.tsx:604, resources/js/pages/CategoryForm.tsx:750, resources/js/pages/DestinationForm.tsx:610, resources/js/pages/TripForm.tsx:8228
+# Source: resources/js/pages/ActivityForm.tsx:604, resources/js/pages/CategoryForm.tsx:750, resources/js/pages/DestinationForm.tsx:610, resources/js/pages/TripForm.tsx:8243
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:33590
 #: assets/admin/dist/js/app.js:34905
@@ -18224,7 +18224,7 @@ msgstr ""
 msgid "Meta Keywords"
 msgstr ""
 
-# Source: resources/js/pages/ActivityForm.tsx:548, resources/js/pages/CategoryForm.tsx:694, resources/js/pages/DestinationForm.tsx:554, resources/js/pages/TripForm.tsx:8153, resources/js/pages/TripForm.tsx:8157
+# Source: resources/js/pages/ActivityForm.tsx:548, resources/js/pages/CategoryForm.tsx:694, resources/js/pages/DestinationForm.tsx:554, resources/js/pages/TripForm.tsx:8168, resources/js/pages/TripForm.tsx:8172
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:33534
 #: assets/admin/dist/js/app.js:34849
@@ -18272,7 +18272,7 @@ msgstr ""
 msgid "Method"
 msgstr ""
 
-# Source: resources/js/components/shared/Table.tsx:388, resources/js/pages/TripForm.tsx:3913
+# Source: resources/js/components/shared/Table.tsx:388, resources/js/pages/TripForm.tsx:3928
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:29222
 msgid "Method:"
@@ -18311,7 +18311,7 @@ msgstr ""
 msgid "Min Travelers"
 msgstr ""
 
-# Source: resources/js/pages/TravelerCategoryForm.tsx:600, resources/js/pages/TripForm.tsx:5965
+# Source: resources/js/pages/TravelerCategoryForm.tsx:600, resources/js/pages/TripForm.tsx:5980
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:59398
 msgid "Minimum Age"
@@ -18342,7 +18342,7 @@ msgstr ""
 msgid "Minimum Rating"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5584
+# Source: resources/js/pages/TripForm.tsx:5599
 #: assets/admin/dist/js/app.js
 msgid "Minimum Travelers"
 msgstr ""
@@ -18365,7 +18365,7 @@ msgstr ""
 msgid "Minimum amount must be a positive number"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5528
+# Source: resources/js/pages/TripForm.tsx:5543
 #: assets/admin/dist/js/app.js
 msgid "Minimum days in advance customers can book this trip"
 msgstr ""
@@ -18517,7 +18517,7 @@ msgstr ""
 msgid "More actions"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5756
+# Source: resources/js/pages/TripForm.tsx:5771
 #: assets/admin/dist/js/app.js
 msgid "Morning Tour"
 msgstr ""
@@ -18527,18 +18527,18 @@ msgstr ""
 msgid "Move Rule to Trash"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5186, resources/js/pages/TripForm.tsx:7005, resources/js/pages/TripForm.tsx:8791
+# Source: resources/js/pages/Settings.tsx:5186, resources/js/pages/TripForm.tsx:7020, resources/js/pages/TripForm.tsx:8806
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/Settings-C5RvnmMN.js:4125
 msgid "Move down"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6711
+# Source: resources/js/pages/TripForm.tsx:6726
 #: assets/admin/dist/js/app.js
 msgid "Move left"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6723
+# Source: resources/js/pages/TripForm.tsx:6738
 #: assets/admin/dist/js/app.js
 msgid "Move right"
 msgstr ""
@@ -18591,7 +18591,7 @@ msgstr ""
 msgid "Move to Trash"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:5177, resources/js/pages/TripForm.tsx:6990, resources/js/pages/TripForm.tsx:8778
+# Source: resources/js/pages/Settings.tsx:5177, resources/js/pages/TripForm.tsx:7005, resources/js/pages/TripForm.tsx:8793
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/Settings-C5RvnmMN.js:4114
 msgid "Move up"
@@ -18606,14 +18606,14 @@ msgstr ""
 msgid "Multi-Day"
 msgstr ""
 
-# Source: resources/js/components/availability/RecurringRules.tsx:681, resources/js/pages/RecurringRuleForm.tsx:1539, resources/js/pages/TripForm.tsx:4584
+# Source: resources/js/components/availability/RecurringRules.tsx:681, resources/js/pages/RecurringRuleForm.tsx:1539, resources/js/pages/TripForm.tsx:4599
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:60508
 #: assets/dist/js/RecurringRuleForm-CY2V3hrG.js:1306
 msgid "Multi-Day Trip"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5899
+# Source: resources/js/pages/TripForm.tsx:5914
 #: assets/admin/dist/js/app.js
 msgid "Multi-Day Trip Departure Settings"
 msgstr ""
@@ -18639,7 +18639,7 @@ msgstr ""
 msgid "Multiple installments"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:9126
+# Source: resources/js/pages/TripForm.tsx:9141
 #: assets/admin/dist/js/app.js
 msgid "Must Complete"
 msgstr ""
@@ -18663,7 +18663,7 @@ msgstr ""
 msgid "My Documents"
 msgstr ""
 
-# Source: resources/js/pages/Categories.tsx:415, resources/js/pages/DifficultyLevels.tsx:341, resources/js/pages/Discounts.tsx:288, resources/js/pages/ItemTypes.tsx:187, resources/js/pages/Items.tsx:202, resources/js/pages/TravelerCategories.tsx:155, resources/js/pages/TripForm.tsx:3920, resources/js/pages/account/utils.ts:29
+# Source: resources/js/pages/Categories.tsx:415, resources/js/pages/DifficultyLevels.tsx:341, resources/js/pages/Discounts.tsx:288, resources/js/pages/ItemTypes.tsx:187, resources/js/pages/Items.tsx:202, resources/js/pages/TravelerCategories.tsx:155, resources/js/pages/TripForm.tsx:3935, resources/js/pages/account/utils.ts:29
 #: assets/admin/dist/js/app.js
 #: templates/pdf/itinerary.php:320
 #: assets/admin/dist/js/app.js:35263
@@ -18793,7 +18793,7 @@ msgstr ""
 msgid "Never synced"
 msgstr ""
 
-# Source: resources/js/pages/Enquiries.tsx:461, resources/js/pages/Enquiries.tsx:649, resources/js/pages/Enquiries.tsx:724, resources/js/pages/EnquiryForm.tsx:439, resources/js/pages/TripForm.tsx:6610, resources/js/pages/Trips.tsx:1078, resources/js/pages/ViewEnquiry.tsx:124
+# Source: resources/js/pages/Enquiries.tsx:461, resources/js/pages/Enquiries.tsx:649, resources/js/pages/Enquiries.tsx:724, resources/js/pages/EnquiryForm.tsx:439, resources/js/pages/TripForm.tsx:6625, resources/js/pages/Trips.tsx:1078, resources/js/pages/ViewEnquiry.tsx:124
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:30604
 #: assets/admin/dist/js/app.js:65094
@@ -18823,7 +18823,7 @@ msgstr ""
 msgid "New Password"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:3158
+# Source: resources/js/pages/TripForm.tsx:3161
 #: assets/admin/dist/js/app.js
 msgid "New Tab"
 msgstr ""
@@ -18833,7 +18833,7 @@ msgstr ""
 msgid "New Template"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8846
+# Source: resources/js/pages/TripForm.tsx:8861
 #: assets/admin/dist/js/app.js
 msgid "New Trip"
 msgstr ""
@@ -18857,7 +18857,7 @@ msgstr ""
 msgid "Newsletter"
 msgstr ""
 
-# Source: resources/js/components/shared/Pagination.tsx:136, resources/js/pages/TripForm.tsx:9103
+# Source: resources/js/components/shared/Pagination.tsx:136, resources/js/pages/TripForm.tsx:9118
 #: assets/admin/dist/js/app.js
 #: templates/listing-activity.php:308
 #: templates/listing-activity.php:313
@@ -18964,14 +18964,14 @@ msgstr ""
 msgid "No abandoned bookings found"
 msgstr ""
 
-# Source: resources/js/pages/AvailabilityForm.tsx:1243, resources/js/pages/RecurringRuleForm.tsx:1151, resources/js/pages/TripForm.tsx:7416
+# Source: resources/js/pages/AvailabilityForm.tsx:1243, resources/js/pages/RecurringRuleForm.tsx:1151, resources/js/pages/TripForm.tsx:7431
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/AvailabilityForm-amQiiorh.js:1001
 #: assets/dist/js/RecurringRuleForm-CY2V3hrG.js:1010
 msgid "No active traveler categories found."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6567
+# Source: resources/js/pages/TripForm.tsx:6582
 #: assets/admin/dist/js/app.js
 msgid "No activities available. "
 msgstr ""
@@ -19060,7 +19060,7 @@ msgstr ""
 msgid "No bookings yet"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6454
+# Source: resources/js/pages/TripForm.tsx:6469
 #: assets/admin/dist/js/app.js
 msgid "No categories available. "
 msgstr ""
@@ -19176,7 +19176,7 @@ msgstr ""
 msgid "No destination data yet."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4835
+# Source: resources/js/pages/TripForm.tsx:4850
 #: assets/admin/dist/js/app.js
 msgid "No destinations available. Please create destinations first."
 msgstr ""
@@ -19187,12 +19187,12 @@ msgstr ""
 msgid "No destinations found"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6502
+# Source: resources/js/pages/TripForm.tsx:6517
 #: assets/admin/dist/js/app.js
 msgid "No difficulty levels available - Click below to create"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6522
+# Source: resources/js/pages/TripForm.tsx:6537
 #: assets/admin/dist/js/app.js
 msgid "No difficulty levels available. "
 msgstr ""
@@ -19227,7 +19227,7 @@ msgstr ""
 msgid "No documents found"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:7181
+# Source: resources/js/pages/TripForm.tsx:7196
 #: assets/admin/dist/js/app.js
 msgid "No downloads added yet"
 msgstr ""
@@ -19275,7 +19275,7 @@ msgstr ""
 msgid "No fields configured. Click \"Add Field\" to get started."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:7128
+# Source: resources/js/pages/TripForm.tsx:7143
 #: assets/admin/dist/js/app.js
 msgid "No file selected"
 msgstr ""
@@ -19291,7 +19291,7 @@ msgstr ""
 msgid "No form is set to collect an email address. An email is required for booking confirmation, the customer account and the voucher. Please enable an email field on the Contact or Traveler form — otherwise customers can't complete checkout."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4453
+# Source: resources/js/pages/TripForm.tsx:4468
 #: assets/admin/dist/js/app.js
 msgid "No highlights added yet"
 msgstr ""
@@ -19345,7 +19345,7 @@ msgstr ""
 msgid "No itinerary entries yet"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5407
+# Source: resources/js/pages/TripForm.tsx:5422
 #: assets/admin/dist/js/app.js
 msgid "No landmarks added yet"
 msgstr ""
@@ -19467,7 +19467,7 @@ msgstr ""
 msgid "No pending payments"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:7767
+# Source: resources/js/pages/TripForm.tsx:7782
 #: assets/admin/dist/js/app.js
 msgid "No pricing added yet. Select a category above to add pricing."
 msgstr ""
@@ -19534,7 +19534,7 @@ msgstr ""
 msgid "No reviews found"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:9524
+# Source: resources/js/pages/TripForm.tsx:9539
 #: assets/admin/dist/js/app.js
 msgid "No revisions found"
 msgstr ""
@@ -19617,7 +19617,7 @@ msgstr ""
 msgid "No templates yet — click Add custom template."
 msgstr ""
 
-# Source: resources/js/pages/RecurringRuleForm.tsx:1591, resources/js/pages/TripForm.tsx:5746
+# Source: resources/js/pages/RecurringRuleForm.tsx:1591, resources/js/pages/TripForm.tsx:5761
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/RecurringRuleForm-CY2V3hrG.js:1357
 msgid "No time slots added yet"
@@ -19733,7 +19733,7 @@ msgstr ""
 msgid "No valid entries or days found to apply this action."
 msgstr ""
 
-# Source: resources/js/components/settings/EmailDeliverySection.tsx:227, resources/js/pages/TripForm.tsx:6606, resources/js/pages/Trips.tsx:1246
+# Source: resources/js/components/settings/EmailDeliverySection.tsx:227, resources/js/pages/TripForm.tsx:6621, resources/js/pages/Trips.tsx:1246
 #: assets/admin/dist/js/app.js
 #: templates/partials/single-trip/content-itinerary.php:196
 #: templates/partials/single-trip/content-itinerary.php:216
@@ -20168,7 +20168,7 @@ msgstr ""
 msgid "Only published coupons can be used by customers."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:3980
+# Source: resources/js/pages/TripForm.tsx:3995
 #: assets/admin/dist/js/app.js
 msgid "Only the Trip Title and Trip URL are required to create a draft. Everything else is optional for now, but filling it in is highly recommended for better discovery and conversions."
 msgstr ""
@@ -20353,12 +20353,12 @@ msgstr ""
 msgid "Opted out"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8132
+# Source: resources/js/pages/TripForm.tsx:8147
 #: assets/admin/dist/js/app.js
 msgid "Optimize for search engines and answer common questions to build trust and improve discoverability."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4792
+# Source: resources/js/pages/TripForm.tsx:4807
 #: assets/admin/dist/js/app.js
 msgid "Optimize how your trip appears in search engines and social shares"
 msgstr ""
@@ -20368,7 +20368,7 @@ msgstr ""
 msgid "Optimize pricing for maximum revenue and occupancy"
 msgstr ""
 
-# Source: resources/js/pages/AvailabilityForm.tsx:1154, resources/js/pages/AvailabilityForm.tsx:1190, resources/js/pages/AvailabilityForm.tsx:1225, resources/js/pages/AvailabilityForm.tsx:1422, resources/js/pages/AvailabilityForm.tsx:1456, resources/js/pages/DepartureForm.tsx:307, resources/js/pages/DepartureForm.tsx:352, resources/js/pages/DepartureForm.tsx:378, resources/js/pages/DepartureRecurringRuleForm.tsx:294, resources/js/pages/DepartureRecurringRuleForm.tsx:316, resources/js/pages/DepartureRecurringRuleForm.tsx:371, resources/js/pages/RecurringRuleForm.tsx:1080, resources/js/pages/TripForm.tsx:5310, resources/js/pages/TripForm.tsx:7028, resources/js/pages/TripForm.tsx:7336, resources/js/pages/TripForm.tsx:7364, resources/js/pages/TripForm.tsx:7667, resources/js/pages/TripForm.tsx:7698, resources/js/pages/TripForm.tsx:9285, resources/js/pages/premium-pages/TripConsent.tsx:263
+# Source: resources/js/pages/AvailabilityForm.tsx:1154, resources/js/pages/AvailabilityForm.tsx:1190, resources/js/pages/AvailabilityForm.tsx:1225, resources/js/pages/AvailabilityForm.tsx:1422, resources/js/pages/AvailabilityForm.tsx:1456, resources/js/pages/DepartureForm.tsx:307, resources/js/pages/DepartureForm.tsx:352, resources/js/pages/DepartureForm.tsx:378, resources/js/pages/DepartureRecurringRuleForm.tsx:294, resources/js/pages/DepartureRecurringRuleForm.tsx:316, resources/js/pages/DepartureRecurringRuleForm.tsx:371, resources/js/pages/RecurringRuleForm.tsx:1080, resources/js/pages/TripForm.tsx:5325, resources/js/pages/TripForm.tsx:7043, resources/js/pages/TripForm.tsx:7351, resources/js/pages/TripForm.tsx:7379, resources/js/pages/TripForm.tsx:7682, resources/js/pages/TripForm.tsx:7713, resources/js/pages/TripForm.tsx:9300, resources/js/pages/premium-pages/TripConsent.tsx:263
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:63641
 #: assets/admin/dist/js/app.js:63692
@@ -20382,7 +20382,7 @@ msgstr ""
 msgid "Optional"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4784
+# Source: resources/js/pages/TripForm.tsx:4799
 #: assets/admin/dist/js/app.js
 msgid "Optional but highly recommended to help travelers understand the experience."
 msgstr ""
@@ -20451,7 +20451,7 @@ msgstr ""
 msgid "Optional transaction ID or reference number from the payment gateway."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4742
+# Source: resources/js/pages/TripForm.tsx:4757
 #: assets/admin/dist/js/app.js
 msgid "Optional — for an hour-based day tour (e.g. an 8-hour experience). When set, the tour's duration shows in hours and Google Calendar creates a same-day timed event instead of an all-day one. Leave empty for a normal day tour."
 msgstr ""
@@ -20462,12 +20462,12 @@ msgstr ""
 msgid "Optional — only needed when receiving messages."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6672
+# Source: resources/js/pages/TripForm.tsx:6687
 #: assets/admin/dist/js/app.js
 msgid "Optional, but adding rich media greatly increases engagement and conversions."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4797
+# Source: resources/js/pages/TripForm.tsx:4812
 #: assets/admin/dist/js/app.js
 msgid "Optional, but completing these fields improves SEO and click-through rates."
 msgstr ""
@@ -20490,7 +20490,7 @@ msgstr ""
 msgid "Optional. Some receivers require Yatra to authenticate at the TLS handshake with a client certificate, in addition to the HMAC signature on the body. Paste your PEM-encoded cert and private key below. The pair is encrypted at rest and used only at delivery time."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5354
+# Source: resources/js/pages/TripForm.tsx:5369
 #: assets/admin/dist/js/app.js
 msgid "Optional: Manual coordinate entry. Auto-filled when you select a location from the map above."
 msgstr ""
@@ -20552,7 +20552,7 @@ msgstr ""
 msgid "Ordering & Status"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6390
+# Source: resources/js/pages/TripForm.tsx:6405
 #: assets/admin/dist/js/app.js
 msgid "Organize your trip with categories, activities, and custom attributes to help travelers discover it through search and filters."
 msgstr ""
@@ -20569,7 +20569,7 @@ msgstr ""
 msgid "Original Message:"
 msgstr ""
 
-# Source: resources/js/pages/AvailabilityForm.tsx:1152, resources/js/pages/AvailabilityForm.tsx:1420, resources/js/pages/RecurringRuleForm.tsx:1078, resources/js/pages/RecurringRuleForm.tsx:1386, resources/js/pages/TripForm.tsx:7335, resources/js/pages/TripForm.tsx:7666
+# Source: resources/js/pages/AvailabilityForm.tsx:1152, resources/js/pages/AvailabilityForm.tsx:1420, resources/js/pages/RecurringRuleForm.tsx:1078, resources/js/pages/RecurringRuleForm.tsx:1386, resources/js/pages/TripForm.tsx:7350, resources/js/pages/TripForm.tsx:7681
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/AvailabilityForm-amQiiorh.js:927
 #: assets/dist/js/AvailabilityForm-amQiiorh.js:1124
@@ -20660,7 +20660,7 @@ msgstr ""
 msgid "Overrides trip starting location for this date only. Coordinates power maps and distance features."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8734
+# Source: resources/js/pages/TripForm.tsx:8749
 #: assets/admin/dist/js/app.js
 #: templates/partials/single-trip/content-overview.php:8
 #: templates/partials/single-trip/content-overview.php:9
@@ -20679,22 +20679,22 @@ msgstr ""
 msgid "Owner, Manager, Sales Agent, Front Desk, Guide, Accountant, Marketing, Auditor."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:9119
+# Source: resources/js/pages/TripForm.tsx:9134
 #: assets/admin/dist/js/app.js
 msgid "PHASE 1: ESSENTIALS"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:9205
+# Source: resources/js/pages/TripForm.tsx:9220
 #: assets/admin/dist/js/app.js
 msgid "PHASE 2: DETAILS"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:9278
+# Source: resources/js/pages/TripForm.tsx:9293
 #: assets/admin/dist/js/app.js
 msgid "PHASE 3: OPTIMIZATION"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:9355
+# Source: resources/js/pages/TripForm.tsx:9370
 #: assets/admin/dist/js/app.js
 msgid "PHASE 4: ADVANCED"
 msgstr ""
@@ -20917,7 +20917,7 @@ msgstr ""
 msgid "Paste the credential value…"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6787
+# Source: resources/js/pages/TripForm.tsx:6802
 #: assets/admin/dist/js/app.js
 msgid "Paste the full URL from YouTube or Vimeo. The video will be embedded on your trip page."
 msgstr ""
@@ -21012,7 +21012,7 @@ msgstr ""
 msgid "Payload sent"
 msgstr ""
 
-# Source: resources/js/components/shared/Table.tsx:402, resources/js/pages/TripForm.tsx:3926
+# Source: resources/js/components/shared/Table.tsx:402, resources/js/pages/TripForm.tsx:3941
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:29232
 msgid "Payload:"
@@ -21135,7 +21135,7 @@ msgstr ""
 msgid "Payment Summary"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:7955
+# Source: resources/js/pages/TripForm.tsx:7970
 #: assets/admin/dist/js/app.js
 msgid "Payment Terms"
 msgstr ""
@@ -21400,7 +21400,7 @@ msgstr ""
 msgid "Per channel"
 msgstr ""
 
-# Source: resources/js/pages/TravelerCategories.tsx:237, resources/js/pages/TravelerCategories.tsx:241, resources/js/pages/TravelerCategories.tsx:245, resources/js/pages/TravelerCategories.tsx:248, resources/js/pages/TravelerCategoryForm.tsx:689, resources/js/pages/TripForm.tsx:7522, resources/js/pages/TripForm.tsx:7524, resources/js/pages/TripForm.tsx:7526, resources/js/pages/TripForm.tsx:7528, resources/js/pages/TripForm.tsx:7632, resources/js/pages/TripForm.tsx:7635, resources/js/pages/TripForm.tsx:7638, resources/js/pages/TripForm.tsx:7640
+# Source: resources/js/pages/TravelerCategories.tsx:237, resources/js/pages/TravelerCategories.tsx:241, resources/js/pages/TravelerCategories.tsx:245, resources/js/pages/TravelerCategories.tsx:248, resources/js/pages/TravelerCategoryForm.tsx:689, resources/js/pages/TripForm.tsx:7537, resources/js/pages/TripForm.tsx:7539, resources/js/pages/TripForm.tsx:7541, resources/js/pages/TripForm.tsx:7543, resources/js/pages/TripForm.tsx:7647, resources/js/pages/TripForm.tsx:7650, resources/js/pages/TripForm.tsx:7653, resources/js/pages/TripForm.tsx:7655
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:58385
 #: assets/admin/dist/js/app.js:58388
@@ -21410,7 +21410,7 @@ msgstr ""
 msgid "Per group"
 msgstr ""
 
-# Source: resources/js/pages/TravelerCategories.tsx:251, resources/js/pages/TravelerCategoryForm.tsx:686, resources/js/pages/TripForm.tsx:7534, resources/js/pages/TripForm.tsx:7643, resources/js/pages/account/SavedTrips.tsx:278
+# Source: resources/js/pages/TravelerCategories.tsx:251, resources/js/pages/TravelerCategoryForm.tsx:686, resources/js/pages/TripForm.tsx:7549, resources/js/pages/TripForm.tsx:7658, resources/js/pages/account/SavedTrips.tsx:278
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:58395
 #: assets/admin/dist/js/app.js:59478
@@ -21467,12 +21467,12 @@ msgstr ""
 msgid "Per-period breakdown isn't available for this section. The summary cards above show the aggregate for the selected date range."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:7852
+# Source: resources/js/pages/TripForm.tsx:7867
 #: assets/admin/dist/js/app.js
 msgid "Per-trip deposit amount, percentage and custom payment terms are a Yatra Pro feature."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:7837
+# Source: resources/js/pages/TripForm.tsx:7852
 #: assets/admin/dist/js/app.js
 msgid "Per-trip deposits need the Flexible Payments module."
 msgstr ""
@@ -21665,7 +21665,7 @@ msgstr ""
 msgid "Phone number ID"
 msgstr ""
 
-# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:917, resources/js/components/ui/media-upload.tsx:47, resources/js/pages/TripForm.tsx:6683
+# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:917, resources/js/components/ui/media-upload.tsx:47, resources/js/pages/TripForm.tsx:6698
 #: assets/admin/dist/js/app.js
 #: templates/partials/single-trip/content-gallery.php:9
 #: assets/admin/dist/js/app.js:51070
@@ -21689,14 +21689,14 @@ msgstr ""
 msgid "Photography"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6024
+# Source: resources/js/pages/TripForm.tsx:6039
 #: assets/admin/dist/js/app.js
 #: templates/partials/single-trip/content-important-info.php:26
 #: templates/pdf/itinerary.php:709
 msgid "Physical Requirements"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6535
+# Source: resources/js/pages/TripForm.tsx:6550
 #: assets/admin/dist/js/app.js
 msgid "Physical difficulty level required for this trip"
 msgstr ""
@@ -21788,7 +21788,7 @@ msgstr ""
 msgid "Pick which fields from this event's data block should be forwarded. The envelope (id, type, api_version, occurred_at) is always sent so receivers can route the event."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6298
+# Source: resources/js/pages/TripForm.tsx:6313
 #: assets/admin/dist/js/app.js
 msgid "Pickup Location"
 msgstr ""
@@ -21852,7 +21852,7 @@ msgstr ""
 msgid "Please activate"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:3554
+# Source: resources/js/pages/TripForm.tsx:3569
 #: assets/admin/dist/js/app.js
 msgid "Please add a trip title and URL before saving."
 msgstr ""
@@ -21961,7 +21961,7 @@ msgstr ""
 msgid "Please select a trip first."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5935
+# Source: resources/js/pages/TripForm.tsx:5950
 #: assets/admin/dist/js/app.js
 msgid "Please select a trip type (Day Tour or Multi-Day) to configure fallback settings."
 msgstr ""
@@ -22075,7 +22075,7 @@ msgstr ""
 msgid "Postal Code"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8419, resources/js/pages/TripForm.tsx:9362
+# Source: resources/js/pages/TripForm.tsx:8434, resources/js/pages/TripForm.tsx:9377
 #: assets/admin/dist/js/app.js
 msgid "Power Users"
 msgstr ""
@@ -22162,7 +22162,7 @@ msgstr ""
 msgid "Premium features & integrations — view plans."
 msgstr ""
 
-# Source: resources/js/components/ai/AiEmailTemplateModal.tsx:358, resources/js/components/ai/AutoFillTripModal.tsx:703, resources/js/components/email/EmailTemplatesList.tsx:711, resources/js/components/ui/icon-picker.tsx:499, resources/js/pages/ActivityForm.tsx:377, resources/js/pages/CategoryForm.tsx:453, resources/js/pages/DestinationForm.tsx:382, resources/js/pages/EmailAutomation.tsx:692, resources/js/pages/EmailTemplateForm.tsx:655, resources/js/pages/RecurringRuleForm.tsx:2525, resources/js/pages/Settings.tsx:2483, resources/js/pages/TripConsent.tsx:914, resources/js/pages/TripConsentForm.tsx:917, resources/js/pages/TripForm.tsx:8972, resources/js/pages/account/Documents.tsx:284, resources/js/pages/account/Documents.tsx:288
+# Source: resources/js/components/ai/AiEmailTemplateModal.tsx:358, resources/js/components/ai/AutoFillTripModal.tsx:703, resources/js/components/email/EmailTemplatesList.tsx:711, resources/js/components/ui/icon-picker.tsx:499, resources/js/pages/ActivityForm.tsx:377, resources/js/pages/CategoryForm.tsx:453, resources/js/pages/DestinationForm.tsx:382, resources/js/pages/EmailAutomation.tsx:692, resources/js/pages/EmailTemplateForm.tsx:655, resources/js/pages/RecurringRuleForm.tsx:2525, resources/js/pages/Settings.tsx:2483, resources/js/pages/TripConsent.tsx:914, resources/js/pages/TripConsentForm.tsx:917, resources/js/pages/TripForm.tsx:8987, resources/js/pages/account/Documents.tsx:284, resources/js/pages/account/Documents.tsx:288
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:32733
 #: assets/admin/dist/js/app.js:33383
@@ -22185,7 +22185,7 @@ msgstr ""
 msgid "Preview URL the button will open"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4123
+# Source: resources/js/pages/TripForm.tsx:4138
 #: assets/admin/dist/js/app.js
 msgid "Preview URL:"
 msgstr ""
@@ -22226,7 +22226,7 @@ msgstr ""
 msgid "Preview failed."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8257
+# Source: resources/js/pages/TripForm.tsx:8272
 #: assets/admin/dist/js/app.js
 msgid "Preview how your trip appears in search results"
 msgstr ""
@@ -22243,7 +22243,7 @@ msgstr ""
 msgid "Preview shows the rendered email; HTML tab lets you edit. Merge tags like {{customer_name}} stay as-is — they're replaced when the email actually sends."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4328
+# Source: resources/js/pages/TripForm.tsx:4343
 #: assets/admin/dist/js/app.js
 msgid "Preview unavailable"
 msgstr ""
@@ -22260,7 +22260,7 @@ msgstr ""
 msgid "Preview:"
 msgstr ""
 
-# Source: resources/js/components/shared/Pagination.tsx:122, resources/js/pages/TripForm.tsx:9092
+# Source: resources/js/components/shared/Pagination.tsx:122, resources/js/pages/TripForm.tsx:9107
 #: assets/admin/dist/js/app.js
 #: templates/listing-activity.php:278
 #: templates/listing-activity.php:283
@@ -22356,7 +22356,7 @@ msgstr ""
 msgid "Prices automatically adjust based on your predefined rules"
 msgstr ""
 
-# Source: resources/js/pages/AdditionalServicesForm.tsx:473, resources/js/pages/AiAssistant.tsx:603, resources/js/pages/Settings.tsx:4107, resources/js/pages/TravelerCategories.tsx:532, resources/js/pages/TravelerCategories.tsx:766, resources/js/pages/TripForm.tsx:2547
+# Source: resources/js/pages/AdditionalServicesForm.tsx:473, resources/js/pages/AiAssistant.tsx:603, resources/js/pages/Settings.tsx:4107, resources/js/pages/TravelerCategories.tsx:532, resources/js/pages/TravelerCategories.tsx:766, resources/js/pages/TripForm.tsx:2550
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:58626
 #: assets/admin/dist/js/app.js:58845
@@ -22372,7 +22372,7 @@ msgstr ""
 msgid "Pricing & Availability"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:7206
+# Source: resources/js/pages/TripForm.tsx:7221
 #: assets/admin/dist/js/app.js
 msgid "Pricing & Payment"
 msgstr ""
@@ -22417,7 +22417,7 @@ msgstr ""
 msgid "Pricing Rules"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:7229
+# Source: resources/js/pages/TripForm.tsx:7244
 #: assets/admin/dist/js/app.js
 msgid "Pricing Type"
 msgstr ""
@@ -22532,12 +22532,12 @@ msgstr ""
 msgid "Privacy policy"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:7066
+# Source: resources/js/pages/TripForm.tsx:7081
 #: assets/admin/dist/js/app.js
 msgid "Private (Booking confirmation only)"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:7063
+# Source: resources/js/pages/TripForm.tsx:7078
 #: assets/admin/dist/js/app.js
 msgid "Private (My Account only)"
 msgstr ""
@@ -22706,7 +22706,7 @@ msgstr ""
 msgid "Provide a 24+ character secret instead of letting Yatra auto-generate one."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:7060
+# Source: resources/js/pages/TripForm.tsx:7075
 #: assets/admin/dist/js/app.js
 msgid "Public"
 msgstr ""
@@ -22736,7 +22736,7 @@ msgstr ""
 msgid "Public listing URL (optional)"
 msgstr ""
 
-# Source: resources/js/components/shared/BulkActionToolbar.tsx:327, resources/js/pages/ActivityForm.tsx:528, resources/js/pages/AdditionalServices.tsx:733, resources/js/pages/AdditionalServicesForm.tsx:572, resources/js/pages/AttributeForm.tsx:1050, resources/js/pages/Categories.tsx:435, resources/js/pages/Categories.tsx:1017, resources/js/pages/CategoryForm.tsx:644, resources/js/pages/DestinationForm.tsx:534, resources/js/pages/DifficultyLevelForm.tsx:466, resources/js/pages/DifficultyLevels.tsx:361, resources/js/pages/DiscountForm.tsx:2625, resources/js/pages/Discounts.tsx:233, resources/js/pages/Discounts.tsx:315, resources/js/pages/Discounts.tsx:320, resources/js/pages/Discounts.tsx:592, resources/js/pages/ItemForm.tsx:454, resources/js/pages/ItemTypeForm.tsx:540, resources/js/pages/ItemTypes.tsx:207, resources/js/pages/ItemTypes.tsx:439, resources/js/pages/ItemTypes.tsx:805, resources/js/pages/Items.tsx:222, resources/js/pages/Items.tsx:401, resources/js/pages/Items.tsx:774, resources/js/pages/Items.tsx:838, resources/js/pages/ItineraryForm.tsx:1119, resources/js/pages/TravelerCategories.tsx:175, resources/js/pages/TravelerCategories.tsx:680, resources/js/pages/TravelerCategoryForm.tsx:862, resources/js/pages/TripForm.tsx:9050
+# Source: resources/js/components/shared/BulkActionToolbar.tsx:327, resources/js/pages/ActivityForm.tsx:528, resources/js/pages/AdditionalServices.tsx:733, resources/js/pages/AdditionalServicesForm.tsx:572, resources/js/pages/AttributeForm.tsx:1050, resources/js/pages/Categories.tsx:435, resources/js/pages/Categories.tsx:1017, resources/js/pages/CategoryForm.tsx:644, resources/js/pages/DestinationForm.tsx:534, resources/js/pages/DifficultyLevelForm.tsx:466, resources/js/pages/DifficultyLevels.tsx:361, resources/js/pages/DiscountForm.tsx:2625, resources/js/pages/Discounts.tsx:233, resources/js/pages/Discounts.tsx:315, resources/js/pages/Discounts.tsx:320, resources/js/pages/Discounts.tsx:592, resources/js/pages/ItemForm.tsx:454, resources/js/pages/ItemTypeForm.tsx:540, resources/js/pages/ItemTypes.tsx:207, resources/js/pages/ItemTypes.tsx:439, resources/js/pages/ItemTypes.tsx:805, resources/js/pages/Items.tsx:222, resources/js/pages/Items.tsx:401, resources/js/pages/Items.tsx:774, resources/js/pages/Items.tsx:838, resources/js/pages/ItineraryForm.tsx:1119, resources/js/pages/TravelerCategories.tsx:175, resources/js/pages/TravelerCategories.tsx:680, resources/js/pages/TravelerCategoryForm.tsx:862, resources/js/pages/TripForm.tsx:9065
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:29794
 #: assets/admin/dist/js/app.js:33518
@@ -22786,12 +22786,12 @@ msgstr ""
 msgid "Publish Items"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:9003
+# Source: resources/js/pages/TripForm.tsx:9018
 #: assets/admin/dist/js/app.js
 msgid "Publish Trip"
 msgstr ""
 
-# Source: resources/js/pages/Activities.tsx:481, resources/js/pages/Activities.tsx:636, resources/js/pages/Activities.tsx:927, resources/js/pages/AdditionalServices.tsx:322, resources/js/pages/AdditionalServices.tsx:392, resources/js/pages/AdditionalServices.tsx:669, resources/js/pages/AdditionalServicesForm.tsx:586, resources/js/pages/Attributes.tsx:411, resources/js/pages/Attributes.tsx:515, resources/js/pages/Attributes.tsx:661, resources/js/pages/Categories.tsx:746, resources/js/pages/Categories.tsx:1085, resources/js/pages/Destinations.tsx:378, resources/js/pages/Destinations.tsx:454, resources/js/pages/Destinations.tsx:753, resources/js/pages/DifficultyLevels.tsx:625, resources/js/pages/DifficultyLevels.tsx:669, resources/js/pages/ItemTypes.tsx:856, resources/js/pages/Itinerary.tsx:1327, resources/js/pages/Itinerary.tsx:1347, resources/js/pages/Itinerary.tsx:1387, resources/js/pages/Itinerary.tsx:1523, resources/js/pages/TravelerCategories.tsx:732, resources/js/pages/TripConsent.tsx:340, resources/js/pages/TripConsent.tsx:384, resources/js/pages/TripConsentForm.tsx:991, resources/js/pages/TripForm.tsx:8872, resources/js/pages/Trips.tsx:456, resources/js/pages/Trips.tsx:869, resources/js/pages/Trips.tsx:1550
+# Source: resources/js/pages/Activities.tsx:481, resources/js/pages/Activities.tsx:636, resources/js/pages/Activities.tsx:927, resources/js/pages/AdditionalServices.tsx:322, resources/js/pages/AdditionalServices.tsx:392, resources/js/pages/AdditionalServices.tsx:669, resources/js/pages/AdditionalServicesForm.tsx:586, resources/js/pages/Attributes.tsx:411, resources/js/pages/Attributes.tsx:515, resources/js/pages/Attributes.tsx:661, resources/js/pages/Categories.tsx:746, resources/js/pages/Categories.tsx:1085, resources/js/pages/Destinations.tsx:378, resources/js/pages/Destinations.tsx:454, resources/js/pages/Destinations.tsx:753, resources/js/pages/DifficultyLevels.tsx:625, resources/js/pages/DifficultyLevels.tsx:669, resources/js/pages/ItemTypes.tsx:856, resources/js/pages/Itinerary.tsx:1327, resources/js/pages/Itinerary.tsx:1347, resources/js/pages/Itinerary.tsx:1387, resources/js/pages/Itinerary.tsx:1523, resources/js/pages/TravelerCategories.tsx:732, resources/js/pages/TripConsent.tsx:340, resources/js/pages/TripConsent.tsx:384, resources/js/pages/TripConsentForm.tsx:991, resources/js/pages/TripForm.tsx:8887, resources/js/pages/Trips.tsx:456, resources/js/pages/Trips.tsx:869, resources/js/pages/Trips.tsx:1550
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:30082
 #: assets/admin/dist/js/app.js:30427
@@ -22890,7 +22890,7 @@ msgstr ""
 msgid "Quality gear and equipment for outdoor activities."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8364
+# Source: resources/js/pages/TripForm.tsx:8379
 #: assets/admin/dist/js/app.js
 msgid "Question"
 msgstr ""
@@ -23165,7 +23165,7 @@ msgstr ""
 msgid "Recipient email. Use variables or leave empty for default"
 msgstr ""
 
-# Source: resources/js/components/ai/AutoFillTripModal.tsx:547, resources/js/components/ai/BuildItineraryModal.tsx:456, resources/js/pages/TripForm.tsx:4168, resources/js/pages/TripForm.tsx:4246, resources/js/pages/TripForm.tsx:4289, resources/js/pages/TripForm.tsx:4773, resources/js/pages/TripForm.tsx:5440, resources/js/pages/TripForm.tsx:6384, resources/js/pages/TripForm.tsx:6663, resources/js/pages/TripForm.tsx:7212, resources/js/pages/TripForm.tsx:8000, resources/js/pages/TripForm.tsx:8126, resources/js/pages/TripForm.tsx:9212
+# Source: resources/js/components/ai/AutoFillTripModal.tsx:547, resources/js/components/ai/BuildItineraryModal.tsx:456, resources/js/pages/TripForm.tsx:4183, resources/js/pages/TripForm.tsx:4261, resources/js/pages/TripForm.tsx:4304, resources/js/pages/TripForm.tsx:4788, resources/js/pages/TripForm.tsx:5455, resources/js/pages/TripForm.tsx:6399, resources/js/pages/TripForm.tsx:6678, resources/js/pages/TripForm.tsx:7227, resources/js/pages/TripForm.tsx:8015, resources/js/pages/TripForm.tsx:8141, resources/js/pages/TripForm.tsx:9227
 #: assets/admin/dist/js/app.js
 #: app/Services/TripListingPageContextFactory.php:274
 #: templates/setup-wizard/theme-old.php:31
@@ -23181,7 +23181,7 @@ msgstr ""
 msgid "Recommended size: 1200x630 pixels for optimal social media display."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4381
+# Source: resources/js/pages/TripForm.tsx:4396
 #: assets/admin/dist/js/app.js
 msgid "Recommended: 1200x800px"
 msgstr ""
@@ -23471,7 +23471,7 @@ msgstr ""
 msgid "Regular Discount"
 msgstr ""
 
-# Source: resources/js/components/availability/RecurringRules.tsx:692, resources/js/pages/AvailabilityForm.tsx:1129, resources/js/pages/RecurringRuleForm.tsx:1055, resources/js/pages/TripForm.tsx:7258
+# Source: resources/js/components/availability/RecurringRules.tsx:692, resources/js/pages/AvailabilityForm.tsx:1129, resources/js/pages/RecurringRuleForm.tsx:1055, resources/js/pages/TripForm.tsx:7273
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:60515
 #: assets/dist/js/AvailabilityForm-amQiiorh.js:914
@@ -23552,7 +23552,7 @@ msgstr ""
 msgid "Reminder starts closer to the tour"
 msgstr ""
 
-# Source: resources/js/components/ui/icon-picker.tsx:521, resources/js/pages/BookingForm.tsx:1808, resources/js/pages/DiscountForm.tsx:1795, resources/js/pages/DiscountForm.tsx:2179, resources/js/pages/DiscountForm.tsx:2331, resources/js/pages/Team.tsx:764, resources/js/pages/TripForm.tsx:7018, resources/js/pages/WhiteLabel.tsx:1025
+# Source: resources/js/components/ui/icon-picker.tsx:521, resources/js/pages/BookingForm.tsx:1808, resources/js/pages/DiscountForm.tsx:1795, resources/js/pages/DiscountForm.tsx:2179, resources/js/pages/DiscountForm.tsx:2331, resources/js/pages/Team.tsx:764, resources/js/pages/TripForm.tsx:7033, resources/js/pages/WhiteLabel.tsx:1025
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:32762
 #: assets/dist/js/BookingForm-G9U_E5X6.js:1608
@@ -23583,7 +23583,7 @@ msgstr ""
 msgid "Remove Field"
 msgstr ""
 
-# Source: resources/js/pages/AvailabilityForm.tsx:1412, resources/js/pages/RecurringRuleForm.tsx:1375, resources/js/pages/TripForm.tsx:7658
+# Source: resources/js/pages/AvailabilityForm.tsx:1412, resources/js/pages/RecurringRuleForm.tsx:1375, resources/js/pages/TripForm.tsx:7673
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/AvailabilityForm-amQiiorh.js:1116
 #: assets/dist/js/RecurringRuleForm-CY2V3hrG.js:1166
@@ -23624,7 +23624,7 @@ msgstr ""
 msgid "Remove from team"
 msgstr ""
 
-# Source: resources/js/pages/Settings.tsx:9427, resources/js/pages/TripForm.tsx:4336
+# Source: resources/js/pages/Settings.tsx:9427, resources/js/pages/TripForm.tsx:4351
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/Settings-C5RvnmMN.js:7938
 msgid "Remove image"
@@ -23656,7 +23656,7 @@ msgstr ""
 msgid "Remove row"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5847
+# Source: resources/js/pages/TripForm.tsx:5862
 #: assets/admin/dist/js/app.js
 msgid "Remove time slot"
 msgstr ""
@@ -23872,7 +23872,7 @@ msgstr ""
 msgid "Require signature"
 msgstr ""
 
-# Source: resources/js/components/trip-form/TripAttributesSection.tsx:580, resources/js/pages/AdditionalServices.tsx:541, resources/js/pages/Attributes.tsx:337, resources/js/pages/Attributes.tsx:716, resources/js/pages/Settings.tsx:1919, resources/js/pages/Settings.tsx:2361, resources/js/pages/TripConsentForm.tsx:1193, resources/js/pages/TripForm.tsx:4001, resources/js/pages/TripForm.tsx:4074, resources/js/pages/TripForm.tsx:4963, resources/js/pages/TripForm.tsx:5224, resources/js/pages/premium-pages/TripConsent.tsx:263
+# Source: resources/js/components/trip-form/TripAttributesSection.tsx:580, resources/js/pages/AdditionalServices.tsx:541, resources/js/pages/Attributes.tsx:337, resources/js/pages/Attributes.tsx:716, resources/js/pages/Settings.tsx:1919, resources/js/pages/Settings.tsx:2361, resources/js/pages/TripConsentForm.tsx:1193, resources/js/pages/TripForm.tsx:4016, resources/js/pages/TripForm.tsx:4089, resources/js/pages/TripForm.tsx:4978, resources/js/pages/TripForm.tsx:5239, resources/js/pages/premium-pages/TripConsent.tsx:263
 #: assets/admin/dist/js/app.js
 #: templates/partials/pricing-summary.php:114
 #: assets/admin/dist/js/app.js:75436
@@ -24271,7 +24271,7 @@ msgstr ""
 msgid "Revert"
 msgstr ""
 
-# Source: resources/js/components/ai/CreateTripWithAiWizard.tsx:1053, resources/js/pages/Reviews.tsx:364, resources/js/pages/Reviews.tsx:677, resources/js/pages/Reviews.tsx:761, resources/js/pages/Settings.tsx:4119, resources/js/pages/TripForm.tsx:8868, resources/js/pages/Trips.tsx:471, resources/js/pages/Trips.tsx:873, resources/js/pages/Trips.tsx:1552
+# Source: resources/js/components/ai/CreateTripWithAiWizard.tsx:1053, resources/js/pages/Reviews.tsx:364, resources/js/pages/Reviews.tsx:677, resources/js/pages/Reviews.tsx:761, resources/js/pages/Settings.tsx:4119, resources/js/pages/TripForm.tsx:8883, resources/js/pages/Trips.tsx:471, resources/js/pages/Trips.tsx:873, resources/js/pages/Trips.tsx:1552
 #: assets/admin/dist/js/app.js
 #: templates/partials/single-trip/hero.php:66
 #: assets/admin/dist/js/app.js:28232
@@ -24384,17 +24384,17 @@ msgstr ""
 msgid "Reviews will appear here once customers submit and they are approved"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:9539
+# Source: resources/js/pages/TripForm.tsx:9554
 #: assets/admin/dist/js/app.js
 msgid "Revision"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:3675
+# Source: resources/js/pages/TripForm.tsx:3690
 #: assets/admin/dist/js/app.js
 msgid "Revision feature is coming soon"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8945
+# Source: resources/js/pages/TripForm.tsx:8960
 #: assets/admin/dist/js/app.js
 msgid "Revisions"
 msgstr ""
@@ -24589,7 +24589,7 @@ msgstr ""
 msgid "SEO"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:2640, resources/js/pages/TripForm.tsx:8120
+# Source: resources/js/pages/TripForm.tsx:2643, resources/js/pages/TripForm.tsx:8135
 #: assets/admin/dist/js/app.js
 msgid "SEO & Marketing"
 msgstr ""
@@ -24624,7 +24624,7 @@ msgstr ""
 msgid "SEO Keywords"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8255
+# Source: resources/js/pages/TripForm.tsx:8270
 #: assets/admin/dist/js/app.js
 msgid "SEO Preview"
 msgstr ""
@@ -24835,7 +24835,7 @@ msgstr ""
 msgid "Save Departure"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8983
+# Source: resources/js/pages/TripForm.tsx:8998
 #: assets/admin/dist/js/app.js
 msgid "Save Draft"
 msgstr ""
@@ -24880,7 +24880,7 @@ msgstr ""
 msgid "Save allowlist"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:9019
+# Source: resources/js/pages/TripForm.tsx:9034
 #: assets/admin/dist/js/app.js
 msgid "Save as Draft"
 msgstr ""
@@ -24914,7 +24914,7 @@ msgstr ""
 msgid "Save email settings"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:9029
+# Source: resources/js/pages/TripForm.tsx:9044
 #: assets/admin/dist/js/app.js
 msgid "Save for Review"
 msgstr ""
@@ -24925,7 +24925,7 @@ msgstr ""
 msgid "Save limits"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8058
+# Source: resources/js/pages/TripForm.tsx:8073
 #: assets/admin/dist/js/app.js
 msgid "Save the trip first to enable AI itinerary generation — the agent needs a trip ID to attach days to."
 msgstr ""
@@ -25064,17 +25064,17 @@ msgstr ""
 msgid "Scenario"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8481
+# Source: resources/js/pages/TripForm.tsx:8496
 #: assets/admin/dist/js/app.js
 msgid "Schedule Publish Date"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8500
+# Source: resources/js/pages/TripForm.tsx:8515
 #: assets/admin/dist/js/app.js
 msgid "Schedule Unpublish Date"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8425
+# Source: resources/js/pages/TripForm.tsx:8440
 #: assets/admin/dist/js/app.js
 msgid "Schedule automatic publishing and unpublishing for seasonal trips. Optional but useful for managing trip lifecycles."
 msgstr ""
@@ -25107,7 +25107,7 @@ msgstr ""
 msgid "Scheduled Payments is a premium module. Upgrade to Yatra Pro to collect booking balances automatically."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8470
+# Source: resources/js/pages/TripForm.tsx:8485
 #: assets/admin/dist/js/app.js
 msgid "Scheduled Publishing"
 msgstr ""
@@ -25231,12 +25231,12 @@ msgstr ""
 msgid "Search Bar Fields"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8144
+# Source: resources/js/pages/TripForm.tsx:8159
 #: assets/admin/dist/js/app.js
 msgid "Search Engine Optimization"
 msgstr ""
 
-# Source: resources/js/pages/Activities.tsx:652, resources/js/pages/TripForm.tsx:6562
+# Source: resources/js/pages/Activities.tsx:652, resources/js/pages/TripForm.tsx:6577
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:31813
 msgid "Search activities..."
@@ -25364,7 +25364,7 @@ msgstr ""
 msgid "Search categories"
 msgstr ""
 
-# Source: resources/js/pages/TravelerCategories.tsx:704, resources/js/pages/TripForm.tsx:6449
+# Source: resources/js/pages/TravelerCategories.tsx:704, resources/js/pages/TripForm.tsx:6464
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:58784
 msgid "Search categories..."
@@ -25404,7 +25404,7 @@ msgstr ""
 msgid "Search dates, locations..."
 msgstr ""
 
-# Source: resources/js/pages/Destinations.tsx:470, resources/js/pages/TripForm.tsx:4829
+# Source: resources/js/pages/Destinations.tsx:470, resources/js/pages/TripForm.tsx:4844
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:34004
 msgid "Search destinations..."
@@ -25428,7 +25428,7 @@ msgstr ""
 msgid "Search enquiries..."
 msgstr ""
 
-# Source: resources/js/pages/AvailabilityForm.tsx:981, resources/js/pages/RecurringRuleForm.tsx:2396, resources/js/pages/TripForm.tsx:5259
+# Source: resources/js/pages/AvailabilityForm.tsx:981, resources/js/pages/RecurringRuleForm.tsx:2396, resources/js/pages/TripForm.tsx:5274
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/AvailabilityForm-amQiiorh.js:791
 #: assets/dist/js/RecurringRuleForm-CY2V3hrG.js:1965
@@ -25441,7 +25441,7 @@ msgstr ""
 msgid "Search for location..."
 msgstr ""
 
-# Source: resources/js/pages/AvailabilityForm.tsx:900, resources/js/pages/RecurringRuleForm.tsx:2304, resources/js/pages/TripForm.tsx:4998
+# Source: resources/js/pages/AvailabilityForm.tsx:900, resources/js/pages/RecurringRuleForm.tsx:2304, resources/js/pages/TripForm.tsx:5013
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/AvailabilityForm-amQiiorh.js:726
 #: assets/dist/js/RecurringRuleForm-CY2V3hrG.js:1896
@@ -25554,12 +25554,12 @@ msgstr ""
 msgid "Season Start (Departure Date)"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8523
+# Source: resources/js/pages/TripForm.tsx:8538
 #: assets/admin/dist/js/app.js
 msgid "Seasonal Auto-Enable/Disable"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5542
+# Source: resources/js/pages/TripForm.tsx:5557
 #: assets/admin/dist/js/app.js
 msgid "Seasonal Availability Notes"
 msgstr ""
@@ -25624,7 +25624,7 @@ msgstr ""
 msgid "Section Title"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8832
+# Source: resources/js/pages/TripForm.tsx:8847
 #: assets/admin/dist/js/app.js
 msgid "Section content coming soon..."
 msgstr ""
@@ -25691,17 +25691,17 @@ msgstr ""
 msgid "Select Country"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4348
+# Source: resources/js/pages/TripForm.tsx:4363
 #: assets/admin/dist/js/app.js
 msgid "Select Featured Image"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:2959, resources/js/pages/TripForm.tsx:7122
+# Source: resources/js/pages/TripForm.tsx:2962, resources/js/pages/TripForm.tsx:7137
 #: assets/admin/dist/js/app.js
 msgid "Select File"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:2826
+# Source: resources/js/pages/TripForm.tsx:2829
 #: assets/admin/dist/js/app.js
 msgid "Select Gallery Images"
 msgstr ""
@@ -25774,7 +25774,7 @@ msgstr ""
 msgid "Select a bulk action first."
 msgstr ""
 
-# Source: resources/js/pages/AvailabilityForm.tsx:1292, resources/js/pages/DiscountForm.tsx:2046, resources/js/pages/RecurringRuleForm.tsx:1206, resources/js/pages/RecurringRuleForm.tsx:1839, resources/js/pages/TripForm.tsx:7466
+# Source: resources/js/pages/AvailabilityForm.tsx:1292, resources/js/pages/DiscountForm.tsx:2046, resources/js/pages/RecurringRuleForm.tsx:1206, resources/js/pages/RecurringRuleForm.tsx:1839, resources/js/pages/TripForm.tsx:7481
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/AvailabilityForm-amQiiorh.js:1044
 #: assets/dist/js/DiscountForm-nCjvGJdl.js:1582
@@ -25844,7 +25844,7 @@ msgstr ""
 msgid "Select a type..."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6561
+# Source: resources/js/pages/TripForm.tsx:6576
 #: assets/admin/dist/js/app.js
 msgid "Select activities..."
 msgstr ""
@@ -25857,12 +25857,12 @@ msgstr ""
 msgid "Select all"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6580
+# Source: resources/js/pages/TripForm.tsx:6595
 #: assets/admin/dist/js/app.js
 msgid "Select all activities included in this trip"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4882
+# Source: resources/js/pages/TripForm.tsx:4897
 #: assets/admin/dist/js/app.js
 msgid "Select all destinations included in this trip"
 msgstr ""
@@ -25912,7 +25912,7 @@ msgstr ""
 msgid "Select an icon from the library or upload a custom image for this service."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8675
+# Source: resources/js/pages/TripForm.tsx:8690
 #: assets/admin/dist/js/app.js
 msgid "Select an icon or upload an image for this tab"
 msgstr ""
@@ -26020,7 +26020,7 @@ msgstr ""
 msgid "Select brand logo"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6448
+# Source: resources/js/pages/TripForm.tsx:6463
 #: assets/admin/dist/js/app.js
 msgid "Select categories..."
 msgstr ""
@@ -26037,7 +26037,7 @@ msgstr ""
 msgid "Select currency..."
 msgstr ""
 
-# Source: resources/js/pages/Availability.tsx:1113, resources/js/pages/AvailabilityForm.tsx:697, resources/js/pages/BookingForm.tsx:1954, resources/js/pages/EnquiryForm.tsx:366, resources/js/pages/TripForm.tsx:5475, resources/js/pages/TripForm.tsx:5497, resources/js/pages/TripForm.tsx:8488, resources/js/pages/TripForm.tsx:8507, resources/js/pages/TripForm.tsx:8564, resources/js/pages/TripForm.tsx:8583
+# Source: resources/js/pages/Availability.tsx:1113, resources/js/pages/AvailabilityForm.tsx:697, resources/js/pages/BookingForm.tsx:1954, resources/js/pages/EnquiryForm.tsx:366, resources/js/pages/TripForm.tsx:5490, resources/js/pages/TripForm.tsx:5512, resources/js/pages/TripForm.tsx:8503, resources/js/pages/TripForm.tsx:8522, resources/js/pages/TripForm.tsx:8579, resources/js/pages/TripForm.tsx:8598
 #: assets/admin/dist/js/app.js
 #: templates/partials/single-trip/content-sidebar.php:286
 #: templates/partials/single-trip/content-sidebar.php:406
@@ -26083,12 +26083,12 @@ msgstr ""
 msgid "Select departure time"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4828
+# Source: resources/js/pages/TripForm.tsx:4843
 #: assets/admin/dist/js/app.js
 msgid "Select destinations..."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6492
+# Source: resources/js/pages/TripForm.tsx:6507
 #: assets/admin/dist/js/app.js
 msgid "Select difficulty"
 msgstr ""
@@ -26145,7 +26145,7 @@ msgstr ""
 msgid "Select meal plan"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6467
+# Source: resources/js/pages/TripForm.tsx:6482
 #: assets/admin/dist/js/app.js
 msgid "Select one or more categories for this trip"
 msgstr ""
@@ -26410,7 +26410,7 @@ msgstr ""
 msgid "Selected discounts deleted successfully"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:7093
+# Source: resources/js/pages/TripForm.tsx:7108
 #: assets/admin/dist/js/app.js
 msgid "Selected file"
 msgstr ""
@@ -27021,7 +27021,7 @@ msgstr ""
 msgid "Set a password now"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:7267
+# Source: resources/js/pages/TripForm.tsx:7282
 #: assets/admin/dist/js/app.js
 msgid "Set a single price for all travelers"
 msgstr ""
@@ -27031,7 +27031,7 @@ msgstr ""
 msgid "Set as Draft"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:7313
+# Source: resources/js/pages/TripForm.tsx:7328
 #: assets/admin/dist/js/app.js
 msgid "Set different prices for each traveler category"
 msgstr ""
@@ -27041,12 +27041,12 @@ msgstr ""
 msgid "Set different prices for early bookings, last-minute deals, and peak seasons."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4907
+# Source: resources/js/pages/TripForm.tsx:4922
 #: assets/admin/dist/js/app.js
 msgid "Set precise starting and ending points with location names and GPS coordinates. Use manual entry or visual map selection for maximum accuracy."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:7218
+# Source: resources/js/pages/TripForm.tsx:7233
 #: assets/admin/dist/js/app.js
 msgid "Set pricing for different traveler types and payment options. Optional for drafts, but adding pricing now makes publishing easier."
 msgstr ""
@@ -27074,7 +27074,7 @@ msgstr ""
 msgid "Set pricing per person, per booking, or per day with multiple options."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4855
+# Source: resources/js/pages/TripForm.tsx:4870
 #: assets/admin/dist/js/app.js
 msgid "Set status to \"Published\""
 msgstr ""
@@ -27101,7 +27101,7 @@ msgstr ""
 msgid "Set up automatic emails based on booking status, payments, and customer actions."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5446
+# Source: resources/js/pages/TripForm.tsx:5461
 #: assets/admin/dist/js/app.js
 msgid "Set your trip's availability period, capacity limits, and booking requirements. This helps automate bookings and prevent overbooking."
 msgstr ""
@@ -27185,7 +27185,7 @@ msgstr ""
 msgid "Share of bookings that landed in confirmed or completed."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4163, resources/js/pages/TripForm.tsx:4198
+# Source: resources/js/pages/TripForm.tsx:4178, resources/js/pages/TripForm.tsx:4213
 #: assets/admin/dist/js/app.js
 msgid "Short Description"
 msgstr ""
@@ -27235,7 +27235,7 @@ msgstr ""
 msgid "Show Savings Badge"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4154
+# Source: resources/js/pages/TripForm.tsx:4169
 #: assets/admin/dist/js/app.js
 msgid "Show URL Preview"
 msgstr ""
@@ -27483,7 +27483,7 @@ msgstr ""
 msgid "Silver"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8896
+# Source: resources/js/pages/TripForm.tsx:8911
 #: assets/admin/dist/js/app.js
 msgid "Simple"
 msgstr ""
@@ -27512,7 +27512,7 @@ msgstr ""
 msgid "Single Day"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4527
+# Source: resources/js/pages/TripForm.tsx:4542
 #: assets/admin/dist/js/app.js
 msgid "Single Day Trip"
 msgstr ""
@@ -27531,17 +27531,17 @@ msgstr ""
 msgid "Single day"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4660
+# Source: resources/js/pages/TripForm.tsx:4675
 #: assets/admin/dist/js/app.js
 msgid "Single day trips are always 1 day"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4700
+# Source: resources/js/pages/TripForm.tsx:4715
 #: assets/admin/dist/js/app.js
 msgid "Single day trips have 0 nights (no overnight stay)"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5884
+# Source: resources/js/pages/TripForm.tsx:5899
 #: assets/admin/dist/js/app.js
 msgid "Single departure time for all bookings when multiple time slots are not enabled."
 msgstr ""
@@ -27620,7 +27620,7 @@ msgstr ""
 msgid "Slug auto-generated from the name (yatra_* prefix added)."
 msgstr ""
 
-# Source: resources/js/pages/ActivityForm.tsx:193, resources/js/pages/CategoryForm.tsx:253, resources/js/pages/DestinationForm.tsx:193, resources/js/pages/DifficultyLevelForm.tsx:150, resources/js/pages/ItemForm.tsx:172, resources/js/pages/ItemTypeForm.tsx:173, resources/js/pages/TravelerCategoryForm.tsx:188, resources/js/pages/TripForm.tsx:3268, resources/js/pages/Trips.tsx:630
+# Source: resources/js/pages/ActivityForm.tsx:193, resources/js/pages/CategoryForm.tsx:253, resources/js/pages/DestinationForm.tsx:193, resources/js/pages/DifficultyLevelForm.tsx:150, resources/js/pages/ItemForm.tsx:172, resources/js/pages/ItemTypeForm.tsx:173, resources/js/pages/TravelerCategoryForm.tsx:188, resources/js/pages/TripForm.tsx:3271, resources/js/pages/Trips.tsx:630
 #: assets/admin/dist/js/app.js
 #: app/Validators/ActivityValidator.php:47
 #: app/Validators/ActivityValidator.php:114
@@ -27639,7 +27639,7 @@ msgstr ""
 msgid "Slug can only contain letters, numbers, and hyphens"
 msgstr ""
 
-# Source: resources/js/pages/ActivityForm.tsx:191, resources/js/pages/CategoryForm.tsx:251, resources/js/pages/DestinationForm.tsx:191, resources/js/pages/DifficultyLevelForm.tsx:148, resources/js/pages/ItemForm.tsx:170, resources/js/pages/ItemTypeForm.tsx:171, resources/js/pages/TravelerCategoryForm.tsx:186, resources/js/pages/TripForm.tsx:3266
+# Source: resources/js/pages/ActivityForm.tsx:191, resources/js/pages/CategoryForm.tsx:251, resources/js/pages/DestinationForm.tsx:191, resources/js/pages/DifficultyLevelForm.tsx:148, resources/js/pages/ItemForm.tsx:170, resources/js/pages/ItemTypeForm.tsx:171, resources/js/pages/TravelerCategoryForm.tsx:186, resources/js/pages/TripForm.tsx:3269
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:33235
 #: assets/admin/dist/js/app.js:34546
@@ -27762,7 +27762,7 @@ msgstr ""
 msgid "Spam"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8758
+# Source: resources/js/pages/TripForm.tsx:8773
 #: assets/admin/dist/js/app.js
 msgid "Special"
 msgstr ""
@@ -27797,7 +27797,7 @@ msgstr ""
 msgid "Special Requirements"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6616
+# Source: resources/js/pages/TripForm.tsx:6631
 #: assets/admin/dist/js/app.js
 msgid "Special designation for frontend display and promotion"
 msgstr ""
@@ -27837,7 +27837,7 @@ msgstr ""
 msgid "Specify the age range for this category (e.g., 0-4 for Infant, 5-17 for Child, 18+ for Adult). Leave empty if no age restriction."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4778
+# Source: resources/js/pages/TripForm.tsx:4793
 #: assets/admin/dist/js/app.js
 msgid "Specify where your trip takes place, including destinations, coordinates, and key landmarks."
 msgstr ""
@@ -27903,7 +27903,7 @@ msgstr ""
 msgid "Start Date (Optional)"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:3972
+# Source: resources/js/pages/TripForm.tsx:3987
 #: assets/admin/dist/js/app.js
 msgid "Start Here"
 msgstr ""
@@ -27968,13 +27968,13 @@ msgstr ""
 msgid "Starter plan"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4957, resources/js/pages/ViewDeparture.tsx:595
+# Source: resources/js/pages/TripForm.tsx:4972, resources/js/pages/ViewDeparture.tsx:595
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:64232
 msgid "Starting Location"
 msgstr ""
 
-# Source: resources/js/pages/AvailabilityForm.tsx:868, resources/js/pages/RecurringRuleForm.tsx:2271, resources/js/pages/TripForm.tsx:4925
+# Source: resources/js/pages/AvailabilityForm.tsx:868, resources/js/pages/RecurringRuleForm.tsx:2271, resources/js/pages/TripForm.tsx:4940
 #: assets/admin/dist/js/app.js
 #: app/Controllers/TripController.php:2162
 #: app/Controllers/TripController.php:2175
@@ -28233,7 +28233,7 @@ msgstr ""
 msgid "Stores the full POST body + receiver response on every attempt (90-day retention). Recommended for debugging."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8755
+# Source: resources/js/pages/TripForm.tsx:8770
 #: assets/admin/dist/js/app.js
 msgid "Story"
 msgstr ""
@@ -28411,22 +28411,22 @@ msgstr ""
 msgid "Supported OTAs:"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:9061
+# Source: resources/js/pages/TripForm.tsx:9076
 #: assets/admin/dist/js/app.js
 msgid "Suspend"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8874
+# Source: resources/js/pages/TripForm.tsx:8889
 #: assets/admin/dist/js/app.js
 msgid "Suspended"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8888
+# Source: resources/js/pages/TripForm.tsx:8903
 #: assets/admin/dist/js/app.js
 msgid "Switch to Advanced Mode"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8889
+# Source: resources/js/pages/TripForm.tsx:8904
 #: assets/admin/dist/js/app.js
 msgid "Switch to Simple Mode"
 msgstr ""
@@ -28671,17 +28671,17 @@ msgstr ""
 msgid "TXN"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8674, resources/js/pages/TripForm.tsx:8686
+# Source: resources/js/pages/TripForm.tsx:8689, resources/js/pages/TripForm.tsx:8701
 #: assets/admin/dist/js/app.js
 msgid "Tab Icon"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8661
+# Source: resources/js/pages/TripForm.tsx:8676
 #: assets/admin/dist/js/app.js
 msgid "Tab Label"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8916
+# Source: resources/js/pages/TripForm.tsx:8931
 #: assets/admin/dist/js/app.js
 msgid "Take a Tour"
 msgstr ""
@@ -28807,7 +28807,7 @@ msgstr ""
 msgid "Team members see only what their role allows."
 msgstr ""
 
-# Source: resources/js/components/shared/Table.tsx:350, resources/js/pages/TripForm.tsx:3886
+# Source: resources/js/components/shared/Table.tsx:350, resources/js/pages/TripForm.tsx:3901
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:29192
 msgid "Technical details"
@@ -28824,17 +28824,17 @@ msgstr ""
 msgid "Tell AI about this trip"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6882
+# Source: resources/js/pages/TripForm.tsx:6897
 #: assets/admin/dist/js/app.js
 msgid "Tell an engaging story about this trip. Use storytelling to connect with potential travelers emotionally"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6846
+# Source: resources/js/pages/TripForm.tsx:6861
 #: assets/admin/dist/js/app.js
 msgid "Tell an engaging story and highlight what makes this trip unique"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6229
+# Source: resources/js/pages/TripForm.tsx:6244
 #: assets/admin/dist/js/app.js
 msgid "Tells travelers which meals are included with lodging (e.g. breakfast only vs full board)."
 msgstr ""
@@ -28992,7 +28992,7 @@ msgstr ""
 msgid "Test webhook"
 msgstr ""
 
-# Source: resources/js/components/trip-form/TestimonialsSelector.tsx:113, resources/js/components/trip-form/TestimonialsSelector.tsx:132, resources/js/pages/TripForm.tsx:8761
+# Source: resources/js/components/trip-form/TestimonialsSelector.tsx:113, resources/js/components/trip-form/TestimonialsSelector.tsx:132, resources/js/pages/TripForm.tsx:8776
 #: assets/admin/dist/js/app.js
 #: templates/partials/single-trip/content-testimonials.php:15
 msgid "Testimonials"
@@ -29096,7 +29096,7 @@ msgstr ""
 msgid "The magic-link sent to %s will stop working immediately. Anyone who already clicked the link before now has already accepted (you can confirm in the audit log)."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4294
+# Source: resources/js/pages/TripForm.tsx:4309
 #: assets/admin/dist/js/app.js
 msgid "The main image that represents your trip. This appears in listings and as the hero image on the trip page."
 msgstr ""
@@ -29166,7 +29166,7 @@ msgstr ""
 msgid "The trip cannot be changed when editing a day."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4079
+# Source: resources/js/pages/TripForm.tsx:4094
 #: assets/admin/dist/js/app.js
 msgid "The web address for your trip page. Auto-generated from your title, but you can customize it."
 msgstr ""
@@ -29196,12 +29196,12 @@ msgstr ""
 msgid "These options apply to trip review forms on the frontend (who may review, moderation, minimum stars, and reminder scheduling)."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5654
+# Source: resources/js/pages/TripForm.tsx:5669
 #: assets/admin/dist/js/app.js
 msgid "These settings apply ONLY when your trip has ZERO availability dates AND ZERO recurring rules. They provide defaults for flexible booking scenarios."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5636
+# Source: resources/js/pages/TripForm.tsx:5651
 #: assets/admin/dist/js/app.js
 msgid "These settings are used when the trip has no availability dates or recurring rules set. They provide default values for flexible booking."
 msgstr ""
@@ -29223,7 +29223,7 @@ msgstr ""
 msgid "This attribute has no options configured. Edit the attribute to add choices."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:3001
+# Source: resources/js/pages/TripForm.tsx:3004
 #: assets/admin/dist/js/app.js
 msgid "This category already has pricing set"
 msgstr ""
@@ -29420,7 +29420,7 @@ msgstr ""
 msgid "This rewrites the live template with v%d's contents. The current state is saved as a new version first so you can roll back this restore later."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:9190, resources/js/pages/TripForm.tsx:9263, resources/js/pages/TripForm.tsx:9340
+# Source: resources/js/pages/TripForm.tsx:9205, resources/js/pages/TripForm.tsx:9278, resources/js/pages/TripForm.tsx:9355
 #: assets/admin/dist/js/app.js
 msgid "This section has errors"
 msgstr ""
@@ -29559,7 +29559,7 @@ msgstr ""
 msgid "Thursday"
 msgstr ""
 
-# Source: resources/js/components/availability/AvailabilityCalendar.tsx:351, resources/js/pages/Departures.tsx:826, resources/js/pages/PastDepartures.tsx:217, resources/js/pages/TripForm.tsx:5783
+# Source: resources/js/components/availability/AvailabilityCalendar.tsx:351, resources/js/pages/Departures.tsx:826, resources/js/pages/PastDepartures.tsx:217, resources/js/pages/TripForm.tsx:5798
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:59904
 #: assets/admin/dist/js/app.js:62937
@@ -29584,7 +29584,7 @@ msgstr ""
 msgid "Time Slots"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5711
+# Source: resources/js/pages/TripForm.tsx:5726
 #: assets/admin/dist/js/app.js
 msgid "Time Slots Configuration"
 msgstr ""
@@ -29650,7 +29650,7 @@ msgstr ""
 msgid "Tips for Included/Excluded Items:"
 msgstr ""
 
-# Source: resources/js/components/trips/TripsTable.tsx:119, resources/js/pages/TripConsentForm.tsx:1406, resources/js/pages/TripForm.tsx:6963, resources/js/pages/Trips.tsx:1566
+# Source: resources/js/components/trips/TripsTable.tsx:119, resources/js/pages/TripConsentForm.tsx:1406, resources/js/pages/TripForm.tsx:6978, resources/js/pages/Trips.tsx:1566
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:30999
 #: assets/dist/blocks/activity.js:241
@@ -29669,12 +29669,12 @@ msgstr ""
 msgid "Title displayed on the booking page"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4053
+# Source: resources/js/pages/TripForm.tsx:4068
 #: assets/admin/dist/js/app.js
 msgid "Title is longer than recommended for SEO (60 characters)"
 msgstr ""
 
-# Source: resources/js/hooks/useItineraryFormValidation.ts:89, resources/js/pages/TripForm.tsx:3262
+# Source: resources/js/hooks/useItineraryFormValidation.ts:89, resources/js/pages/TripForm.tsx:3265
 #: assets/admin/dist/js/app.js
 #: app/Services/ItineraryService.php:44
 #: app/Validators/TripValidator.php:25
@@ -29699,7 +29699,7 @@ msgstr ""
 msgid "To admin"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4842
+# Source: resources/js/pages/TripForm.tsx:4857
 #: assets/admin/dist/js/app.js
 msgid "To create destinations:"
 msgstr ""
@@ -30057,7 +30057,7 @@ msgstr ""
 msgid "Track booking conversions with Facebook Pixel. Retarget visitors who viewed trips and optimize ad campaigns with accurate conversion data."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8436
+# Source: resources/js/pages/TripForm.tsx:8451
 #: assets/admin/dist/js/app.js
 msgid "Track changes and version history"
 msgstr ""
@@ -30114,7 +30114,7 @@ msgstr ""
 msgid "Transform your customer communication with intelligent email automation and drive more bookings with Yatra Pro."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6267
+# Source: resources/js/pages/TripForm.tsx:6282
 #: assets/admin/dist/js/app.js
 #: includes/helpers.php:715
 #: templates/partials/single-trip/content-important-info.php:148
@@ -30122,12 +30122,12 @@ msgstr ""
 msgid "Transportation"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6345
+# Source: resources/js/pages/TripForm.tsx:6360
 #: assets/admin/dist/js/app.js
 msgid "Transportation Details"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6287
+# Source: resources/js/pages/TripForm.tsx:6302
 #: assets/admin/dist/js/app.js
 #: templates/partials/single-trip/content-important-info.php:154
 #: templates/pdf/itinerary.php:784
@@ -30309,7 +30309,7 @@ msgstr ""
 msgid "Traveler Category"
 msgstr ""
 
-# Source: resources/js/pages/AvailabilityForm.tsx:1223, resources/js/pages/RecurringRuleForm.tsx:1129, resources/js/pages/RecurringRuleForm.tsx:1775, resources/js/pages/TripForm.tsx:7400
+# Source: resources/js/pages/AvailabilityForm.tsx:1223, resources/js/pages/RecurringRuleForm.tsx:1129, resources/js/pages/RecurringRuleForm.tsx:1775, resources/js/pages/TripForm.tsx:7415
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/AvailabilityForm-amQiiorh.js:987
 #: assets/dist/js/RecurringRuleForm-CY2V3hrG.js:995
@@ -30362,7 +30362,7 @@ msgstr ""
 msgid "Traveler(s)"
 msgstr ""
 
-# Source: resources/js/components/availability/RecurringRules.tsx:691, resources/js/pages/AvailabilityForm.tsx:1128, resources/js/pages/RecurringRuleForm.tsx:1054, resources/js/pages/TripForm.tsx:7304
+# Source: resources/js/components/availability/RecurringRules.tsx:691, resources/js/pages/AvailabilityForm.tsx:1128, resources/js/pages/RecurringRuleForm.tsx:1054, resources/js/pages/TripForm.tsx:7319
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:60515
 #: assets/dist/js/AvailabilityForm-amQiiorh.js:914
@@ -30370,7 +30370,7 @@ msgstr ""
 msgid "Traveler-Based Pricing"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:7753
+# Source: resources/js/pages/TripForm.tsx:7768
 #: assets/admin/dist/js/app.js
 msgid "Traveler-based pricing only"
 msgstr ""
@@ -30457,7 +30457,7 @@ msgstr ""
 msgid "Trigger this event in Yatra (create a booking, submit an enquiry, etc.). The real payload will appear here automatically."
 msgstr ""
 
-# Source: resources/js/components/itinerary/DayFormFields.tsx:54, resources/js/pages/AbandonedRecovery.tsx:384, resources/js/pages/AbandonedRecovery.tsx:1500, resources/js/pages/Availability.tsx:1202, resources/js/pages/BookingForm.tsx:1159, resources/js/pages/Bookings.tsx:588, resources/js/pages/Bookings.tsx:604, resources/js/pages/Bookings.tsx:668, resources/js/pages/ChannelManager.tsx:1663, resources/js/pages/ChannelManager.tsx:2140, resources/js/pages/Departures.tsx:802, resources/js/pages/Departures.tsx:1106, resources/js/pages/Departures.tsx:1351, resources/js/pages/Enquiries.tsx:262, resources/js/pages/Enquiries.tsx:668, resources/js/pages/Enquiries.tsx:796, resources/js/pages/Itinerary.tsx:1594, resources/js/pages/RecurringRuleForm.tsx:632, resources/js/pages/ReviewForm.tsx:304, resources/js/pages/Reviews.tsx:351, resources/js/pages/Reviews.tsx:541, resources/js/pages/Reviews.tsx:636, resources/js/pages/Travelers.tsx:296, resources/js/pages/Travelers.tsx:558, resources/js/pages/TripForm.tsx:9690, resources/js/pages/Trips.tsx:740, resources/js/pages/Trips.tsx:952, resources/js/pages/ViewBooking.tsx:538, resources/js/pages/ViewCustomer.tsx:611, resources/js/pages/ViewEnquiry.tsx:430, resources/js/pages/ViewPayment.tsx:454, resources/js/pages/ViewReview.tsx:320, resources/js/pages/account/BookingDetails.tsx:295
+# Source: resources/js/components/itinerary/DayFormFields.tsx:54, resources/js/pages/AbandonedRecovery.tsx:384, resources/js/pages/AbandonedRecovery.tsx:1500, resources/js/pages/Availability.tsx:1202, resources/js/pages/BookingForm.tsx:1159, resources/js/pages/Bookings.tsx:588, resources/js/pages/Bookings.tsx:604, resources/js/pages/Bookings.tsx:668, resources/js/pages/ChannelManager.tsx:1663, resources/js/pages/ChannelManager.tsx:2140, resources/js/pages/Departures.tsx:802, resources/js/pages/Departures.tsx:1106, resources/js/pages/Departures.tsx:1351, resources/js/pages/Enquiries.tsx:262, resources/js/pages/Enquiries.tsx:668, resources/js/pages/Enquiries.tsx:796, resources/js/pages/Itinerary.tsx:1594, resources/js/pages/RecurringRuleForm.tsx:632, resources/js/pages/ReviewForm.tsx:304, resources/js/pages/Reviews.tsx:351, resources/js/pages/Reviews.tsx:541, resources/js/pages/Reviews.tsx:636, resources/js/pages/Travelers.tsx:296, resources/js/pages/Travelers.tsx:558, resources/js/pages/TripForm.tsx:9705, resources/js/pages/Trips.tsx:740, resources/js/pages/Trips.tsx:952, resources/js/pages/ViewBooking.tsx:538, resources/js/pages/ViewCustomer.tsx:611, resources/js/pages/ViewEnquiry.tsx:430, resources/js/pages/ViewPayment.tsx:454, resources/js/pages/ViewReview.tsx:320, resources/js/pages/account/BookingDetails.tsx:295
 #: assets/admin/dist/js/app.js
 #: app/Blocks/TourBlock.php:86
 #: app/Controllers/BookingSessionController.php:3463
@@ -30559,7 +30559,7 @@ msgstr ""
 msgid "Trip Base Price"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:2527
+# Source: resources/js/pages/TripForm.tsx:2530
 #: assets/admin/dist/js/app.js
 msgid "Trip Basics"
 msgstr ""
@@ -30570,7 +30570,7 @@ msgstr ""
 msgid "Trip Bookings"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6408
+# Source: resources/js/pages/TripForm.tsx:6423
 #: assets/admin/dist/js/app.js
 #: app/Services/SEOService.php:405
 #: templates/listing-trip-category.php:87
@@ -30612,12 +30612,12 @@ msgstr ""
 msgid "Trip Created"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4241
+# Source: resources/js/pages/TripForm.tsx:4256
 #: assets/admin/dist/js/app.js
 msgid "Trip Description"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:2583, resources/js/pages/TripForm.tsx:7994, resources/js/pages/ViewDeparture.tsx:590
+# Source: resources/js/pages/TripForm.tsx:2586, resources/js/pages/TripForm.tsx:8009, resources/js/pages/ViewDeparture.tsx:590
 #: assets/admin/dist/js/app.js
 #: app/Providers/FrontendAssetsProvider.php:1122
 #: templates/pdf/itinerary.php:413
@@ -30625,7 +30625,7 @@ msgstr ""
 msgid "Trip Details"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4398
+# Source: resources/js/pages/TripForm.tsx:4413
 #: assets/admin/dist/js/app.js
 #: templates/partials/single-trip/content-overview.php:27
 #: templates/pdf/itinerary.php:462
@@ -30663,7 +30663,7 @@ msgstr ""
 msgid "Trip Liability Waiver"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4904
+# Source: resources/js/pages/TripForm.tsx:4919
 #: assets/admin/dist/js/app.js
 msgid "Trip Locations"
 msgstr ""
@@ -30696,33 +30696,33 @@ msgstr ""
 msgid "Trip Reminders"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6016
+# Source: resources/js/pages/TripForm.tsx:6031
 #: assets/admin/dist/js/app.js
 msgid "Trip Requirements"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:9503
+# Source: resources/js/pages/TripForm.tsx:9518
 #: assets/admin/dist/js/app.js
 msgid "Trip Revisions"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6843
+# Source: resources/js/pages/TripForm.tsx:6858
 #: assets/admin/dist/js/app.js
 msgid "Trip Story & Special Features"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6879
+# Source: resources/js/pages/TripForm.tsx:6894
 #: assets/admin/dist/js/app.js
 msgid "Trip Story / Narrative"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:3996, resources/js/pages/TripForm.tsx:8172, resources/js/pages/Trips.tsx:1753
+# Source: resources/js/pages/TripForm.tsx:4011, resources/js/pages/TripForm.tsx:8187, resources/js/pages/Trips.tsx:1753
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:31148
 msgid "Trip Title"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4485, resources/js/pages/Trips.tsx:753, resources/js/pages/Trips.tsx:1111
+# Source: resources/js/pages/TripForm.tsx:4500, resources/js/pages/Trips.tsx:753, resources/js/pages/Trips.tsx:1111
 #: assets/admin/dist/js/app.js
 #: templates/listing-trip.php:238
 #: assets/admin/dist/js/app.js:30321
@@ -30730,12 +30730,12 @@ msgstr ""
 msgid "Trip Type"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4479
+# Source: resources/js/pages/TripForm.tsx:4494
 #: assets/admin/dist/js/app.js
 msgid "Trip Type & Duration"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4069, resources/js/pages/Trips.tsx:1774
+# Source: resources/js/pages/TripForm.tsx:4084, resources/js/pages/Trips.tsx:1774
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:31169
 msgid "Trip URL"
@@ -30759,7 +30759,7 @@ msgstr ""
 msgid "Trip completed / thank-you"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4536
+# Source: resources/js/pages/TripForm.tsx:4551
 #: assets/admin/dist/js/app.js
 msgid "Trip completed within one day (no overnight stay)"
 msgstr ""
@@ -30770,7 +30770,7 @@ msgstr ""
 msgid "Trip consent request"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:3519
+# Source: resources/js/pages/TripForm.tsx:3534
 #: assets/admin/dist/js/app.js
 msgid "Trip created and published successfully"
 msgstr ""
@@ -30874,7 +30874,7 @@ msgstr ""
 msgid "Trip restored to draft."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:3520
+# Source: resources/js/pages/TripForm.tsx:3535
 #: assets/admin/dist/js/app.js
 msgid "Trip saved as draft successfully"
 msgstr ""
@@ -30886,7 +30886,7 @@ msgstr ""
 msgid "Trip slug is missing"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:3625
+# Source: resources/js/pages/TripForm.tsx:3640
 #: assets/admin/dist/js/app.js
 msgid "Trip slug is missing. Please add a slug before previewing."
 msgstr ""
@@ -30897,7 +30897,7 @@ msgstr ""
 msgid "Trip slug is required"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4593
+# Source: resources/js/pages/TripForm.tsx:4608
 #: assets/admin/dist/js/app.js
 msgid "Trip spans multiple days with overnight stays"
 msgstr ""
@@ -30908,7 +30908,7 @@ msgstr ""
 msgid "Trip status updated successfully"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:3569
+# Source: resources/js/pages/TripForm.tsx:3584
 #: assets/admin/dist/js/app.js
 msgid "Trip title and slug are required before publishing."
 msgstr ""
@@ -30919,32 +30919,32 @@ msgstr ""
 msgid "Trip title is required"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:3513
+# Source: resources/js/pages/TripForm.tsx:3528
 #: assets/admin/dist/js/app.js
 msgid "Trip updated and published successfully"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:3514
+# Source: resources/js/pages/TripForm.tsx:3529
 #: assets/admin/dist/js/app.js
 msgid "Trip updated successfully"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8491
+# Source: resources/js/pages/TripForm.tsx:8506
 #: assets/admin/dist/js/app.js
 msgid "Trip will be automatically published on this date and time"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8510
+# Source: resources/js/pages/TripForm.tsx:8525
 #: assets/admin/dist/js/app.js
 msgid "Trip will be automatically unpublished (archived) on this date and time"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8567
+# Source: resources/js/pages/TripForm.tsx:8582
 #: assets/admin/dist/js/app.js
 msgid "Trip will become available for booking on this date"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8586
+# Source: resources/js/pages/TripForm.tsx:8601
 #: assets/admin/dist/js/app.js
 msgid "Trip will become unavailable for booking on this date"
 msgstr ""
@@ -31036,7 +31036,7 @@ msgstr ""
 msgid "Try adjusting your search or filters to see more results."
 msgstr ""
 
-# Source: resources/js/components/ai/AiFieldAffordance.tsx:274, resources/js/components/ai/BuildItineraryModal.tsx:746, resources/js/components/ai/BuildItineraryModal.tsx:768, resources/js/components/ai/EnquiryReplyAffordance.tsx:269, resources/js/components/shared/Table.tsx:328, resources/js/pages/TripForm.tsx:3865
+# Source: resources/js/components/ai/AiFieldAffordance.tsx:274, resources/js/components/ai/BuildItineraryModal.tsx:746, resources/js/components/ai/BuildItineraryModal.tsx:768, resources/js/components/ai/EnquiryReplyAffordance.tsx:269, resources/js/components/shared/Table.tsx:328, resources/js/pages/TripForm.tsx:3880
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:29172
 #: assets/admin/dist/js/app.js:64716
@@ -31131,7 +31131,7 @@ msgstr ""
 msgid "URL"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4137
+# Source: resources/js/pages/TripForm.tsx:4152
 #: assets/admin/dist/js/app.js
 msgid "URL copied to clipboard"
 msgstr ""
@@ -31172,13 +31172,13 @@ msgstr ""
 msgid "URL slug for trip single pages (e.g., \"trip\" will create URLs like /trip/everest-base-camp)"
 msgstr ""
 
-# Source: resources/js/components/shared/Table.tsx:395, resources/js/pages/TripForm.tsx:3918
+# Source: resources/js/components/shared/Table.tsx:395, resources/js/pages/TripForm.tsx:3933
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:29227
 msgid "URL:"
 msgstr ""
 
-# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:440, resources/js/pages/TripForm.tsx:5060
+# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:440, resources/js/pages/TripForm.tsx:5075
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:52166
 msgid "Unable to get your location"
@@ -31202,7 +31202,7 @@ msgstr ""
 msgid "Unanswered enquiries"
 msgstr ""
 
-# Source: resources/js/pages/AvailabilityForm.tsx:1328, resources/js/pages/AvailabilityForm.tsx:1395, resources/js/pages/RecurringRuleForm.tsx:1249, resources/js/pages/RecurringRuleForm.tsx:1345, resources/js/pages/RecurringRuleForm.tsx:1873, resources/js/pages/TravelerCategories.tsx:222, resources/js/pages/TripForm.tsx:7506, resources/js/pages/TripForm.tsx:7611
+# Source: resources/js/pages/AvailabilityForm.tsx:1328, resources/js/pages/AvailabilityForm.tsx:1395, resources/js/pages/RecurringRuleForm.tsx:1249, resources/js/pages/RecurringRuleForm.tsx:1345, resources/js/pages/RecurringRuleForm.tsx:1873, resources/js/pages/TravelerCategories.tsx:222, resources/js/pages/TripForm.tsx:7521, resources/js/pages/TripForm.tsx:7626
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:58375
 #: assets/dist/js/AvailabilityForm-amQiiorh.js:1060
@@ -31304,7 +31304,7 @@ msgstr ""
 msgid "Untitled Field"
 msgstr ""
 
-# Source: resources/js/pages/TravelerCategories.tsx:245, resources/js/pages/TripForm.tsx:7526, resources/js/pages/TripForm.tsx:7638, resources/js/pages/Trips.tsx:353
+# Source: resources/js/pages/TravelerCategories.tsx:245, resources/js/pages/TripForm.tsx:7541, resources/js/pages/TripForm.tsx:7653, resources/js/pages/Trips.tsx:353
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:30009
 #: assets/admin/dist/js/app.js:58391
@@ -31336,7 +31336,7 @@ msgstr ""
 msgid "Upcoming Trips"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:9049
+# Source: resources/js/pages/TripForm.tsx:9064
 #: assets/admin/dist/js/app.js
 msgid "Update & Publish"
 msgstr ""
@@ -31401,7 +31401,7 @@ msgstr ""
 msgid "Update Difficulty Level"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8982
+# Source: resources/js/pages/TripForm.tsx:8997
 #: assets/admin/dist/js/app.js
 msgid "Update Draft"
 msgstr ""
@@ -31464,7 +31464,7 @@ msgstr ""
 msgid "Update Service"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:9002
+# Source: resources/js/pages/TripForm.tsx:9017
 #: assets/admin/dist/js/app.js
 msgid "Update Trip"
 msgstr ""
@@ -31664,7 +31664,7 @@ msgstr ""
 msgid "Upgrade to Growth"
 msgstr ""
 
-# Source: resources/js/components/Layout.tsx:1172, resources/js/components/ProFeature.tsx:134, resources/js/components/modules/PremiumUpgradeDialog.tsx:128, resources/js/components/notices/InlineNotices.tsx:85, resources/js/pages/AdditionalServicesForm.tsx:284, resources/js/pages/TripConsentForm.tsx:763, resources/js/pages/TripForm.tsx:7862, resources/js/pages/premium-pages/AbandonedRecovery.tsx:150, resources/js/pages/premium-pages/AbandonedRecovery.tsx:325, resources/js/pages/premium-pages/AdditionalServices.tsx:140, resources/js/pages/premium-pages/AdditionalServices.tsx:311, resources/js/pages/premium-pages/DynamicPricing.tsx:142, resources/js/pages/premium-pages/DynamicPricing.tsx:374, resources/js/pages/premium-pages/EmailAutomation.tsx:137, resources/js/pages/premium-pages/EmailAutomation.tsx:297, resources/js/pages/premium-pages/ScheduledPayments.tsx:98, resources/js/pages/premium-pages/TripConsent.tsx:147, resources/js/pages/premium-pages/TripConsent.tsx:322
+# Source: resources/js/components/Layout.tsx:1172, resources/js/components/ProFeature.tsx:134, resources/js/components/modules/PremiumUpgradeDialog.tsx:128, resources/js/components/notices/InlineNotices.tsx:85, resources/js/pages/AdditionalServicesForm.tsx:284, resources/js/pages/TripConsentForm.tsx:763, resources/js/pages/TripForm.tsx:7877, resources/js/pages/premium-pages/AbandonedRecovery.tsx:150, resources/js/pages/premium-pages/AbandonedRecovery.tsx:325, resources/js/pages/premium-pages/AdditionalServices.tsx:140, resources/js/pages/premium-pages/AdditionalServices.tsx:311, resources/js/pages/premium-pages/DynamicPricing.tsx:142, resources/js/pages/premium-pages/DynamicPricing.tsx:374, resources/js/pages/premium-pages/EmailAutomation.tsx:137, resources/js/pages/premium-pages/EmailAutomation.tsx:297, resources/js/pages/premium-pages/ScheduledPayments.tsx:98, resources/js/pages/premium-pages/TripConsent.tsx:147, resources/js/pages/premium-pages/TripConsent.tsx:322
 #: assets/admin/dist/js/app.js
 #: app/Providers/AdminServiceProvider.php:295
 #: app/Providers/AdminServiceProvider.php:447
@@ -31713,7 +31713,7 @@ msgstr ""
 msgid "Upgrade to Yatra Pro to create and manage consent forms."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4376
+# Source: resources/js/pages/TripForm.tsx:4391
 #: assets/admin/dist/js/app.js
 msgid "Upload Featured Image"
 msgstr ""
@@ -31737,7 +31737,7 @@ msgstr ""
 msgid "Upload images to showcase this activity"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6685
+# Source: resources/js/pages/TripForm.tsx:6700
 #: assets/admin/dist/js/app.js
 msgid "Upload images to showcase your trip. These will be displayed on the trip page."
 msgstr ""
@@ -31783,7 +31783,7 @@ msgstr ""
 msgid "Use Conversions API"
 msgstr ""
 
-# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:509, resources/js/pages/TripForm.tsx:5133
+# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:509, resources/js/pages/TripForm.tsx:5148
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:52230
 msgid "Use Current Location"
@@ -31795,12 +31795,12 @@ msgstr ""
 msgid "Use Day"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:9556
+# Source: resources/js/pages/TripForm.tsx:9571
 #: assets/admin/dist/js/app.js
 msgid "Use This Revision"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:9576
+# Source: resources/js/pages/TripForm.tsx:9591
 #: assets/admin/dist/js/app.js
 msgid "Use This Revision?"
 msgstr ""
@@ -31864,12 +31864,12 @@ msgstr ""
 msgid "Use this"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:2960
+# Source: resources/js/pages/TripForm.tsx:2963
 #: assets/admin/dist/js/app.js
 msgid "Use this file"
 msgstr ""
 
-# Source: resources/js/components/ui/icon-picker.tsx:112, resources/js/pages/Settings.tsx:9447, resources/js/pages/Settings.tsx:9502, resources/js/pages/TripForm.tsx:4349, resources/js/pages/WhiteLabel.tsx:498
+# Source: resources/js/components/ui/icon-picker.tsx:112, resources/js/pages/Settings.tsx:9447, resources/js/pages/Settings.tsx:9502, resources/js/pages/TripForm.tsx:4364, resources/js/pages/WhiteLabel.tsx:498
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:32425
 #: assets/dist/js/Settings-C5RvnmMN.js:7956
@@ -31997,7 +31997,7 @@ msgstr ""
 msgid "VAT Number"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6072
+# Source: resources/js/pages/TripForm.tsx:6087
 #: assets/admin/dist/js/app.js
 msgid "Vaccination Requirements"
 msgstr ""
@@ -32097,12 +32097,12 @@ msgstr ""
 msgid "Verify token"
 msgstr ""
 
-# Source: resources/js/pages/TripConsent.tsx:455, resources/js/pages/TripConsent.tsx:573, resources/js/pages/TripForm.tsx:8442
+# Source: resources/js/pages/TripConsent.tsx:455, resources/js/pages/TripConsent.tsx:573, resources/js/pages/TripForm.tsx:8457
 #: assets/admin/dist/js/app.js
 msgid "Version"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8434
+# Source: resources/js/pages/TripForm.tsx:8449
 #: assets/admin/dist/js/app.js
 msgid "Version Control"
 msgstr ""
@@ -32122,7 +32122,7 @@ msgstr ""
 msgid "Version history — %s"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8458
+# Source: resources/js/pages/TripForm.tsx:8473
 #: assets/admin/dist/js/app.js
 msgid "Version number is automatically incremented when changes are saved"
 msgstr ""
@@ -32134,7 +32134,7 @@ msgstr ""
 msgid "Video"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6773
+# Source: resources/js/pages/TripForm.tsx:6788
 #: assets/admin/dist/js/app.js
 msgid "Video & Virtual Tour"
 msgstr ""
@@ -32145,13 +32145,13 @@ msgstr ""
 msgid "Video Gallery"
 msgstr ""
 
-# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:947, resources/js/pages/TripForm.tsx:6784
+# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:947, resources/js/pages/TripForm.tsx:6799
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:52742
 msgid "Video URL"
 msgstr ""
 
-# Source: resources/js/components/availability/AvailabilityCalendar.tsx:474, resources/js/components/dashboard/PendingPayments.tsx:143, resources/js/pages/Activities.tsx:1024, resources/js/pages/Bookings.tsx:797, resources/js/pages/Customers.tsx:586, resources/js/pages/Departures.tsx:1020, resources/js/pages/Destinations.tsx:855, resources/js/pages/Enquiries.tsx:289, resources/js/pages/Payments.tsx:611, resources/js/pages/Reviews.tsx:398, resources/js/pages/Settings.tsx:8911, resources/js/pages/Settings.tsx:8951, resources/js/pages/Settings.tsx:8987, resources/js/pages/Settings.tsx:9027, resources/js/pages/Settings.tsx:9079, resources/js/pages/TripForm.tsx:7138, resources/js/pages/ViewCustomer.tsx:648, resources/js/pages/account/Support.tsx:262
+# Source: resources/js/components/availability/AvailabilityCalendar.tsx:474, resources/js/components/dashboard/PendingPayments.tsx:143, resources/js/pages/Activities.tsx:1024, resources/js/pages/Bookings.tsx:797, resources/js/pages/Customers.tsx:586, resources/js/pages/Departures.tsx:1020, resources/js/pages/Destinations.tsx:855, resources/js/pages/Enquiries.tsx:289, resources/js/pages/Payments.tsx:611, resources/js/pages/Reviews.tsx:398, resources/js/pages/Settings.tsx:8911, resources/js/pages/Settings.tsx:8951, resources/js/pages/Settings.tsx:8987, resources/js/pages/Settings.tsx:9027, resources/js/pages/Settings.tsx:9079, resources/js/pages/TripForm.tsx:7153, resources/js/pages/ViewCustomer.tsx:648, resources/js/pages/account/Support.tsx:262
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:26398
 #: assets/admin/dist/js/app.js:32122
@@ -32367,7 +32367,7 @@ msgstr ""
 msgid "View event statistics and activity in the "
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:7084
+# Source: resources/js/pages/TripForm.tsx:7099
 #: assets/admin/dist/js/app.js
 msgid "View file"
 msgstr ""
@@ -32407,14 +32407,14 @@ msgstr ""
 msgid "View trip in new tab"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6048
+# Source: resources/js/pages/TripForm.tsx:6063
 #: assets/admin/dist/js/app.js
 #: templates/partials/single-trip/content-important-info.php:41
 #: templates/pdf/itinerary.php:716
 msgid "Visa Requirements"
 msgstr ""
 
-# Source: resources/js/pages/CategoryForm.tsx:653, resources/js/pages/TripForm.tsx:7047
+# Source: resources/js/pages/CategoryForm.tsx:653, resources/js/pages/TripForm.tsx:7062
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:36437
 msgid "Visibility"
@@ -32433,7 +32433,7 @@ msgstr ""
 msgid "Visible copy — the recipient can see this address. Separate several addresses with commas."
 msgstr ""
 
-# Source: resources/js/components/shared/Table.tsx:342, resources/js/pages/TripForm.tsx:3878
+# Source: resources/js/components/shared/Table.tsx:342, resources/js/pages/TripForm.tsx:3893
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:29186
 msgid "Visit support center"
@@ -32522,7 +32522,7 @@ msgstr ""
 msgid "We couldn’t connect to the destinations service. Please refresh or try again shortly."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:3853
+# Source: resources/js/pages/TripForm.tsx:3868
 #: assets/admin/dist/js/app.js
 msgid "We couldn’t connect to the trips service. Please refresh or try again shortly."
 msgstr ""
@@ -32631,7 +32631,7 @@ msgstr ""
 msgid "Welcome to Yatra"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6855
+# Source: resources/js/pages/TripForm.tsx:6870
 #: assets/admin/dist/js/app.js
 #: templates/partials/single-trip/content-whats-make-special.php:8
 #: templates/partials/single-trip/content-whats-make-special.php:9
@@ -32687,7 +32687,7 @@ msgstr ""
 msgid "What we collect"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8004
+# Source: resources/js/pages/TripForm.tsx:8019
 #: assets/admin/dist/js/app.js
 msgid "What will travelers experience?"
 msgstr ""
@@ -32800,7 +32800,7 @@ msgstr ""
 msgid "When an online payment (Stripe, PayPal, Razorpay…) pays the balance in full, the booking is confirmed. Deposits/partial payments and offline methods stay Pending."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5651
+# Source: resources/js/pages/TripForm.tsx:5666
 #: assets/admin/dist/js/app.js
 msgid "When are these settings used?"
 msgstr ""
@@ -32829,12 +32829,12 @@ msgstr ""
 msgid "When does this activity start?"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6164
+# Source: resources/js/pages/TripForm.tsx:6179
 #: assets/admin/dist/js/app.js
 msgid "When enabled, the booking form and date picker will be hidden. Visitors can only send an enquiry for this trip."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5444
+# Source: resources/js/pages/TripForm.tsx:5459
 #: assets/admin/dist/js/app.js
 msgid "When is it available & who can book it?"
 msgstr ""
@@ -32882,7 +32882,7 @@ msgstr ""
 msgid "When should this sequence start?"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8423
+# Source: resources/js/pages/TripForm.tsx:8438
 #: assets/admin/dist/js/app.js
 msgid "When should this trip be published or archived?"
 msgstr ""
@@ -32908,14 +32908,14 @@ msgstr ""
 msgid "Where replies will be sent. Leave empty to use From Email"
 msgstr ""
 
-# Source: resources/js/pages/AvailabilityForm.tsx:871, resources/js/pages/RecurringRuleForm.tsx:2274, resources/js/pages/TripForm.tsx:4928
+# Source: resources/js/pages/AvailabilityForm.tsx:871, resources/js/pages/RecurringRuleForm.tsx:2274, resources/js/pages/TripForm.tsx:4943
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/AvailabilityForm-amQiiorh.js:697
 #: assets/dist/js/RecurringRuleForm-CY2V3hrG.js:1869
 msgid "Where the journey begins"
 msgstr ""
 
-# Source: resources/js/pages/AvailabilityForm.tsx:952, resources/js/pages/RecurringRuleForm.tsx:2367, resources/js/pages/TripForm.tsx:5196
+# Source: resources/js/pages/AvailabilityForm.tsx:952, resources/js/pages/RecurringRuleForm.tsx:2367, resources/js/pages/TripForm.tsx:5211
 #: assets/admin/dist/js/app.js
 #: assets/dist/js/AvailabilityForm-amQiiorh.js:762
 #: assets/dist/js/RecurringRuleForm-CY2V3hrG.js:1938
@@ -33077,7 +33077,7 @@ msgstr ""
 msgid "Write a rich description (supports formatting, lists, links...)"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6893
+# Source: resources/js/pages/TripForm.tsx:6908
 #: assets/admin/dist/js/app.js
 msgid "Write an engaging narrative about this trip..."
 msgstr ""
@@ -33160,7 +33160,7 @@ msgstr ""
 msgid "Yes, Replace Day"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:9581
+# Source: resources/js/pages/TripForm.tsx:9596
 #: assets/admin/dist/js/app.js
 msgid "Yes, Use This Revision"
 msgstr ""
@@ -33457,7 +33457,7 @@ msgstr ""
 msgid "admin@example.com"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:8237
+# Source: resources/js/pages/TripForm.tsx:8252
 #: assets/admin/dist/js/app.js
 msgid "adventure, travel, tour, guide, experience"
 msgstr ""
@@ -33543,7 +33543,7 @@ msgstr ""
 msgid "bali-beach-retreat"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4109
+# Source: resources/js/pages/TripForm.tsx:4124
 #: assets/admin/dist/js/app.js
 msgid "bali-beach-retreat-7-days"
 msgstr ""
@@ -33806,7 +33806,7 @@ msgstr ""
 msgid "difficulty-slug"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6135
+# Source: resources/js/pages/TripForm.tsx:6150
 #: assets/admin/dist/js/app.js
 msgid "disable the booking calendar and make trips enquiry-only"
 msgstr ""
@@ -33888,7 +33888,7 @@ msgstr ""
 msgid "e.g., -8.3405"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5330
+# Source: resources/js/pages/TripForm.tsx:5345
 #: assets/admin/dist/js/app.js
 msgid "e.g., -8.5069"
 msgstr ""
@@ -33915,13 +33915,13 @@ msgstr ""
 msgid "e.g., 100"
 msgstr ""
 
-# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:545, resources/js/pages/TripForm.tsx:5170
+# Source: resources/js/components/trip-form/shared/ItineraryEntryFields.tsx:545, resources/js/pages/TripForm.tsx:5185
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:52275
 msgid "e.g., 115.0920"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5348
+# Source: resources/js/pages/TripForm.tsx:5363
 #: assets/admin/dist/js/app.js
 msgid "e.g., 115.2625"
 msgstr ""
@@ -33938,7 +33938,7 @@ msgstr ""
 msgid "e.g., 150.00"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5975
+# Source: resources/js/pages/TripForm.tsx:5990
 #: assets/admin/dist/js/app.js
 msgid "e.g., 18"
 msgstr ""
@@ -33961,7 +33961,7 @@ msgstr ""
 msgid "e.g., 3 hours"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5525
+# Source: resources/js/pages/TripForm.tsx:5540
 #: assets/admin/dist/js/app.js
 msgid "e.g., 30"
 msgstr ""
@@ -33972,7 +33972,7 @@ msgstr ""
 msgid "e.g., 4, 17, leave empty for 18+"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6252
+# Source: resources/js/pages/TripForm.tsx:6267
 #: assets/admin/dist/js/app.js
 msgid "e.g., 4-star beachfront resort with private balconies, infinity pool, and spa facilities"
 msgstr ""
@@ -33985,7 +33985,7 @@ msgstr ""
 msgid "e.g., 50"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:7963
+# Source: resources/js/pages/TripForm.tsx:7978
 #: assets/admin/dist/js/app.js
 msgid "e.g., 50% deposit required at booking, balance due 30 days before departure"
 msgstr ""
@@ -33996,7 +33996,7 @@ msgstr ""
 msgid "e.g., 500 (optional)"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4691
+# Source: resources/js/pages/TripForm.tsx:4706
 #: assets/admin/dist/js/app.js
 msgid "e.g., 6"
 msgstr ""
@@ -34007,17 +34007,17 @@ msgstr ""
 msgid "e.g., 6 (optional)"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6000
+# Source: resources/js/pages/TripForm.tsx:6015
 #: assets/admin/dist/js/app.js
 msgid "e.g., 65"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4653
+# Source: resources/js/pages/TripForm.tsx:4668
 #: assets/admin/dist/js/app.js
 msgid "e.g., 7"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4736
+# Source: resources/js/pages/TripForm.tsx:4751
 #: assets/admin/dist/js/app.js
 msgid "e.g., 8"
 msgstr ""
@@ -34045,7 +34045,7 @@ msgstr ""
 msgid "e.g., Airport Transfer, Travel Insurance"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6310, resources/js/pages/TripForm.tsx:6333
+# Source: resources/js/pages/TripForm.tsx:6325, resources/js/pages/TripForm.tsx:6348
 #: assets/admin/dist/js/app.js
 msgid "e.g., Airport, Hotel, City Center"
 msgstr ""
@@ -34062,7 +34062,7 @@ msgstr ""
 msgid "e.g., Arrival in Kathmandu"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5554
+# Source: resources/js/pages/TripForm.tsx:5569
 #: assets/admin/dist/js/app.js
 msgid "e.g., Available year-round except monsoon season"
 msgstr ""
@@ -34073,7 +34073,7 @@ msgstr ""
 msgid "e.g., Bali Beach Retreat"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4038
+# Source: resources/js/pages/TripForm.tsx:4053
 #: assets/admin/dist/js/app.js
 msgid "e.g., Bali Beach Retreat - 7 Days"
 msgstr ""
@@ -34107,7 +34107,7 @@ msgstr ""
 msgid "e.g., Discover amazing {name} activities and experiences. Book your adventure today!"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:9640
+# Source: resources/js/pages/TripForm.tsx:9655
 #: assets/admin/dist/js/app.js
 msgid "e.g., Eiffel Tower, Central Park, Grand Canyon"
 msgstr ""
@@ -34123,7 +34123,7 @@ msgstr ""
 msgid "e.g., First Reminder Email"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6116
+# Source: resources/js/pages/TripForm.tsx:6131
 #: assets/admin/dist/js/app.js
 msgid "e.g., Free cancellation up to 30 days before departure. 50% refund for cancellations 15-30 days before. No refund for cancellations less than 15 days before."
 msgstr ""
@@ -34152,7 +34152,7 @@ msgstr ""
 msgid "e.g., Hiking, Lunch, Hotel"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6199
+# Source: resources/js/pages/TripForm.tsx:6214
 #: assets/admin/dist/js/app.js
 msgid "e.g., Hotel, Resort, Teahouse, Camping"
 msgstr ""
@@ -34168,17 +34168,17 @@ msgstr ""
 msgid "e.g., Maintenance, Holiday, Special Event"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6035
+# Source: resources/js/pages/TripForm.tsx:6050
 #: assets/admin/dist/js/app.js
 msgid "e.g., Moderate fitness level required. Some walking involved but no strenuous activities."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:5824
+# Source: resources/js/pages/TripForm.tsx:5839
 #: assets/admin/dist/js/app.js
 msgid "e.g., Morning Tour, Afternoon Tour"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6083
+# Source: resources/js/pages/TripForm.tsx:6098
 #: assets/admin/dist/js/app.js
 msgid "e.g., No mandatory vaccinations. Recommended: Hepatitis A, Typhoid, and routine vaccinations."
 msgstr ""
@@ -34194,12 +34194,12 @@ msgstr ""
 msgid "e.g., Post-Booking Welcome Series"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6356
+# Source: resources/js/pages/TripForm.tsx:6371
 #: assets/admin/dist/js/app.js
 msgid "e.g., Private air-conditioned vehicle with professional driver"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:9453
+# Source: resources/js/pages/TripForm.tsx:9468
 #: assets/admin/dist/js/app.js
 msgid "e.g., Private guide included"
 msgstr ""
@@ -34239,7 +34239,7 @@ msgstr ""
 msgid "e.g., TXN123456789"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:6059
+# Source: resources/js/pages/TripForm.tsx:6074
 #: assets/admin/dist/js/app.js
 msgid "e.g., Tourist visa required. Can be obtained on arrival or in advance."
 msgstr ""
@@ -34969,7 +34969,7 @@ msgstr ""
 msgid "when a discount is valid, Dynamic Pricing is skipped for that booking."
 msgstr ""
 
-# Source: resources/js/pages/AvailabilityForm.tsx:1324, resources/js/pages/AvailabilityForm.tsx:1326, resources/js/pages/AvailabilityForm.tsx:1328, resources/js/pages/AvailabilityForm.tsx:1391, resources/js/pages/AvailabilityForm.tsx:1393, resources/js/pages/AvailabilityForm.tsx:1395, resources/js/pages/DiscountForm.tsx:2074, resources/js/pages/RecurringRuleForm.tsx:1245, resources/js/pages/RecurringRuleForm.tsx:1247, resources/js/pages/RecurringRuleForm.tsx:1249, resources/js/pages/RecurringRuleForm.tsx:1341, resources/js/pages/RecurringRuleForm.tsx:1343, resources/js/pages/RecurringRuleForm.tsx:1345, resources/js/pages/RecurringRuleForm.tsx:1870, resources/js/pages/RecurringRuleForm.tsx:1872, resources/js/pages/RecurringRuleForm.tsx:1873, resources/js/pages/RecurringRuleForm.tsx:2000, resources/js/pages/TripForm.tsx:7502, resources/js/pages/TripForm.tsx:7504, resources/js/pages/TripForm.tsx:7506, resources/js/pages/TripForm.tsx:7607, resources/js/pages/TripForm.tsx:7609, resources/js/pages/TripForm.tsx:7611
+# Source: resources/js/pages/AvailabilityForm.tsx:1324, resources/js/pages/AvailabilityForm.tsx:1326, resources/js/pages/AvailabilityForm.tsx:1328, resources/js/pages/AvailabilityForm.tsx:1391, resources/js/pages/AvailabilityForm.tsx:1393, resources/js/pages/AvailabilityForm.tsx:1395, resources/js/pages/DiscountForm.tsx:2074, resources/js/pages/RecurringRuleForm.tsx:1245, resources/js/pages/RecurringRuleForm.tsx:1247, resources/js/pages/RecurringRuleForm.tsx:1249, resources/js/pages/RecurringRuleForm.tsx:1341, resources/js/pages/RecurringRuleForm.tsx:1343, resources/js/pages/RecurringRuleForm.tsx:1345, resources/js/pages/RecurringRuleForm.tsx:1870, resources/js/pages/RecurringRuleForm.tsx:1872, resources/js/pages/RecurringRuleForm.tsx:1873, resources/js/pages/RecurringRuleForm.tsx:2000, resources/js/pages/TripForm.tsx:7517, resources/js/pages/TripForm.tsx:7519, resources/js/pages/TripForm.tsx:7521, resources/js/pages/TripForm.tsx:7622, resources/js/pages/TripForm.tsx:7624, resources/js/pages/TripForm.tsx:7626
 #: assets/admin/dist/js/app.js
 #: templates/partials/single-trip/content-important-info.php:91
 #: templates/partials/single-trip/content-important-info.php:96
@@ -35080,7 +35080,7 @@ msgstr ""
 msgid "💎 Platinum"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4303
+# Source: resources/js/pages/TripForm.tsx:4318
 #: assets/admin/dist/js/app.js
 msgid "💡 Choose your best photo! This is the first thing travelers see. Use a high-quality image (1200x800px recommended) that shows what makes your trip special."
 msgstr ""
@@ -35090,7 +35090,7 @@ msgstr ""
 msgid "💡 Demand scores are calculated automatically via cron job based on booking velocity."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:3977
+# Source: resources/js/pages/TripForm.tsx:3992
 #: assets/admin/dist/js/app.js
 msgid "💡 Getting Started"
 msgstr ""
@@ -35100,7 +35100,7 @@ msgstr ""
 msgid "💡 Sign matters: a positive Adjustment Value adds a premium on the selected days; a negative value gives a discount."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4098
+# Source: resources/js/pages/TripForm.tsx:4113
 #: assets/admin/dist/js/app.js
 msgid "💡 This is automatically created from your title. You usually don't need to change it unless you want a custom web address."
 msgstr ""
@@ -35111,7 +35111,7 @@ msgstr ""
 msgid "💡 Tip:"
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4027
+# Source: resources/js/pages/TripForm.tsx:4042
 #: assets/admin/dist/js/app.js
 msgid "💡 Tip: Include your destination and trip length. Example: \"Bali Beach Retreat - 7 Days\" or \"Paris City Tour - Half Day\""
 msgstr ""
@@ -35121,7 +35121,7 @@ msgstr ""
 msgid "💡 Tip: Use a positive Adjustment Value for peak-season markup (e.g. 25% during summer) or a negative value for an off-peak discount."
 msgstr ""
 
-# Source: resources/js/pages/TripForm.tsx:4208
+# Source: resources/js/pages/TripForm.tsx:4223
 #: assets/admin/dist/js/app.js
 msgid "💡 Write 2-3 sentences that grab attention! This appears in trip listings. Example: \"Escape to paradise with our 7-day Bali beach retreat. Experience stunning sunsets, world-class diving, and authentic local culture.\""
 msgstr ""

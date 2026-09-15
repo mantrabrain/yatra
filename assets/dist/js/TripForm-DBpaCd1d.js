@@ -3257,7 +3257,7 @@ const TripForm = () => {
     }).filter((faq) => faq.question && faq.answer);
   };
   reactExports.useEffect(() => {
-    var _a2, _b2, _c2, _d2, _e2, _f2, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s;
+    var _a2, _b2, _c2, _d2, _e2, _f2, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r;
     if (!tripData || !isEditMode) {
       return;
     }
@@ -3290,16 +3290,17 @@ const TripForm = () => {
       trip_type: tripData.trip_type || (tripData.duration_days && parseInt(((_e2 = tripData.duration_days) == null ? void 0 : _e2.toString()) || "0") === 1 ? "single_day" : "multi_day"),
       duration_days: ((_f2 = tripData.duration_days) == null ? void 0 : _f2.toString()) || "",
       duration_nights: ((_g = tripData.duration_nights) == null ? void 0 : _g.toString()) || "",
-      duration_hours: ((_h = tripData.duration_hours) == null ? void 0 : _h.toString()) || "",
+      // 0 / null both mean "not hour-based" — show an empty field, not "0".
+      duration_hours: tripData.duration_hours ? String(tripData.duration_hours) : "",
       available_from: tripData.available_from || "",
       available_to: tripData.available_to || "",
-      booking_window_days: ((_i = tripData.booking_window_days) == null ? void 0 : _i.toString()) || "",
+      booking_window_days: ((_h = tripData.booking_window_days) == null ? void 0 : _h.toString()) || "",
       seasonal_availability: tripData.seasonal_availability || "",
       best_season: tripData.best_season || "",
       peak_season: tripData.peak_season || "",
       off_season: tripData.off_season || "",
       activity_types: extractIds(tripData.activity_types || []),
-      difficulty_level: ((_j = tripData.difficulty_level) == null ? void 0 : _j.toString()) || "",
+      difficulty_level: ((_i = tripData.difficulty_level) == null ? void 0 : _i.toString()) || "",
       trip_category: extractIds(tripData.trip_category || []),
       tags: Array.isArray(tripData.tags) ? tripData.tags : [],
       featured_priority: tripData.featured_priority || "none",
@@ -3311,8 +3312,8 @@ const TripForm = () => {
       dropoff_location: tripData.dropoff_location || "",
       transportation_details: tripData.transportation_details || "",
       pricing_type: tripData.pricing_type || (tripData.price_types && Array.isArray(tripData.price_types) && tripData.price_types.length > 0 ? "traveler_based" : "regular"),
-      original_price: ((_k = tripData.original_price) == null ? void 0 : _k.toString()) || "",
-      discounted_price: ((_l = tripData.discounted_price) == null ? void 0 : _l.toString()) || "",
+      original_price: ((_j = tripData.original_price) == null ? void 0 : _j.toString()) || "",
+      discounted_price: ((_k = tripData.discounted_price) == null ? void 0 : _k.toString()) || "",
       price_types: Array.isArray(tripData.price_types) ? tripData.price_types.map((pt) => {
         var _a3, _b3;
         return {
@@ -3322,19 +3323,19 @@ const TripForm = () => {
           is_default: Boolean(pt.is_default)
         };
       }) : [],
-      deposit_amount: ((_m = tripData.deposit_amount) == null ? void 0 : _m.toString()) || "",
-      deposit_percentage: ((_n = tripData.deposit_percentage) == null ? void 0 : _n.toString()) || "",
+      deposit_amount: ((_l = tripData.deposit_amount) == null ? void 0 : _l.toString()) || "",
+      deposit_percentage: ((_m = tripData.deposit_percentage) == null ? void 0 : _m.toString()) || "",
       payment_terms: tripData.payment_terms || "",
-      max_travelers: ((_o = tripData.max_travelers) == null ? void 0 : _o.toString()) || "",
-      min_travelers: ((_p = tripData.min_travelers) == null ? void 0 : _p.toString()) || "",
+      max_travelers: ((_n = tripData.max_travelers) == null ? void 0 : _n.toString()) || "",
+      min_travelers: ((_o = tripData.min_travelers) == null ? void 0 : _o.toString()) || "",
       booking_deadline_hours: tripData.booking_deadline_hours || "",
       cancellation_policy: tripData.cancellation_policy || "",
-      age_min: ((_q = tripData.age_min) == null ? void 0 : _q.toString()) || "",
-      age_max: ((_r = tripData.age_max) == null ? void 0 : _r.toString()) || "",
+      age_min: ((_p = tripData.age_min) == null ? void 0 : _p.toString()) || "",
+      age_max: ((_q = tripData.age_max) == null ? void 0 : _q.toString()) || "",
       physical_requirements: tripData.physical_requirements || "",
       visa_requirements: tripData.visa_requirements || "",
       vaccination_requirements: tripData.vaccination_requirements || "",
-      disable_booking: Boolean((_s = tripData.custom_fields) == null ? void 0 : _s.disable_booking),
+      disable_booking: Boolean((_r = tripData.custom_fields) == null ? void 0 : _r.disable_booking),
       // tinyint(1) columns can serialize from PHP/wpdb as the string "0"/"1".
       // JS treats "0" as truthy, so a plain `value || false` would leave the
       // checkbox stuck on after the user un-checked + saved. Coerce explicitly.
@@ -4148,6 +4149,13 @@ const TripForm = () => {
         trip_type: data.trip_type,
         duration_days: data.duration_days ? parseInt(data.duration_days) : null,
         duration_nights: data.duration_nights ? parseInt(data.duration_nights) : null,
+        // Hour-based day tours. This key was missing from the payload, so the
+        // Duration (Hours) field could never be saved: the form kept the value,
+        // the request dropped it, and the field reloaded empty. Send 0 (never
+        // null) when the field is blank — the validator treats null as "not
+        // provided" and would leave a stale hours value on a trip switched
+        // back to multi-day, which the storefront would then show as hours.
+        duration_hours: data.duration_hours !== "" && data.duration_hours != null && !isNaN(parseInt(data.duration_hours)) ? parseInt(data.duration_hours) : 0,
         available_from: data.available_from || null,
         available_to: data.available_to || null,
         booking_window_days: data.booking_window_days ? parseInt(data.booking_window_days) : null,
@@ -9678,4 +9686,4 @@ A: ${f.answer}`).join("\n\n"),
 export {
   TripForm as default
 };
-//# sourceMappingURL=TripForm-CLQImvhJ.js.map
+//# sourceMappingURL=TripForm-DBpaCd1d.js.map

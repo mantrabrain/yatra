@@ -20,6 +20,7 @@ _With thanks to [Vista-Tours](https://vista-tours.de) for detailed testing and f
 * **Compact listing card layout** for trip archives, shortcodes and the Trip block.
 
 **Fixed**
+* **Duration (Hours) can now be saved.** The trip form showed the field for single-day tours but never included it in the save request, so the value was dropped and the field reloaded empty — the new hours display could not be used. Switching a trip back to multi-day now clears any stored hours rather than leaving a stale value.
 * Departures: *Upcoming* no longer hides sold-out departures; capacity is a separate **Availability** filter; the list is genuinely paginated and its search box works.
 * Enquiries: the status tabs showed `0` for every count; the bulk *Mark as Completed* action silently did nothing; a submission containing a `subject` field returned a server error.
 * The confirmation email is sent when a gateway payment auto-confirms a booking, and *Resend → Booking confirmation* resends the right template.
