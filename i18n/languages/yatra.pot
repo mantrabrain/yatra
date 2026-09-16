@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-15T11:14:12+00:00\n"
+"POT-Creation-Date: 2026-09-16T14:14:26+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
@@ -5404,7 +5404,7 @@ msgstr ""
 #: assets/dist/js/Webhooks-BVWPQrRC.js:2014
 #: assets/js/listing-wishlist.js:38
 #: assets/js/stripe.js:151
-#: assets/js/trip.js:4969
+#: assets/js/trip.js:4977
 msgid "Cancel"
 msgstr ""
 
@@ -6452,7 +6452,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js
 #: templates/partials/single-trip/content-faq.php:98
 #: assets/dist/js/BookingForm-DvQk4uBk.js:1555
-#: assets/js/trip.js:4458
+#: assets/js/trip.js:4466
 msgid "Collapse All"
 msgstr ""
 
@@ -7115,8 +7115,8 @@ msgstr ""
 #: app/Providers/FrontendAssetsProvider.php:980
 #: app/Providers/FrontendAssetsProvider.php:1117
 #: includes/helpers.php:365
-#: templates/partials/single-trip/content-sidebar.php:93
-#: templates/partials/single-trip/content-sidebar.php:157
+#: templates/partials/single-trip/content-sidebar.php:96
+#: templates/partials/single-trip/content-sidebar.php:160
 #: templates/partials/single-trip/similar-trips.php:274
 #: templates/trip-listing-card.php:455
 #: assets/dist/js/account-page.js:134
@@ -9542,7 +9542,7 @@ msgstr ""
 # Source: resources/js/pages/Availability.tsx:776, resources/js/pages/Availability.tsx:1740, resources/js/pages/ChannelManager.tsx:2557
 #: assets/admin/dist/js/app.js
 #: app/Controllers/TripController.php:2040
-#: app/Controllers/TripController.php:2160
+#: app/Controllers/TripController.php:2162
 #: app/Services/TransactionalEmailTemplateService.php:662
 #: templates/partials/availability-card.php:190
 #: assets/admin/dist/js/app.js:61266
@@ -10472,7 +10472,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:46299
 #: assets/js/downloads-list.js:84
-#: assets/js/trip.js:5373
+#: assets/js/trip.js:5381
 msgid "Download failed. Please try again."
 msgstr ""
 
@@ -11682,8 +11682,8 @@ msgstr ""
 
 # Source: resources/js/pages/AvailabilityForm.tsx:949, resources/js/pages/RecurringRuleForm.tsx:2364, resources/js/pages/TripForm.tsx:5208
 #: assets/admin/dist/js/app.js
-#: app/Controllers/TripController.php:2165
-#: app/Controllers/TripController.php:2176
+#: app/Controllers/TripController.php:2167
+#: app/Controllers/TripController.php:2178
 #: templates/partials/single-trip/content-location.php:86
 #: templates/partials/single-trip/content-location.php:545
 #: assets/dist/js/AvailabilityForm-DGL4UC_6.js:761
@@ -12699,7 +12699,7 @@ msgstr ""
 #: templates/partials/single-trip/content-faq.php:97
 #: templates/partials/single-trip/content-itinerary.php:20
 #: assets/dist/js/BookingForm-DvQk4uBk.js:1555
-#: assets/js/trip.js:4458
+#: assets/js/trip.js:4466
 msgid "Expand All"
 msgstr ""
 
@@ -14399,8 +14399,8 @@ msgstr ""
 # Source: resources/js/pages/TravelerCategories.tsx:241, resources/js/pages/TripForm.tsx:7539, resources/js/pages/TripForm.tsx:7650, resources/js/pages/account/Profile.tsx:626
 #: assets/admin/dist/js/app.js
 #: templates/listing-activity.php:246
-#: templates/partials/single-trip/content-sidebar.php:79
-#: templates/partials/single-trip/content-sidebar.php:142
+#: templates/partials/single-trip/content-sidebar.php:82
+#: templates/partials/single-trip/content-sidebar.php:145
 #: templates/partials/single-trip/similar-trips.php:260
 #: templates/shortcodes/activity.php:101
 #: templates/shortcodes/destination.php:93
@@ -17354,7 +17354,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:44216
 #: assets/admin/dist/js/app.js:50633
 #: assets/js/trip.js:2164
-#: assets/js/trip.js:4214
+#: assets/js/trip.js:4222
 msgid "Loading..."
 msgstr ""
 
@@ -20172,10 +20172,10 @@ msgstr ""
 
 # Source: resources/js/pages/BookingForm.tsx:1420, resources/js/pages/EnquiryForm.tsx:344, resources/js/pages/ViewBooking.tsx:590, resources/js/pages/ViewEnquiry.tsx:368, resources/js/pages/account/BookingDetails.tsx:331
 #: assets/admin/dist/js/app.js
-#: app/Controllers/TripController.php:2476
+#: app/Controllers/TripController.php:2478
 #: templates/booking-confirmation.php:459
-#: templates/partials/single-trip/content-sidebar.php:323
-#: templates/partials/single-trip/content-sidebar.php:445
+#: templates/partials/single-trip/content-sidebar.php:326
+#: templates/partials/single-trip/content-sidebar.php:448
 #: templates/partials/single-trip/enquiry-modal.php:61
 #: assets/admin/dist/js/app.js:65906
 #: assets/admin/dist/js/app.js:66302
@@ -22529,7 +22529,7 @@ msgstr ""
 #: assets/dist/js/account-page.js:2407
 #: assets/dist/js/RecurringRuleForm-Cqv2cbJU.js:2058
 #: assets/dist/js/Settings-B2qDy-3v.js:2094
-#: assets/js/trip.js:5391
+#: assets/js/trip.js:5399
 msgid "Preview"
 msgstr ""
 
@@ -23976,7 +23976,7 @@ msgstr ""
 #: app/Providers/FrontendAssetsProvider.php:357
 #: assets/dist/js/account-page.js:2992
 #: assets/js/listing-wishlist.js:45
-#: assets/js/trip.js:4930
+#: assets/js/trip.js:4938
 msgid "Remove from favorites"
 msgstr ""
 
@@ -26454,8 +26454,8 @@ msgstr ""
 
 # Source: resources/js/pages/Availability.tsx:1113, resources/js/pages/AvailabilityForm.tsx:697, resources/js/pages/BookingForm.tsx:1959, resources/js/pages/EnquiryForm.tsx:366, resources/js/pages/TripForm.tsx:5490, resources/js/pages/TripForm.tsx:5512, resources/js/pages/TripForm.tsx:8503, resources/js/pages/TripForm.tsx:8522, resources/js/pages/TripForm.tsx:8579, resources/js/pages/TripForm.tsx:8598
 #: assets/admin/dist/js/app.js
-#: templates/partials/single-trip/content-sidebar.php:286
-#: templates/partials/single-trip/content-sidebar.php:406
+#: templates/partials/single-trip/content-sidebar.php:289
+#: templates/partials/single-trip/content-sidebar.php:409
 #: templates/partials/single-trip/enquiry-modal.php:53
 #: templates/partials/single-trip/sticky-sidebar.php:134
 #: templates/partials/single-trip/sticky-sidebar.php:143
@@ -28404,8 +28404,8 @@ msgstr ""
 
 # Source: resources/js/pages/AvailabilityForm.tsx:868, resources/js/pages/RecurringRuleForm.tsx:2271, resources/js/pages/TripForm.tsx:4940
 #: assets/admin/dist/js/app.js
-#: app/Controllers/TripController.php:2162
-#: app/Controllers/TripController.php:2175
+#: app/Controllers/TripController.php:2164
+#: app/Controllers/TripController.php:2177
 #: templates/partials/single-trip/content-location.php:85
 #: templates/partials/single-trip/content-location.php:521
 #: assets/dist/js/AvailabilityForm-DGL4UC_6.js:696
@@ -28762,7 +28762,7 @@ msgstr ""
 
 # Source: resources/js/pages/TripConsentForm.tsx:2073
 #: assets/admin/dist/js/app.js
-#: assets/js/trip.js:4574
+#: assets/js/trip.js:4582
 msgid "Submitting..."
 msgstr ""
 
@@ -35267,11 +35267,12 @@ msgstr ""
 
 # Source: resources/js/pages/account/BookingDetails.tsx:433
 #: assets/admin/dist/js/app.js
+#: app/Controllers/TripController.php:2105
+#: app/Services/TripPricingService.php:601
 #: templates/partials/availability-card.php:216
 #: templates/partials/booking-content.php:688
 #: templates/partials/single-trip/content-itinerary.php:151
-#: templates/partials/single-trip/content-sidebar.php:84
-#: templates/partials/single-trip/content-sidebar.php:148
+#: templates/partials/single-trip/content-sidebar.php:37
 #: templates/single-activity.php:263
 #: templates/single-destination.php:263
 #: assets/dist/js/account-page.js:1246
@@ -37232,6 +37233,7 @@ msgstr ""
 #. translators: 1: minimum pax for the group price, 2: maximum pax.
 #: app/Controllers/SingleTripController.php:1844
 #: app/Controllers/SingleTripController.php:2134
+#: app/Services/TripPricingService.php:590
 #: templates/partials/availability-card.php:423
 #, php-format
 msgid "per group (%1$d-%2$d pax)"
@@ -37240,6 +37242,7 @@ msgstr ""
 #. translators: %d: maximum pax for the group price.
 #: app/Controllers/SingleTripController.php:1847
 #: app/Controllers/SingleTripController.php:2137
+#: app/Services/TripPricingService.php:593
 #: templates/partials/availability-card.php:426
 #, php-format
 msgid "per group (up to %d pax)"
@@ -37248,6 +37251,7 @@ msgstr ""
 #. translators: %d: minimum pax for the group price.
 #: app/Controllers/SingleTripController.php:1850
 #: app/Controllers/SingleTripController.php:2140
+#: app/Services/TripPricingService.php:596
 #: templates/partials/availability-card.php:429
 #, php-format
 msgid "per group (%d+ pax)"
@@ -37255,6 +37259,7 @@ msgstr ""
 
 #: app/Controllers/SingleTripController.php:1852
 #: app/Controllers/SingleTripController.php:2142
+#: app/Services/TripPricingService.php:598
 #: templates/partials/availability-card.php:431
 #: templates/partials/pricing-summary.php:48
 msgid "per group"
@@ -37526,25 +37531,25 @@ msgid "End"
 msgstr ""
 
 #: app/Controllers/TripController.php:2041
-#: app/Controllers/TripController.php:2163
+#: app/Controllers/TripController.php:2165
 #: templates/partials/availability-card.php:197
 msgid "Return"
 msgstr ""
 
 #: app/Controllers/TripController.php:2088
-#: app/Controllers/TripController.php:2172
+#: app/Controllers/TripController.php:2174
 msgid "Group Departure"
 msgstr ""
 
 #. translators: %d: dynamic pricing increase percentage.
-#: app/Controllers/TripController.php:2269
+#: app/Controllers/TripController.php:2271
 #, php-format
 msgid "+%d%%"
 msgstr ""
 
 #. translators: %d: discount percentage.
-#: app/Controllers/TripController.php:2276
-#: app/Controllers/TripController.php:2283
+#: app/Controllers/TripController.php:2278
+#: app/Controllers/TripController.php:2285
 #, php-format
 msgid "%d%% OFF"
 msgstr ""
@@ -37677,7 +37682,7 @@ msgstr ""
 #: templates/shortcodes/login.php:51
 #: templates/shortcodes/login.php:124
 #: assets/js/listing-wishlist.js:37
-#: assets/js/trip.js:4968
+#: assets/js/trip.js:4976
 msgid "Login"
 msgstr ""
 
@@ -38928,7 +38933,7 @@ msgid "Your review has been submitted!"
 msgstr ""
 
 #: app/Hooks/ReviewHooks.php:120
-#: assets/js/trip.js:4609
+#: assets/js/trip.js:4617
 msgid "Failed to submit review. Please try again."
 msgstr ""
 
@@ -39013,9 +39018,9 @@ msgid "Untitled Trip"
 msgstr ""
 
 #: app/Models/Trip.php:977
-#: app/Services/TripPricingService.php:117
-#: app/Services/TripPricingService.php:138
-#: app/Services/TripPricingService.php:145
+#: app/Services/TripPricingService.php:130
+#: app/Services/TripPricingService.php:151
+#: app/Services/TripPricingService.php:166
 #: templates/listing-destination.php:254
 #: templates/listing-trip-category.php:259
 #: templates/partials/single-trip/sticky-sidebar.php:48
@@ -39314,13 +39319,13 @@ msgstr ""
 #: templates/partials/booking-content.php:80
 #: templates/partials/booking-form-fields.php:821
 #: assets/js/listing-wishlist.js:35
-#: assets/js/trip.js:4966
+#: assets/js/trip.js:4974
 msgid "Login Required"
 msgstr ""
 
 #: app/Providers/FrontendAssetsProvider.php:348
 #: assets/js/listing-wishlist.js:36
-#: assets/js/trip.js:4967
+#: assets/js/trip.js:4975
 msgid "Please login to save trips to your wishlist."
 msgstr ""
 
@@ -39333,39 +39338,39 @@ msgstr ""
 #: assets/js/booking.js:1833
 #: assets/js/booking.js:1969
 #: assets/js/listing-wishlist.js:39
-#: assets/js/trip.js:4613
-#: assets/js/trip.js:4884
-#: assets/js/trip.js:4914
+#: assets/js/trip.js:4621
+#: assets/js/trip.js:4892
+#: assets/js/trip.js:4922
 msgid "An error occurred. Please try again."
 msgstr ""
 
 #: app/Providers/FrontendAssetsProvider.php:352
 #: assets/js/listing-wishlist.js:40
-#: assets/js/trip.js:4878
+#: assets/js/trip.js:4886
 msgid "Trip saved to wishlist"
 msgstr ""
 
 #: app/Providers/FrontendAssetsProvider.php:353
 #: assets/js/listing-wishlist.js:41
-#: assets/js/trip.js:4908
+#: assets/js/trip.js:4916
 msgid "Trip removed from wishlist"
 msgstr ""
 
 #: app/Providers/FrontendAssetsProvider.php:354
 #: assets/js/listing-wishlist.js:42
-#: assets/js/trip.js:4880
+#: assets/js/trip.js:4888
 msgid "Failed to save trip"
 msgstr ""
 
 #: app/Providers/FrontendAssetsProvider.php:355
 #: assets/js/listing-wishlist.js:43
-#: assets/js/trip.js:4910
+#: assets/js/trip.js:4918
 msgid "Failed to remove trip"
 msgstr ""
 
 #: app/Providers/FrontendAssetsProvider.php:356
 #: assets/js/listing-wishlist.js:44
-#: assets/js/trip.js:4940
+#: assets/js/trip.js:4948
 msgid "Add to favorites"
 msgstr ""
 
@@ -40732,7 +40737,7 @@ msgid "Failed to submit review."
 msgstr ""
 
 #: app/Services/ReviewService.php:152
-#: assets/js/trip.js:4590
+#: assets/js/trip.js:4598
 msgid "Thank you for your review!"
 msgstr ""
 
@@ -42671,21 +42676,21 @@ msgid "Flexible dates"
 msgstr ""
 
 #: templates/partials/availability-section.php:123
-#: templates/partials/single-trip/content-sidebar.php:474
+#: templates/partials/single-trip/content-sidebar.php:477
 #: templates/partials/single-trip/enquiry-modal.php:10
 msgid "Make Enquiry"
 msgstr ""
 
 #. translators: %d: number of additional departures still available to load.
 #: templates/partials/availability-section.php:164
-#: assets/js/trip.js:4275
+#: assets/js/trip.js:4283
 #, php-format,js-format
 msgid "Load more departures (%d remaining)"
 msgstr ""
 
 #. translators: 1: number of departures currently loaded, 2: total number of departures matching the filter.
 #: templates/partials/availability-section.php:170
-#: assets/js/trip.js:4289
+#: assets/js/trip.js:4297
 #, php-format,js-format
 msgid "Showing %1$d of %2$d departures"
 msgstr ""
@@ -43465,16 +43470,16 @@ msgid "Key Landmarks"
 msgstr ""
 
 #. translators: %d: maximum discount percentage.
-#: templates/partials/single-trip/content-sidebar.php:42
+#: templates/partials/single-trip/content-sidebar.php:45
 #, php-format
 msgid "Save up to %d%%"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:103
+#: templates/partials/single-trip/content-sidebar.php:106
 msgid "This trip is available for enquiry only. Please contact us to discuss dates and availability."
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:111
+#: templates/partials/single-trip/content-sidebar.php:114
 #: templates/partials/single-trip/enquiry-modal.php:89
 #: templates/partials/single-trip/sticky-sidebar.php:117
 #: assets/js/trip.js:2841
@@ -43482,7 +43487,7 @@ msgid "Send Enquiry"
 msgstr ""
 
 #. translators: %d: number of departures available.
-#: templates/partials/single-trip/content-sidebar.php:255
+#: templates/partials/single-trip/content-sidebar.php:258
 #: assets/js/trip.js:2329
 #, php-format,js-format
 msgid "%d departure available"
@@ -43490,52 +43495,52 @@ msgid_plural "%d departures available"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/partials/single-trip/content-sidebar.php:273
-#: templates/partials/single-trip/content-sidebar.php:393
+#: templates/partials/single-trip/content-sidebar.php:276
+#: templates/partials/single-trip/content-sidebar.php:396
 msgid "Select a departure date"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:343
+#: templates/partials/single-trip/content-sidebar.php:346
 msgid "Flexible booking available"
 msgstr ""
 
 #. translators: 1: available-from date, 2: available-to date.
-#: templates/partials/single-trip/content-sidebar.php:351
+#: templates/partials/single-trip/content-sidebar.php:354
 #, php-format
 msgid "Available: %1$s - %2$s"
 msgstr ""
 
 #. translators: %s: available-from date.
-#: templates/partials/single-trip/content-sidebar.php:358
+#: templates/partials/single-trip/content-sidebar.php:361
 #, php-format
 msgid "Available from: %s"
 msgstr ""
 
 #. translators: %s: available-until date.
-#: templates/partials/single-trip/content-sidebar.php:364
+#: templates/partials/single-trip/content-sidebar.php:367
 #, php-format
 msgid "Available until: %s"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:467
+#: templates/partials/single-trip/content-sidebar.php:470
 msgid "Check Availability"
 msgstr ""
 
 #. translators: 1: numeric time value, 2: time unit (hour/day/week), 3: plural suffix ("s" or empty).
-#: templates/partials/single-trip/content-sidebar.php:500
+#: templates/partials/single-trip/content-sidebar.php:503
 #, php-format
 msgid "Free cancellation up to %1$d %2$s%3$s before"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:506
+#: templates/partials/single-trip/content-sidebar.php:509
 msgid "Free cancellation"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:510
+#: templates/partials/single-trip/content-sidebar.php:513
 msgid "Cancellation policy applies"
 msgstr ""
 
-#: templates/partials/single-trip/content-sidebar.php:514
+#: templates/partials/single-trip/content-sidebar.php:517
 msgid "Cancellation policy may apply"
 msgstr ""
 
@@ -45648,7 +45653,7 @@ msgid "Getting download..."
 msgstr ""
 
 #: assets/js/downloads-list.js:61
-#: assets/js/trip.js:5354
+#: assets/js/trip.js:5362
 msgid "Download failed"
 msgstr ""
 
@@ -46019,7 +46024,7 @@ msgstr ""
 
 #. translators: %d is the number of travelers. Singular form is "for 1 traveler", plural "for N travelers".
 #: assets/js/trip.js:2519
-#: assets/js/trip.js:3968
+#: assets/js/trip.js:3976
 #, js-format
 msgid "for %d traveler"
 msgid_plural "for %d travelers"
@@ -46062,54 +46067,54 @@ msgid "Unable to process booking. Please try again."
 msgstr ""
 
 #. translators: %s: formatted discount amount.
-#: assets/js/trip.js:3979
+#: assets/js/trip.js:3987
 #, js-format
 msgid " (Group discount: -%s)"
 msgstr ""
 
 #. translators: %s: discount percentage.
-#: assets/js/trip.js:4100
+#: assets/js/trip.js:4108
 #, js-format
 msgid "%s%% group discount applied!"
 msgstr ""
 
-#: assets/js/trip.js:4103
+#: assets/js/trip.js:4111
 msgid "Group discount applied!"
 msgstr ""
 
-#: assets/js/trip.js:4185
+#: assets/js/trip.js:4193
 msgid "Selected!"
 msgstr ""
 
-#: assets/js/trip.js:4235
+#: assets/js/trip.js:4243
 msgid "Load more failed"
 msgstr ""
 
-#: assets/js/trip.js:4981
+#: assets/js/trip.js:4989
 msgid "Please login to save trips to your wishlist. Would you like to go to the login page?"
 msgstr ""
 
-#: assets/js/trip.js:5233
+#: assets/js/trip.js:5241
 msgid "Itinerary Video"
 msgstr ""
 
-#: assets/js/trip.js:5385
+#: assets/js/trip.js:5393
 msgid "Failed to get file info"
 msgstr ""
 
-#: assets/js/trip.js:5398
+#: assets/js/trip.js:5406
 msgid "Failed to load preview. Please try again."
 msgstr ""
 
-#: assets/js/trip.js:5428
+#: assets/js/trip.js:5436
 msgid "Preview not available for this file type"
 msgstr ""
 
-#: assets/js/trip.js:5429
+#: assets/js/trip.js:5437
 msgid "Please download the file to view its contents"
 msgstr ""
 
-#: assets/js/trip.js:5458
+#: assets/js/trip.js:5466
 msgid "Loading preview..."
 msgstr ""
 

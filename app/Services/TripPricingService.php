@@ -66,6 +66,11 @@ class TripPricingService
             'pricing_type' => $pricing_type,
             'price_types' => $price_types,
             'has_traveler_pricing' => $has_traveler_pricing,
+            // How the displayed amount is charged: 'per_person' or 'per_group'
+            // (+ the pax range), taken from the SAME category the amount comes
+            // from, so the label can never contradict the price.
+            'price_unit' => 'per_person',
+            'price_unit_label' => self::priceUnitLabel(null),
             'currency' => SettingsService::getCurrency(),
         ];
 
@@ -75,8 +80,10 @@ class TripPricingService
             // - Otherwise fall back to minimum effective price across categories (current behavior).
             $default_price = 0.0;
             $default_original = 0.0;
+            $default_pt = null;
             $min_price = PHP_FLOAT_MAX;
             $min_original = 0.0;
+            $min_pt = null;
             $max_discount = 0;
 
             foreach ($price_types as $pt) {
@@ -87,11 +94,13 @@ class TripPricingService
                 if (!empty($pt['is_default']) && $default_price <= 0 && $discounted > 0) {
                     $default_price = $discounted;
                     $default_original = $original;
+                    $default_pt = $pt;
                 }
 
                 if ($discounted > 0 && $discounted < $min_price) {
                     $min_price = $discounted;
                     $min_original = $original;
+                    $min_pt = $pt;
                 }
 
                 // Track max discount across categories
@@ -105,8 +114,12 @@ class TripPricingService
 
             $chosen_price = $default_price > 0 ? $default_price : ($min_price < PHP_FLOAT_MAX ? $min_price : 0.0);
             $chosen_original = $default_price > 0 ? $default_original : $min_original;
+            $chosen_pt = $default_price > 0 ? $default_pt : $min_pt;
 
             if ($chosen_price > 0) {
+                $unit = self::priceUnit($chosen_pt);
+                $result['price_unit'] = $unit['unit'];
+                $result['price_unit_label'] = $unit['label'];
                 $result['effective_price_min'] = $chosen_price;
                 $result['min_category_original_price'] = $chosen_original;
                 $result['max_discount_percentage'] = $max_discount;
@@ -140,6 +153,14 @@ class TripPricingService
             if ($avail_min > 0 && ($result['effective_price_min'] <= 0 || $avail_min < $result['effective_price_min'])) {
                 $result['effective_price_min'] = $avail_min;
                 $result['current_price'] = $avail_min;
+                if ($has_traveler_pricing) {
+                    $avail_pt = self::findAvailabilityPriceTypeAt($availabilityDates, $avail_min);
+                    if ($avail_pt !== null) {
+                        $unit = self::priceUnit($avail_pt);
+                        $result['price_unit'] = $unit['unit'];
+                        $result['price_unit_label'] = $unit['label'];
+                    }
+                }
             }
         } elseif ($has_traveler_pricing) {
             $result['price_prefix'] = __('From ', 'yatra');
@@ -178,6 +199,8 @@ class TripPricingService
             'discount_percentage' => 0,
             'pricing_type' => $pricing_type,
             'price_types' => $pricing_type === 'traveler_based' ? $avail_price_types : [],
+            'price_unit' => 'per_person',
+            'price_unit_label' => self::priceUnitLabel(null),
         ];
 
         if ($pricing_type === 'traveler_based' && !empty($avail_price_types)) {
@@ -185,6 +208,9 @@ class TripPricingService
             $first = (array) $avail_price_types[0];
             $result['sale_price'] = self::resolveCategoryEffectivePrice($first);
             $result['original_price'] = (float) ($first['original_price'] ?? $result['sale_price']);
+            $unit = self::priceUnit($first);
+            $result['price_unit'] = $unit['unit'];
+            $result['price_unit_label'] = $unit['label'];
         } elseif (isset($avail->effective_price) && (float) $avail->effective_price > 0) {
             // Regular: use pre-calculated effective price
             $result['sale_price'] = (float) $avail->effective_price;
@@ -526,6 +552,100 @@ class TripPricingService
         }
 
         return (array) apply_filters('yatra_resolve_discount_info', $result, $originalPrice, $currentPrice);
+    }
+
+    /**
+     * How a category's price is charged, for display next to an amount.
+     *
+     * A traveller category is priced 'per_person' (× headcount) or 'per_group'
+     * (flat for min_pax–max_pax people). The trip's stored price_types JSON does
+     * not carry the mode, so it is read back from the category classification
+     * (applyCategoryPricingMeta) exactly as checkout does. Pass the category
+     * entry whose price is being displayed; null / a regular-pricing trip →
+     * per person.
+     *
+     * @param array|object|null $pt
+     * @return array{unit:string,label:string,min_pax:?int,max_pax:?int}
+     */
+    public static function priceUnit($pt): array
+    {
+        $unit = ['unit' => 'per_person', 'label' => '', 'min_pax' => null, 'max_pax' => null];
+
+        if ($pt !== null) {
+            $pt = (array) $pt;
+            if (!isset($pt['pricing_mode']) && isset($pt['category_id'])) {
+                $backfilled = self::applyCategoryPricingMeta([$pt]);
+                $pt = (array) ($backfilled[0] ?? $pt);
+            }
+            if (($pt['pricing_mode'] ?? 'per_person') === 'per_group') {
+                $unit['unit'] = 'per_group';
+                $unit['min_pax'] = isset($pt['min_pax']) && $pt['min_pax'] !== '' && $pt['min_pax'] !== null ? (int) $pt['min_pax'] : null;
+                $unit['max_pax'] = isset($pt['max_pax']) && $pt['max_pax'] !== '' && $pt['max_pax'] !== null ? (int) $pt['max_pax'] : null;
+            }
+        }
+
+        if ($unit['unit'] === 'per_group') {
+            if ($unit['min_pax'] > 0 && $unit['max_pax'] > 0) {
+                /* translators: 1: minimum pax for the group price, 2: maximum pax. */
+                $label = sprintf(__('per group (%1$d-%2$d pax)', 'yatra'), $unit['min_pax'], $unit['max_pax']);
+            } elseif ($unit['max_pax'] > 0) {
+                /* translators: %d: maximum pax for the group price. */
+                $label = sprintf(__('per group (up to %d pax)', 'yatra'), $unit['max_pax']);
+            } elseif ($unit['min_pax'] > 0) {
+                /* translators: %d: minimum pax for the group price. */
+                $label = sprintf(__('per group (%d+ pax)', 'yatra'), $unit['min_pax']);
+            } else {
+                $label = __('per group', 'yatra');
+            }
+        } else {
+            $label = __('per person', 'yatra');
+        }
+
+        /**
+         * Wording of the unit shown next to a price ("per person", "per group (1-2 pax)").
+         *
+         * @param string     $label Translated label.
+         * @param string     $unit  'per_person' or 'per_group'.
+         * @param array|null $pt    The traveller-category price entry, if any.
+         */
+        $unit['label'] = (string) apply_filters('yatra_price_unit_label', $label, $unit['unit'], $pt);
+
+        return $unit;
+    }
+
+    /**
+     * Shorthand for priceUnit()['label'].
+     *
+     * @param array|object|null $pt
+     */
+    public static function priceUnitLabel($pt): string
+    {
+        return self::priceUnit($pt)['label'];
+    }
+
+    /**
+     * The availability price-type entry whose effective price equals $price
+     * (the value findMinPriceFromAvailability() picked), so the unit label can
+     * follow that category. Null when the minimum came from the availability
+     * row itself rather than a category.
+     *
+     * @param array<int, object> $availabilityDates
+     */
+    private static function findAvailabilityPriceTypeAt(array $availabilityDates, float $price): ?array
+    {
+        foreach ($availabilityDates as $avail) {
+            if (empty($avail->price_types) || !is_array($avail->price_types)) {
+                continue;
+            }
+            foreach ($avail->price_types as $pt) {
+                $pt = (array) $pt;
+                if (abs(self::resolveCategoryEffectivePrice($pt) - $price) < 0.005) {
+                    return $pt;
+                }
+            }
+        }
+
+        return null;
     }
 
     /**

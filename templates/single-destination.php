@@ -260,7 +260,7 @@ yatra_get_header();
                                         }
                                         ?>
                                     </div>
-                                    <div class="yatra-price-note"><?php esc_html_e('per person', 'yatra'); ?></div>
+                                    <div class="yatra-price-note"><?php echo esc_html(\Yatra\Services\TripPricingService::resolveDisplayPricing($trip)['price_unit_label'] ?? __('per person', 'yatra')); ?></div>
                                     <?php if (!empty($yatra_dest_urgency)) : ?>
                                         <?php foreach ($yatra_dest_urgency as $yatra_d_urg) : ?>
                                             <div style="margin-top:6px;font-size:11px;line-height:1.35;color:#92400e;background:#fef3c7;padding:4px 6px;border-radius:4px;">

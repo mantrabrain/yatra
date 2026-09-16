@@ -3897,6 +3897,7 @@ if (typeof window.yatraNumOr !== 'function') {
       const categoryInputs = this.section.querySelectorAll(`.yatra-availability-category[data-item="${itemIndex}"]`);
       let totalPrice = 0;
       let totalTravelers = 0;
+      let totalGroups = 0; // per-group categories: number of group prices charged
 
       if (categoryInputs.length > 0) {
         // Traveler-based pricing: sum up each category's price * quantity (respecting pricing mode)
@@ -3910,9 +3911,9 @@ if (typeof window.yatraNumOr !== 'function') {
 
           if (pricingMode === 'per_group') {
             if (quantity > 0) {
-              totalPrice += (groupOverflow === 'per_block' && maxPax > 0)
-                ? price * Math.ceil(quantity / maxPax)
-                : price;
+              const blocks = (groupOverflow === 'per_block' && maxPax > 0) ? Math.ceil(quantity / maxPax) : 1;
+              totalPrice += price * blocks;
+              totalGroups += blocks;
             }
           } else {
             totalPrice += quantity * price;
@@ -3942,12 +3943,19 @@ if (typeof window.yatraNumOr !== 'function') {
         totalAmountElement.textContent = String(finalPrice.toFixed(2));
       }
 
-      // Header "per person" must match chargable average (row totals + group discount), not static PHP.
+      // Header price must match the chargeable amount (row totals + group discount), not static PHP.
+      // Its unit follows the card's price label: "per person" → average per traveller;
+      // "per group" → the price per group actually charged (never divided by headcount,
+      // which would turn a flat $1,100 group price into "$550 per group" for two travellers).
       const cardRoot = this.section.querySelector('.yatra-availability-card[data-item="' + itemIndex + '"]');
-      const headerSaleEl = cardRoot ? cardRoot.querySelector('.yatra-card-header-price .yatra-sale-price') : null;
+      const headerPriceWrap = cardRoot ? cardRoot.querySelector('.yatra-card-header-price') : null;
+      const headerSaleEl = headerPriceWrap ? headerPriceWrap.querySelector('.yatra-sale-price') : null;
       if (headerSaleEl) {
+        const headerUnit = headerPriceWrap.getAttribute('data-price-unit') || 'per_person';
         let perPerson = 0;
-        if (totalTravelers > 0) {
+        if (headerUnit === 'per_group') {
+          perPerson = totalGroups > 0 ? finalPrice / totalGroups : (totalPrice > 0 ? totalPrice : 0);
+        } else if (totalTravelers > 0) {
           perPerson = finalPrice / totalTravelers;
         } else if (totalPrice > 0) {
           perPerson = totalPrice;

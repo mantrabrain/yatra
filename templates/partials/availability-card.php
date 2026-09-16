@@ -207,13 +207,13 @@ $initial_total_price = $display_sale_price;
                     </div>
                     
                     <!-- Price (sale only; struck original + % badge sit in .yatra-card-badges-container with status) -->
-                    <div class="yatra-card-header-price">
+                    <div class="yatra-card-header-price" data-price-unit="<?php echo esc_attr($card['price_unit'] ?? 'per_person'); ?>">
                         <div class="yatra-card-price-group yatra-card-price-group--stack">
                             <?php
                             echo '<span class="yatra-sale-price">' . yatra_format_price($display_sale_price) . '</span>';
                             ?>
                         </div>
-                        <span class="yatra-price-label"><?php echo esc_html__('per person', 'yatra'); ?></span>
+                        <span class="yatra-price-label"><?php echo esc_html($card['price_unit_label'] ?? __('per person', 'yatra')); ?></span>
                     </div>
                     
                     <!-- Toggle Arrow -->

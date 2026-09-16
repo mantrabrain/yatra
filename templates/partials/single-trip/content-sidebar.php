@@ -32,6 +32,9 @@ if (!defined('ABSPATH')) {
         'raw_current_price'  => $displayPricing['effective_price_min'],
         'raw_original_price' => $displayPricing['min_category_original_price'],
         'is_traveler_based'  => $displayPricing['has_traveler_pricing'],
+        // "per person" / "per group (1-2 pax)" — follows the category the shown price comes from
+        'price_unit'         => $displayPricing['price_unit'] ?? 'per_person',
+        'price_unit_label'   => $displayPricing['price_unit_label'] ?? __('per person', 'yatra'),
     ];
 
     $discount = [
@@ -81,7 +84,7 @@ if (!defined('ABSPATH')) {
                         <span class="yatra-booking-price-original"><?php echo esc_html($pricing['original_price']); ?></span>
                     <?php endif; ?>
                     <span class="yatra-booking-price-amount" id="display-price"><?php echo esc_html($pricing['current_price']); ?></span>
-                    <span class="yatra-booking-price-label"><?php echo esc_html__('per person', 'yatra'); ?></span>
+                    <span class="yatra-booking-price-label" data-price-unit="<?php echo esc_attr($pricing['price_unit']); ?>"><?php echo esc_html($pricing['price_unit_label']); ?></span>
                     <?php if (!empty($yatra_sidebar_urgency)) : ?>
                         <?php foreach ($yatra_sidebar_urgency as $yatra_sb_urg) : ?>
                             <div class="yatra-booking-dp-urgency" style="background-color:#fef3c7;color:#92400e;padding:6px 8px;border-radius:6px;margin-top:8px;font-size:12px;line-height:1.35;">
@@ -145,7 +148,7 @@ if (!defined('ABSPATH')) {
                         <span class="yatra-booking-price-original"><?php echo esc_html($pricing['original_price']); ?></span>
                     <?php endif; ?>
                     <span class="yatra-booking-price-amount" id="display-price"><?php echo esc_html($pricing['current_price']); ?></span>
-                    <span class="yatra-booking-price-label"><?php echo esc_html__('per person', 'yatra'); ?></span>
+                    <span class="yatra-booking-price-label" data-price-unit="<?php echo esc_attr($pricing['price_unit']); ?>"><?php echo esc_html($pricing['price_unit_label']); ?></span>
                     <?php if (!empty($yatra_sidebar_urgency)) : ?>
                         <?php foreach ($yatra_sidebar_urgency as $yatra_sb_urg) : ?>
                             <div class="yatra-booking-dp-urgency" style="background-color:#fef3c7;color:#92400e;padding:6px 8px;border-radius:6px;margin-top:8px;font-size:12px;line-height:1.35;">

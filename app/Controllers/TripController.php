@@ -2101,6 +2101,8 @@ class TripController extends BaseController
                     // Card-specific pricing
                     'pricing_type' => $card_pricing_type,
                     'traveler_pricing' => $card_traveler_pricing,
+                    'price_unit' => $cardPricing['price_unit'] ?? 'per_person',
+                    'price_unit_label' => $cardPricing['price_unit_label'] ?? __('per person', 'yatra'),
                     'is_recurring' => !empty($avail->is_recurring),
                     'rule_id' => $avail->rule_id ?? null,
                 ] + $dp_card_fields;
