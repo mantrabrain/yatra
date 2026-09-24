@@ -752,7 +752,7 @@ do_action('yatra_booking_confirmation_header', $booking);
                         
                         <div class="yatra-payment-method">
                             <span class="yatra-pm-label"><?php esc_html_e('Payment Method:', 'yatra'); ?></span>
-                            <span class="yatra-pm-value"><?php echo esc_html(ucwords(str_replace('_', ' ', (string) $display_payment_gateway))); ?></span>
+                            <span class="yatra-pm-value"><?php echo esc_html(yatra_payment_gateway_label((string) $display_payment_gateway)); ?></span>
                         </div>
                     </div>
 

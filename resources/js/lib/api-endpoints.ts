@@ -165,6 +165,7 @@ export const API_ENDPOINTS = {
   GOOGLE_CALENDAR_CONNECT: "/google-calendar/connect",
   GOOGLE_CALENDAR_DISCONNECT: "/google-calendar/disconnect",
   GOOGLE_CALENDAR_SYNC_ALL: "/google-calendar/sync-all",
+  GOOGLE_CALENDAR_RESYNC: "/google-calendar/resync",
 
   // Tools
   TOOLS_SYSTEM_STATUS: "/tools/system-status",

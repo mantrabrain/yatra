@@ -15,7 +15,7 @@ import {
   MapPin,
   CheckCircle2,
 } from "lucide-react";
-import { __ } from "../lib/i18n";
+import { __, sprintf } from "../lib/i18n";
 import { toDateValue } from "../lib/dateFormat";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -148,6 +148,25 @@ const AvailabilityForm: React.FC = () => {
     enabled: !!tripId,
   });
 
+  const isSingleDayTrip = tripData?.trip_type === "single_day";
+
+  // A day tour can run several departures a day ("multiple time slots", set on
+  // the trip). Only then does a date need a departure time — it identifies
+  // which slot this row overrides, exactly as the server resolves it
+  // (AvailabilityResolutionService: has_default_time_slots && single_day).
+  // A day tour with one departure stores no time, which every consumer
+  // already handles (CapacityService falls back to the rule/date seats).
+  const hasTimeSlots = isSingleDayTrip && !!tripData?.has_default_time_slots;
+
+  // The trip's max travellers seeds a new date's capacity so it doesn't have
+  // to be retyped for every date. It stays editable per date, and it is still
+  // stored explicitly: an empty/zero seat count means "sold out" to the
+  // availability layer, so it must never be left blank.
+  const tripMaxTravelers = (() => {
+    const raw = Number(tripData?.max_travelers ?? 0);
+    return Number.isFinite(raw) && raw > 0 ? raw : 0;
+  })();
+
   // Fetch traveler categories
   const { data: categoriesData, isLoading: isLoadingCategories } = useQuery({
     queryKey: ["traveler-categories"],
@@ -200,6 +219,11 @@ const AvailabilityForm: React.FC = () => {
 
       setFormData((prev) => ({
         ...prev,
+        // Only seeds an untouched field — never overwrites a typed value if
+        // the trip query refetches.
+        total_seats:
+          prev.total_seats ||
+          (tripMaxTravelers > 0 ? String(tripMaxTravelers) : prev.total_seats),
         from_location: tripData.starting_location || "",
         to_location: tripData.ending_location || "",
         from_latitude: coordFromApi(tripData.starting_latitude),
@@ -210,7 +234,7 @@ const AvailabilityForm: React.FC = () => {
         pricing_type: effectivePricingType as "regular" | "traveler_based",
       }));
     }
-  }, [tripData, isEditMode]);
+  }, [tripData, isEditMode, tripMaxTravelers]);
 
   useEffect(() => {
     if (availabilityData) {
@@ -359,7 +383,7 @@ const AvailabilityForm: React.FC = () => {
     }
 
     // Validate dates and times based on trip type
-    const isSingleDay = tripData?.trip_type === "single_day";
+    const isSingleDay = isSingleDayTrip;
 
     if (isSingleDay) {
       // For single day trips, both dates should be the same
@@ -373,16 +397,13 @@ const AvailabilityForm: React.FC = () => {
           "yatra",
         );
       }
-      // Validate times
-      if (!formData.departure_time) {
+      // Times are only needed when the day tour runs several departures a
+      // day: the departure time is what identifies the slot. A single-
+      // departure day tour saves without times (arrival time is display-only
+      // and never required).
+      if (hasTimeSlots && !formData.departure_time) {
         newErrors.departure_time = __(
-          "Departure time is required for single day trips",
-          "yatra",
-        );
-      }
-      if (!formData.arrival_time) {
-        newErrors.arrival_time = __(
-          "Arrival time is required for single day trips",
+          "Departure time is required when the trip has multiple time slots",
           "yatra",
         );
       }
@@ -707,7 +728,13 @@ const AvailabilityForm: React.FC = () => {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                       {__("Departure Time", "yatra")}{" "}
-                      <span className="text-red-500">*</span>
+                      {hasTimeSlots ? (
+                        <span className="text-red-500">*</span>
+                      ) : (
+                        <span className="text-gray-400 font-normal">
+                          {__("(optional)", "yatra")}
+                        </span>
+                      )}
                     </label>
                     <TimePicker
                       value={formData.departure_time}
@@ -726,7 +753,9 @@ const AvailabilityForm: React.FC = () => {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                       {__("Arrival Time", "yatra")}{" "}
-                      <span className="text-red-500">*</span>
+                      <span className="text-gray-400 font-normal">
+                        {__("(optional)", "yatra")}
+                      </span>
                     </label>
                     <TimePicker
                       value={formData.arrival_time}
@@ -1526,10 +1555,21 @@ const AvailabilityForm: React.FC = () => {
                     </p>
                   )}
                   <HelpText
-                    text={__(
-                      "Maximum number of seats available for this date",
-                      "yatra",
-                    )}
+                    text={
+                      tripMaxTravelers > 0
+                        ? sprintf(
+                            /* translators: %d: the trip's max travellers. */
+                            __(
+                              "Seats for this date. Pre-filled from the trip's max travellers (%d) — change it for this date if it differs.",
+                              "yatra",
+                            ),
+                            tripMaxTravelers,
+                          )
+                        : __(
+                            "Maximum number of seats available for this date",
+                            "yatra",
+                          )
+                    }
                     className="mt-1"
                   />
                 </div>

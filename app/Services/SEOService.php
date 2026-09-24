@@ -725,11 +725,74 @@ class SEOService
     }
 
     /**
+     * The robots directive for this page.
+     *
+     * Normally "index, follow" with the usual snippet hints, exactly as before.
+     * When the operator has both dropped this content type from the sitemap and
+     * opted in to noindexing excluded types, it becomes "noindex, follow" —
+     * because removing a URL from a sitemap does not stop Google indexing it,
+     * and this page was previously asserting the opposite.
+     *
+     * "follow" is kept deliberately: the page should stop being indexed, but
+     * links out of it (to trips that ARE published) should still be crawled.
+     */
+    private function robotsDirective(): string
+    {
+        $indexable = 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1';
+
+        if (!SettingsService::isEnabled('sitemap_noindex_excluded')) {
+            return $indexable;
+        }
+
+        $sitemapType = $this->sitemapTypeForPage();
+        if ($sitemapType === '') {
+            return $indexable;
+        }
+
+        if (!class_exists(\Yatra\Sitemap\SitemapService::class)) {
+            return $indexable;
+        }
+
+        $sitemap = new \Yatra\Sitemap\SitemapService();
+
+        return $sitemap->isTypeEnabled($sitemapType) ? $indexable : 'noindex, follow';
+    }
+
+    /**
+     * Map this page onto the sitemap content type that governs it.
+     *
+     * The taxonomy listing pages are published by the sitemap's `archive` type
+     * (the trip listing plus each taxonomy index), so they follow it.
+     *
+     * @return string '' when no sitemap type owns this page.
+     */
+    private function sitemapTypeForPage(): string
+    {
+        switch ($this->pageType) {
+            case self::PAGE_TYPE_TRIP:
+                return \Yatra\Sitemap\SitemapService::TYPE_TRIP;
+            case self::PAGE_TYPE_DESTINATION:
+                return \Yatra\Sitemap\SitemapService::TYPE_DESTINATION;
+            case self::PAGE_TYPE_ACTIVITY:
+                return \Yatra\Sitemap\SitemapService::TYPE_ACTIVITY;
+            case self::PAGE_TYPE_CATEGORY:
+                return \Yatra\Sitemap\SitemapService::TYPE_CATEGORY;
+            case self::PAGE_TYPE_TRIP_ARCHIVE:
+            case self::PAGE_TYPE_DESTINATION_LISTING:
+            case self::PAGE_TYPE_ACTIVITY_LISTING:
+            case self::PAGE_TYPE_CATEGORY_LISTING:
+                return \Yatra\Sitemap\SitemapService::TYPE_ARCHIVE;
+            default:
+                return '';
+        }
+    }
+
+    /**
      * Output advanced meta tags
      */
     private function outputAdvancedMetaTags(): void
     {
-        echo '<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">' . "\n";
+        echo '<meta name="robots" content="' . esc_attr($this->robotsDirective()) . '">' . "\n";
         echo '<link rel="canonical" href="' . esc_url($this->seoData['url']) . '">' . "\n";
         echo '<meta name="author" content="' . esc_attr($this->seoData['author']) . '">' . "\n";
         echo '<meta name="publisher" content="' . esc_attr($this->seoData['publisher']) . '">' . "\n";

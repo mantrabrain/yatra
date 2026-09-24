@@ -4,7 +4,7 @@ Tags: tour-booking, travel-booking, tour-operator, travel, travel-agency
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 3.0.15
+Stable tag: 3.0.16
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -282,6 +282,23 @@ Pricing starts at **$99/yr** (Starter, sale) and goes up to **$599/yr** (Scale 1
 == Changelog ==
 
 The two most recent releases are listed below. For the complete version history, see [changelog.txt](https://plugins.svn.wordpress.org/yatra/trunk/changelog.txt).
+
+= 3.0.16 — 24 September 2026 =
+
+**Please read if you use reCAPTCHA.** With reCAPTCHA switched on for the booking form, checkout could not be completed on Stripe, Square or Authorize.net — the card form showed "reCAPTCHA verification failed. Please try again." and the payment never went through. Lowering the score threshold did not help, because no token was being sent at all. This release fixes that; if you turned reCAPTCHA off to take payments, you can turn it back on.
+
+**New**
+* **Download a booking's invoice from the dashboard.** Bookings → ⋮ → *Download invoice*, and a *Download invoice* button on the booking detail, produce a PDF for the whole booking rather than for a single payment. Available to anyone who can view bookings.
+* **Exclude a whole period from a recurring rule.** Trip → Availability → Recurring Rules gains **Excluded Periods**: give a first and last day and the rule skips everything in between, instead of adding a business vacation one day at a time. The existing single-date exclusions are unchanged and the two can be mixed.
+* **Choose what goes in the sitemap.** Settings → SEO → *Content in the sitemap* lets you publish only the types you want — trips, destinations, activities, trip categories, listing pages. Leaving a type out of the sitemap does not stop search engines indexing it, so there is a separate, deliberately opt-in **Also add noindex to excluded types**. It is off by default, because switching it on removes those pages from search results.
+* **Google Calendar controls** (with Yatra Pro). The Google Calendar screen gains *Resync Everything*, which walks every booking in batches and repairs the calendar in one click; an **Event reminders** editor so the 7/3/1-day reminders are no longer fixed; **Add customers as guests**, which keeps the customer's address off the event entirely so Google sends them no reminders or cancellations; and **One event per departure**, which puts every booking on the same departure into a single event with each booking's details in the description. The last one is off by default.
+
+**Fixed**
+* **reCAPTCHA blocked checkout.** Gateways that handle the card themselves (Stripe here, Square and Authorize.net in Pro) submit the booking directly, so they never attached a reCAPTCHA token and the server rejected every attempt. Each now sends its own fresh token. The account-registration form on the booking page had the same gap and is fixed too.
+* **Excluded dates were still bookable.** A date excluded from a recurring rule disappeared from the calendar but could still be booked by posting that date directly, because the resolver fell through to the trip's default availability. Excluded dates are now refused at checkout. An explicit availability row for that date, or another rule that generates it, still opens it as before.
+* **Availability times were demanded for tours that have none.** Adding or editing an availability date on a single-day tour insisted on a start and end time even when the tour has no time slots configured, so the date could not be saved. Times are now required only for day tours that actually use time slots, arrival time is always optional, and every field says whether it is required. The capacity field also stops overwriting a value you have already typed, and its help text names the tour's own maximum.
+* **Invoices and emails named the gateway, not its title.** Payment details showed the internal gateway id (`bank_transfer`) instead of the title your customers see at checkout ("Bank Transfer"). The payment invoice, the booking invoice, payment emails and the booking confirmation page now all use the checkout title, falling back to a readable version of the id for a gateway that no longer exists.
+* The sitemap is rebuilt as soon as you change what it contains, instead of waiting up to an hour for its cache to expire.
 
 = 3.0.15 — 15 September 2026 =
 _With thanks to [Vista-Tours](https://vista-tours.de) for detailed testing and feedback._

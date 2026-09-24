@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yatra\Sitemap;
 
+use Yatra\Services\SettingsService;
+
 use Yatra\Database\Tables\ClassificationsTable;
 use Yatra\Database\Tables\TripsTable;
 
@@ -38,7 +40,19 @@ class SitemapService
         self::TYPE_CATEGORY,
     ];
 
+    /**
+     * Per-request memo. Held as a class property rather than a method static so
+     * flushCache() can actually clear it — a flush that only dropped the
+     * transient left this stale for the rest of the request.
+     *
+     * @var array<int, array{loc: string, lastmod: string}>|null
+     */
+    private static $runtime = null;
+
     private const CACHE_KEY = 'yatra_sitemap_entries_all';
+
+    /** Setting holding the types the operator wants published. */
+    private const TYPES_SETTING = 'sitemap_types';
     private const CACHE_TTL = HOUR_IN_SECONDS;
 
     /** sitemaps.org caps a single sitemap file at 50,000 URLs. */
@@ -51,19 +65,18 @@ class SitemapService
      */
     public function getAllEntries(): array
     {
-        static $runtime = null;
-        if ($runtime !== null) {
-            return $runtime;
+        if (self::$runtime !== null) {
+            return self::$runtime;
         }
 
         $cached = get_transient(self::CACHE_KEY);
         if (is_array($cached)) {
-            $runtime = $cached;
+            self::$runtime = $cached;
             return $cached;
         }
 
         $entries = [];
-        foreach (self::TYPES as $type) {
+        foreach ($this->enabledTypes() as $type) {
             foreach ($this->entriesForType($type) as $entry) {
                 $entries[] = $entry;
             }
@@ -87,7 +100,7 @@ class SitemapService
         }
 
         set_transient(self::CACHE_KEY, $entries, self::CACHE_TTL);
-        $runtime = $entries;
+        self::$runtime = $entries;
 
         return $entries;
     }
@@ -115,8 +128,56 @@ class SitemapService
     /**
      * Drop the cached list. Call when a trip or classification changes.
      */
+    /**
+     * Types the operator has chosen to publish, in the canonical order.
+     *
+     * An unset or empty setting means "everything", which is what every site
+     * had before this was configurable — so an upgrade changes nothing until
+     * the operator actually makes a choice.
+     *
+     * @return string[]
+     */
+    public function enabledTypes(): array
+    {
+        $selected = null;
+
+        if (class_exists(SettingsService::class)) {
+            $selected = SettingsService::get(self::TYPES_SETTING, null);
+        }
+
+        if (!is_array($selected) || $selected === []) {
+            return self::TYPES;
+        }
+
+        $selected = array_map('strval', $selected);
+
+        // Intersect rather than trust the stored list, so an unknown or stale
+        // type can never introduce an entry type this class cannot build.
+        $types = array_values(array_intersect(self::TYPES, $selected));
+
+        /**
+         * Final say over which Yatra content types the sitemap publishes.
+         *
+         * @param string[] $types    Selected types, canonical order.
+         * @param string[] $selected Raw stored selection.
+         */
+        return (array) apply_filters('yatra_sitemap_types', $types, $selected);
+    }
+
+    /**
+     * Is this content type published in the sitemap?
+     *
+     * Also answers "should this page be noindexed?" for the SEO layer, which
+     * is why it is public.
+     */
+    public function isTypeEnabled(string $type): bool
+    {
+        return in_array($type, $this->enabledTypes(), true);
+    }
+
     public static function flushCache(): void
     {
+        self::$runtime = null;
         delete_transient(self::CACHE_KEY);
     }
 

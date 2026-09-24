@@ -23,8 +23,7 @@ function getAdminRestConfig(): AdminRestConfig {
   return { base, nonce };
 }
 
-function buildInvoiceUrl(base: string, paymentId: number): string {
-  const suffix = `/yatra/v1/payment/${paymentId}/invoice`;
+function buildInvoiceUrl(base: string, suffix: string): string {
   const origin =
     typeof window !== "undefined" ? window.location.origin : "http://localhost";
 
@@ -65,22 +64,22 @@ async function readError(res: Response): Promise<string> {
 }
 
 /**
- * Download a payment invoice PDF as a file.
+ * Fetch an invoice PDF from `suffix` and save it, falling back to
+ * `fallbackName` when the response carries no Content-Disposition.
  *
  * Authentication is handled server-side via the admin REST nonce + cookie
- * (administrators bypass the ownership check inside `download_invoice`).
+ * (administrators bypass the ownership check inside the endpoint).
  */
-export async function downloadAdminInvoice(paymentId: number): Promise<void> {
-  if (!paymentId || paymentId <= 0) {
-    throw new Error("Invalid payment ID");
-  }
-
+async function downloadInvoicePdf(
+  suffix: string,
+  fallbackName: string,
+): Promise<void> {
   const { base, nonce } = getAdminRestConfig();
   if (!nonce) {
     throw new Error("Missing REST nonce; please reload the page.");
   }
 
-  const url = buildInvoiceUrl(base, paymentId);
+  const url = buildInvoiceUrl(base, suffix);
   const res = await fetch(url, {
     method: "GET",
     credentials: "include",
@@ -96,7 +95,7 @@ export async function downloadAdminInvoice(paymentId: number): Promise<void> {
 
   const blob = await res.blob();
   const dispo = res.headers.get("Content-Disposition");
-  let filename = `invoice-${paymentId}.pdf`;
+  let filename = fallbackName;
   if (dispo) {
     const m = /filename\*?=(?:UTF-8'')?["']?([^";\n]+)/i.exec(dispo);
     if (m?.[1]) {
@@ -116,4 +115,37 @@ export async function downloadAdminInvoice(paymentId: number): Promise<void> {
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(objectUrl);
+}
+
+/**
+ * Download a payment invoice (receipt for one recorded payment).
+ */
+export async function downloadAdminInvoice(paymentId: number): Promise<void> {
+  if (!paymentId || paymentId <= 0) {
+    throw new Error("Invalid payment ID");
+  }
+
+  await downloadInvoicePdf(
+    `/yatra/v1/payment/${paymentId}/invoice`,
+    `invoice-${paymentId}.pdf`,
+  );
+}
+
+/**
+ * Download a booking invoice — the whole booking rather than a single
+ * payment, so it also works for bookings with no payment recorded yet
+ * (bank transfer, pay later), where it renders as a pro-forma invoice with
+ * the gateway's payment instructions.
+ */
+export async function downloadAdminBookingInvoice(
+  bookingId: number,
+): Promise<void> {
+  if (!bookingId || bookingId <= 0) {
+    throw new Error("Invalid booking ID");
+  }
+
+  await downloadInvoicePdf(
+    `/yatra/v1/booking/${bookingId}/invoice`,
+    `invoice-booking-${bookingId}.pdf`,
+  );
 }

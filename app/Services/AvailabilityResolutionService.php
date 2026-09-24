@@ -103,6 +103,27 @@ class AvailabilityResolutionService
             return $this->buildAvailabilityObject($trip, $recurring, 'recurring_rule');
         }
 
+        // Priority 2.5: A date the operator explicitly excluded on a recurring
+        // rule — a holiday, or a period such as a business vacation.
+        //
+        // Without this the date matches no rule, falls through to the trip
+        // default below and reports free seats, so the booking guard allows a
+        // booking on a day the operator has closed. Same failure mode the
+        // blocked/sold_out short-circuits above already guard against.
+        //
+        // Deliberately narrow: it only suppresses the trip-default fallback. An
+        // explicit availability row or another rule that does generate this date
+        // has already returned above, so this can never close a date the
+        // operator opened by other means.
+        if ($this->recurringAvailabilityService->isDateExcludedForTrip($tripId, $date)) {
+            $excluded = $this->buildAvailabilityObject($trip, null, 'trip_default');
+            $excluded->status = 'blocked';
+            $excluded->seats_available = 0;
+            $excluded->seats_total = 0;
+
+            return $excluded;
+        }
+
         // Priority 3: Trip default (flexible booking / no configured calendar)
         return $this->buildAvailabilityObject($trip, null, 'trip_default');
     }

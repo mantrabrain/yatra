@@ -1088,6 +1088,8 @@ interface SettingsData {
   seo_trip_meta_keywords: string;
   seo_trip_meta_image: number;
   enable_sitemap: boolean;
+  sitemap_types: string[];
+  sitemap_noindex_excluded: boolean;
 }
 
 // Form Builder Component
@@ -2225,6 +2227,8 @@ const Settings: React.FC = () => {
       seo_trip_meta_keywords: "",
       seo_trip_meta_image: 0,
       enable_sitemap: true,
+      sitemap_types: ["archive", "trip", "destination", "activity", "category"],
+      sitemap_noindex_excluded: false,
     }),
     [],
   );
@@ -8605,6 +8609,93 @@ const Settings: React.FC = () => {
                         "Optional: submit this URL in Google Search Console or Bing Webmaster Tools. It is already listed in robots.txt, so search engines find it automatically.",
                         "yatra",
                       )}
+
+                {formData.enable_sitemap && (
+                  <div className="p-3 border border-gray-200 dark:border-gray-700 rounded-md space-y-3">
+                    <div>
+                      <Label className="font-medium">
+                        {__("Content in the sitemap", "yatra")}
+                      </Label>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                        {__(
+                          "Uncheck a type to keep it out of /yatra-sitemap.xml.",
+                          "yatra",
+                        )}
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {[
+                        { key: "trip", label: __("Trips", "yatra") },
+                        { key: "destination", label: __("Destinations", "yatra") },
+                        { key: "activity", label: __("Activities", "yatra") },
+                        { key: "category", label: __("Trip categories", "yatra") },
+                        { key: "archive", label: __("Listing pages", "yatra") },
+                      ].map((t) => {
+                        const selected = formData.sitemap_types ?? [];
+                        const checked = selected.includes(t.key);
+                        return (
+                          <label
+                            key={t.key}
+                            className="flex items-center gap-2 text-sm cursor-pointer"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              onChange={() =>
+                                setFormData((prev) => {
+                                  if (!prev) return prev;
+                                  return {
+                                    ...prev,
+                                    sitemap_types: checked
+                                      ? (prev.sitemap_types ?? []).filter(
+                                          (x: string) => x !== t.key,
+                                        )
+                                      : [...(prev.sitemap_types ?? []), t.key],
+                                  };
+                                })
+                              }
+                              className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            />
+                            <span>{t.label}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+
+                    <div className="flex items-start gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                      <input
+                        type="checkbox"
+                        id="sitemap_noindex_excluded"
+                        name="sitemap_noindex_excluded"
+                        checked={formData.sitemap_noindex_excluded}
+                        onChange={(e) =>
+                          setFormData((prev) => {
+                            if (!prev) return prev;
+                            return {
+                              ...prev,
+                              sitemap_noindex_excluded: e.target.checked,
+                            };
+                          })
+                        }
+                        className="mt-0.5 w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <div className="flex-1">
+                        <Label
+                          htmlFor="sitemap_noindex_excluded"
+                          className="font-medium cursor-pointer"
+                        >
+                          {__("Also add noindex to excluded types", "yatra")}
+                        </Label>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                          {__(
+                            "Leaving a type out of the sitemap does not stop Google indexing it. Turn this on to send noindex on those pages as well — they will drop out of search results, so only do this for content you do not want found.",
+                            "yatra",
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
                     </p>
                   </div>
                 )}

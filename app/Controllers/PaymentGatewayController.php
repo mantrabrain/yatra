@@ -869,7 +869,9 @@ class PaymentGatewayController extends BaseController
         }
 
         // Authorisation:
-        //  1. Administrators can always access (no further checks).
+        //  1. Staff can always access (no further checks): a WP administrator,
+        //     or a user holding Yatra's yatra_view_bookings capability, which is
+        //     the same audience that already sees every booking in the list.
         //  2. Logged-in owner of the booking can access.
         //  3. Anyone with a valid signed `invoice_token` (HMAC) can access — used on the
         //     booking-confirmation page so guest checkouts and post-session views work.
@@ -877,7 +879,7 @@ class PaymentGatewayController extends BaseController
         $currentUserId = (int) get_current_user_id();
         $bookingUserId = (int) ($payment->booking_user_id ?? $payment->user_id ?? 0);
         $paymentBookingId = (int) ($payment->booking_id ?? 0);
-        $isAdmin = current_user_can('manage_options');
+        $isAdmin = current_user_can('manage_options') || current_user_can('yatra_view_bookings');
         $authorised = false;
 
         if ($isAdmin) {
@@ -996,7 +998,10 @@ class PaymentGatewayController extends BaseController
             'payment_status' => ucfirst($payment->status ?? 'paid'),
             'status_class' => in_array(strtolower((string) ($payment->status ?? '')), ['paid', 'completed', 'success'], true) ? 'paid' : 'pending',
             'trip_title' => $trip->title ?? $payment->trip_title ?? __('Trip Booking', 'yatra'),
-            'payment_method' => ucfirst($payment->gateway ?? $payment->payment_method ?? 'Online'),
+            'payment_method' => $this->gatewayLabel(
+                $payment->gateway ?? $payment->payment_method ?? null,
+                __('Online', 'yatra')
+            ),
             // Booking-only fallback chain (never a payment identifier) so the
             // invoice number always resolves to the booking reference.
             'booking_ref' => $payment->booking_reference ?? $payment->booking_number ?? (string) ($payment->booking_id ?? ''),
@@ -1032,6 +1037,21 @@ class PaymentGatewayController extends BaseController
     }
 
     /**
+     * Customer-facing label for a gateway id on a document.
+     *
+     * Uses the same title the checkout shows (operator's custom title, else the
+     * gateway's translated one). Falls back to the prettified id — the previous
+     * behaviour — when the gateway is not registered any more, so an invoice for
+     * a payment taken through a since-removed gateway still reads sensibly.
+     */
+    private function gatewayLabel(?string $gatewayId, string $fallback = 'Online'): string
+    {
+        return function_exists('yatra_payment_gateway_label')
+            ? yatra_payment_gateway_label($gatewayId, $fallback)
+            : ($gatewayId ? ucwords(str_replace(['_', '-'], ' ', $gatewayId)) : $fallback);
+    }
+
+    /**
      * Download a PRO-FORMA invoice for a booking that has no payment yet
      * (offline gateways such as Bank Transfer). Shows the amount due and any
      * gateway-supplied payment instructions (via yatra_invoice_payment_instructions)
@@ -1054,12 +1074,15 @@ class PaymentGatewayController extends BaseController
             return new WP_Error('booking_not_found', __('Booking not found.', 'yatra'), ['status' => 404]);
         }
 
-        // Authorisation mirrors download_invoice: admin -> owner -> signed
+        // Authorisation mirrors download_invoice: staff -> owner -> signed
         // booking-scoped invoice_token (paymentId 0) -> guest booking_token.
+        // Staff means a WP admin OR a user holding Yatra's booking-view
+        // capability, so Pro Team roles (which deliberately don't carry
+        // manage_options) can use the admin "Download invoice" action.
         $currentUserId = (int) get_current_user_id();
         $bookingUserId = (int) ($booking->user_id ?? 0);
         $authorised = false;
-        if (current_user_can('manage_options')) {
+        if (current_user_can('manage_options') || current_user_can('yatra_view_bookings')) {
             $authorised = true;
         } elseif ($currentUserId && $bookingUserId && $currentUserId === $bookingUserId) {
             $authorised = true;
@@ -1115,7 +1138,10 @@ class PaymentGatewayController extends BaseController
                 : ($paid > 0.0 ? __('Partially Paid', 'yatra') : __('Payment Pending', 'yatra')),
             'status_class'    => $due <= 0.0 ? 'paid' : ($paid > 0.0 ? 'partial' : 'pending'),
             'trip_title'      => $trip->title ?? $booking->trip_title ?? __('Trip Booking', 'yatra'),
-            'payment_method'  => ucwords(str_replace('_', ' ', (string) ($booking->payment_gateway ?? 'offline'))),
+            'payment_method'  => $this->gatewayLabel(
+                $booking->payment_gateway ?? null,
+                __('Offline', 'yatra')
+            ),
             'booking_ref'     => $bookingRef,
             'travel_date'     => $travelDate,
             'currency_symbol' => $currencySymbol,

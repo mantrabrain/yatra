@@ -718,6 +718,13 @@ export const apiService = {
     apiClient.post(API_ENDPOINTS.GOOGLE_CALENDAR_DISCONNECT),
   syncAllGoogleCalendar: () =>
     apiClient.post(API_ENDPOINTS.GOOGLE_CALENDAR_SYNC_ALL),
+  /**
+   * One batch of a full resync. Repeat with the returned `next_cursor` until
+   * `done` is true — the server processes a slice per call so a large calendar
+   * can't time out and the UI can show progress.
+   */
+  resyncGoogleCalendar: (cursor = 0, limit = 25) =>
+    apiClient.post(API_ENDPOINTS.GOOGLE_CALENDAR_RESYNC, { cursor, limit }),
   updateGoogleCalendarSettings: (data: any) =>
     apiClient.post(API_ENDPOINTS.GOOGLE_CALENDAR_SETTINGS, data),
 

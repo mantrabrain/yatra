@@ -1,9 +1,9 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-tYqd0a--.js","../../../dist/js/react-vendor-BJn7BIDO.js","../css/react-vendor.css","../../../dist/js/index-CH-UeeqR.js","../css/index.css","../../../dist/js/BuildItineraryModal-Dc-IObiC.js","../../../dist/js/ProFeature-CoknA3cp.js","../../../dist/js/Settings-B2qDy-3v.js","../../../dist/js/Team-BKam8pDN.js","../../../dist/js/Reports-CrPrqhsM.js","../../../dist/js/DiscountForm-BTh3UQWx.js","../../../dist/js/ApplicableTripSelector-DATjt5hg.js","../../../dist/js/Itinerary-B51OPTS8.js","../../../dist/js/RecurringRuleForm-Cqv2cbJU.js","./Whatsapp.js","../../../dist/js/module-skeleton-_pm14M7g.js","../../../dist/js/ChannelManager-BC4qM78i.js","../../../dist/js/Webhooks-BVWPQrRC.js","../../../dist/js/ScheduledPayments-D6SuU6pk.js","../../../dist/js/TripConsentForm-CAl-wHRC.js","../../../dist/js/BookingForm-DvQk4uBk.js","../../../dist/js/ViewBooking-CVs-Shqy.js","../../../dist/js/AvailabilityForm-DGL4UC_6.js","../../../dist/js/DynamicPricing-CM_zxrI5.js","../../../dist/js/RuleTypeSelectionModal-CQ-cb9q0.js","../../../dist/js/toggle-BZSHgkC-.js","../../../dist/js/DynamicPricingRuleForm-C5k92h6w.js","../../../dist/js/AiAssistant-cc-9i8HW.js","../../../dist/js/AbandonedRecovery-C3Eo0alU.js","../../../dist/js/WhiteLabel-CchtPIJy.js"])))=>i.map(i=>d[i]);
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-DEQpXvzy.js","../../../dist/js/react-vendor-CithbthY.js","../css/react-vendor.css","../../../dist/js/index-Dec_weLB.js","../css/index.css","../../../dist/js/BuildItineraryModal-CzFq1WTm.js","../../../dist/js/ProFeature-DE6oH70S.js","../../../dist/js/Settings-BCwXvDOi.js","../../../dist/js/Team-M9W1qR00.js","../../../dist/js/Reports-JeXttK0I.js","../../../dist/js/DiscountForm-DYxWHwCn.js","../../../dist/js/ApplicableTripSelector-BZ25j59n.js","../../../dist/js/Itinerary-C1e5Vxj0.js","../../../dist/js/RecurringRuleForm-fKEgpUir.js","./Whatsapp.js","../../../dist/js/module-skeleton-CpoAoviJ.js","../../../dist/js/ChannelManager-DZ64KNZZ.js","../../../dist/js/Webhooks-Cb89OgkB.js","../../../dist/js/ScheduledPayments-BnLNP2BI.js","../../../dist/js/TripConsentForm-C4az7Muo.js","../../../dist/js/BookingForm-hQVneAfI.js","../../../dist/js/ViewBooking-CgYCok3W.js","../../../dist/js/AvailabilityForm-D4S_wB_o.js","../../../dist/js/DynamicPricing-CBtPFtKK.js","../../../dist/js/RuleTypeSelectionModal-_WAr6JyA.js","../../../dist/js/toggle-CKa3ExrH.js","../../../dist/js/DynamicPricingRuleForm-C99aT0Zu.js","../../../dist/js/AiAssistant-Bu_zHUnt.js","../../../dist/js/AbandonedRecovery-BHbQat9C.js","../../../dist/js/WhiteLabel-DsK2IbJo.js"])))=>i.map(i=>d[i]);
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key2, value) => key2 in obj ? __defProp(obj, key2, { enumerable: true, configurable: true, writable: true, value }) : obj[key2] = value;
 var __publicField = (obj, key2, value) => __defNormalProp(obj, typeof key2 !== "symbol" ? key2 + "" : key2, value);
-import { r as reactExports, j as jsxRuntimeExports, W as Wrench, N as Network, M as MessageCircle, S as Sparkles, R as RotateCcw, P as Puzzle, a as MessageSquare, b as Plane, B as BadgePercent, c as Route, F as FileSignature, K as Key, d as Mail, C as Crown, A as Activity, L as List, T as TrendingUp, e as Tag, f as FolderTree, U as Users, g as CircleUser, h as Package, i as CreditCard, k as FileText, l as Settings$1, m as BarChart3, n as Star, o as CalendarDays, p as CalendarClock, q as Calendar$1, s as MapPin, t as LayoutDashboard, u as useQuery, v as useQueryClient, w as useMutation, Z as Zap, x as Webhook, y as ChevronDown, z as ChevronRight, D as ArrowLeft, G as Gift, E as Loader2, H as Sun, I as Moon, J as User, O as RefreshCw, Q as Inbox, V as AlertTriangle, X as ExternalLink, Y as isObjectLike_1, _ as _baseGetTag, $ as isArray_1, a0 as _MapCache, a1 as getDefaultExportFromCjs, a2 as _Symbol, a3 as isObject$5, a4 as isFunction, a5 as reactIsExports, a6 as React, a7 as _Stack, a8 as _baseIsEqual, a9 as isObject_1, aa as keys_1, ab as isLength_1, ac as _isIndex, ad as isArguments_1, ae as _Set, af as _setToArray, ag as _SetCache, ah as _cacheHas, ai as _arrayPush, aj as isArrayLike_1, ak as _baseUnary, al as _getNative, am as eq_1, an as _root, ao as isEqual, ap as Animate, aq as _overArg, ar as _arraySome, as as Clock, at as DollarSign, au as ArrowRight, av as Shield, aw as CheckCircle, ax as Plus, ay as X, az as reactDomExports, aA as AlertCircle, aB as Check, aC as Wand2, aD as ChevronLeft, aE as CheckCircle2, aF as HelpCircle, aG as Info, aH as Copy, aI as MoreVertical, aJ as Columns, aK as PenSquare, aL as ArrowUp, aM as ArrowDown, aN as Archive, aO as Trash2, aP as Search, aQ as ArrowUpDown, aR as Eye, aS as Upload, aT as Image, aU as ReactQuill, aV as Pen, aW as Save, aX as CircleDollarSign, aY as Undo2, aZ as Phone, a_ as PauseCircle, a$ as ShieldX, b0 as ShieldOff, b1 as Globe, b2 as Award, b3 as Database, b4 as Folder, b5 as Mountain, b6 as UserCheck, b7 as Download, b8 as Server, b9 as XCircle, ba as Video, bb as Lock, bc as GripVertical, bd as ChevronUp, be as Play, bf as ClipboardCopy, bg as Ban, bh as Bell, bi as Heart, bj as Scissors, bk as Send, bl as Filter, bm as ArrowUpRight, bn as ClipboardCheck, bo as PenTool, bp as Camera, bq as BarChart$1, br as Megaphone, bs as Compass, bt as GitBranch, bu as Pause, bv as Settings2, bw as Code, bx as Bug, by as EyeOff, bz as QueryClient, bA as client, bB as QueryClientProvider } from "../../../dist/js/react-vendor-BJn7BIDO.js";
-import { a as apiClient, A as API_ENDPOINTS, u as useToast, _ as __, b as apiService, n as normalizeCurrencyPosition, t as toDateValue, f as formatYatraMoney, r as readYatraCurrencyPositionFromWindow, s as sprintf, c as brandName, d as formatDateForInput, I as Input, e as formatDate$1, g as todayYmd, S as SearchableSelect, h as getCurrencySymbol, i as getCountryName, j as ajaxService, T as ToastProvider, E as ErrorBoundary } from "../../../dist/js/index-CH-UeeqR.js";
+import { r as reactExports, j as jsxRuntimeExports, W as Wrench, N as Network, M as MessageCircle, S as Sparkles, R as RotateCcw, P as Puzzle, a as MessageSquare, b as Plane, B as BadgePercent, c as Route, F as FileSignature, K as Key, d as Mail, C as Crown, A as Activity, L as List, T as TrendingUp, e as Tag, f as FolderTree, U as Users, g as CircleUser, h as Package, i as CreditCard, k as FileText, l as Settings$1, m as BarChart3, n as Star, o as CalendarDays, p as CalendarClock, q as Calendar$1, s as MapPin, t as LayoutDashboard, u as useQuery, v as useQueryClient, w as useMutation, Z as Zap, x as Webhook, y as ChevronDown, z as ChevronRight, D as ArrowLeft, G as Gift, E as Loader2, H as Sun, I as Moon, J as User, O as RefreshCw, Q as Inbox, V as AlertTriangle, X as ExternalLink, Y as isObjectLike_1, _ as _baseGetTag, $ as isArray_1, a0 as _MapCache, a1 as getDefaultExportFromCjs, a2 as _Symbol, a3 as isObject$5, a4 as isFunction, a5 as reactIsExports, a6 as React, a7 as _Stack, a8 as _baseIsEqual, a9 as isObject_1, aa as keys_1, ab as isLength_1, ac as _isIndex, ad as isArguments_1, ae as _Set, af as _setToArray, ag as _SetCache, ah as _cacheHas, ai as _arrayPush, aj as isArrayLike_1, ak as _baseUnary, al as _getNative, am as eq_1, an as _root, ao as isEqual, ap as Animate, aq as _overArg, ar as _arraySome, as as Clock, at as DollarSign, au as ArrowRight, av as Shield, aw as CheckCircle, ax as Plus, ay as X, az as reactDomExports, aA as AlertCircle, aB as Check, aC as Wand2, aD as ChevronLeft, aE as CheckCircle2, aF as HelpCircle, aG as Info, aH as Copy, aI as MoreVertical, aJ as Columns, aK as PenSquare, aL as ArrowUp, aM as ArrowDown, aN as Archive, aO as Trash2, aP as Search, aQ as ArrowUpDown, aR as Eye, aS as Upload, aT as Image, aU as ReactQuill, aV as Pen, aW as Save, aX as Download, aY as CircleDollarSign, aZ as Undo2, a_ as Phone, a$ as PauseCircle, b0 as ShieldX, b1 as ShieldOff, b2 as Globe, b3 as Award, b4 as Database, b5 as Folder, b6 as Mountain, b7 as UserCheck, b8 as Server, b9 as XCircle, ba as Video, bb as Lock, bc as GripVertical, bd as ChevronUp, be as Play, bf as ClipboardCopy, bg as Ban, bh as Bell, bi as Heart, bj as Scissors, bk as Send, bl as Filter, bm as ArrowUpRight, bn as ClipboardCheck, bo as PenTool, bp as Camera, bq as BarChart$1, br as Megaphone, bs as Compass, bt as GitBranch, bu as Pause, bv as Settings2, bw as Code, bx as Bug, by as EyeOff, bz as QueryClient, bA as client, bB as QueryClientProvider } from "../../../dist/js/react-vendor-CithbthY.js";
+import { a as apiClient, A as API_ENDPOINTS, u as useToast, _ as __, b as apiService, n as normalizeCurrencyPosition, t as toDateValue, f as formatYatraMoney, r as readYatraCurrencyPositionFromWindow, s as sprintf, c as brandName, d as formatDateForInput, I as Input, e as formatDate$1, g as todayYmd, S as SearchableSelect, h as getCurrencySymbol, i as getCountryName, j as ajaxService, T as ToastProvider, E as ErrorBoundary } from "../../../dist/js/index-Dec_weLB.js";
 const scriptRel = "modulepreload";
 const assetsURL = function(dep, importerUrl) {
   return new URL(dep, importerUrl).href;
@@ -37662,6 +37662,104 @@ const DifficultyLevelForm = () => {
     ] }) }) })
   ] });
 };
+function getAdminRestConfig() {
+  var _a, _b;
+  const w = window;
+  const raw = ((_a = w == null ? void 0 : w.yatraAdmin) == null ? void 0 : _a.restUrl) || "/wp-json";
+  const base = raw.endsWith("/") ? raw.slice(0, -1) : raw;
+  const nonce = ((_b = w == null ? void 0 : w.yatraAdmin) == null ? void 0 : _b.nonce) || "";
+  return { base, nonce };
+}
+function buildInvoiceUrl(base, suffix) {
+  const origin = typeof window !== "undefined" ? window.location.origin : "http://localhost";
+  let u;
+  try {
+    u = new URL(base, origin);
+  } catch {
+    return `${base.replace(/\/$/, "")}${suffix}?download=1`;
+  }
+  if (u.searchParams.has("rest_route")) {
+    const route2 = (u.searchParams.get("rest_route") || "").replace(/\/$/, "");
+    u.searchParams.set("rest_route", `${route2}${suffix}`);
+    u.searchParams.set("download", "1");
+    return u.toString();
+  }
+  u.pathname = (u.pathname || "").replace(/\/$/, "") + suffix;
+  u.searchParams.set("download", "1");
+  return u.toString();
+}
+async function readError(res) {
+  let msg = res.statusText || "Request failed";
+  try {
+    const j = await res.json();
+    if ((j == null ? void 0 : j.message) && typeof j.message === "string") {
+      msg = j.message;
+    }
+  } catch {
+    const t = await res.text().catch(() => "");
+    if (t && t.length < 300) {
+      msg = t;
+    }
+  }
+  return msg;
+}
+async function downloadInvoicePdf(suffix, fallbackName) {
+  const { base, nonce } = getAdminRestConfig();
+  if (!nonce) {
+    throw new Error("Missing REST nonce; please reload the page.");
+  }
+  const url = buildInvoiceUrl(base, suffix);
+  const res = await fetch(url, {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      "X-WP-Nonce": nonce,
+      Accept: "application/pdf, application/octet-stream, */*"
+    }
+  });
+  if (!res.ok) {
+    throw new Error(await readError(res));
+  }
+  const blob = await res.blob();
+  const dispo = res.headers.get("Content-Disposition");
+  let filename = fallbackName;
+  if (dispo) {
+    const m = /filename\*?=(?:UTF-8'')?["']?([^";\n]+)/i.exec(dispo);
+    if (m == null ? void 0 : m[1]) {
+      try {
+        filename = decodeURIComponent(m[1].replace(/['"]/g, "").trim());
+      } catch {
+        filename = m[1].replace(/['"]/g, "").trim();
+      }
+    }
+  }
+  const objectUrl = URL.createObjectURL(blob);
+  const link2 = document.createElement("a");
+  link2.href = objectUrl;
+  link2.download = filename;
+  document.body.appendChild(link2);
+  link2.click();
+  document.body.removeChild(link2);
+  URL.revokeObjectURL(objectUrl);
+}
+async function downloadAdminInvoice(paymentId) {
+  if (!paymentId || paymentId <= 0) {
+    throw new Error("Invalid payment ID");
+  }
+  await downloadInvoicePdf(
+    `/yatra/v1/payment/${paymentId}/invoice`,
+    `invoice-${paymentId}.pdf`
+  );
+}
+async function downloadAdminBookingInvoice(bookingId) {
+  if (!bookingId || bookingId <= 0) {
+    throw new Error("Invalid booking ID");
+  }
+  await downloadInvoicePdf(
+    `/yatra/v1/booking/${bookingId}/invoice`,
+    `invoice-booking-${bookingId}.pdf`
+  );
+}
 const PAYMENT_STATUS_ACTIONS = [
   {
     value: "paid",
@@ -38344,6 +38442,24 @@ const Bookings = () => {
       // the booking-status actions above behave.
       condition: (booking) => can("yatra_edit_bookings") && booking.payment_status !== action.value
     })),
+    {
+      key: "download_invoice",
+      label: __2("Download invoice"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Download, { className: "w-4 h-4" }),
+      onClick: async (booking) => {
+        try {
+          await downloadAdminBookingInvoice(booking.id);
+        } catch (error2) {
+          showToast(
+            (error2 == null ? void 0 : error2.message) || __2("Failed to download invoice"),
+            "error"
+          );
+        }
+      },
+      // Available for every booking, paid or not: an unpaid booking renders a
+      // pro-forma invoice with the gateway's payment instructions.
+      condition: () => can("yatra_view_bookings")
+    },
     {
       key: "resend_confirmation",
       label: __2("Resend confirmation email"),
@@ -56292,90 +56408,6 @@ const Discounts = () => {
     ] }) })
   ] });
 };
-function getAdminRestConfig() {
-  var _a, _b;
-  const w = window;
-  const raw = ((_a = w == null ? void 0 : w.yatraAdmin) == null ? void 0 : _a.restUrl) || "/wp-json";
-  const base = raw.endsWith("/") ? raw.slice(0, -1) : raw;
-  const nonce = ((_b = w == null ? void 0 : w.yatraAdmin) == null ? void 0 : _b.nonce) || "";
-  return { base, nonce };
-}
-function buildInvoiceUrl(base, paymentId) {
-  const suffix = `/yatra/v1/payment/${paymentId}/invoice`;
-  const origin = typeof window !== "undefined" ? window.location.origin : "http://localhost";
-  let u;
-  try {
-    u = new URL(base, origin);
-  } catch {
-    return `${base.replace(/\/$/, "")}${suffix}?download=1`;
-  }
-  if (u.searchParams.has("rest_route")) {
-    const route2 = (u.searchParams.get("rest_route") || "").replace(/\/$/, "");
-    u.searchParams.set("rest_route", `${route2}${suffix}`);
-    u.searchParams.set("download", "1");
-    return u.toString();
-  }
-  u.pathname = (u.pathname || "").replace(/\/$/, "") + suffix;
-  u.searchParams.set("download", "1");
-  return u.toString();
-}
-async function readError(res) {
-  let msg = res.statusText || "Request failed";
-  try {
-    const j = await res.json();
-    if ((j == null ? void 0 : j.message) && typeof j.message === "string") {
-      msg = j.message;
-    }
-  } catch {
-    const t = await res.text().catch(() => "");
-    if (t && t.length < 300) {
-      msg = t;
-    }
-  }
-  return msg;
-}
-async function downloadAdminInvoice(paymentId) {
-  if (!paymentId || paymentId <= 0) {
-    throw new Error("Invalid payment ID");
-  }
-  const { base, nonce } = getAdminRestConfig();
-  if (!nonce) {
-    throw new Error("Missing REST nonce; please reload the page.");
-  }
-  const url = buildInvoiceUrl(base, paymentId);
-  const res = await fetch(url, {
-    method: "GET",
-    credentials: "include",
-    headers: {
-      "X-WP-Nonce": nonce,
-      Accept: "application/pdf, application/octet-stream, */*"
-    }
-  });
-  if (!res.ok) {
-    throw new Error(await readError(res));
-  }
-  const blob = await res.blob();
-  const dispo = res.headers.get("Content-Disposition");
-  let filename = `invoice-${paymentId}.pdf`;
-  if (dispo) {
-    const m = /filename\*?=(?:UTF-8'')?["']?([^";\n]+)/i.exec(dispo);
-    if (m == null ? void 0 : m[1]) {
-      try {
-        filename = decodeURIComponent(m[1].replace(/['"]/g, "").trim());
-      } catch {
-        filename = m[1].replace(/['"]/g, "").trim();
-      }
-    }
-  }
-  const objectUrl = URL.createObjectURL(blob);
-  const link2 = document.createElement("a");
-  link2.href = objectUrl;
-  link2.download = filename;
-  document.body.appendChild(link2);
-  link2.click();
-  document.body.removeChild(link2);
-  URL.revokeObjectURL(objectUrl);
-}
 const Payments = () => {
   var _a, _b;
   const [searchTerm, setSearchTerm] = reactExports.useState("");
@@ -67478,15 +67510,18 @@ const Switch = ({
   );
 };
 const GoogleCalendar = () => {
-  var _a;
+  var _a, _b;
   const [settings2, setSettings] = reactExports.useState(null);
   const [loading, setLoading] = reactExports.useState(true);
   const [connecting, setConnecting] = reactExports.useState(false);
   const [syncing, setSyncing] = reactExports.useState(false);
+  const [newReminderDay, setNewReminderDay] = reactExports.useState("");
+  const [reminderError, setReminderError] = reactExports.useState("");
+  const [resyncing, setResyncing] = reactExports.useState(false);
+  const [resyncProgress, setResyncProgress] = reactExports.useState(null);
   const { showToast } = useToast();
   const adminUrl = ((_a = window.yatraAdmin) == null ? void 0 : _a.adminUrl) || "admin.php";
   const settingsIntegrationUrl = `${adminUrl}?page=yatra&subpage=settings&section=integration`;
-  const __2 = (text) => text;
   reactExports.useEffect(() => {
     fetchSettings2();
   }, []);
@@ -67507,24 +67542,24 @@ const GoogleCalendar = () => {
       if (data.success && data.data.auth_url) {
         window.location.href = data.data.auth_url;
       } else {
-        showToast(data.message || __2("Failed to connect"), "error");
+        showToast(data.message || __("Failed to connect"), "error");
       }
     } catch (error) {
-      showToast(__2("Failed to connect to Google Calendar"), "error");
+      showToast(__("Failed to connect to Google Calendar"), "error");
     } finally {
       setConnecting(false);
     }
   };
   const handleDisconnect = async () => {
-    if (!confirm(__2("Are you sure you want to disconnect Google Calendar?"))) {
+    if (!confirm(__("Are you sure you want to disconnect Google Calendar?"))) {
       return;
     }
     try {
       await apiService.disconnectGoogleCalendar();
-      showToast(__2("Disconnected successfully"), "success");
+      showToast(__("Disconnected successfully"), "success");
       fetchSettings2();
     } catch (error) {
-      showToast(__2("Failed to disconnect"), "error");
+      showToast(__("Failed to disconnect"), "error");
     }
   };
   const handleSyncAll = async () => {
@@ -67532,25 +67567,123 @@ const GoogleCalendar = () => {
     try {
       const data = await apiService.syncAllGoogleCalendar();
       if (data.success) {
-        showToast(__2("Sync completed successfully"), "success");
+        showToast(__("Sync completed successfully"), "success");
         fetchSettings2();
       } else {
-        showToast(data.message || __2("Sync failed"), "error");
+        showToast(data.message || __("Sync failed"), "error");
       }
     } catch (error) {
-      showToast(__2("Failed to sync bookings"), "error");
+      showToast(__("Failed to sync bookings"), "error");
     } finally {
       setSyncing(false);
+    }
+  };
+  const handleResync = async () => {
+    var _a2, _b2, _c;
+    const confirmed = window.confirm(
+      __(
+        "Resync every booking with Google Calendar? Existing events are updated in place, missing ones are recreated, and events for cancelled bookings are removed. This can take a while on a large calendar."
+      )
+    );
+    if (!confirmed) {
+      return;
+    }
+    setResyncing(true);
+    const totals = {
+      processed: 0,
+      total: 0,
+      created: 0,
+      updated: 0,
+      deleted: 0,
+      failed: 0
+    };
+    setResyncProgress({ ...totals });
+    try {
+      let cursor = 0;
+      for (let guard = 0; guard < 2e3 && cursor !== null; guard++) {
+        const response = await apiService.resyncGoogleCalendar(cursor);
+        const data = (response == null ? void 0 : response.data) ?? response;
+        if (!(response == null ? void 0 : response.success) && !(data == null ? void 0 : data.success)) {
+          throw new Error((response == null ? void 0 : response.message) || __("Resync failed"));
+        }
+        totals.processed += Number(data.processed) || 0;
+        totals.created += Number(data.created) || 0;
+        totals.updated += Number(data.updated) || 0;
+        totals.deleted += Number(data.deleted) || 0;
+        totals.failed += Number(data.failed) || 0;
+        if (data.total) {
+          totals.total = Number(data.total) || 0;
+        }
+        setResyncProgress({ ...totals });
+        const next = data.done || data.next_cursor == null ? null : Number(data.next_cursor);
+        cursor = next !== null && next > cursor ? next : null;
+      }
+      showToast(
+        sprintf(
+          /* translators: %1$d created, %2$d updated, %3$d removed, %4$d failed. */
+          __(
+            "Resync complete — %1$d created, %2$d updated, %3$d removed, %4$d failed."
+          ),
+          totals.created,
+          totals.updated,
+          totals.deleted,
+          totals.failed
+        ),
+        totals.failed > 0 ? "warning" : "success"
+      );
+      fetchSettings2();
+    } catch (error) {
+      const status = ((_a2 = error == null ? void 0 : error.response) == null ? void 0 : _a2.status) ?? (error == null ? void 0 : error.status);
+      const code = ((_c = (_b2 = error == null ? void 0 : error.response) == null ? void 0 : _b2.data) == null ? void 0 : _c.code) ?? (error == null ? void 0 : error.code);
+      const missingRoute = status === 404 || code === "rest_no_route";
+      showToast(
+        missingRoute ? __(
+          "Resync needs a newer version of Yatra Pro. Please update Yatra Pro and try again."
+        ) : (error == null ? void 0 : error.message) || __("Resync failed"),
+        "error"
+      );
+    } finally {
+      setResyncing(false);
     }
   };
   const handleSettingChange = async (key2, value) => {
     try {
       await apiService.updateGoogleCalendarSettings({ [key2]: value });
       setSettings((prev) => prev ? { ...prev, [key2]: value } : null);
-      showToast(__2("Settings updated"), "success");
+      showToast(__("Settings updated"), "success");
     } catch (error) {
-      showToast(__2("Failed to update settings"), "error");
+      showToast(__("Failed to update settings"), "error");
     }
+  };
+  const MAX_REMINDERS = 5;
+  const addReminderDay = () => {
+    const days = Number(newReminderDay);
+    if (!Number.isInteger(days) || days <= 0) {
+      setReminderError(__("Enter a whole number of days, 1 or more."));
+      return;
+    }
+    const current = (settings2 == null ? void 0 : settings2.reminder_days) ?? [];
+    if (current.includes(days)) {
+      setReminderError(__("That reminder already exists."));
+      return;
+    }
+    if (current.length >= MAX_REMINDERS) {
+      setReminderError(
+        __("Google allows at most 5 reminders on an event.")
+      );
+      return;
+    }
+    setReminderError("");
+    const next = [...current, days].sort((a2, b) => b - a2);
+    setNewReminderDay("");
+    handleSettingChange("reminder_days", next);
+  };
+  const removeReminderDay = (days) => {
+    setReminderError("");
+    handleSettingChange(
+      "reminder_days",
+      ((settings2 == null ? void 0 : settings2.reminder_days) ?? []).filter((d) => d !== days)
+    );
   };
   if (loading) {
     return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-center h-64", children: /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "w-8 h-8 animate-spin text-blue-600" }) });
@@ -67563,45 +67696,45 @@ const GoogleCalendar = () => {
         className: "inline-flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200",
         children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowLeft, { className: "w-4 h-4" }),
-          __2("Back to Settings → Integration")
+          __("Back to Settings → Integration")
         ]
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-between", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h1", { className: "text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-8 h-8 text-blue-600" }),
-        __2("Google Calendar Integration")
+        __("Google Calendar Integration")
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-600 dark:text-gray-400 mt-2", children: __2(
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-600 dark:text-gray-400 mt-2", children: __(
         "Automatically sync your bookings and departures to Google Calendar"
       ) })
     ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "flex items-center justify-between", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: __2("Connection Status") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: __("Connection Status") }),
           (settings2 == null ? void 0 : settings2.connected) ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { className: "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-4 h-4 mr-1" }),
-            __2("Connected")
+            __("Connected")
           ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { className: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(XCircle, { className: "w-4 h-4 mr-1" }),
-            __2("Not Connected")
+            __("Not Connected")
           ] })
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { children: (settings2 == null ? void 0 : settings2.connected) ? __2("Your Google Calendar is connected and ready to sync") : __2("Connect your Google account to start syncing bookings") })
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { children: (settings2 == null ? void 0 : settings2.connected) ? __("Your Google Calendar is connected and ready to sync") : __("Connect your Google account to start syncing bookings") })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "space-y-4", children: (settings2 == null ? void 0 : settings2.connected) ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-lg p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium text-gray-900 dark:text-white", children: settings2.calendar_name || __2("Primary Calendar") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium text-gray-900 dark:text-white", children: settings2.calendar_name || __("Primary Calendar") }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-gray-600 dark:text-gray-400 mt-1", children: [
-              __2("Calendar ID"),
+              __("Calendar ID"),
               ": ",
               settings2.calendar_id
             ] }),
             settings2.last_sync && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-gray-500 dark:text-gray-500 mt-2", children: [
-              __2("Last synced"),
+              __("Last synced"),
               ":",
               " ",
               new Date(settings2.last_sync).toLocaleString()
@@ -67613,14 +67746,38 @@ const GoogleCalendar = () => {
             Button,
             {
               onClick: handleSyncAll,
-              disabled: syncing,
+              disabled: syncing || resyncing,
               className: "flex-1",
               children: syncing ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "w-4 h-4 mr-2 animate-spin" }),
-                __2("Syncing...")
+                __("Syncing...")
               ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "w-4 h-4 mr-2" }),
-                __2("Sync All Bookings")
+                __("Sync All Bookings")
+              ] })
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Button,
+            {
+              variant: "outline",
+              onClick: handleResync,
+              disabled: resyncing || syncing,
+              className: "flex-1",
+              title: __(
+                "Re-push every booking: updates existing events, recreates missing ones and removes events for cancelled bookings."
+              ),
+              children: resyncing ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "w-4 h-4 mr-2 animate-spin" }),
+                resyncProgress && resyncProgress.total > 0 ? sprintf(
+                  /* translators: %1$d: bookings processed so far, %2$d: total bookings. */
+                  __("Resyncing %1$d/%2$d…"),
+                  resyncProgress.processed,
+                  resyncProgress.total
+                ) : __("Resyncing…")
+              ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "w-4 h-4 mr-2" }),
+                __("Resync Everything")
               ] })
             }
           ),
@@ -67630,10 +67787,20 @@ const GoogleCalendar = () => {
               variant: "outline",
               onClick: handleDisconnect,
               className: "text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/10",
-              children: __2("Disconnect")
+              children: __("Disconnect")
             }
           )
-        ] })
+        ] }),
+        resyncProgress && !resyncing && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-xs text-gray-500 dark:text-gray-400", children: sprintf(
+          /* translators: %1$d created, %2$d updated, %3$d removed, %4$d failed. */
+          __(
+            "Last resync: %1$d created, %2$d updated, %3$d removed, %4$d failed."
+          ),
+          resyncProgress.created,
+          resyncProgress.updated,
+          resyncProgress.deleted,
+          resyncProgress.failed
+        ) })
       ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx(
         Button,
         {
@@ -67643,10 +67810,10 @@ const GoogleCalendar = () => {
           size: "lg",
           children: connecting ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "w-5 h-5 mr-2 animate-spin" }),
-            __2("Connecting...")
+            __("Connecting...")
           ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-5 h-5 mr-2" }),
-            __2("Connect Google Calendar")
+            __("Connect Google Calendar")
           ] })
         }
       ) })
@@ -67655,15 +67822,15 @@ const GoogleCalendar = () => {
       /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "flex items-center gap-2", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(Settings$1, { className: "w-5 h-5" }),
-          __2("Sync Settings")
+          __("Sync Settings")
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { children: __2("Configure what gets synced to your Google Calendar") })
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { children: __("Configure what gets synced to your Google Calendar") })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "space-y-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "font-medium text-gray-900 dark:text-white", children: __2("Auto Sync") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: __2("Automatically sync new bookings and changes") })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "font-medium text-gray-900 dark:text-white", children: __("Auto Sync") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: __("Automatically sync new bookings and changes") })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             Switch,
@@ -67675,8 +67842,8 @@ const GoogleCalendar = () => {
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "font-medium text-gray-900 dark:text-white", children: __2("Sync Bookings") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: __2("Create calendar events for new bookings") })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "font-medium text-gray-900 dark:text-white", children: __("Sync Bookings") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: __("Create calendar events for new bookings") })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             Switch,
@@ -67688,8 +67855,8 @@ const GoogleCalendar = () => {
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "font-medium text-gray-900 dark:text-white", children: __2("Sync Departures") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: __2("Create calendar events for departures") })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "font-medium text-gray-900 dark:text-white", children: __("Sync Departures") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: __("Create calendar events for departures") })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             Switch,
@@ -67701,8 +67868,8 @@ const GoogleCalendar = () => {
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "font-medium text-gray-900 dark:text-white", children: __2("Send Invitations") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: __2("Send calendar invitations to customers") })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "font-medium text-gray-900 dark:text-white", children: __("Send Invitations") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: __("Send calendar invitations to customers") })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             Switch,
@@ -67711,13 +67878,101 @@ const GoogleCalendar = () => {
               onCheckedChange: (checked) => handleSettingChange("send_invitations", checked)
             }
           )
+        ] }),
+        settings2.add_guests !== void 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 pr-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "font-medium text-gray-900 dark:text-white", children: __("Add customers as guests") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: __(
+              "Puts the customer's email on the calendar event. Turn this off to keep their address off the event entirely, so Google sends them no reminders or cancellation emails."
+            ) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Switch,
+            {
+              checked: settings2.add_guests,
+              onCheckedChange: (checked) => handleSettingChange("add_guests", checked)
+            }
+          )
+        ] }),
+        settings2.combine_bookings !== void 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 pr-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "font-medium text-gray-900 dark:text-white", children: __("One event per departure") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: __(
+              "Puts every booking on the same departure into a single calendar event, with each booking's details listed in the description. Customers are never added as guests on a shared event, so they cannot see each other's addresses."
+            ) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Switch,
+            {
+              checked: settings2.combine_bookings,
+              onCheckedChange: (checked) => handleSettingChange("combine_bookings", checked)
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "pt-4 border-t border-gray-200 dark:border-gray-700", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "font-medium text-gray-900 dark:text-white", children: __("Event reminders") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400 mb-3", children: __(
+            "Email reminders added to each calendar event, counted in days before departure. Google allows up to 5."
+          ) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2 mb-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "input",
+              {
+                type: "number",
+                min: "1",
+                step: "1",
+                value: newReminderDay,
+                onChange: (e) => setNewReminderDay(e.target.value),
+                onKeyDown: (e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addReminderDay();
+                  }
+                },
+                placeholder: __("Days before"),
+                className: "w-40 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Button,
+              {
+                type: "button",
+                variant: "outline",
+                onClick: addReminderDay,
+                disabled: !newReminderDay || (((_b = settings2.reminder_days) == null ? void 0 : _b.length) ?? 0) >= MAX_REMINDERS,
+                children: __("Add")
+              }
+            )
+          ] }),
+          reminderError && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-red-600 dark:text-red-400 mb-2", children: reminderError }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-wrap gap-2", children: (settings2.reminder_days ?? []).length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400", children: __("No reminders — Google will use your calendar's defaults.") }) : (settings2.reminder_days ?? []).map((days) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            Badge,
+            {
+              variant: "outline",
+              className: "flex items-center gap-1",
+              children: [
+                days === 1 ? __("1 day before") : `${days} ${__("days before")}`,
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: () => removeReminderDay(days),
+                    className: "ml-1 hover:text-red-500",
+                    "aria-label": __("Remove reminder"),
+                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-3 h-3" })
+                  }
+                )
+              ]
+            },
+            days
+          )) })
         ] })
       ] }) })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { children: __2("Documentation") }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { children: __2("Learn more about Google Calendar integration") })
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { children: __("Documentation") }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { children: __("Learn more about Google Calendar integration") })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
         "a",
@@ -67727,7 +67982,7 @@ const GoogleCalendar = () => {
           rel: "noopener noreferrer",
           className: "inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300",
           children: [
-            __2("View Documentation"),
+            __("View Documentation"),
             /* @__PURE__ */ jsxRuntimeExports.jsx(ExternalLink, { className: "w-4 h-4" })
           ]
         }
@@ -78818,28 +79073,28 @@ const License = () => {
     ] }) }) })
   ] });
 };
-const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-tYqd0a--.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
-const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-B2qDy-3v.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
-const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-BKam8pDN.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
-const Reports = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Reports-CrPrqhsM.js"), true ? __vite__mapDeps([9,1,2,3,4]) : void 0, import.meta.url));
-const DiscountForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DiscountForm-BTh3UQWx.js"), true ? __vite__mapDeps([10,1,2,3,4,11]) : void 0, import.meta.url));
-const Itinerary = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Itinerary-B51OPTS8.js"), true ? __vite__mapDeps([12,1,2,3,4,5]) : void 0, import.meta.url));
-const RecurringRuleForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/RecurringRuleForm-Cqv2cbJU.js"), true ? __vite__mapDeps([13,1,2,3,4]) : void 0, import.meta.url));
+const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-DEQpXvzy.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
+const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-BCwXvDOi.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
+const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-M9W1qR00.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
+const Reports = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Reports-JeXttK0I.js"), true ? __vite__mapDeps([9,1,2,3,4]) : void 0, import.meta.url));
+const DiscountForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DiscountForm-DYxWHwCn.js"), true ? __vite__mapDeps([10,1,2,3,4,11]) : void 0, import.meta.url));
+const Itinerary = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Itinerary-C1e5Vxj0.js"), true ? __vite__mapDeps([12,1,2,3,4,5]) : void 0, import.meta.url));
+const RecurringRuleForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/RecurringRuleForm-fKEgpUir.js"), true ? __vite__mapDeps([13,1,2,3,4]) : void 0, import.meta.url));
 const Whatsapp = reactExports.lazy(() => __vitePreload(() => import("./Whatsapp.js"), true ? __vite__mapDeps([14,1,2,3,4,15]) : void 0, import.meta.url));
-const ChannelManager = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ChannelManager-BC4qM78i.js"), true ? __vite__mapDeps([16,1,2,3,4,15]) : void 0, import.meta.url));
-const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Webhooks-BVWPQrRC.js"), true ? __vite__mapDeps([17,1,2,3,4,15]) : void 0, import.meta.url));
-const ScheduledPayments = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ScheduledPayments-D6SuU6pk.js"), true ? __vite__mapDeps([18,1,2,3,4]) : void 0, import.meta.url));
-const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-CAl-wHRC.js"), true ? __vite__mapDeps([19,1,2,3,4,11]) : void 0, import.meta.url));
-const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-DvQk4uBk.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
-const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-CVs-Shqy.js"), true ? __vite__mapDeps([21,1,2,3,4]) : void 0, import.meta.url));
-const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-DGL4UC_6.js"), true ? __vite__mapDeps([22,1,2,3,4]) : void 0, import.meta.url));
-const DynamicPricing = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DynamicPricing-CM_zxrI5.js"), true ? __vite__mapDeps([23,1,2,24,3,4,25]) : void 0, import.meta.url));
+const ChannelManager = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ChannelManager-DZ64KNZZ.js"), true ? __vite__mapDeps([16,1,2,3,4,15]) : void 0, import.meta.url));
+const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Webhooks-Cb89OgkB.js"), true ? __vite__mapDeps([17,1,2,3,4,15]) : void 0, import.meta.url));
+const ScheduledPayments = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ScheduledPayments-BnLNP2BI.js"), true ? __vite__mapDeps([18,1,2,3,4]) : void 0, import.meta.url));
+const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-C4az7Muo.js"), true ? __vite__mapDeps([19,1,2,3,4,11]) : void 0, import.meta.url));
+const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-hQVneAfI.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
+const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-CgYCok3W.js"), true ? __vite__mapDeps([21,1,2,3,4]) : void 0, import.meta.url));
+const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-D4S_wB_o.js"), true ? __vite__mapDeps([22,1,2,3,4]) : void 0, import.meta.url));
+const DynamicPricing = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DynamicPricing-CBtPFtKK.js"), true ? __vite__mapDeps([23,1,2,24,3,4,25]) : void 0, import.meta.url));
 const DynamicPricingRuleForm = reactExports.lazy(
-  () => __vitePreload(() => import("../../../dist/js/DynamicPricingRuleForm-C5k92h6w.js"), true ? __vite__mapDeps([26,1,2,3,4,24]) : void 0, import.meta.url)
+  () => __vitePreload(() => import("../../../dist/js/DynamicPricingRuleForm-C99aT0Zu.js"), true ? __vite__mapDeps([26,1,2,3,4,24]) : void 0, import.meta.url)
 );
-const AiAssistant = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AiAssistant-cc-9i8HW.js"), true ? __vite__mapDeps([27,1,2,3,4,15]) : void 0, import.meta.url));
-const AbandonedRecovery = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AbandonedRecovery-C3Eo0alU.js"), true ? __vite__mapDeps([28,1,2,3,4,25]) : void 0, import.meta.url));
-const WhiteLabel = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/WhiteLabel-CchtPIJy.js"), true ? __vite__mapDeps([29,1,2,3,4,15]) : void 0, import.meta.url));
+const AiAssistant = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AiAssistant-Bu_zHUnt.js"), true ? __vite__mapDeps([27,1,2,3,4,15]) : void 0, import.meta.url));
+const AbandonedRecovery = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AbandonedRecovery-BHbQat9C.js"), true ? __vite__mapDeps([28,1,2,3,4,25]) : void 0, import.meta.url));
+const WhiteLabel = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/WhiteLabel-DsK2IbJo.js"), true ? __vite__mapDeps([29,1,2,3,4,15]) : void 0, import.meta.url));
 const PageLoadingFallback = () => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-1/3" }),
@@ -79167,15 +79422,16 @@ export {
   IconSelector as a7,
   useNavigate as a8,
   Table$1 as a9,
-  YAxis as aA,
-  formatAxisMap as aB,
-  ResponsiveContainer as aC,
-  CartesianGrid as aD,
-  Tooltip as aE,
-  DEFAULT_MENU_ITEMS as aF,
-  useWordPressMedia as aG,
-  MenuIcon as aH,
-  ICON_MAP as aI,
+  XAxis as aA,
+  YAxis as aB,
+  formatAxisMap as aC,
+  ResponsiveContainer as aD,
+  CartesianGrid as aE,
+  Tooltip as aF,
+  DEFAULT_MENU_ITEMS as aG,
+  useWordPressMedia as aH,
+  MenuIcon as aI,
+  ICON_MAP as aJ,
   TableHeader as aa,
   TableRow as ab,
   TableHead as ac,
@@ -79185,23 +79441,23 @@ export {
   Popover as ag,
   PopoverTrigger as ah,
   PopoverContent as ai,
-  clsx as aj,
-  Dot as ak,
-  findAllByType as al,
-  ErrorBar as am,
-  Layer as an,
-  filterProps as ao,
-  Curve as ap,
-  interpolateNumber$2 as aq,
-  isNil$1 as ar,
-  hasClipDot as as,
-  LabelList as at,
-  getValueByDataKey as au,
-  uniqueId as av,
-  Global as aw,
-  getCateCoordinateOfLine as ax,
-  generateCategoricalChart as ay,
-  XAxis as az,
+  downloadAdminBookingInvoice as aj,
+  clsx as ak,
+  Dot as al,
+  findAllByType as am,
+  ErrorBar as an,
+  Layer as ao,
+  filterProps as ap,
+  Curve as aq,
+  interpolateNumber$2 as ar,
+  isNil$1 as as,
+  hasClipDot as at,
+  LabelList as au,
+  getValueByDataKey as av,
+  uniqueId as aw,
+  Global as ax,
+  getCateCoordinateOfLine as ay,
+  generateCategoricalChart as az,
   isAiReady as b,
   aiApi as c,
   CardContent as d,

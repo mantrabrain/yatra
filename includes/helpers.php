@@ -1074,6 +1074,44 @@ function yatra_get_pdf_branding(string $defaultHeaderColor): array
 }
 
 /**
+ * Customer-facing label for a payment gateway id.
+ *
+ * Returns the same **Gateway Title** the checkout shows — the operator's custom
+ * title when they set one, otherwise the gateway's own translated title — so
+ * invoices, the confirmation page and the checkout all name a gateway the same
+ * way. Falls back to the prettified id (the historical behaviour) when the
+ * gateway is not registered any more, e.g. a Pro gateway while Pro is inactive,
+ * so an old document still reads sensibly.
+ *
+ * @param string|null $gatewayId Gateway id / slug as stored on the payment or booking.
+ * @param string      $fallback  Used when no id is stored at all.
+ */
+function yatra_payment_gateway_label(?string $gatewayId, string $fallback = ''): string
+{
+    $id = trim((string) $gatewayId);
+    if ($id === '') {
+        return $fallback;
+    }
+
+    if (class_exists(\Yatra\PaymentGateways\PaymentGatewayRegistry::class)) {
+        $title = \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance()->resolveGatewayTitle($id);
+        if ($title !== '') {
+            return $title;
+        }
+    }
+
+    // Only a slug-shaped value is a gateway id we may prettify. Anything else
+    // is operator free text — a manually recorded payment stores whatever they
+    // typed ("Cash on arrival", "SEPA Direct Debit") — and is returned exactly
+    // as entered rather than re-cased.
+    if (!preg_match('/^[A-Za-z0-9_-]+$/', $id)) {
+        return $id;
+    }
+
+    return ucwords(str_replace(['_', '-'], ' ', $id));
+}
+
+/**
  * Are partial payments possible on this site at all?
  *
  * True when deposits or partial payments are switched on globally. Used to

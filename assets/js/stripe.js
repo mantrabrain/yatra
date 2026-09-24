@@ -921,6 +921,28 @@ class YatraStripe {
                 : '')
             || '';
 
+
+        // reCAPTCHA v3: this gateway posts to /booking/create itself, so it must
+        // attach its own token — the shared submit path in booking.js never runs
+        // for an intercepted gateway submit. Without this the server receives an
+        // empty token and rejects the booking with "reCAPTCHA verification
+        // failed", which no score threshold can get past.
+        //
+        // A fresh token every attempt: v3 tokens are single-use and expire after
+        // ~2 minutes, so a retry after a declined card must not reuse the old one.
+        try {
+            const yatraRc = (typeof window !== 'undefined') ? window.yatraRecaptcha : null;
+            if (yatraRc && typeof yatraRc.protects === 'function' && yatraRc.protects('booking')
+                && typeof yatraRc.execute === 'function') {
+                const recaptchaToken = await yatraRc.execute('booking');
+                if (recaptchaToken) {
+                    bookingData.recaptcha_token = recaptchaToken;
+                }
+            }
+        } catch (e) {
+            // Never block checkout on the helper itself; the server still decides.
+        }
+
         // Always call the same endpoint - server decides based on session type
         const bookingResponse = await fetch(`${this.apiUrl}/booking/create`, {
             method: 'POST',

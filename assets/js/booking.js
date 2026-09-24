@@ -1908,6 +1908,22 @@ if (typeof window.yatraNumOr !== 'function') {
             confirm_password: confirmPassword
         };
         
+        // reCAPTCHA v3: this form posts straight to /auth/register, so it must
+        // carry its own token when the operator protects registration — the
+        // server rejects an empty one outright, whatever the score threshold.
+        // Resolves to '' when reCAPTCHA is off or unavailable, so the normal
+        // (unprotected) flow is completely unchanged.
+        const yatraRcReg = window.yatraRecaptcha;
+        const regTokenPromise = (yatraRcReg && typeof yatraRcReg.protects === 'function'
+            && yatraRcReg.protects('registration') && typeof yatraRcReg.execute === 'function')
+            ? yatraRcReg.execute('registration')
+            : Promise.resolve('');
+
+        regTokenPromise.catch(function () { return ''; }).then(function (regToken) {
+        if (regToken) {
+            registerData.recaptcha_token = regToken;
+        }
+
         fetch(apiUrl + '/auth/register', {
             method: 'POST',
             headers: {
@@ -1973,6 +1989,7 @@ if (typeof window.yatraNumOr !== 'function') {
             $btnText.show();
             $btnLoading.hide();
         });
+        }); // end reCAPTCHA token wrapper
     });
 
     // ---------------------------------------------------------------------

@@ -279,6 +279,35 @@ class PaymentGatewayRegistry
     }
 
     /**
+     * The gateway's customer-facing title — the same label the checkout shows.
+     *
+     * Prefers the operator's stored title, but ONLY when they actually
+     * customized it: the gateway's default title is persisted into the config
+     * at install time, and using that stored English string would shadow the
+     * translatable getTitle(). A genuine custom value (operator free-text, not
+     * translatable) is honored as-is.
+     *
+     * Works for any registered gateway, enabled or not, so a document about a
+     * past payment still names the gateway correctly after it was switched
+     * off. Returns '' when the id belongs to no registered gateway (e.g. a Pro
+     * gateway while Pro is inactive) so callers can fall back to the raw id.
+     */
+    public function resolveGatewayTitle(string $gatewayId): string
+    {
+        $gateway = $this->get($gatewayId);
+        if (!$gateway) {
+            return '';
+        }
+
+        $config = $gateway->getConfig();
+        $storedTitle = isset($config['title']) ? (string) $config['title'] : '';
+
+        return ($storedTitle !== '' && $storedTitle !== $gateway->getDefaultTitle())
+            ? $storedTitle
+            : $gateway->getTitle();
+    }
+
+    /**
      * Gateways to show on checkout: all enabled in settings.
      * Configuration is validated when processing payment (see processPayment).
      */
@@ -296,13 +325,10 @@ class PaymentGatewayRegistry
             // the stored value equals the gateway's built-in default, fall
             // through to the translated getter; a genuine custom value (which
             // is operator free-text, not translatable) is still honored.
-            $storedTitle = isset($config['title']) ? (string) $config['title'] : '';
             $storedDescription = isset($config['description']) ? (string) $config['description'] : '';
             $checkoutGateways[] = [
                 'id' => $id,
-                'title' => ($storedTitle !== '' && $storedTitle !== $gateway->getDefaultTitle())
-                    ? $storedTitle
-                    : $gateway->getTitle(),
+                'title' => $this->resolveGatewayTitle($id),
                 'description' => ($storedDescription !== '' && $storedDescription !== $gateway->getDefaultDescription())
                     ? $storedDescription
                     : $gateway->getDescription(),

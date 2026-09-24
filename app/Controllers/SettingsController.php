@@ -267,6 +267,13 @@ class SettingsController extends BaseController
         'seo_trip_meta_keywords' => '',
         'seo_trip_meta_image' => 0,
         'enable_sitemap' => true,
+        // Which Yatra content types appear in /yatra-sitemap.xml. Defaults to
+        // every type, so a site that never touches this keeps today's sitemap.
+        'sitemap_types' => ['archive', 'trip', 'destination', 'activity', 'category'],
+        // Opt-in, and deliberately separate from the list above: dropping a type
+        // from the sitemap is housekeeping, while noindex de-indexes pages that
+        // may currently rank. That should never happen as a side effect.
+        'sitemap_noindex_excluded' => false,
 
         // Advanced Settings
         'debug_mode' => false,

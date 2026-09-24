@@ -88,6 +88,24 @@ interface TimeSlot {
   traveler_pricing?: TravelerPricing[];
 }
 
+/**
+ * One entry in a rule's exclusion list: either a single day ("2027-03-08", the
+ * original format) or an inclusive period. Both are stored in the same
+ * `excluded_dates` column, so rules saved before periods existed load as-is.
+ */
+type ExcludedEntry = string | { start: string; end: string };
+
+const isPeriod = (e: ExcludedEntry): e is { start: string; end: string } =>
+  typeof e === "object" && e !== null && "start" in e && "end" in e;
+
+/** Sort key: a period sorts by its first day, alongside single dates. */
+const excludedSortKey = (e: ExcludedEntry): string =>
+  isPeriod(e) ? e.start : e;
+
+/** Stable identity for list keys and removal, for both shapes. */
+const excludedId = (e: ExcludedEntry): string =>
+  isPeriod(e) ? `${e.start}..${e.end}` : e;
+
 interface RecurringRule {
   id?: number;
   trip_id: number;
@@ -99,7 +117,7 @@ interface RecurringRule {
   interval_days?: number;
   start_date: string;
   end_date?: string;
-  excluded_dates: string[];
+  excluded_dates: ExcludedEntry[];
   months: number[]; // Array of month numbers (1-12) to filter by
   time_slots: TimeSlot[]; // For single-day trips with multiple slots
   pricing_type: "regular" | "traveler_based"; // Allow override of trip's pricing type
@@ -182,6 +200,9 @@ const RecurringRuleForm: React.FC = () => {
   });
 
   const [newExcludedDate, setNewExcludedDate] = useState("");
+  const [newExcludedStart, setNewExcludedStart] = useState("");
+  const [newExcludedEnd, setNewExcludedEnd] = useState("");
+  const [excludedError, setExcludedError] = useState("");
   const [previewData, setPreviewData] = useState<{
     total: number;
     dates: any[];
@@ -565,22 +586,77 @@ const RecurringRuleForm: React.FC = () => {
     }));
   };
 
-  // Add excluded date
-  const addExcludedDate = () => {
-    if (newExcludedDate && !formData.excluded_dates.includes(newExcludedDate)) {
-      setFormData((prev) => ({
-        ...prev,
-        excluded_dates: [...prev.excluded_dates, newExcludedDate].sort(),
-      }));
-      setNewExcludedDate("");
-    }
-  };
+  const sortExcluded = (list: ExcludedEntry[]): ExcludedEntry[] =>
+    [...list].sort((a, b) => excludedSortKey(a).localeCompare(excludedSortKey(b)));
 
-  // Remove excluded date
-  const removeExcludedDate = (date: string) => {
+  // Add a single excluded day
+  const addExcludedDate = () => {
+    if (!newExcludedDate) {
+      return;
+    }
+    const exists = formData.excluded_dates.some(
+      (e) => excludedId(e) === newExcludedDate,
+    );
+    if (exists) {
+      setExcludedError(__("That date is already excluded.", "yatra"));
+      return;
+    }
+    setExcludedError("");
     setFormData((prev) => ({
       ...prev,
-      excluded_dates: prev.excluded_dates.filter((d) => d !== date),
+      excluded_dates: sortExcluded([...prev.excluded_dates, newExcludedDate]),
+    }));
+    setNewExcludedDate("");
+  };
+
+  // Add an excluded period — one entry covering every day from start to end,
+  // so a shutdown doesn't have to be added a day at a time.
+  const addExcludedPeriod = () => {
+    if (!newExcludedStart || !newExcludedEnd) {
+      return;
+    }
+    // Accept the two dates in either order rather than rejecting the input.
+    const start =
+      newExcludedStart <= newExcludedEnd ? newExcludedStart : newExcludedEnd;
+    const end =
+      newExcludedStart <= newExcludedEnd ? newExcludedEnd : newExcludedStart;
+
+    if (start === end) {
+      // A one-day period is just a single date; keep the list in its simplest form.
+      if (formData.excluded_dates.some((e) => excludedId(e) === start)) {
+        setExcludedError(__("That date is already excluded.", "yatra"));
+        return;
+      }
+      setExcludedError("");
+      setFormData((prev) => ({
+        ...prev,
+        excluded_dates: sortExcluded([...prev.excluded_dates, start]),
+      }));
+      setNewExcludedStart("");
+      setNewExcludedEnd("");
+      return;
+    }
+
+    const id = `${start}..${end}`;
+    if (formData.excluded_dates.some((e) => excludedId(e) === id)) {
+      setExcludedError(__("That period is already excluded.", "yatra"));
+      return;
+    }
+    setExcludedError("");
+    setFormData((prev) => ({
+      ...prev,
+      excluded_dates: sortExcluded([...prev.excluded_dates, { start, end }]),
+    }));
+    setNewExcludedStart("");
+    setNewExcludedEnd("");
+  };
+
+  // Remove an excluded day or period
+  const removeExcluded = (id: string) => {
+    setExcludedError("");
+    setFormData((prev) => ({
+      ...prev,
+      excluded_dates: prev.excluded_dates.filter((e) => excludedId(e) !== id),
     }));
   };
 
@@ -908,7 +984,7 @@ const RecurringRuleForm: React.FC = () => {
                   )}
                 </div>
 
-                {/* Excluded Dates */}
+                {/* Excluded Dates & Periods */}
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     {__("Excluded Dates", "yatra")}{" "}
@@ -933,32 +1009,84 @@ const RecurringRuleForm: React.FC = () => {
                       <Plus className="w-4 h-4" />
                     </Button>
                   </div>
+
+                  {/* A whole period in one go — a shutdown shouldn't have to be
+                      added a day at a time. Named "Periods" so it can't be
+                      confused with the rule's own Date Range above. */}
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 mt-4">
+                    {__("Excluded Periods", "yatra")}{" "}
+                    <span className="text-gray-400">
+                      ({__("holiday closures, vacations", "yatra")})
+                    </span>
+                  </label>
+                  <div className="flex flex-col sm:flex-row gap-2 mb-1">
+                    <div className="flex-1">
+                      <DatePicker
+                        value={newExcludedStart}
+                        onChange={(value: string) => setNewExcludedStart(value)}
+                        placeholder={__("First day", "yatra")}
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <DatePicker
+                        value={newExcludedEnd}
+                        onChange={(value: string) => setNewExcludedEnd(value)}
+                        placeholder={__("Last day", "yatra")}
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={addExcludedPeriod}
+                      disabled={!newExcludedStart || !newExcludedEnd}
+                    >
+                      <Plus className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                    {__(
+                      "Both days are included. Every date in between is skipped by this rule.",
+                      "yatra",
+                    )}
+                  </p>
+
+                  {excludedError && (
+                    <p className="text-xs text-red-600 dark:text-red-400 mb-2">
+                      {excludedError}
+                    </p>
+                  )}
+
                   {formData.excluded_dates.length > 0 && (
                     <div className="flex flex-wrap gap-2">
-                      {formData.excluded_dates.map((date) => (
-                        <Badge
-                          key={date}
-                          variant="outline"
-                          className="flex items-center gap-1"
-                        >
-                          {new Date(date + "T00:00:00").toLocaleDateString(
-                            "en-US",
-                            {
-                              weekday: "short",
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
-                            },
-                          )}
-                          <button
-                            type="button"
-                            onClick={() => removeExcludedDate(date)}
-                            className="ml-1 hover:text-red-500"
+                      {formData.excluded_dates.map((entry) => {
+                        const id = excludedId(entry);
+                        const fmt = (d: string) =>
+                          new Date(d + "T00:00:00").toLocaleDateString("en-US", {
+                            weekday: "short",
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          });
+                        return (
+                          <Badge
+                            key={id}
+                            variant="outline"
+                            className="flex items-center gap-1"
                           >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </Badge>
-                      ))}
+                            {isPeriod(entry)
+                              ? `${fmt(entry.start)} → ${fmt(entry.end)}`
+                              : fmt(entry)}
+                            <button
+                              type="button"
+                              onClick={() => removeExcluded(id)}
+                              className="ml-1 hover:text-red-500"
+                              aria-label={__("Remove exclusion", "yatra")}
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </Badge>
+                        );
+                      })}
                     </div>
                   )}
                 </div>

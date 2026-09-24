@@ -61,6 +61,15 @@ class SitemapManager
         foreach (['yatra_trip_created', 'yatra_trip_updated', 'yatra_trip_deleted'] as $hook) {
             add_action($hook, [SitemapService::class, 'flushCache']);
         }
+
+        // ...and when the operator changes which types are published. Without
+        // this the entry list is cached for an hour, so the setting would look
+        // as though it had done nothing.
+        foreach (['yatra_sitemap_types', 'yatra_enable_sitemap'] as $option) {
+            add_action('update_option_' . $option, [SitemapService::class, 'flushCache']);
+            add_action('add_option_' . $option, [SitemapService::class, 'flushCache']);
+            add_action('delete_option_' . $option, [SitemapService::class, 'flushCache']);
+        }
     }
 
     private static function registerActiveIntegration(

@@ -117,7 +117,15 @@ class NotificationService
 
         $vars = TransactionalEmailTemplateService::variablesFromBooking($booking);
         $vars['payment_amount_formatted'] = yatra_format_price((float) ($paymentData['amount'] ?? 0));
-        $vars['payment_method'] = (string) ($paymentData['payment_method'] ?? __('Online payment', 'yatra'));
+        // Name the gateway the way the customer saw it at checkout (the
+        // operator's Gateway Title), not its internal id — a Stripe capture
+        // passes the slug "stripe" here. A manually recorded payment passes
+        // free text ("Credit Card"), which is not a gateway id and is returned
+        // unchanged.
+        $vars['payment_method'] = yatra_payment_gateway_label(
+            isset($paymentData['payment_method']) ? (string) $paymentData['payment_method'] : null,
+            __('Online payment', 'yatra')
+        );
         $vars['transaction_id'] = (string) ($paymentData['transaction_id'] ?? '');
 
         TransactionalEmailTemplateService::sendIfEnabled(
@@ -176,7 +184,15 @@ class NotificationService
 
         $vars = TransactionalEmailTemplateService::variablesFromBooking($booking);
         $vars['payment_amount_formatted'] = yatra_format_price((float) ($paymentData['amount'] ?? 0));
-        $vars['payment_method'] = (string) ($paymentData['payment_method'] ?? __('Online payment', 'yatra'));
+        // Name the gateway the way the customer saw it at checkout (the
+        // operator's Gateway Title), not its internal id — a Stripe capture
+        // passes the slug "stripe" here. A manually recorded payment passes
+        // free text ("Credit Card"), which is not a gateway id and is returned
+        // unchanged.
+        $vars['payment_method'] = yatra_payment_gateway_label(
+            isset($paymentData['payment_method']) ? (string) $paymentData['payment_method'] : null,
+            __('Online payment', 'yatra')
+        );
         $vars['transaction_id'] = (string) ($paymentData['transaction_id'] ?? '');
 
         TransactionalEmailTemplateService::sendIfEnabled(

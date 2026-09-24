@@ -18,6 +18,7 @@ import {
   CircleDollarSign,
   Undo2,
   Mail,
+  Download,
 } from "lucide-react";
 import {
   Pagination,
@@ -26,6 +27,7 @@ import {
   Table as SharedTable,
 } from "../components/shared";
 import { __ } from "../lib/i18n";
+import { downloadAdminBookingInvoice } from "../lib/invoice-download";
 import {
   buildYatraSinglePublicUrls,
   isWordPressPlainPermalink,
@@ -64,7 +66,6 @@ interface Booking {
   payment_gateway?: string;
   created_at: string;
 }
-
 
 /**
  * Payment statuses an administrator can set straight from the booking list.
@@ -909,10 +910,29 @@ const Bookings: React.FC = () => {
         can("yatra_edit_bookings") && booking.payment_status !== action.value,
     })),
     {
+      key: "download_invoice",
+      label: __("Download invoice"),
+      icon: <Download className="w-4 h-4" />,
+      onClick: async (booking: Booking) => {
+        try {
+          await downloadAdminBookingInvoice(booking.id);
+        } catch (error: any) {
+          showToast(
+            error?.message || __("Failed to download invoice"),
+            "error",
+          );
+        }
+      },
+      // Available for every booking, paid or not: an unpaid booking renders a
+      // pro-forma invoice with the gateway's payment instructions.
+      condition: () => can("yatra_view_bookings"),
+    },
+    {
       key: "resend_confirmation",
       label: __("Resend confirmation email"),
       icon: <Mail className="w-4 h-4" />,
-      onClick: (booking: Booking) => resendBookingEmail(booking.id, "confirmation"),
+      onClick: (booking: Booking) =>
+        resendBookingEmail(booking.id, "confirmation"),
       condition: (booking: Booking) =>
         can("yatra_edit_bookings") && !!booking.customer_email,
     },

@@ -3,9 +3,10 @@
  * Display booking details in a clean, minimal SaaS-style design
  */
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
+  Download,
   ArrowLeft,
   Mail,
   Phone,
@@ -36,6 +37,7 @@ import {
 } from "../components/ui/card";
 import { ConditionalRender } from "../components/ui/conditional-render";
 import { ResendEmailMenu } from "../components/bookings/ResendEmailMenu";
+import { downloadAdminBookingInvoice } from "../lib/invoice-download";
 import { Skeleton } from "../components/ui/skeleton";
 import { formatYatraMoney } from "../lib/currency-display";
 
@@ -353,6 +355,27 @@ const ViewBooking: React.FC = () => {
     window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=bookings&action=edit&id=${bookingId}`;
   };
 
+  // The booking invoice works for unpaid bookings too — it renders as a
+  // pro-forma invoice with the gateway's payment instructions. This page has
+  // no toast provider, so a failure is rendered as an inline banner under the
+  // header; a tooltip alone would leave a failed download looking like nothing
+  // happened.
+  const [invoiceError, setInvoiceError] = useState<string>("");
+  const handleDownloadInvoice = async () => {
+    const id = Number(booking?.id ?? 0);
+    if (!id) {
+      return;
+    }
+    setInvoiceError("");
+    try {
+      await downloadAdminBookingInvoice(id);
+    } catch (error: any) {
+      setInvoiceError(
+        error?.message || __("Failed to download invoice", "yatra"),
+      );
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-3">
@@ -504,6 +527,16 @@ const ViewBooking: React.FC = () => {
         description={__("View complete booking information", "yatra")}
         actions={
           <div className="flex gap-2">
+            <ConditionalRender capability="yatra_view_bookings">
+              <Button
+                variant="outline"
+                onClick={handleDownloadInvoice}
+                className="flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                {__("Download invoice", "yatra")}
+              </Button>
+            </ConditionalRender>
             <ConditionalRender capability="yatra_edit_bookings">
               <ResendEmailMenu
                 bookingId={Number(booking.id)}
@@ -527,6 +560,16 @@ const ViewBooking: React.FC = () => {
           </div>
         }
       />
+
+      {invoiceError && (
+        <div
+          role="alert"
+          className="flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400"
+        >
+          <AlertCircle className="w-4 h-4 shrink-0" />
+          {invoiceError}
+        </div>
+      )}
 
       <ConditionalRender capability="yatra_view_bookings">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
