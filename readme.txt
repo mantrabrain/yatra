@@ -270,14 +270,15 @@ Pricing starts at **$99/yr** (Starter, sale) and goes up to **$599/yr** (Scale 1
 
 == Screenshots ==
 
-📷 **Screenshots** (as shown on WordPress.org)
-
-1. Yatra dashboard inside WordPress — bookings, revenue and quick access to daily tasks
-2. Trip Creation Process — content, pricing, media and settings in one workspace
-3. Trip list & All listing page — search, filters and status at a glance
-4. Trip Booking Process — hero, itinerary and book flow
-5. Global Settings - Payment Gateways etc.
-6. Traveler account — bookings, payments and documents
+1. Trip pages that sell themselves — gallery, duration, season and a sticky "Book Now" price button on any theme
+2. Book in a few taps, no redirects — live departure availability, traveller count and enquiry, all inline
+3. Your whole operation at a glance — bookings, revenue and upcoming departures the moment you log in
+4. Every trip in one organised list — search, filter by status, and see pricing, type and availability instantly
+5. Build a complete trip in one place — basics, pricing, itinerary, media and SEO, guided step by step
+6. Never lose track of a reservation — filter by traveller, payment state and status across every departure
+7. Full booking detail, one-click invoice — payment summary, traveller records and a downloadable invoice
+8. Every transaction accounted for — Stripe, PayPal, bank transfer and manual payments in one ledger
+9. Run offers without spreadsheets — coupon codes with usage limits, expiry dates and live status
 
 == Changelog ==
 
