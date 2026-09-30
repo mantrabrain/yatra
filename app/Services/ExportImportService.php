@@ -1256,10 +1256,41 @@ class ExportImportService
         return $single !== null ? (string) $single : '';
     }
 
+    /**
+     * Does this table exist?
+     *
+     * The import de-duplicates keys against tables owned by Yatra Pro modules.
+     * On a free-only site — or one where the owning module has never been
+     * enabled — those tables are absent, and probing one logs a database error
+     * for every record imported. Nothing to collide with in that case, so the
+     * callers below keep the incoming value.
+     *
+     * Cached for the request: each caller runs once per imported row.
+     */
+    private static function tableExists(string $table): bool
+    {
+        static $cache = [];
+
+        if (!array_key_exists($table, $cache)) {
+            global $wpdb;
+            $cache[$table] = (bool) $wpdb->get_var(
+                $wpdb->prepare('SHOW TABLES LIKE %s', $table)
+            );
+        }
+
+        return $cache[$table];
+    }
+
     private static function ensureUniqueConsentRequestToken(string $token): string
     {
         global $wpdb;
         $table = $wpdb->prefix . 'yatra_consent_requests';
+
+        // Trip Consent is a Pro module; without it there is no table to clash with.
+        if (!self::tableExists($table)) {
+            return $token;
+        }
+
         $base = $token;
         $candidate = $base;
         for ($n = 0; $n < 5000; $n++) {
@@ -1282,6 +1313,12 @@ class ExportImportService
     {
         global $wpdb;
         $table = $wpdb->prefix . 'yatra_email_templates';
+
+        // Email Automation is a Pro module; without it there is no table to clash with.
+        if (!self::tableExists($table)) {
+            return $key;
+        }
+
         $base = $key;
         $candidate = $base;
         for ($n = 0; $n < 5000; $n++) {
