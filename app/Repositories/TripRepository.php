@@ -692,18 +692,19 @@ class TripRepository extends BaseRepository
                 if (!is_string($age)) {
                     continue;
                 }
+                $ageLimits = self::ageSuitabilityThresholds();
                 switch ($age) {
                     case 'family-friendly':
-                        $ageParts[] = '(t.age_min IS NULL OR t.age_min <= 5)';
+                        $ageParts[] = '(t.age_min IS NULL OR t.age_min <= ' . (int) $ageLimits['family_max'] . ')';
                         break;
                     case 'kids-friendly':
-                        $ageParts[] = '(t.age_min IS NULL OR t.age_min <= 12)';
+                        $ageParts[] = '(t.age_min IS NULL OR t.age_min <= ' . (int) $ageLimits['kids_max'] . ')';
                         break;
                     case 'senior-friendly':
-                        $ageParts[] = '(t.age_max IS NULL OR t.age_max >= 65)';
+                        $ageParts[] = '(t.age_max IS NULL OR t.age_max >= ' . (int) $ageLimits['senior_min'] . ')';
                         break;
                     case 'adults-only':
-                        $ageParts[] = 't.age_min >= 18';
+                        $ageParts[] = 't.age_min >= ' . (int) $ageLimits['adults_min'];
                         break;
                 }
             }
@@ -3731,14 +3732,46 @@ public function saveAvailabilityDates(int $tripId, array $availabilityDates): vo
     }
 
     /**
+     * Age thresholds behind the suitability filters.
+     *
+     * These were repeated as literals in six places — the filter query and the
+     * count query for each band — so an operator whose "kids" means under 18
+     * rather than under 12 had no way to say so, and changing it meant editing
+     * the same number in six spots and hoping none were missed.
+     *
+     * @return array{family_max:int, kids_max:int, senior_min:int, adults_min:int}
+     */
+    public static function ageSuitabilityThresholds(): array
+    {
+        $defaults = [
+            'family_max' => 5,
+            'kids_max'   => 12,
+            'senior_min' => 65,
+            'adults_min' => 18,
+        ];
+
+        $filtered = (array) apply_filters('yatra_age_suitability_thresholds', $defaults);
+
+        foreach ($defaults as $key => $fallback) {
+            $filtered[$key] = isset($filtered[$key]) && is_numeric($filtered[$key])
+                ? (int) $filtered[$key]
+                : $fallback;
+        }
+
+        return $filtered;
+    }
+
+    /**
      * Count family friendly trips
      */
     public function countByFamilyFriendly(): int
     {
         $table = $this->getTableName();
+        $limit = (int) self::ageSuitabilityThresholds()['family_max'];
+
         return (int) $this->wpdb->get_var(
-            "SELECT COUNT(*) FROM {$table} 
-             WHERE status = 'publish' AND (age_min IS NULL OR age_min <= 5)"
+            "SELECT COUNT(*) FROM {$table}
+             WHERE status = 'publish' AND (age_min IS NULL OR age_min <= {$limit})"
         );
     }
 
@@ -3748,9 +3781,11 @@ public function saveAvailabilityDates(int $tripId, array $availabilityDates): vo
     public function countByKidsFriendly(): int
     {
         $table = $this->getTableName();
+        $limit = (int) self::ageSuitabilityThresholds()['kids_max'];
+
         return (int) $this->wpdb->get_var(
-            "SELECT COUNT(*) FROM {$table} 
-             WHERE status = 'publish' AND (age_min IS NULL OR age_min <= 12)"
+            "SELECT COUNT(*) FROM {$table}
+             WHERE status = 'publish' AND (age_min IS NULL OR age_min <= {$limit})"
         );
     }
 
@@ -3760,9 +3795,11 @@ public function saveAvailabilityDates(int $tripId, array $availabilityDates): vo
     public function countBySeniorFriendly(): int
     {
         $table = $this->getTableName();
+        $limit = (int) self::ageSuitabilityThresholds()['senior_min'];
+
         return (int) $this->wpdb->get_var(
-            "SELECT COUNT(*) FROM {$table} 
-             WHERE status = 'publish' AND (age_max IS NULL OR age_max >= 65)"
+            "SELECT COUNT(*) FROM {$table}
+             WHERE status = 'publish' AND (age_max IS NULL OR age_max >= {$limit})"
         );
     }
 
@@ -3772,9 +3809,11 @@ public function saveAvailabilityDates(int $tripId, array $availabilityDates): vo
     public function countByAdultsOnly(): int
     {
         $table = $this->getTableName();
+        $limit = (int) self::ageSuitabilityThresholds()['adults_min'];
+
         return (int) $this->wpdb->get_var(
-            "SELECT COUNT(*) FROM {$table} 
-             WHERE status = 'publish' AND age_min >= 18"
+            "SELECT COUNT(*) FROM {$table}
+             WHERE status = 'publish' AND age_min >= {$limit}"
         );
     }
 

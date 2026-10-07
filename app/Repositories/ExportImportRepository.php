@@ -140,6 +140,50 @@ class ExportImportRepository
     }
 
     /**
+     * Find a row's id by its business-unique columns.
+     *
+     * Import used to insert every row unconditionally, so re-running it
+     * duplicated everything that had no unique constraint and rejected
+     * everything that had one. Looking the row up first lets the importer
+     * recognise what it has already brought in.
+     *
+     * @param array<string, scalar|null> $criteria column => value (all must match)
+     * @return int|null existing row id, or null when there is no match
+     */
+    public function findRowIdBy(string $tableName, array $criteria): ?int
+    {
+        global $wpdb;
+
+        if ($criteria === []) {
+            return null;
+        }
+
+        $where = [];
+        $values = [];
+        foreach ($criteria as $column => $value) {
+            if (!preg_match('/^[a-zA-Z0-9_]+$/', (string) $column)) {
+                return null;
+            }
+            if ($value === null) {
+                $where[] = "`{$column}` IS NULL";
+                continue;
+            }
+            $where[] = "`{$column}` = %s";
+            $values[] = (string) $value;
+        }
+
+        $sql = "SELECT id FROM `" . esc_sql($tableName) . "` WHERE " . implode(' AND ', $where) . " LIMIT 1";
+        if ($values !== []) {
+            // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+            $sql = $wpdb->prepare($sql, $values);
+        }
+
+        $id = $wpdb->get_var($sql);
+
+        return $id !== null ? (int) $id : null;
+    }
+
+    /**
      * Insert and return new auto-increment id, or null on failure.
      */
     public function insertRecordReturningId(string $tableName, array $record): ?int

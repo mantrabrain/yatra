@@ -224,6 +224,12 @@ class SettingsController extends BaseController
         'recaptcha_protect_booking' => false,
         'recaptcha_protect_registration' => false,
 
+        // Uninstall. Off by default and deliberately never defaulted to true:
+        // turning this on means deleting the operator's bookings, customers and
+        // payment history when the plugin is removed, so it has to be a decision
+        // somebody makes on purpose.
+        'delete_data_on_uninstall' => false,
+
         // Permalink Settings
         'trip_base' => 'trip',
         'destination_base' => 'destination',

@@ -466,6 +466,11 @@ class ExportImportService
      */
     public static function processImportJob(string $jobId): void
     {
+        // Per-job state: without this a second import in the same request would
+        // inherit the first one's "already here" set.
+        self::$importPreExisting = [];
+        self::$importSkippedOldIds = [];
+
         $repository = new ExportImportRepository();
         global $wpdb;
         
@@ -614,9 +619,10 @@ class ExportImportService
                     $entryTotal = count($payload['entries']);
                     $importStats['itinerary'] = [
                         'total' => $dayTotal + $entryTotal,
-                    'imported' => 0,
-                    'failed' => 0,
-                ];
+                        'imported' => 0,
+                        'failed' => 0,
+                        'skipped' => 0,
+                    ];
                 
                     foreach (array_chunk($payload['days'], self::BATCH_SIZE) as $batch) {
                     foreach ($batch as $record) {
@@ -624,6 +630,19 @@ class ExportImportService
                             $oldDayId = (int) ($record['id'] ?? 0);
                             unset($record['id']);
                             try {
+                                // Itinerary has its own import path, so it needs the
+                                // same recognition the main loop does: a trip already
+                                // here already has its days, and re-inserting them is
+                                // what made every one of these fail on a second run.
+                                $oldTripIdForDay = (int) ($record['trip_id'] ?? 0);
+                                if ($oldTripIdForDay > 0 && !empty(self::$importSkippedOldIds['trips'][$oldTripIdForDay])) {
+                                    $importStats['itinerary']['skipped'] = ($importStats['itinerary']['skipped'] ?? 0) + 1;
+                                    if ($oldDayId > 0) {
+                                        self::$importSkippedOldIds['itinerary_days'][$oldDayId] = true;
+                                    }
+                                    continue;
+                                }
+
                                 if (isset($record['trip_id'])) {
                                     $mappedTrip = $mapper->map('trips', $record['trip_id']);
                                     $record['trip_id'] = $mappedTrip;
@@ -670,6 +689,12 @@ class ExportImportService
                             $record = (array) $record;
                             unset($record['id']);
                             try {
+                                $oldDayRef = (int) ($record['day_id'] ?? 0);
+                                if ($oldDayRef > 0 && !empty(self::$importSkippedOldIds['itinerary_days'][$oldDayRef])) {
+                                    $importStats['itinerary']['skipped'] = ($importStats['itinerary']['skipped'] ?? 0) + 1;
+                                    continue;
+                                }
+
                                 if (isset($record['day_id'])) {
                                     $record['day_id'] = $mapper->map('itinerary_days', $record['day_id']);
                                 }
@@ -813,6 +838,190 @@ class ExportImportService
     }
 
     /**
+     * Rows found to be already present during the current import, as
+     * entity => [id => true]. Children of these are skipped: the parent is
+     * already here, so its children are too.
+     *
+     * @var array<string, array<int, bool>>
+     */
+    private static $importPreExisting = [];
+
+    /**
+     * Export-side ids skipped during this import, as entity => [oldId => true].
+     *
+     * Needed for depth: when a booking is recognised, its travellers are skipped
+     * too, and those travellers never get an id mapping — so their meta rows had
+     * nothing to resolve `traveller_id` against and were rejected. Remembering
+     * the skip by export id lets the whole subtree be skipped cleanly.
+     *
+     * @var array<string, array<int, bool>>
+     */
+    private static $importSkippedOldIds = [];
+
+    /**
+     * Natural-key columns that are themselves foreign keys, so they hold the
+     * export's id and must be translated to this site's before matching.
+     *
+     * @var array<string, array<string, string>> dataType => [column => entity]
+     */
+    private const IMPORT_NATURAL_KEY_FKS = [
+        'availability' => ['trip_id' => 'trips'],
+    ];
+
+    /**
+     * Business identity per data type, used to recognise a row the importer has
+     * already brought in.
+     *
+     * Import inserts every row with a fresh id, so without this a second run
+     * duplicated everything that had no unique constraint (bookings, trip
+     * content, availability) and rejected everything that had one — on a real
+     * site that meant all 69 customers failing because `uk_email` refused them.
+     * Matching on the natural key instead lets an existing row be reused.
+     *
+     * @var array<string, list<string>>
+     */
+    private const IMPORT_NATURAL_KEYS = [
+        'trips'            => ['slug'],
+        'customers'        => ['email'],
+        'bookings'         => ['reference'],
+        'discounts'        => ['code'],
+        'email_templates'  => ['template_key'],
+        'consent_requests' => ['token'],
+        'availability'     => ['trip_id', 'departure_date', 'departure_time'],
+    ];
+
+    /**
+     * Owning parent for rows that carry no identity of their own.
+     *
+     * A trip's content, itinerary and departures belong to that trip. When the
+     * trip is recognised as already present its children are already present
+     * too, so re-inserting them is what produced duplicate itineraries and
+     * duplicate departure rows on a second import.
+     *
+     * @var array<string, array{0: string, 1: string}> dataType => [entity, fk column]
+     */
+    private const IMPORT_PRIMARY_PARENT = [
+        'trip_classifications'        => [['trips', 'trip_id']],
+        'trip_content'                => [['trips', 'trip_id']],
+        'trip_revisions'              => [['trips', 'trip_id']],
+        'itinerary'                   => [['trips', 'trip_id']],
+        'availability_rules'          => [['trips', 'trip_id']],
+        'departures'                  => [['trips', 'trip_id']],
+        'reviews'                     => [['trips', 'trip_id']],
+        'enquiries'                   => [['trips', 'trip_id']],
+        'pricing_history'             => [['trips', 'trip_id']],
+        'trip_demand_scores'          => [['trips', 'trip_id']],
+        'trip_additional_services'    => [['trips', 'trip_id'], ['services', 'service_id']],
+        'trip_consent_forms'          => [['trips', 'trip_id'], ['consent_forms', 'form_id']],
+        // Two parents, and either is enough: a booking_departures row cannot be
+        // new if the departure it points at is already here. This is what left
+        // 240 of them failing — departures are skipped as children of a trip, so
+        // they carry no id mapping and `departure_id` could not resolve.
+        'booking_departures'          => [['bookings', 'booking_id'], ['departures', 'departure_id']],
+        'booking_additional_services' => [['bookings', 'booking_id'], ['services', 'service_id']],
+        'travelers'                   => [['bookings', 'booking_id']],
+        'payments'                    => [['bookings', 'booking_id']],
+        'google_calendar_events'      => [['bookings', 'booking_id'], ['departures', 'departure_id']],
+        'signed_consents'             => [['bookings', 'booking_id'], ['consent_forms', 'form_id']],
+        'traveler_meta'               => [['travelers', 'traveller_id']],
+        'recovery_email_logs'         => [['abandoned_bookings', 'abandoned_booking_id']],
+        'abandoned_bookings'          => [['trips', 'trip_id']],
+        'email_sequence_steps'        => [['email_sequences', 'sequence_id']],
+        'email_queue'                 => [['email_sequences', 'sequence_id']],
+    ];
+
+    /**
+     * Id of the row this site already holds for the record being imported, or
+     * null when it is genuinely new.
+     *
+     * Two ways a row can already be here: it carries a business key that
+     * matches (a trip slug, a customer email), or it is a child of a parent we
+     * just recognised, in which case the parent brought its children with it.
+     *
+     * Returns [skip, existingId]. existingId is only meaningful for a natural-key
+     * match — a child skipped because its parent was already here has no row of
+     * its own to map to, and mapping it to the parent's id would corrupt anything
+     * referencing the child (traveller meta being the obvious one).
+     *
+     * @param array<string, mixed> $record
+     * @return array{0: bool, 1: int|null}
+     */
+    private static function findExistingRowId(
+        ExportImportRepository $repository,
+        string $tableName,
+        string $dataType,
+        array $record,
+        ExportImportIdMapper $mapper
+    ): array {
+        $naturalKeys = (array) apply_filters('yatra_import_natural_keys', self::IMPORT_NATURAL_KEYS);
+
+        if (isset($naturalKeys[$dataType])) {
+            $criteria = [];
+            foreach ((array) $naturalKeys[$dataType] as $column) {
+                if (!array_key_exists($column, $record)) {
+                    return [false, null];
+                }
+                $value = $record[$column];
+
+                // A null part of a composite key is meaningful — an availability
+                // date with no departure time is still that date — so it is
+                // matched as IS NULL rather than abandoning the lookup. Only a
+                // key that is empty in every part identifies nothing.
+                if ($value === null || $value === '') {
+                    $criteria[$column] = null;
+                    continue;
+                }
+                if (!is_scalar($value)) {
+                    return [false, null];
+                }
+
+                $keyFks = self::IMPORT_NATURAL_KEY_FKS[$dataType] ?? [];
+                if (isset($keyFks[$column])) {
+                    $mapped = $mapper->map($keyFks[$column], $value);
+                    if ($mapped === null) {
+                        // Parent not on this site: nothing here can match.
+                        return [false, null];
+                    }
+                    $value = $mapped;
+                }
+
+                $criteria[$column] = $value;
+            }
+
+            if ($criteria === [] || count(array_filter($criteria, static fn($v) => $v !== null)) === 0) {
+                return [false, null];
+            }
+
+            $existingId = $repository->findRowIdBy($tableName, $criteria);
+
+            return $existingId !== null ? [true, $existingId] : [false, null];
+        }
+
+        $parents = (array) apply_filters('yatra_import_primary_parent', self::IMPORT_PRIMARY_PARENT);
+        foreach ((array) ($parents[$dataType] ?? []) as $parent) {
+            [$parentEntity, $fkColumn] = $parent;
+            if (empty($record[$fkColumn])) {
+                continue;
+            }
+            $parentOldId = (int) $record[$fkColumn];
+
+            // Matched on the export's id rather than ours: a skipped row has no
+            // id here, so anything hanging off it could not be resolved any
+            // other way.
+            if ($parentOldId > 0 && !empty(self::$importSkippedOldIds[$parentEntity][$parentOldId])) {
+                return [true, null];
+            }
+
+            $mappedParentId = (int) $mapper->map($parentEntity, $record[$fkColumn]);
+            if ($mappedParentId > 0 && !empty(self::$importPreExisting[$parentEntity][$mappedParentId])) {
+                return [true, null];
+            }
+        }
+
+        return [false, null];
+    }
+
+    /**
      * @param array<int, mixed> $records
      * @param array<string, array{total: int, imported: int, failed: int}> $importStats
      */
@@ -833,6 +1042,7 @@ class ExportImportService
             'total' => count($records),
             'imported' => 0,
             'failed' => 0,
+            'skipped' => 0,
         ];
         Logger::info('Importing ' . $dataType . ': Found ' . count($records) . ' records');
 
@@ -843,6 +1053,26 @@ class ExportImportService
                 unset($record['id']);
 
                 try {
+                    // Recognise a row this site already has. Deliberately before the
+                    // ensureUnique* helpers below, which would otherwise rename the
+                    // very value being matched on ("SUMMER10" -> "SUMMER10-i1") and
+                    // turn every re-import into a fresh duplicate.
+                    [$alreadyHere, $existingId] = self::findExistingRowId($repository, $tableName, $dataType, $record, $mapper);
+                    if ($alreadyHere) {
+                        $importStats[$dataType]['skipped']++;
+                        $entity = self::entityKeyForDataType($dataType);
+                        if ($entity !== null && $oldId > 0) {
+                            self::$importSkippedOldIds[$entity][$oldId] = true;
+                        }
+                        if ($entity !== null && $oldId > 0 && $existingId !== null) {
+                            // Point this export's id at the row already here, so
+                            // children attach to it instead of dangling.
+                            $mapper->remember($entity, $oldId, $existingId);
+                            self::$importPreExisting[$entity][$existingId] = true;
+                        }
+                        continue;
+                    }
+
                     self::applyForeignKeyRemapping($mapper, $dataType, $record);
 
                     if ($dataType === 'bookings' && isset($record['reference']) && $record['reference'] !== '') {
@@ -1580,6 +1810,8 @@ class ExportImportService
      */
     private static function importSettings(array $settings): void
     {
+        $permalinkChanged = false;
+
         foreach ($settings as $key => $value) {
             if (!is_string($key) || strpos($key, 'yatra_') !== 0) {
                 continue;
@@ -1587,8 +1819,45 @@ class ExportImportService
             if (!preg_match('/^[a-zA-Z0-9_\-]+$/', $key)) {
                 continue;
             }
+
+            if (!$permalinkChanged && self::settingAffectsPermalinks($key)) {
+                $existing = get_option($key, null);
+                if ($existing !== $value) {
+                    $permalinkChanged = true;
+                }
+            }
+
             update_option($key, $value);
         }
+
+        // Settings are cached per request, so without this the rest of the
+        // import still sees the pre-import values.
+        if (class_exists(\Yatra\Services\SettingsService::class)) {
+            \Yatra\Services\SettingsService::reload();
+        }
+
+        // A restored permalink base rewrites the trip and taxonomy URLs, but the
+        // rules behind them are only rebuilt on a flush. Without this the site
+        // keeps serving the old structure until someone happens to open
+        // Settings > Permalinks — until then trip links resolve to nothing and
+        // WordPress sends the visitor to the front page.
+        if ($permalinkChanged) {
+            // Deliberately not flush_rewrite_rules() here: the rules currently in
+            // memory were built during init from the pre-import bases, so
+            // regenerating now would just write the stale set back. Clearing the
+            // cached rules makes WordPress rebuild them on the next request, by
+            // which time init has read the imported values.
+            delete_option('rewrite_rules');
+            Logger::info('Import changed permalink settings; cached rewrite rules cleared for rebuild.');
+        }
+    }
+
+    /**
+     * Does this option take part in building URLs?
+     */
+    private static function settingAffectsPermalinks(string $key): bool
+    {
+        return (bool) preg_match('/_base$|_prefix$|_segment$|permalink/i', $key);
     }
 
     /**

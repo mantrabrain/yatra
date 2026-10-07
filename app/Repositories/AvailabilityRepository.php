@@ -185,19 +185,23 @@ class AvailabilityRepository extends BaseRepository
         return $results ?: [];
     }
 
-    public function existsForTripDateTime(int $tripId, string $departureDate, ?string $departureTime): bool
+    public function existsForTripDateTime(int $tripId, string $departureDate, ?string $departureTime, ?int $excludeId = null): bool
     {
         $table = esc_sql($this->table);
 
+        // Optional so update() can ignore the row it is editing; omitted, behaviour
+        // is exactly as before for existing callers.
+        $exclude = $excludeId !== null ? $this->wpdb->prepare(' AND id <> %d', $excludeId) : '';
+
         if ($departureTime === null || $departureTime === '') {
             $count = (int) $this->wpdb->get_var($this->wpdb->prepare(
-                "SELECT COUNT(*) FROM `{$table}` WHERE trip_id = %d AND departure_date = %s AND departure_time IS NULL",
+                "SELECT COUNT(*) FROM `{$table}` WHERE trip_id = %d AND departure_date = %s AND departure_time IS NULL{$exclude}",
                 $tripId,
                 $departureDate
             ));
         } else {
             $count = (int) $this->wpdb->get_var($this->wpdb->prepare(
-                "SELECT COUNT(*) FROM `{$table}` WHERE trip_id = %d AND departure_date = %s AND departure_time = %s",
+                "SELECT COUNT(*) FROM `{$table}` WHERE trip_id = %d AND departure_date = %s AND departure_time = %s{$exclude}",
                 $tripId,
                 $departureDate,
                 $departureTime
@@ -343,13 +347,24 @@ class AvailabilityRepository extends BaseRepository
             $insertData['discount_percentage'] = round((($insertData['original_price'] - $insertData['discounted_price']) / $insertData['original_price']) * 100, 2);
         }
 
-        $this->wpdb->insert($table, $insertData, [
+        $inserted = $this->wpdb->insert($table, $insertData, [
             '%d', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d',
             '%s', '%f', '%f', '%f', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d',
             '%d', '%s', '%d',
         ]);
-        
-        return $this->wpdb->insert_id;
+
+        // A rejected insert used to be swallowed: insert_id stays 0, the caller
+        // looks up row 0, gets null, and trips its own return type with a fatal
+        // TypeError. Fail loudly instead so the caller can report something useful.
+        if ($inserted === false) {
+            throw new \RuntimeException(
+                $this->wpdb->last_error !== ''
+                    ? $this->wpdb->last_error
+                    : 'Could not save the availability date.'
+            );
+        }
+
+        return (int) $this->wpdb->insert_id;
     }
 
     /**

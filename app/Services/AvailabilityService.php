@@ -127,7 +127,27 @@ class AvailabilityService
     public function create(array $data): Availability
     {
         $this->validate($data);
-        
+
+        // The table carries a UNIQUE KEY on (trip_id, departure_date, departure_time).
+        // Without this check the insert is rejected by the database, the repository
+        // hands back id 0, findModel(0) returns null and the declared return type
+        // raises a TypeError — which is an Error, not an Exception, so it escaped
+        // the controller's catch blocks and surfaced as a fatal 500. Rejecting it
+        // here gives the operator the same clear message duplicate() already gives.
+        $departureTime = !empty($data['departure_time'])
+            ? $this->normalizeTimeFormat((string) $data['departure_time'])
+            : null;
+        if ($departureTime === false) {
+            throw new \InvalidArgumentException('Invalid departure time format. Use HH:MM');
+        }
+        if ($this->repository->existsForTripDateTime(
+            (int) $data['trip_id'],
+            (string) $data['departure_date'],
+            $departureTime
+        )) {
+            throw new \InvalidArgumentException('Availability date already exists for the selected departure');
+        }
+
         // Set default seats_available if not provided
         if (!isset($data['seats_available'])) {
             $data['seats_available'] = $data['seats_total'] ?? 0;
@@ -164,6 +184,28 @@ class AvailabilityService
         // Merge with existing data for validation
         $mergedData = array_merge($existing->toArray(), $data);
         $this->validate($mergedData, $id);
+
+        // Moving a date onto a slot another row already holds is rejected by the
+        // same UNIQUE KEY. wpdb::update() then returns false, which this method
+        // used to ignore — it re-read the untouched row and returned 200, so the
+        // operator was told the change saved when nothing had changed.
+        if (array_key_exists('departure_date', $data) || array_key_exists('departure_time', $data)) {
+            $targetDate = (string) ($data['departure_date'] ?? $existing->departure_date);
+            if (array_key_exists('departure_time', $data)) {
+                $targetTime = !empty($data['departure_time'])
+                    ? $this->normalizeTimeFormat((string) $data['departure_time'])
+                    : null;
+                if ($targetTime === false) {
+                    throw new \InvalidArgumentException('Invalid departure time format. Use HH:MM');
+                }
+            } else {
+                $targetTime = $existing->departure_time;
+            }
+
+            if ($this->repository->existsForTripDateTime((int) $existing->trip_id, $targetDate, $targetTime, $id)) {
+                throw new \InvalidArgumentException('Availability date already exists for the selected departure');
+            }
+        }
         
         // Auto-update status based on availability
         if (isset($data['seats_available']) || isset($data['seats_total'])) {

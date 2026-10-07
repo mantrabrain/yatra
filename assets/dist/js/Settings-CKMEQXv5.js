@@ -2151,7 +2151,8 @@ const Settings = () => {
       "integration",
       "permalink",
       "seo",
-      "advanced"
+      "advanced",
+      "uninstall"
     ];
     if (typeof window !== "undefined") {
       const fromUrl = new URLSearchParams(window.location.search).get(
@@ -2178,7 +2179,8 @@ const Settings = () => {
         "integration",
         "permalink",
         "seo",
-        "advanced"
+        "advanced",
+        "uninstall"
       ].includes(saved)) {
         return saved;
       }
@@ -2545,6 +2547,7 @@ const Settings = () => {
       privacy_policy_page_id: 0,
       debug_mode: false,
       enable_logging: false,
+      delete_data_on_uninstall: false,
       cache_enabled: true,
       api_key: "",
       api_rate_limit: 100,
@@ -3505,6 +3508,11 @@ const Settings = () => {
       id: "advanced",
       label: __("Advanced", "yatra"),
       icon: Shield
+    },
+    {
+      id: "uninstall",
+      label: __("Uninstall", "yatra"),
+      icon: Trash2
     }
   ];
   const SectionDivider = ({ title }) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "border-t border-gray-200 dark:border-gray-700 pt-4 mt-6", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-sm font-semibold text-gray-900 dark:text-white mb-4", children: title }) });
@@ -8609,6 +8617,50 @@ const Settings = () => {
             ] })
           ] })
         ] });
+      case "uninstall":
+        return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-md border border-red-200 bg-red-50 p-3 text-xs text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300", children: __(
+            "This only applies when Yatra is deleted from the Plugins screen. Deactivating the plugin never removes anything.",
+            "yatra"
+          ) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "input",
+              {
+                type: "checkbox",
+                id: "delete_data_on_uninstall",
+                checked: formData.delete_data_on_uninstall,
+                name: "delete_data_on_uninstall",
+                onChange: handleFieldChange,
+                className: "mt-1 w-4 h-4 rounded border-gray-300 text-red-600 focus:ring-red-500"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Label,
+                {
+                  htmlFor: "delete_data_on_uninstall",
+                  className: "font-medium cursor-pointer",
+                  children: __("Delete all data on uninstall", "yatra")
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: __(
+                "Permanently remove every Yatra database table, setting and scheduled task when the plugin is deleted. Yatra Pro follows the same switch and removes its own data too.",
+                "yatra"
+              ) })
+            ] })
+          ] }),
+          formData.delete_data_on_uninstall ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-md border border-red-300 bg-red-50 p-3 dark:border-red-900 dark:bg-red-950/40", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-semibold text-red-800 dark:text-red-200", children: __("This cannot be undone", "yatra") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-red-700 dark:text-red-300 mt-1", children: __(
+              "Trips, bookings, customers, payments, reviews and enquiries are destroyed along with the plugin. Take a backup, or use Tools to export first, if you may want this data again.",
+              "yatra"
+            ) })
+          ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "rounded-md border border-gray-200 bg-gray-50 p-3 text-xs text-gray-600 dark:border-gray-700 dark:bg-gray-800/50 dark:text-gray-400", children: __(
+            "Your data is kept when Yatra is deleted, so reinstalling restores everything as it was.",
+            "yatra"
+          ) })
+        ] }) });
       case "advanced":
         return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
@@ -9025,4 +9077,4 @@ const Settings = () => {
 export {
   Settings as default
 };
-//# sourceMappingURL=Settings-BCwXvDOi.js.map
+//# sourceMappingURL=Settings-CKMEQXv5.js.map

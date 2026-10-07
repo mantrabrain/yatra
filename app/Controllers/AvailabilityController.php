@@ -232,7 +232,7 @@ class AvailabilityController extends BaseController
                 'page' => $filters['page'],
                 'per_page' => $filters['per_page'],
             ], 200);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return new WP_Error(
                 'availability_fetch_error',
                 $e->getMessage(),
@@ -260,7 +260,7 @@ class AvailabilityController extends BaseController
                 $e->getMessage(),
                 ['status' => 400]
             );
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return new WP_Error(
                 'availability_duplicate_error',
                 $e->getMessage(),
@@ -332,7 +332,7 @@ class AvailabilityController extends BaseController
             }
 
             return new WP_REST_Response(['dates' => $dates, 'total' => count($dates)], 200);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return new WP_Error('availability_generated_error', $e->getMessage(), ['status' => 500]);
         }
     }
@@ -373,7 +373,7 @@ class AvailabilityController extends BaseController
             }
 
             return new WP_REST_Response($prepared, 200);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return new WP_Error(
                 'availability_fetch_error',
                 $e->getMessage(),
@@ -406,7 +406,7 @@ class AvailabilityController extends BaseController
                 $e->getMessage(),
                 ['status' => 400]
             );
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return new WP_Error(
                 'availability_create_error',
                 $e->getMessage(),
@@ -440,7 +440,7 @@ class AvailabilityController extends BaseController
                 $e->getMessage(),
                 ['status' => 400]
             );
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return new WP_Error(
                 'availability_update_error',
                 $e->getMessage(),
@@ -468,7 +468,7 @@ class AvailabilityController extends BaseController
                 $e->getMessage(),
                 ['status' => 400]
             );
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return new WP_Error(
                 'availability_delete_error',
                 $e->getMessage(),

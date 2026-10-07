@@ -4,7 +4,7 @@ Tags: tour-booking, travel-booking, tour-operator, travel, travel-agency
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 3.0.16
+Stable tag: 3.0.17
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -283,6 +283,19 @@ Pricing starts at **$99/yr** (Starter, sale) and goes up to **$599/yr** (Scale 1
 == Changelog ==
 
 The two most recent releases are listed below. For the complete version history, see [changelog.txt](https://plugins.svn.wordpress.org/yatra/trunk/changelog.txt).
+
+= 3.0.17 — 7 October 2026 =
+
+**New**
+* **Choose what happens to your data when Yatra is removed.** A new Uninstall section in Settings, after Advanced, carries a single switch: *Delete all data on uninstall*. It is off, so deleting the plugin leaves every trip, booking and customer in place and reinstalling picks up where you left off. Switch it on and deleting Yatra removes its tables, settings, scheduled tasks and user meta for good — the screen says so plainly before you save, and Yatra Pro follows the same switch for its own data. Deactivating never removes anything either way.
+* **Kids-friendly and the other age filters can be re-tuned.** The age each band covers was fixed in the code — kids-friendly meant "12 and under" and nothing could change it. The four bands now come from one place and a site can set its own: `add_filter( 'yatra_age_suitability_thresholds', fn( $t ) => $t + [ 'kids_max' => 17 ] );`. The filter chips and the trips they return always agree, which they could previously drift apart on.
+
+**Fixed**
+* **Adding an availability date that already existed crashed the screen.** The date is unique per trip, departure date and time, so the second attempt was rejected by the database — and because the rejection was never checked, the code tripped its own return type and raised a fatal error. Operators saw "There has been a critical error on this website" and the Availability screen went blank. It now says *"Availability date already exists for the selected departure"* and the screen stays usable. The same check covers editing a date onto a slot another date already holds, which previously reported success while quietly changing nothing.
+* **Importing the same file twice duplicated everything.** Import gave every row a fresh id, so a second run doubled trips, bookings, discounts, availability and itineraries, while anything with a unique column was rejected outright — on one site every customer failed to import because their email addresses were already present. Import now recognises what the site already has and brings in only what is missing, so running it twice leaves you where the first run finished.
+* **Importing could leave trip and category links pointing nowhere.** Restoring settings also restores the permalink bases, but the rules behind the URLs were not rebuilt, so trips and categories stopped resolving until someone re-saved Settings → Permalinks. The rules are now rebuilt on the next page load.
+* **"1 Trips" on activity, destination and category listings.** Those three templates always used the plural, so a single result read as "1 Trips" — and in a translated site, "1 Reizen". The count now picks singular or plural, and translators get a proper singular to fill in.
+* Import no longer probes Yatra Pro's email-template and consent tables on sites where those modules have never been enabled, which logged a database error for every row imported.
 
 = 3.0.16 — 24 September 2026 =
 

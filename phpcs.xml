@@ -18,6 +18,7 @@
     <file>includes</file>
     <file>templates</file>
     <file>yatra.php</file>
+    <file>uninstall.php</file>
     
     <!-- Directories to exclude -->
     <exclude-pattern>vendor/*</exclude-pattern>
