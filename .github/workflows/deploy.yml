@@ -19,6 +19,14 @@ jobs:
           node-version: 20
       - name: Verify built asset integrity
         run: node scripts/verify-asset-integrity.mjs
+      # WordPress.org caps the Changelog section at 5,000 words and silently
+      # truncates anything longer — the import succeeds and the only sign is a
+      # warning shown to committers afterwards. The repository keeps the full
+      # history; this rewrites only the checkout that is about to be deployed,
+      # keeping the newest releases and linking to GitHub for the rest. It runs
+      # here rather than in `npm run build` so it never dirties a working tree.
+      - name: Trim readme changelog for WordPress.org
+        run: node scripts/trim-readme-changelog.mjs
       - name: WordPress Plugin Deploy
         id: deploy
         uses: 10up/action-wordpress-plugin-deploy@stable
