@@ -51,6 +51,67 @@ function yatra_uninstall_free_table_suffixes(): array
 }
 
 /**
+ * Is Yatra Pro still installed on this site?
+ *
+ * Deleting the free plugin must not take Pro's settings and scheduled work with
+ * it while Pro is still sitting there: Pro keeps its own tables through its own
+ * uninstall.php, so wiping its configuration here would leave it half removed.
+ * Once Pro has gone too, there is nothing left to protect and the sweep below
+ * takes everything, so nothing is orphaned either way.
+ */
+function yatra_uninstall_pro_still_installed(): bool
+{
+    return file_exists(WP_PLUGIN_DIR . '/yatra-pro/yatra-pro.php');
+}
+
+/**
+ * Pro-owned options that do not carry the `yatra_pro_` prefix.
+ *
+ * Mirrors yatra_pro_uninstall_extra_option_names() in Yatra Pro. Repeated here
+ * because uninstall.php runs with no autoloader and cannot read the other
+ * plugin, the same reason both files hard-code their table lists.
+ */
+function yatra_uninstall_pro_owned_options(): array
+{
+    return [
+        'yatra_license',
+        'yatra_abandoned_last_seen_id',
+        'yatra_abandoned_recovery_settings',
+        'yatra_ai_chat_limits',
+        'yatra_ai_trip_chat_enabled',
+        'yatra_dynamic_pricing_settings',
+        'yatra_facebook_pixel_event_log',
+        'yatra_facebook_pixel_settings',
+        'yatra_google_analytics_event_log',
+        'yatra_google_analytics_settings',
+        'yatra_mailchimp_settings',
+        'yatra_mailchimp_sync_log',
+        'yatra_team_keep_access_on_module_disable',
+    ];
+}
+
+/**
+ * Pro cron hooks registered under the plain `yatra_` prefix.
+ *
+ * Mirrors yatra_pro_uninstall_cron_hooks(). Without this the free plugin's
+ * prefix test matched all of them and unscheduled Pro's queue, demand scores,
+ * reminders and consent runs while Pro was still installed and relying on them.
+ */
+function yatra_uninstall_pro_owned_cron_hooks(): array
+{
+    return [
+        'yatra_ai_audit_retention_tick',
+        'yatra_calculate_demand_scores',
+        'yatra_cleanup_abandoned_bookings',
+        'yatra_consent_daily_cron',
+        'yatra_process_email_queue',
+        'yatra_process_recovery_emails',
+        'yatra_send_payment_reminders',
+        'yatra_sync_scheduled_payments',
+    ];
+}
+
+/**
  * Remove Yatra's data for the current site.
  */
 function yatra_uninstall_cleanup_site(): void
@@ -78,9 +139,15 @@ function yatra_uninstall_cleanup_site(): void
 
     // Scheduled work must go too, or WordPress keeps firing hooks for a plugin
     // that is no longer installed.
+    $protectPro = yatra_uninstall_pro_still_installed();
+    $proHooks = yatra_uninstall_pro_owned_cron_hooks();
     foreach ((array) _get_cron_array() as $timestamp => $hooks) {
         foreach ((array) $hooks as $hook => $events) {
-            if (strpos((string) $hook, 'yatra') !== 0) {
+            $hook = (string) $hook;
+            if (strpos($hook, 'yatra') !== 0) {
+                continue;
+            }
+            if ($protectPro && (strpos($hook, 'yatra_pro') === 0 || in_array($hook, $proHooks, true))) {
                 continue;
             }
             foreach ((array) $events as $event) {
@@ -97,7 +164,11 @@ function yatra_uninstall_cleanup_site(): void
          WHERE option_name LIKE 'yatra\\_%'
            AND option_name NOT LIKE 'yatra\\_pro\\_%'"
     );
+    $proOptions = $protectPro ? yatra_uninstall_pro_owned_options() : [];
     foreach ((array) $options as $option) {
+        if ($proOptions && in_array($option, $proOptions, true)) {
+            continue;
+        }
         delete_option($option);
     }
 
