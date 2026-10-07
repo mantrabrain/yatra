@@ -1517,7 +1517,7 @@ const Tools: React.FC = () => {
                     <div className="flex items-center gap-2 mb-2">
                       <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
                       <span className="text-sm font-medium text-green-700 dark:text-green-400">
-                        Import completed successfully!
+                        {__("Import completed successfully!", "yatra")}
                       </span>
                       <button
                         onClick={async () => {
@@ -1539,17 +1539,59 @@ const Tools: React.FC = () => {
                       </button>
                     </div>
 
-                    <div className="text-sm text-green-700 dark:text-green-400 mb-2">
-                      Total: <strong>{importJob.processed_records}</strong>{" "}
-                      records imported
-                    </div>
+                    {(() => {
+                      // "0 imported" on its own reads as a failed import. A
+                      // re-import is supposed to bring in nothing: the rows are
+                      // already here and get skipped, which is the feature
+                      // working. Say so, rather than leaving a column of zeroes
+                      // and a red failure count to speak for themselves.
+                      const totals = Object.values(
+                        importJob.import_stats || {},
+                      ).reduce(
+                        (acc: any, s: any) => ({
+                          imported: acc.imported + (s.imported || 0),
+                          skipped: acc.skipped + (s.skipped || 0),
+                          failed: acc.failed + (s.failed || 0),
+                        }),
+                        { imported: 0, skipped: 0, failed: 0 },
+                      ) as { imported: number; skipped: number; failed: number };
+
+                      return (
+                        <div className="text-sm text-green-700 dark:text-green-400 mb-2">
+                          <strong>{totals.imported}</strong>{" "}
+                          {__("imported", "yatra")}
+                          {totals.skipped > 0 && (
+                            <>
+                              {", "}
+                              <strong>{totals.skipped}</strong>{" "}
+                              {__("already here", "yatra")}
+                            </>
+                          )}
+                          {totals.failed > 0 && (
+                            <>
+                              {", "}
+                              <strong>{totals.failed}</strong>{" "}
+                              {__("could not be linked", "yatra")}
+                            </>
+                          )}
+                          {totals.imported === 0 && totals.skipped > 0 && (
+                            <div className="text-xs mt-1">
+                              {__(
+                                "Everything in this file was already on the site, so nothing was duplicated.",
+                                "yatra",
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
 
                     {/* Detailed statistics by data type */}
                     {importJob.import_stats &&
                       Object.keys(importJob.import_stats).length > 0 && (
                         <div className="mt-2 border-t border-green-200 dark:border-green-800 pt-2">
                           <div className="text-xs font-medium text-green-700 dark:text-green-400 mb-2">
-                            Import Details:
+                            {__("Import Details:", "yatra")}
                           </div>
                           <div className="grid grid-cols-1 gap-1">
                             {Object.entries(importJob.import_stats).map(
@@ -1568,16 +1610,35 @@ const Tools: React.FC = () => {
                                     <div className="flex items-center gap-1">
                                       <Icon className="w-3 h-3 text-green-600 dark:text-green-400" />
                                       <span className="capitalize">
-                                        {dataType.replace("_", " ")}:
+                                        {dataType.replace(/_/g, " ")}:
                                       </span>
                                     </div>
                                     <div>
                                       <span className="text-green-700 dark:text-green-400">
                                         {stats.imported}
                                       </span>
+                                      {stats.skipped > 0 && (
+                                        <span
+                                          className="text-gray-500 dark:text-gray-400 ml-1"
+                                          title={__(
+                                            "Already present on this site, so not imported again",
+                                            "yatra",
+                                          )}
+                                        >
+                                          ({stats.skipped}{" "}
+                                          {__("already here", "yatra")})
+                                        </span>
+                                      )}
                                       {stats.failed > 0 && (
-                                        <span className="text-red-600 dark:text-red-400 ml-1">
-                                          ({stats.failed} failed)
+                                        <span
+                                          className="text-amber-600 dark:text-amber-400 ml-1"
+                                          title={__(
+                                            "These rows point at a record the export file does not contain — usually something deleted on the original site — so there was nothing to attach them to.",
+                                            "yatra",
+                                          )}
+                                        >
+                                          ({stats.failed}{" "}
+                                          {__("not linked", "yatra")})
                                         </span>
                                       )}
                                     </div>
@@ -1864,7 +1925,7 @@ const Tools: React.FC = () => {
                         >
                           <div>
                             <span className="font-medium capitalize">
-                              {key.replace("_", " ")}
+                              {key.replace(/_/g, " ")}
                             </span>
                             <div className="text-sm text-gray-600 dark:text-gray-400">
                               Required: {req.required} | Current: {req.current}

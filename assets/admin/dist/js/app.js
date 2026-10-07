@@ -47102,7 +47102,7 @@ const Tools = () => {
             importJob && importJob.status === "completed" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 mb-2", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-5 h-5 text-green-600 dark:text-green-400" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-medium text-green-700 dark:text-green-400", children: "Import completed successfully!" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-medium text-green-700 dark:text-green-400", children: __("Import completed successfully!", "yatra") }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   "button",
                   {
@@ -47120,14 +47120,41 @@ const Tools = () => {
                   }
                 )
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-green-700 dark:text-green-400 mb-2", children: [
-                "Total: ",
-                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: importJob.processed_records }),
-                " ",
-                "records imported"
-              ] }),
+              (() => {
+                const totals = Object.values(
+                  importJob.import_stats || {}
+                ).reduce(
+                  (acc, s2) => ({
+                    imported: acc.imported + (s2.imported || 0),
+                    skipped: acc.skipped + (s2.skipped || 0),
+                    failed: acc.failed + (s2.failed || 0)
+                  }),
+                  { imported: 0, skipped: 0, failed: 0 }
+                );
+                return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-green-700 dark:text-green-400 mb-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: totals.imported }),
+                  " ",
+                  __("imported", "yatra"),
+                  totals.skipped > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                    ", ",
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: totals.skipped }),
+                    " ",
+                    __("already here", "yatra")
+                  ] }),
+                  totals.failed > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                    ", ",
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: totals.failed }),
+                    " ",
+                    __("could not be linked", "yatra")
+                  ] }),
+                  totals.imported === 0 && totals.skipped > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs mt-1", children: __(
+                    "Everything in this file was already on the site, so nothing was duplicated.",
+                    "yatra"
+                  ) })
+                ] });
+              })(),
               importJob.import_stats && Object.keys(importJob.import_stats).length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-2 border-t border-green-200 dark:border-green-800 pt-2", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs font-medium text-green-700 dark:text-green-400 mb-2", children: "Import Details:" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs font-medium text-green-700 dark:text-green-400 mb-2", children: __("Import Details:", "yatra") }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 gap-1", children: Object.entries(importJob.import_stats).map(
                   ([dataType, stats]) => {
                     const dataTypeObj = dataTypes.find(
@@ -47142,17 +47169,46 @@ const Tools = () => {
                           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
                             /* @__PURE__ */ jsxRuntimeExports.jsx(Icon, { className: "w-3 h-3 text-green-600 dark:text-green-400" }),
                             /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "capitalize", children: [
-                              dataType.replace("_", " "),
+                              dataType.replace(/_/g, " "),
                               ":"
                             ] })
                           ] }),
                           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-green-700 dark:text-green-400", children: stats.imported }),
-                            stats.failed > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-red-600 dark:text-red-400 ml-1", children: [
-                              "(",
-                              stats.failed,
-                              " failed)"
-                            ] })
+                            stats.skipped > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                              "span",
+                              {
+                                className: "text-gray-500 dark:text-gray-400 ml-1",
+                                title: __(
+                                  "Already present on this site, so not imported again",
+                                  "yatra"
+                                ),
+                                children: [
+                                  "(",
+                                  stats.skipped,
+                                  " ",
+                                  __("already here", "yatra"),
+                                  ")"
+                                ]
+                              }
+                            ),
+                            stats.failed > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                              "span",
+                              {
+                                className: "text-amber-600 dark:text-amber-400 ml-1",
+                                title: __(
+                                  "These rows point at a record the export file does not contain — usually something deleted on the original site — so there was nothing to attach them to.",
+                                  "yatra"
+                                ),
+                                children: [
+                                  "(",
+                                  stats.failed,
+                                  " ",
+                                  __("not linked", "yatra"),
+                                  ")"
+                                ]
+                              }
+                            )
                           ] })
                         ]
                       },
@@ -47339,7 +47395,7 @@ const Tools = () => {
                 className: "flex items-center justify-between",
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium capitalize", children: key2.replace("_", " ") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium capitalize", children: key2.replace(/_/g, " ") }),
                     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-gray-600 dark:text-gray-400", children: [
                       "Required: ",
                       req.required,
