@@ -450,6 +450,7 @@ class AdminAssetsProvider
                 // admin strings never reach the SPA. Mirrors FrontendAssetsProvider.
                 if (function_exists('wp_set_script_translations')) {
                     wp_set_script_translations('yatra-admin', 'yatra', YATRA_PLUGIN_PATH . 'i18n/languages');
+                    $this->backfillScriptTranslations('yatra-admin');
                 }
 
                 // Localize script data
@@ -548,6 +549,117 @@ class AdminAssetsProvider
      *
      * @return void
      */
+    /**
+     * Feed the admin bundle its translations when no JSON file exists.
+     *
+     * wp_set_script_translations() can only read a `yatra-{locale}-{md5}.json`
+     * file. WordPress.org language packs ship one, so translations from
+     * translate.wordpress.org simply work — but a site translated by hand, with
+     * Loco Translate or a .po/.mo dropped into wp-content/languages, has only
+     * the PHP catalogue. For those sites every string in the React admin stayed
+     * in English no matter how complete the translation was, which looked like
+     * the plugin ignoring the translation altogether.
+     *
+     * The strings are the same ones the PHP catalogue already holds, so they are
+     * handed to wp.i18n directly. Core is asked first and left in charge
+     * whenever it can find a JSON file: that path is cached by the browser as a
+     * separate request, and this one is not.
+     *
+     * Nothing is emitted on an untranslated site — the map comes back empty and
+     * English sites carry no extra weight.
+     */
+    private function backfillScriptTranslations(string $handle): void
+    {
+        if (!function_exists('load_script_textdomain')) {
+            return;
+        }
+
+        // A real JSON file beats this: let WordPress load it as it normally would.
+        if (load_script_textdomain($handle, 'yatra', YATRA_PLUGIN_PATH . 'i18n/languages')) {
+            return;
+        }
+
+        $localeData = $this->localeDataFromTextdomain('yatra');
+        if ($localeData === []) {
+            return;
+        }
+
+        wp_add_inline_script(
+            $handle,
+            'wp.i18n.setLocaleData(' . wp_json_encode($localeData) . ', "yatra");',
+            'before'
+        );
+    }
+
+    /**
+     * The loaded PHP catalogue, in the shape wp.i18n.setLocaleData() expects.
+     *
+     * Entries that were never translated are left out: they would only restate
+     * the English the bundle already carries. Contexts use the same NUL
+     * separator Jed and gettext use, so _x() resolves too.
+     *
+     * @return array<string, mixed>
+     */
+    private function localeDataFromTextdomain(string $domain): array
+    {
+        $translations = get_translations_for_domain($domain);
+        if (!is_object($translations)) {
+            return [];
+        }
+        // Deliberately duck-typed, and deliberately not isset()/??. WordPress
+        // returns Translations, NOOP_Translations or — since the performant
+        // translations work — WP_Translations, which neither extends
+        // Translations nor declares `entries`: it serves that property through
+        // __get() and defines no __isset(), so both instanceof and isset()
+        // report nothing is there and quietly disable this fallback. Only a
+        // direct read reaches the magic getter.
+        if (!property_exists($translations, 'entries') && !method_exists($translations, '__get')) {
+            return [];
+        }
+
+        $entries = $translations->entries;
+        if (!is_array($entries) || $entries === []) {
+            return [];
+        }
+
+        $data = [];
+        foreach ($entries as $entry) {
+            if (!is_object($entry) || (string) $entry->singular === '') {
+                continue;
+            }
+
+            $forms = array_values(array_filter(
+                (array) $entry->translations,
+                static fn($t) => is_string($t) && $t !== ''
+            ));
+            if ($forms === []) {
+                continue;
+            }
+            // Untranslated entries come back as the original string.
+            if (count($forms) === 1 && $forms[0] === $entry->singular) {
+                continue;
+            }
+
+            $key = ($entry->context !== null && $entry->context !== '')
+                ? $entry->context . "\u{0004}" . $entry->singular
+                : $entry->singular;
+
+            $data[$key] = $forms;
+        }
+
+        if ($data === []) {
+            return [];
+        }
+
+        $data[''] = [
+            'domain' => $domain,
+            'lang' => determine_locale(),
+            'plural-forms' => 'nplurals=2; plural=(n != 1);',
+        ];
+
+        return $data;
+    }
+
     public function enqueueSetupWizardAssets(): void
     {
         // Enqueue setup wizard CSS
