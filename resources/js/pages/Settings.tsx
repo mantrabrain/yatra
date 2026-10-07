@@ -974,6 +974,7 @@ interface SettingsData {
   min_rating: number;
   allow_anonymous_reviews: boolean;
   review_reminder_days: number;
+  review_reminder_max_age_days: number;
 
   // Tax Settings
   enable_tax: boolean;
@@ -1952,7 +1953,8 @@ const Settings: React.FC = () => {
       review_moderation: true,
       min_rating: 1,
       allow_anonymous_reviews: false,
-      review_reminder_days: 7,
+      review_reminder_days: 3,
+      review_reminder_max_age_days: 14,
       enable_tax: true,
       tax_name: __("Tax", "yatra"),
       tax_rate: 10,
@@ -5938,7 +5940,7 @@ const Settings: React.FC = () => {
                     id="review_reminder_days"
                     label={__("Review Reminder Days", "yatra")}
                     description={__(
-                      "Send review reminder email this many days after trip completion",
+                      "Send the review request this many days after the trip ends. Set to 0 to never send one.",
                       "yatra",
                     )}
                   >
@@ -5947,6 +5949,24 @@ const Settings: React.FC = () => {
                       type="number"
                       value={formData.review_reminder_days}
                       name="review_reminder_days"
+                      onChange={handleFieldChange}
+                      min="0"
+                    />
+                  </FormField>
+
+                  <FormField
+                    id="review_reminder_max_age_days"
+                    label={__("Don't Ask About Trips Older Than", "yatra")}
+                    description={__(
+                      "Days. A trip that ended longer ago than this is never asked about — so marking a backlog of old bookings complete does not email those customers.",
+                      "yatra",
+                    )}
+                  >
+                    <Input
+                      id="review_reminder_max_age_days"
+                      type="number"
+                      value={formData.review_reminder_max_age_days}
+                      name="review_reminder_max_age_days"
                       onChange={handleFieldChange}
                       min="0"
                     />

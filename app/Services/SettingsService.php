@@ -219,7 +219,11 @@ class SettingsService
         'auto_approve_reviews' => false,
         'enable_review_moderation' => true,
         'minimum_rating' => 1,
-        'review_reminder_days' => 7,
+        'review_reminder_days' => 3,
+        // Never ask about a trip that ended longer ago than this. The
+        // reminder is anchored to the tour's end date, so a backlog of
+        // bookings completed late is skipped rather than mailed in bulk.
+        'review_reminder_max_age_days' => 14,
         
         // Tax
         'enable_tax' => false,

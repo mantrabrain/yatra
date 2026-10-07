@@ -2504,7 +2504,8 @@ const Settings = () => {
       review_moderation: true,
       min_rating: 1,
       allow_anonymous_reviews: false,
-      review_reminder_days: 7,
+      review_reminder_days: 3,
+      review_reminder_max_age_days: 14,
       enable_tax: true,
       tax_name: __("Tax", "yatra"),
       tax_rate: 10,
@@ -6121,7 +6122,7 @@ const Settings = () => {
                   id: "review_reminder_days",
                   label: __("Review Reminder Days", "yatra"),
                   description: __(
-                    "Send review reminder email this many days after trip completion",
+                    "Send the review request this many days after the trip ends. Set to 0 to never send one.",
                     "yatra"
                   ),
                   children: /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -6131,6 +6132,28 @@ const Settings = () => {
                       type: "number",
                       value: formData.review_reminder_days,
                       name: "review_reminder_days",
+                      onChange: handleFieldChange,
+                      min: "0"
+                    }
+                  )
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                FormField,
+                {
+                  id: "review_reminder_max_age_days",
+                  label: __("Don't Ask About Trips Older Than", "yatra"),
+                  description: __(
+                    "Days. A trip that ended longer ago than this is never asked about — so marking a backlog of old bookings complete does not email those customers.",
+                    "yatra"
+                  ),
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    Input,
+                    {
+                      id: "review_reminder_max_age_days",
+                      type: "number",
+                      value: formData.review_reminder_max_age_days,
+                      name: "review_reminder_max_age_days",
                       onChange: handleFieldChange,
                       min: "0"
                     }
@@ -9077,4 +9100,4 @@ const Settings = () => {
 export {
   Settings as default
 };
-//# sourceMappingURL=Settings-CKMEQXv5.js.map
+//# sourceMappingURL=Settings-jpGp6k0J.js.map
