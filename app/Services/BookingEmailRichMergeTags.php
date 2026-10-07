@@ -45,7 +45,64 @@ final class BookingEmailRichMergeTags
             'booking_custom_fields_html' => self::buildBookingCustomFieldsHtml($booking),
             'special_requests' => $special,
             'special_requests_html' => $special !== '' ? nl2br(esc_html($special)) : '',
-        ], self::contactAndEmergencyTags($booking));
+        ], self::contactAndEmergencyTags($booking), self::leadTravellerTags($travellers));
+    }
+
+    /**
+     * Expose the lead traveller's answers as {{lead_traveler_<field_id>}}.
+     *
+     * The traveller section is asked once per traveller, so a field there has
+     * as many values as there are people on the booking and cannot become a
+     * flat merge tag — {{traveler_custom_fields_html}} prints the lot instead.
+     * The lead traveller is the exception: there is exactly one, so each of
+     * their answers has a single unambiguous value.
+     *
+     * This matters most for a field the form builder marks "lead traveller
+     * only" (`applies_to: lead`). An operator can ask the lead a question no
+     * one else sees, and until now had no way to put the answer in an email
+     * except by printing the whole traveller block for everybody.
+     *
+     * Values come from the lead's stored answers, which is where the builder's
+     * own fields land — including first_name and last_name, since the traveller
+     * section carries its own name fields separate from the contact section.
+     *
+     * @param array<int, array<string, mixed>> $travellers Rows from TravellerRepository::getByBookingId().
+     * @return array<string, string>
+     */
+    private static function leadTravellerTags(array $travellers): array
+    {
+        if ($travellers === []) {
+            return [];
+        }
+
+        $lead = null;
+        foreach ($travellers as $row) {
+            if (!empty($row['is_lead'])) {
+                $lead = $row;
+                break;
+            }
+        }
+        // Older bookings may predate the is_lead flag; the first traveller is
+        // the lead by position, which is how the booking form collects them.
+        if ($lead === null) {
+            $lead = $travellers[0];
+        }
+
+        $fields = isset($lead['fields']) && is_array($lead['fields']) ? $lead['fields'] : [];
+        $tags = [];
+        foreach ($fields as $key => $value) {
+            $k = sanitize_key((string) $key);
+            // Leading underscore marks internal bookkeeping, as elsewhere here.
+            if ($k === '' || strpos((string) $key, '_') === 0) {
+                continue;
+            }
+            if (!is_scalar($value) && $value !== null) {
+                continue;
+            }
+            $tags['lead_traveler_' . $k] = self::scalarToPlain($value);
+        }
+
+        return $tags;
     }
 
     /**

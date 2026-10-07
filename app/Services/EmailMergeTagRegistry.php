@@ -886,6 +886,13 @@ final class EmailMergeTagRegistry
         $sections = [
             'contact_form'           => ['prefix' => 'contact_',   'category' => self::CATEGORY_CUSTOMER],
             'emergency_contact_form' => ['prefix' => 'emergency_', 'category' => self::CATEGORY_BOOKING],
+            // The traveller section is asked once per person, so its fields
+            // have no single value across a booking — {{traveler_custom_fields_html}}
+            // prints them all. The lead traveller is the exception: there is
+            // exactly one, so their answers do resolve to a single value. This
+            // is the only way to print a field the builder marks "lead traveller
+            // only", which otherwise had no merge tag at all.
+            'traveler_form'          => ['prefix' => 'lead_traveler_', 'category' => self::CATEGORY_BOOKING],
         ];
 
         $defs = [];
@@ -921,11 +928,16 @@ final class EmailMergeTagRegistry
                     continue;
                 }
                 $label = (string) ($field['label'] ?? ucwords(str_replace('_', ' ', $id)));
+                $description = $meta['prefix'] === 'lead_traveler_'
+                    /* translators: %s: booking form field label. */
+                    ? sprintf(__('Lead traveller\'s answer to the booking form field: %s', 'yatra'), $label)
+                    /* translators: %s: booking form field label. */
+                    : sprintf(__('Booking form field: %s', 'yatra'), $label);
+
                 $defs[$tagKey] = [
                     'key'         => $tagKey,
                     'label'       => $label,
-                    /* translators: %s: booking form field label. */
-                    'description' => sprintf(__('Booking form field: %s', 'yatra'), $label),
+                    'description' => $description,
                     'category'    => $meta['category'],
                     'sample'      => '',
                     'events'      => $events,

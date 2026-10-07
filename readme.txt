@@ -282,6 +282,12 @@ Pricing starts at **$99/yr** (Starter, sale) and goes up to **$599/yr** (Scale 1
 
 == Changelog ==
 
+= Unreleased =
+
+**New**
+* **The lead traveller's answers can now be used in emails.** The booking form builder lets you mark a traveller field "lead traveller only", but there was no merge tag to print the answer — the only way to show it was `{{traveler_custom_fields_html}}`, which prints every traveller's answers to everything. Each traveller field now also has a `{{lead_traveler_<field>}}` tag carrying the lead traveller's answer, listed in the Available Variables panel beside the others. Fields asked of every traveller still have no single-value tag of their own, because a booking has many travellers; the lead is the one person there is exactly one of.
+
+
 The two most recent releases are listed below. For the complete version history, see [changelog.txt](https://plugins.svn.wordpress.org/yatra/trunk/changelog.txt).
 
 = 3.0.17 — 7 October 2026 =
