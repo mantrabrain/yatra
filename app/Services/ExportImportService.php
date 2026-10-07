@@ -562,6 +562,28 @@ class ExportImportService
 
             $dataTypes = self::sortImportDataTypes($dataTypes);
 
+            /**
+             * Last chance to create any table the file needs.
+             *
+             * Yatra Pro deliberately does not create its tables on activation —
+             * each module creates its own when it is switched on. That is fine
+             * for a running site and wrong for a restore: a backup taken from a
+             * site that used Email Automation, Dynamic Pricing or Consent Forms
+             * arrives at a fresh install whose tables for those do not exist
+             * yet, and every one of those rows was counted as a failure and
+             * dropped. On the migration this was tested against that silently
+             * lost 2,440 rows — the entire email history, pricing history and
+             * template set.
+             *
+             * Pro listens for this and brings its tables into being so the data
+             * has somewhere to land; whether the operator later switches those
+             * modules on is a separate decision from whether their data survived
+             * the move.
+             *
+             * @param list<string> $dataTypes Data types present in the file.
+             */
+            do_action('yatra_export_import_prepare_tables', $dataTypes);
+
             $mapper = new ExportImportIdMapper();
 
             $totalRecords = 0;
@@ -828,6 +850,16 @@ class ExportImportService
             'activities',
             'categories',
             'difficulty_levels',
+            // The classifications table holds eight kinds of row and only the
+            // four above were ever exported. Traveller categories, attributes
+            // and itinerary item types are operator-configured data too, and
+            // leaving them out silently dropped them from every backup — and
+            // took the trip links that pointed at them down with it, because
+            // those could no longer resolve on import.
+            'traveler_categories',
+            'attributes',
+            'itinerary_item_types',
+            'itinerary_items',
             'trips',
             'itinerary',
         ];
@@ -897,6 +929,10 @@ class ExportImportService
         'activities'        => ['type', 'slug'],
         'categories'        => ['type', 'slug'],
         'difficulty_levels' => ['type', 'slug'],
+        'traveler_categories'  => ['type', 'slug'],
+        'attributes'           => ['type', 'slug'],
+        'itinerary_item_types' => ['type', 'slug'],
+        'itinerary_items'      => ['type', 'slug'],
 
         // Catalogue rows an operator maintains by name. Nothing about them is
         // unique at the database level, so a re-import simply added a second
@@ -1196,6 +1232,10 @@ class ExportImportService
             case 'activities':
             case 'categories':
             case 'difficulty_levels':
+            case 'traveler_categories':
+            case 'attributes':
+            case 'itinerary_item_types':
+            case 'itinerary_items':
                 return 'classifications';
             case 'trips':
                 return 'trips';
@@ -1664,6 +1704,14 @@ class ExportImportService
                 return ClassificationTypes::CATEGORY;
             case 'difficulty_levels':
                 return ClassificationTypes::DIFFICULTY;
+            case 'traveler_categories':
+                return ClassificationTypes::TRAVELER_TYPE;
+            case 'attributes':
+                return ClassificationTypes::ATTRIBUTE;
+            case 'itinerary_item_types':
+                return ClassificationTypes::ITEM_TYPE;
+            case 'itinerary_items':
+                return ClassificationTypes::ITEM;
             default:
                 return null;
         }
@@ -1710,6 +1758,10 @@ class ExportImportService
             'activities',
             'categories',
             'difficulty_levels',
+            'traveler_categories',
+            'attributes',
+            'itinerary_item_types',
+            'itinerary_items',
             'additional_service_catalog',
             'consent_forms',
             'email_templates',
