@@ -888,6 +888,35 @@ class ExportImportService
         'email_templates'  => ['template_key'],
         'consent_requests' => ['token'],
         'availability'     => ['trip_id', 'departure_date', 'departure_time'],
+
+        // The four taxonomies share one table, which already carries a UNIQUE
+        // KEY on (type, slug). Without an identity here the slug was handed to
+        // ensureUniqueSlug() first, which renamed "hiking" to "hiking-i1" and so
+        // re-imported every term as a new one instead of recognising it.
+        'destinations'      => ['type', 'slug'],
+        'activities'        => ['type', 'slug'],
+        'categories'        => ['type', 'slug'],
+        'difficulty_levels' => ['type', 'slug'],
+
+        // Catalogue rows an operator maintains by name. Nothing about them is
+        // unique at the database level, so a re-import simply added a second
+        // "Trip Liability Waiver" beside the first. The name alone would be the
+        // obvious key, but nothing stops a site holding two services called
+        // "Transfer" at different prices, and keying on the name would drop one
+        // of them from a restore. Each key therefore carries enough of the row
+        // to tell two genuinely different ones apart, while an unchanged row
+        // still matches itself exactly.
+        'additional_service_catalog' => ['name', 'price', 'price_type', 'price_per'],
+        'consent_forms'              => ['name', 'version'],
+        'dynamic_pricing_rules'      => ['name', 'rule_type', 'adjustment_type', 'adjustment_value'],
+
+        // email_logs deliberately has no natural key. The obvious candidate,
+        // (recipient_email, template_key, sent_at), collides on real data — a
+        // 1,231-row log here held 419 rows that share one with another row,
+        // because a booking can send the same template to the same address
+        // within the same second. Keying on it would silently drop those rows
+        // from a restore, and losing history is worse than repeating it, so a
+        // re-import appends the log again rather than risk discarding it.
     ];
 
     /**
