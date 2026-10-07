@@ -152,7 +152,16 @@ class SettingsController extends BaseController
         'email_template_enquiry_received' => true,
         'email_template_enquiry_admin' => true,
         'email_template_enquiry_response' => true,
-        'email_template_review_request' => true,
+        // Off by default, unlike the other templates. A review request is the
+        // one transactional email that is not a response to something the
+        // customer just did, and several jurisdictions treat it as advertising
+        // rather than service mail — in Germany the BGH (VI ZR 225/17) holds it
+        // needs prior consent, and the existing-customer exemption in
+        // §7 Abs. 3 UWG does not cover it. Shipping it on would have every new
+        // site mailing customers for consent it has not collected, so the
+        // operator turns it on once they have decided how they collect it.
+        // Sites that already have it on are untouched.
+        'email_template_review_request' => false,
         'email_template_abandoned_booking_recovery_first' => true,
         'email_template_abandoned_booking_recovery_second' => true,
         'email_template_abandoned_booking_recovery_final' => true,

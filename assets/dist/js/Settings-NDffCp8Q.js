@@ -2434,7 +2434,7 @@ const Settings = () => {
       email_template_enquiry_received: true,
       email_template_enquiry_admin: true,
       email_template_enquiry_response: true,
-      email_template_review_request: true,
+      email_template_review_request: false,
       email_template_abandoned_booking_recovery_first: true,
       email_template_abandoned_booking_recovery_second: true,
       email_template_abandoned_booking_recovery_final: true,
@@ -9100,4 +9100,4 @@ const Settings = () => {
 export {
   Settings as default
 };
-//# sourceMappingURL=Settings-jpGp6k0J.js.map
+//# sourceMappingURL=Settings-NDffCp8Q.js.map

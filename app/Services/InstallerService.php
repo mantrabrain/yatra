@@ -207,7 +207,8 @@ class InstallerService
         $seed('yatra_email_template_enquiry_received', true);
         $seed('yatra_email_template_enquiry_admin', true);
         $seed('yatra_email_template_enquiry_response', true);
-        $seed('yatra_email_template_review_request', true);
+        // Off on a fresh install — see SettingsService::$defaults for why.
+        $seed('yatra_email_template_review_request', false);
         $seed('yatra_email_template_abandoned_booking_recovery_first', true);
         $seed('yatra_email_template_abandoned_booking_recovery_second', true);
         $seed('yatra_email_template_abandoned_booking_recovery_final', true);

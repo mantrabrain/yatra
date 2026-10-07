@@ -519,12 +519,32 @@ class TransactionalEmailTemplateService
 
             $rendered = self::render($type, $variables);
 
-            return EmailService::send(
+            $sent = EmailService::send(
                 $to,
                 $rendered['subject'],
                 $rendered['body'],
                 ['Content-Type: text/html; charset=UTF-8']
             );
+
+            /**
+             * A transactional email core just sent.
+             *
+             * Yatra Pro writes the Email Logs, but only from its own modules —
+             * nothing records what core sends, so a booking confirmation or a
+             * review request left no trace and an operator looking for "which
+             * email went to this customer" found a log that quietly covered
+             * only part of the picture. Pro listens for this and logs it.
+             *
+             * @param string               $type      Template type, e.g. review_request.
+             * @param string               $to        Recipient address.
+             * @param string               $subject   Rendered subject.
+             * @param string               $body      Rendered body.
+             * @param bool                 $sent      Whether wp_mail() accepted it.
+             * @param array<string, mixed> $variables Merge variables used to render.
+             */
+            do_action('yatra_transactional_email_sent', $type, $to, $rendered['subject'], $rendered['body'], $sent, $variables);
+
+            return $sent;
         } finally {
             self::$dispatchingType = $previousType;
         }
