@@ -198,6 +198,52 @@ class TransactionalEmailTemplateService
     }
 
     /**
+     * Does the installed Yatra Pro keep its per-template Active switch and this
+     * plugin's per-type setting in step?
+     *
+     * Pro answers true from the build that added TemplateActiveSync. Anything
+     * older — or no Pro at all — answers false, and false only matters when the
+     * setting is off and Pro still holds an active template for the type.
+     */
+    private static function proSyncsTemplateFlags(): bool
+    {
+        return (bool) apply_filters('yatra_pro_email_syncs_template_flags', false);
+    }
+
+    /**
+     * The settings key that switches a transactional type on or off.
+     *
+     * Public so Yatra Pro can keep its own per-template Active switch and this
+     * one in step — they gate the same email, and when they disagreed the one
+     * the operator could see was not the one the send path obeyed.
+     *
+     * @return string Empty when the type is unknown.
+     */
+    public static function settingsFlagFor(string $type): string
+    {
+        $map = self::typeToSettingsKeys();
+
+        return (string) ($map[$type]['flag'] ?? '');
+    }
+
+    /**
+     * Every transactional type this build knows, as type => settings flag.
+     *
+     * @return array<string, string>
+     */
+    public static function settingsFlagMap(): array
+    {
+        $flags = [];
+        foreach (self::typeToSettingsKeys() as $type => $keys) {
+            if (!empty($keys['flag']) && is_string($keys['flag'])) {
+                $flags[$type] = $keys['flag'];
+            }
+        }
+
+        return $flags;
+    }
+
+    /**
      * @return array<string, string>
      */
     private static function typeToSettingsKeys(): array
@@ -488,10 +534,40 @@ class TransactionalEmailTemplateService
         }
 
         $flag = $map[$type]['flag'];
-        $proOwnsType = (bool) apply_filters('yatra_pro_email_automation_owns_transactional_type', false, $type);
 
-        if (!$proOwnsType && !SettingsService::isEnabled($flag)) {
-            return false;
+        // The switch is honoured. It used to be skipped whenever Yatra Pro held
+        // an active template for the type, which meant an operator could turn an
+        // email off in Emails -> Templates and have it keep going out — the
+        // setting described one thing and the send path did another, for 26 of
+        // the 27 types Pro covers. Pro still decides WHICH wording is used, and
+        // suppresses the send when its own template is switched off; what it no
+        // longer does is override "off".
+        if (!SettingsService::isEnabled($flag)) {
+            // ...with one exception, for the window where this plugin has been
+            // updated and Yatra Pro has not. Free updates itself from
+            // WordPress.org; Pro is installed by hand, so the two are regularly
+            // out of step for days. A Pro build without the matching change
+            // cannot keep this setting in step with its own per-template switch,
+            // and on those sites the setting was never the one the operator was
+            // shown — it is very often still at its default. Enforcing it
+            // against an older Pro would therefore switch off emails nobody
+            // asked to switch off; review requests and partial payment receipts
+            // default to off and would stop without warning. So while Pro says
+            // it cannot sync, the old behaviour stands and Pro's own template
+            // decides. Updating Pro closes the gap.
+            if (!self::proSyncsTemplateFlags()) {
+                $legacyProOwns = (bool) apply_filters(
+                    'yatra_pro_email_automation_owns_transactional_type',
+                    false,
+                    $type
+                );
+
+                if (!$legacyProOwns) {
+                    return false;
+                }
+            } else {
+                return false;
+            }
         }
 
         $variables = self::mergeDefaultVariables($variables);
@@ -513,10 +589,10 @@ class TransactionalEmailTemplateService
                 return (bool) $handled;
             }
 
-            if (!SettingsService::isEnabled($flag)) {
-                return false;
-            }
-
+            // No second look at the setting here. It is decided once, above,
+            // where the older-Pro exception is also applied — repeating the
+            // bare check at this point silently overrode that exception and
+            // stopped the very emails it exists to keep sending.
             $rendered = self::render($type, $variables);
 
             $sent = EmailService::send(

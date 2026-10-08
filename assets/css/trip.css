@@ -1132,7 +1132,7 @@ button.yatra-booking-button svg path {
 }
 
 .yatra-hero-book-now-btn {
-    background: #10b981;
+    background: var(--yatra-primary, #10b981);
     color: #fff;
     border: none;
     padding: 14px 28px;
@@ -1147,7 +1147,7 @@ button.yatra-booking-button svg path {
     gap: 8px;
     transition: all 0.3s ease;
     z-index: 10;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
 }
 
 .yatra-hero-book-now-btn svg {
@@ -1155,9 +1155,9 @@ button.yatra-booking-button svg path {
 }
 
 .yatra-hero-book-now-btn:hover {
-    background: #059669;
+    background: var(--yatra-primary-dark, #059669);
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.24);
     color: #fff;
 }
 

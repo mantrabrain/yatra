@@ -124,7 +124,7 @@ class ReviewReminderService
         }
 
         // Check if customer has already reviewed
-        if (self::hasCustomerReviewed($bookingId, (int) ($booking->customer_id ?? 0))) {
+        if (self::hasReviewedTrip($booking)) {
             return;
         }
 
@@ -136,7 +136,22 @@ class ReviewReminderService
             return;
         }
 
-        $review_url = get_permalink($trip->id) . '#reviews';
+        // A trip is a row in Yatra's own table, so $trip->id is NOT a WordPress
+        // post ID: get_permalink() on it returns whatever unrelated post happens
+        // to carry that ID, or false when nothing does — which is how customers
+        // ended up with review links pointing at a stray page, or at a bare
+        // "#reviews" that goes nowhere. yatra_get_trip_permalink() builds the
+        // link from the trip's slug and the configured trip base.
+        $review_url = function_exists('yatra_get_trip_permalink')
+            ? yatra_get_trip_permalink((int) $trip->id)
+            : '';
+        if ($review_url === '') {
+            // No usable trip URL: a review request whose whole purpose is the
+            // link is not worth sending.
+            return;
+        }
+        $review_url .= '#reviews';
+
         $vars = TransactionalEmailTemplateService::variablesFromBooking($booking);
         $vars['review_url'] = esc_url($review_url);
         $vars['completion_date'] = date_i18n(get_option('date_format'));
@@ -262,26 +277,62 @@ class ReviewReminderService
     }
 
     /**
-     * Check if customer has already reviewed the trip
-     * 
-     * @param int $bookingId Booking ID
-     * @param int $customerId Customer ID
-     * @return bool
+     * Has this customer already reviewed the trip they are about to be asked about?
+     *
+     * This used to query `booking_id` and `customer_id` on the reviews table.
+     * Neither column exists — reviews carry `trip_id`, `user_id` and
+     * `author_email` — so every call raised "Unknown column" and returned null,
+     * which is not greater than zero, so the guard never once held. Customers
+     * who had already written a review were asked for another one anyway.
+     *
+     * The value passed in was wrong as well: `bookings.customer_id` points at
+     * `yatra_customers.id`, while a review's `user_id` is a WordPress user ID.
+     * So the match is made on what the two tables genuinely share — the trip,
+     * plus either the WordPress account or the email address on the booking.
+     *
+     * Spam and trashed reviews do not count as having reviewed.
      */
-    private static function hasCustomerReviewed(int $bookingId, int $customerId): bool
+    private static function hasReviewedTrip(object $booking): bool
     {
         global $wpdb;
-        
+
+        $tripId = (int) ($booking->trip_id ?? 0);
+        if ($tripId <= 0) {
+            return false;
+        }
+
         $reviewsTable = \Yatra\Database\Tables\ReviewsTable::getTableName();
-        
-        $count = $wpdb->get_var($wpdb->prepare(
-            "SELECT COUNT(*) FROM {$reviewsTable} 
-             WHERE booking_id = %d OR customer_id = %d",
-            $bookingId,
-            $customerId
-        ));
-        
-        return $count > 0;
+
+        $userId = (int) ($booking->user_id ?? 0);
+        $email = trim((string) ($booking->contact_email ?? ''));
+
+        $clauses = [];
+        $params = [$tripId];
+
+        if ($userId > 0) {
+            $clauses[] = 'user_id = %d';
+            $params[] = $userId;
+        }
+
+        if ($email !== '') {
+            $clauses[] = 'author_email = %s';
+            $params[] = $email;
+        }
+
+        if ($clauses === []) {
+            // Nothing identifies the reviewer, so nothing can be matched.
+            return false;
+        }
+
+        $sql = "SELECT COUNT(*) FROM {$reviewsTable}
+             WHERE trip_id = %d
+               AND status NOT IN ('spam', 'trash')
+               AND (" . implode(' OR ', $clauses) . ')';
+
+        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- placeholders only; values passed to prepare().
+        $count = $wpdb->get_var($wpdb->prepare($sql, ...$params));
+
+        return (int) $count > 0;
     }
     
     /**
