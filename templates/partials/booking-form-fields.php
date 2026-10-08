@@ -91,6 +91,33 @@ function yatra_render_form_field($field, $prefix = '', $countries = [], $custom_
             }
         }
     }
+
+    /**
+     * Filters the value a booking-form field is rendered with.
+     *
+     * The block above only ever prefilled the contact section, and only from an
+     * existing booking, so every other field — the whole traveller section, and
+     * anything an operator added — rendered empty no matter what was known
+     * about the customer. Yatra Pro's abandoned-booking recovery needs exactly
+     * this: it holds what the customer typed before they left and had nowhere
+     * to put it back.
+     *
+     * The field's rendered input name is passed, so a handler can match a value
+     * without re-deriving names from the form config — including array-style
+     * traveller names like `travelers[1][first_name]`.
+     *
+     * @param string $prefill_value Current value; already resolved for the contact section.
+     * @param string $field_name    Rendered input name, e.g. `contact_email` or `travelers[1][email]`.
+     * @param array  $field         The field definition from the booking-form config.
+     * @param string $prefix        Section prefix: `contact_`, `emergency_`, or '' for traveller fields.
+     */
+    $prefill_value = (string) apply_filters(
+        'yatra_booking_form_field_prefill',
+        $prefill_value,
+        $field_name,
+        $field,
+        $prefix
+    );
     
     $width_class = '';
     if (!empty($field['width'])) {

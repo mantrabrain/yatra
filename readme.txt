@@ -285,6 +285,7 @@ Pricing starts at **$99/yr** (Starter, sale) and goes up to **$599/yr** (Scale 1
 = Unreleased =
 
 **New**
+* **Booking form fields can be pre-filled by add-ons.** A new `yatra_booking_form_field_prefill` filter lets a value be supplied for any field by its rendered input name, covering the traveller section and operator-added fields as well as the contact details — previously only the contact section could be pre-filled, and only from an existing booking. Yatra Pro uses this to restore what a customer had typed when they return through an abandoned-booking recovery link.
 * **The lead traveller's answers can now be used in emails.** The booking form builder lets you mark a traveller field "lead traveller only", but there was no merge tag to print the answer — the only way to show it was `{{traveler_custom_fields_html}}`, which prints every traveller's answers to everything. Each traveller field now also has a `{{lead_traveler_<field>}}` tag carrying the lead traveller's answer, listed in the Available Variables panel beside the others. Fields asked of every traveller still have no single-value tag of their own, because a booking has many travellers; the lead is the one person there is exactly one of.
 
 
