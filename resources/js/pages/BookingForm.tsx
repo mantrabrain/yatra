@@ -93,6 +93,7 @@ interface BookingFormData {
   currency: string;
   payment_status: string;
   booking_status: string;
+  cancellation_reason: string;
   payment_method: string;
   notes: string;
 }
@@ -145,6 +146,7 @@ const BookingForm: React.FC = () => {
     currency: globalCurrency,
     payment_status: "pending",
     booking_status: "pending",
+    cancellation_reason: "",
     payment_method: "",
     notes: "",
   });
@@ -423,6 +425,7 @@ const BookingForm: React.FC = () => {
           currency: booking.currency || "USD",
           payment_status: booking.payment_status || "pending",
           booking_status: booking.booking_status || "pending",
+          cancellation_reason: (booking as any).cancellation_reason || "",
           payment_method: booking.payment_method || "",
           notes: booking.notes || "",
           emergency_contact: emergencyContact,
@@ -467,6 +470,7 @@ const BookingForm: React.FC = () => {
         currency: bookingData.currency || "USD",
         payment_status: bookingData.payment_status || "pending",
         booking_status: bookingData.booking_status || "pending",
+        cancellation_reason: bookingData.cancellation_reason || "",
         payment_method: bookingData.payment_method || "",
         notes: (bookingData as any).special_requests || bookingData.notes || "",
       });
@@ -800,6 +804,10 @@ const BookingForm: React.FC = () => {
         total_amount: parseFloat(data.total_amount),
         payment_status: data.payment_status,
         status: data.booking_status,
+        // Only meaningful on a cancellation; reaches the customer's email
+        // through the {{cancellation_reason}} merge tag.
+        cancellation_reason:
+          data.booking_status === "cancelled" ? data.cancellation_reason : "",
         payment_gateway: data.payment_method.trim(),
         special_requests: data.notes.trim(),
         // Include travelers data - use 'travelers' key as expected by BookingService.updateBooking
@@ -2035,6 +2043,39 @@ const BookingForm: React.FC = () => {
                       <option value="failed">{__("Failed", "yatra")}</option>
                     </Select>
                   </div>
+
+                  {/* Why it was cancelled. Shown only when it applies, because
+                      it is the one status that sends the customer an email that
+                      can carry an explanation. */}
+                  {formData.booking_status === "cancelled" && (
+                    <div className="md:col-span-2">
+                      <label
+                        htmlFor="cancellation_reason"
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                      >
+                        {__("Cancellation Reason", "yatra")}
+                      </label>
+                      <textarea
+                        id="cancellation_reason"
+                        rows={2}
+                        value={formData.cancellation_reason}
+                        onChange={(e) =>
+                          handleFieldChange("cancellation_reason", e.target.value)
+                        }
+                        placeholder={__(
+                          "e.g. Cancelled by us — the tour did not reach minimum numbers, or: at the customer's request",
+                          "yatra",
+                        )}
+                        className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      />
+                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        {__(
+                          "Included in the cancellation email wherever the template uses {{cancellation_reason}}.",
+                          "yatra",
+                        )}
+                      </p>
+                    </div>
+                  )}
 
                   {/* Payment Status */}
                   <div>

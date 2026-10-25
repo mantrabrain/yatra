@@ -517,10 +517,23 @@ final class EmailMergeTagRegistry
             'transaction_id' => [
                 'key' => 'transaction_id',
                 'label' => 'Transaction ID',
-                'description' => 'Gateway transaction reference for the payment.',
+                'description' => 'Gateway transaction reference for the payment. '
+                    . 'Empty for a payment recorded by hand, which has no gateway reference — '
+                    . 'use Payment Reference if you want a number that is always present.',
                 'category' => self::CATEGORY_PAYMENT,
                 'sample' => 'ch_3O8XYZabc123',
                 'events' => [self::EVENT_PAYMENT_RECEIVED],
+            ],
+            'payment_reference' => [
+                'key' => 'payment_reference',
+                'label' => 'Payment Reference',
+                'description' => "Yatra's own number for the payment, as shown on the Payments "
+                    . 'screen, the invoice and the customer account. Unlike the gateway '
+                    . 'Transaction ID it exists for every recorded payment, including ones '
+                    . 'entered by hand.',
+                'category' => self::CATEGORY_PAYMENT,
+                'sample' => 'PAY-000004',
+                'events' => [self::EVENT_PAYMENT_RECEIVED, self::EVENT_PAYMENT_PARTIAL_RECEIVED],
             ],
             'payment_gateway' => [
                 'key' => 'payment_gateway',
@@ -566,6 +579,16 @@ final class EmailMergeTagRegistry
             // ---------------------------------------------------------
             // Scheduled payments (installments)
             // ---------------------------------------------------------
+            'balance_payment_url' => [
+                'key' => 'balance_payment_url',
+                'label' => 'Pay Balance Link',
+                'description' => 'Secure link that opens the outstanding balance ready to pay. '
+                    . 'The customer does not need to sign in, so a reminder can take them '
+                    . 'straight to payment instead of into their account to look for it.',
+                'category' => self::CATEGORY_SCHEDULED_PAYMENT,
+                'sample' => home_url('/wp-json/yatra/v1/scheduled-payment/pay/123?token=...'),
+                'events' => $scheduledPaymentEvents,
+            ],
             'scheduled_amount_formatted' => [
                 'key' => 'scheduled_amount_formatted',
                 'label' => 'Scheduled Amount (formatted)',

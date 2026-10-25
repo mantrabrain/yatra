@@ -18,7 +18,7 @@ import {
   MapPin,
   CheckCircle2,
 } from "lucide-react";
-import { __ } from "../lib/i18n";
+import { __, sprintf } from "../lib/i18n";
 import { toDateValue, todayYmd } from "../lib/dateFormat";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -92,19 +92,42 @@ interface TimeSlot {
  * One entry in a rule's exclusion list: either a single day ("2027-03-08", the
  * original format) or an inclusive period. Both are stored in the same
  * `excluded_dates` column, so rules saved before periods existed load as-is.
+ * Either can carry an admin-only note; a single day with a note is stored as a
+ * one-day period ({ start, end: start, note }), which the backend already reads.
  */
-type ExcludedEntry = string | { start: string; end: string };
+type ExcludedPeriod = { start: string; end: string; note?: string };
+type ExcludedEntry = string | ExcludedPeriod;
 
-const isPeriod = (e: ExcludedEntry): e is { start: string; end: string } =>
+const isPeriod = (e: ExcludedEntry): e is ExcludedPeriod =>
   typeof e === "object" && e !== null && "start" in e && "end" in e;
 
 /** Sort key: a period sorts by its first day, alongside single dates. */
 const excludedSortKey = (e: ExcludedEntry): string =>
   isPeriod(e) ? e.start : e;
 
-/** Stable identity for list keys and removal, for both shapes. */
+/**
+ * Stable identity for list keys, removal and duplicate checks. A one-day
+ * period (a single date that has a note) has the same identity as the plain
+ * date, so the same day can't be excluded twice.
+ */
 const excludedId = (e: ExcludedEntry): string =>
-  isPeriod(e) ? `${e.start}..${e.end}` : e;
+  isPeriod(e) ? (e.start === e.end ? e.start : `${e.start}..${e.end}`) : e;
+
+const excludedNote = (e: ExcludedEntry): string =>
+  isPeriod(e) ? e.note || "" : "";
+
+/**
+ * The same exclusion with a new note, in its simplest stored form: a single
+ * date without a note goes back to a plain string, as before notes existed.
+ */
+const withExcludedNote = (e: ExcludedEntry, note: string): ExcludedEntry => {
+  const start = isPeriod(e) ? e.start : e;
+  const end = isPeriod(e) ? e.end : e;
+  if (note === "") {
+    return start === end ? start : { start, end };
+  }
+  return { start, end, note };
+};
 
 interface RecurringRule {
   id?: number;
@@ -651,6 +674,16 @@ const RecurringRuleForm: React.FC = () => {
     setNewExcludedEnd("");
   };
 
+  // Change the note on an excluded day or period
+  const setExcludedNote = (id: string, note: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      excluded_dates: prev.excluded_dates.map((e) =>
+        excludedId(e) === id ? withExcludedNote(e, note) : e,
+      ),
+    }));
+  };
+
   // Remove an excluded day or period
   const removeExcluded = (id: string) => {
     setExcludedError("");
@@ -1057,7 +1090,13 @@ const RecurringRuleForm: React.FC = () => {
                   )}
 
                   {formData.excluded_dates.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
+                    <div className="space-y-2">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {__(
+                          "Notes are for your team only — customers never see them.",
+                          "yatra",
+                        )}
+                      </p>
                       {formData.excluded_dates.map((entry) => {
                         const id = excludedId(entry);
                         const fmt = (d: string) =>
@@ -1067,24 +1106,46 @@ const RecurringRuleForm: React.FC = () => {
                             day: "numeric",
                             year: "numeric",
                           });
+                        const label =
+                          isPeriod(entry) && entry.start !== entry.end
+                            ? `${fmt(entry.start)} → ${fmt(entry.end)}`
+                            : fmt(isPeriod(entry) ? entry.start : entry);
                         return (
-                          <Badge
+                          <div
                             key={id}
-                            variant="outline"
-                            className="flex items-center gap-1"
+                            className="flex flex-col sm:flex-row sm:items-center gap-2"
                           >
-                            {isPeriod(entry)
-                              ? `${fmt(entry.start)} → ${fmt(entry.end)}`
-                              : fmt(entry)}
-                            <button
-                              type="button"
-                              onClick={() => removeExcluded(id)}
-                              className="ml-1 hover:text-red-500"
-                              aria-label={__("Remove exclusion", "yatra")}
+                            <Badge
+                              variant="outline"
+                              className="flex items-center gap-1 shrink-0"
                             >
-                              <X className="w-3 h-3" />
-                            </button>
-                          </Badge>
+                              {label}
+                              <button
+                                type="button"
+                                onClick={() => removeExcluded(id)}
+                                className="ml-1 hover:text-red-500"
+                                aria-label={__("Remove exclusion", "yatra")}
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </Badge>
+                            <Input
+                              value={excludedNote(entry)}
+                              onChange={(e) =>
+                                setExcludedNote(id, e.target.value.slice(0, 200))
+                              }
+                              placeholder={__(
+                                "Why is this excluded? (optional)",
+                                "yatra",
+                              )}
+                              aria-label={sprintf(
+                                __("Note for %s", "yatra"),
+                                label,
+                              )}
+                              maxLength={200}
+                              className="h-9 text-sm"
+                            />
+                          </div>
                         );
                       })}
                     </div>

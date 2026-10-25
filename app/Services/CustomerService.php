@@ -414,6 +414,9 @@ class CustomerService
             'phone' => '',
             'country' => '',
             'city' => '',
+            'address' => '',
+            'postal_code' => '',
+            'state' => '',
             'status' => 'active',
             'total_bookings' => 0,
             'total_spent' => 0.0,
@@ -880,8 +883,41 @@ class CustomerService
         if ($limit > 0 && count($allBookings) > $limit) {
             $allBookings = array_slice($allBookings, 0, $limit);
         }
-        
-        return $allBookings;
+
+        return array_map([$this, 'withBookingStatusAlias'], $allBookings);
+    }
+
+    /**
+     * Expose the booking's lifecycle status as `booking_status` alongside the
+     * raw `status` column.
+     *
+     * The account UI reads `booking_status` — it is what the booking detail
+     * endpoint returns (BookingService::formatBookingWithDetails()) and what the
+     * status badges, the Pending/Completed filters and the booking counts all
+     * key off. The list endpoints return raw booking rows, where the column is
+     * plain `status`, so every one of those read `undefined`: badges fell back
+     * to "Pending" whatever the real status was, the Completed filter matched
+     * nothing, and a cancelled trip still counted towards the totals. Aliasing
+     * here keeps `status` in place, so nothing that already reads it changes.
+     *
+     * @param object|array $booking
+     * @return object|array
+     */
+    private function withBookingStatusAlias($booking)
+    {
+        if (is_array($booking)) {
+            if (!isset($booking['booking_status']) && isset($booking['status'])) {
+                $booking['booking_status'] = (string) $booking['status'];
+            }
+
+            return $booking;
+        }
+
+        if (is_object($booking) && !isset($booking->booking_status) && isset($booking->status)) {
+            $booking->booking_status = (string) $booking->status;
+        }
+
+        return $booking;
     }
 
     public function getBookingDetailsForUser(int $userId, int $bookingId): ?array
@@ -1343,11 +1379,11 @@ class CustomerService
         // Update all bookings to point to target customer
         $this->bookingRepository->updateCustomerBookings($sourceId, $targetId);
 
-        // Update target customer stats
-        $this->customerRepository->updateCustomer($targetId, [
-            'total_bookings' => (int) $target->total_bookings + (int) $source->total_bookings,
-            'total_spent' => (float) $target->total_spent + (float) $source->total_spent,
-        ]);
+        // Recalculate the target's statistics from the bookings table rather
+        // than adding the two stored counters together: every booking now
+        // points at the target, so a recount is the correct answer and it does
+        // not carry over any drift either row had accumulated.
+        $this->customerRepository->recalculateStats($targetId);
 
         // Delete source customer
         $this->customerRepository->deleteCustomer($sourceId);
@@ -1403,6 +1439,8 @@ class CustomerService
             // account page never received the saved value — which is exactly why
             // city/country updated but address didn't.
             'address' => $customer->address ?? '',
+            'postal_code' => $customer->postal_code ?? '',
+            'state' => $customer->state ?? '',
             'status' => $customer->status ?? 'active',
             'total_bookings' => (int) ($customer->total_bookings ?? 0),
             'total_spent' => (float) ($customer->total_spent ?? 0),

@@ -3060,6 +3060,9 @@ video {
 .pt-4 {
   padding-top: 1rem;
 }
+.pt-5 {
+  padding-top: 1.25rem;
+}
 .pt-6 {
   padding-top: 1.5rem;
 }
@@ -3581,6 +3584,10 @@ video {
 }
 .ring-blue-100\/60 {
   --tw-ring-color: rgb(219 234 254 / 0.6);
+}
+.ring-blue-200 {
+  --tw-ring-opacity: 1;
+  --tw-ring-color: rgb(191 219 254 / var(--tw-ring-opacity, 1));
 }
 .ring-blue-400 {
   --tw-ring-opacity: 1;
@@ -5826,6 +5833,11 @@ video {
 
 .dark\:ring-blue-500\/30:is(.dark *) {
   --tw-ring-color: rgb(59 130 246 / 0.3);
+}
+
+.dark\:ring-blue-800:is(.dark *) {
+  --tw-ring-opacity: 1;
+  --tw-ring-color: rgb(30 64 175 / var(--tw-ring-opacity, 1));
 }
 
 .dark\:ring-blue-900\/30:is(.dark *) {

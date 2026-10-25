@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Card,
   CardHeader,
@@ -36,6 +36,12 @@ interface GoogleCalendarSettings {
   add_guests?: boolean;
   /** Pro 3.0.13+. Absent on an older Pro. */
   combine_bookings?: boolean;
+  /** IANA time zone for calendar events; "" = the site's time zone. */
+  timezone?: string;
+  /** Event text templates; "" = the built-in text. Present on a Pro that supports them. */
+  event_title_template?: string;
+  event_details_template?: string;
+  departure_title_template?: string;
   last_sync: string | null;
 }
 
@@ -56,12 +62,60 @@ const GoogleCalendar: React.FC = () => {
     failed: number;
   } | null>(null);
   const { showToast } = useToast();
+  // Named zones from PHP (timezone_identifiers_list), already sorted. Keep a
+  // saved value selectable even if this list somehow lacks it.
+  const timeZoneIds: string[] = (() => {
+    const raw = (window as any).yatraAdmin?.timeZoneIdentifiers;
+    const ids: string[] = Array.isArray(raw)
+      ? raw.filter((x: unknown): x is string => typeof x === "string" && x !== "")
+      : [];
+    const saved = settings?.timezone || "";
+    return saved !== "" && !ids.includes(saved) ? [saved, ...ids] : ids;
+  })();
   // This dashboard lives under Settings → Integration; the Back button returns
   // there (and deep-links the Integration section via ?section=integration).
   const adminUrl = (window as any).yatraAdmin?.adminUrl || "admin.php";
   const settingsIntegrationUrl = `${adminUrl}?page=yatra&subpage=settings&section=integration`;
 
 
+
+  // Event text templates are edited locally and saved with one button —
+  // saving on every keystroke would rebuild nothing but cost a request each.
+  const [templates, setTemplates] = useState({
+    event_title_template: "",
+    event_details_template: "",
+    departure_title_template: "",
+  });
+  const [savingTemplates, setSavingTemplates] = useState(false);
+  // Fill the fields once, when settings first arrive — not on every settings
+  // change, or toggling a switch above would wipe unsaved template edits.
+  const templatesLoaded = useRef(false);
+  useEffect(() => {
+    if (settings && !templatesLoaded.current) {
+      templatesLoaded.current = true;
+      setTemplates({
+        event_title_template: settings.event_title_template || "",
+        event_details_template: settings.event_details_template || "",
+        departure_title_template: settings.departure_title_template || "",
+      });
+    }
+  }, [settings]);
+
+  const saveTemplates = async () => {
+    setSavingTemplates(true);
+    try {
+      const response = await apiService.updateGoogleCalendarSettings(templates);
+      if (response && response.success === false) {
+        throw new Error(response.message || "");
+      }
+      setSettings((prev) => (prev ? { ...prev, ...templates } : null));
+      showToast(__("Event text saved"), "success");
+    } catch (error: any) {
+      showToast(error?.message || __("Failed to update settings"), "error");
+    } finally {
+      setSavingTemplates(false);
+    }
+  };
 
   useEffect(() => {
     fetchSettings();
@@ -479,7 +533,11 @@ const GoogleCalendar: React.FC = () => {
                     {__("Sync Bookings")}
                   </label>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {__("Create calendar events for new bookings")}
+                    {settings.combine_bookings !== undefined
+                      ? __(
+                          "Creates a calendar event for each booking. Turn on \"One event per departure\" below to get one event per departure instead, with its bookings listed in the description. Required by Sync All Bookings and Resync Everything.",
+                        )
+                      : __("Create calendar events for new bookings")}
                   </p>
                 </div>
                 <Switch
@@ -490,22 +548,11 @@ const GoogleCalendar: React.FC = () => {
                 />
               </div>
 
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <label className="font-medium text-gray-900 dark:text-white">
-                    {__("Sync Departures")}
-                  </label>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {__("Create calendar events for departures")}
-                  </p>
-                </div>
-                <Switch
-                  checked={settings.sync_departures}
-                  onCheckedChange={(checked: boolean) =>
-                    handleSettingChange("sync_departures", checked)
-                  }
-                />
-              </div>
+              {/* No "Sync Departures" switch: departures have never been
+                  synced on their own (nothing calls the departure sync), so
+                  the switch did nothing. A departure gets its calendar event
+                  through "One event per departure" below. The setting stays
+                  stored so nothing saved is lost. */}
 
               <div className="flex items-center justify-between">
                 <div className="flex-1">
@@ -575,6 +622,39 @@ const GoogleCalendar: React.FC = () => {
                   }
                 />
               </div>
+              )}
+
+              {/* Time zone for calendar events, when the tours run somewhere
+                  other than the site. Shown only by a Yatra Pro that stores it. */}
+              {settings.timezone !== undefined && (
+                <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <label
+                    htmlFor="gc_timezone"
+                    className="font-medium text-gray-900 dark:text-white"
+                  >
+                    {__("Calendar time zone")}
+                  </label>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                    {__(
+                      "The time zone tour times are written in on calendar events — e.g. America/Los_Angeles for tours that run in Los Angeles. Daylight saving time is handled automatically. Leave it on the site time zone if your tours run where your site is. Changes apply to new events; run Resync Everything to update existing ones.",
+                    )}
+                  </p>
+                  <select
+                    id="gc_timezone"
+                    value={settings.timezone}
+                    onChange={(e) =>
+                      handleSettingChange("timezone", e.target.value)
+                    }
+                    className="w-full max-w-md rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white"
+                  >
+                    <option value="">{__("Site time zone (default)")}</option>
+                    {timeZoneIds.map((tz) => (
+                      <option key={tz} value={tz}>
+                        {tz}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               )}
 
               {/* Reminders on the event. The backend already stored these; there
@@ -649,6 +729,118 @@ const GoogleCalendar: React.FC = () => {
                   )}
                 </div>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Event text templates — shown only by a Yatra Pro that supports them. */}
+      {settings && settings.event_details_template !== undefined && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{__("Event text")}</CardTitle>
+            <CardDescription>
+              {__(
+                "Write your own event title and details with variables, like an email template. Leave a field empty to keep the standard text. Changes apply to new events; run Resync Everything to update existing ones.",
+              )}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            <div>
+              <label
+                htmlFor="gc_tpl_title"
+                className="font-medium text-gray-900 dark:text-white"
+              >
+                {__("Event title")}
+              </label>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                {__("Used for an event per booking.")}
+              </p>
+              <input
+                id="gc_tpl_title"
+                type="text"
+                value={templates.event_title_template}
+                maxLength={300}
+                onChange={(e) =>
+                  setTemplates((t) => ({ ...t, event_title_template: e.target.value }))
+                }
+                placeholder="{{trip_name}} - {{customer_name}} ({{travelers_count}})"
+                className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="gc_tpl_departure_title"
+                className="font-medium text-gray-900 dark:text-white"
+              >
+                {__("Departure event title")}
+              </label>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                {__(
+                  "Used with \"One event per departure\". Variables: {{trip_name}}, {{travel_date}}, {{bookings_count}}, {{travellers_count}}.",
+                )}
+              </p>
+              <input
+                id="gc_tpl_departure_title"
+                type="text"
+                value={templates.departure_title_template}
+                maxLength={300}
+                onChange={(e) =>
+                  setTemplates((t) => ({
+                    ...t,
+                    departure_title_template: e.target.value,
+                  }))
+                }
+                placeholder="{{trip_name}} – {{travellers_count}} pax"
+                className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="gc_tpl_details"
+                className="font-medium text-gray-900 dark:text-white"
+              >
+                {__("Booking details")}
+              </label>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                {__(
+                  "The event description for an event per booking, and each booking's section in a departure event.",
+                )}
+              </p>
+              <textarea
+                id="gc_tpl_details"
+                rows={8}
+                value={templates.event_details_template}
+                maxLength={4000}
+                onChange={(e) =>
+                  setTemplates((t) => ({
+                    ...t,
+                    event_details_template: e.target.value,
+                  }))
+                }
+                placeholder={
+                  "{{customer_name}} · {{travelers_count}} pax\n{{contact_phone}}\nWhatsApp: https://wa.me/{{guest_phone_digits}}\nSignal: https://signal.me/#p/+{{guest_phone_digits}}\nTelegram: https://t.me/+{{guest_phone_digits}}"
+                }
+                className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-mono text-gray-900 dark:text-white"
+              />
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                {__(
+                  "Variables: the same as in booking emails — e.g. {{customer_name}}, {{customer_phone}}, {{customer_email}}, {{booking_reference}}, {{trip_name}}, {{travel_date}}, {{travelers_count}}, {{travelers_list}}, {{amount_due}}, {{special_requests}}, {{admin_url}}, and your booking-form answers ({{contact_…}}, {{emergency_…}}, {{lead_traveler_…}}).",
+                )}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {__(
+                  "{{guest_phone_digits}} is the guest's phone number as digits with the country code (e.g. 491512345678) — for links such as https://wa.me/{{guest_phone_digits}}. It stays empty when a number was saved without its country code, so a link never points at the wrong person. Whether a guest can be reached this way also depends on their own app settings.",
+                )}
+              </p>
+            </div>
+
+            <div className="flex justify-end">
+              <Button onClick={saveTemplates} disabled={savingTemplates}>
+                {savingTemplates ? __("Saving…") : __("Save event text")}
+              </Button>
             </div>
           </CardContent>
         </Card>

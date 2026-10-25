@@ -679,6 +679,14 @@ export function getCoreTemplateDefinition(
 
 /** UI row shape for the shared templates table (API or settings-backed). */
 export type UnifiedEmailTemplate = {
+  /**
+   * Set by Yatra Pro: the template that handles this event instead, when this
+   * one is an older name for it. Absent on older Pro builds, so treat as
+   * optional everywhere.
+   */
+  superseded_by?: string;
+  /** False only when `superseded_by` is set AND that template can still send. */
+  in_use?: boolean;
   id: string | number;
   template_key: string;
   event_key: string;

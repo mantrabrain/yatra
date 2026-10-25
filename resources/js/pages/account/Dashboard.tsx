@@ -17,13 +17,13 @@ import {
   Bell,
 } from "lucide-react";
 import { __, sprintf } from "../../lib/i18n";
-import { toDateValue } from "../../lib/dateFormat";
 import {
   formatDate,
   formatTravelDateRange,
   getBadge,
   getStatusLabel,
   currency,
+  isUpcomingBooking,
   phoneToTelHref,
 } from "./utils";
 import type { Booking, Payment, CustomerProfile } from "./types";
@@ -64,14 +64,10 @@ const Dashboard: React.FC<DashboardProps> = ({
 }) => {
   const conciergeTel = phoneToTelHref(conciergePhone);
   const conciergeMail = String(conciergeEmail || "").trim();
-  const upcomingBookings =
-    bookings.filter((b) => toDateValue(b.travel_date) > new Date()).length > 0
-      ? bookings
-          .filter((b) => toDateValue(b.travel_date) > new Date())
-          .slice(0, 3)
-      : bookings
-          .filter((b) => toDateValue(b.travel_date) > new Date())
-          .slice(0, 3);
+  // Cancelled and refunded bookings are not upcoming trips, however far ahead
+  // their travel date is — isUpcomingBooking() is shared with the Bookings page
+  // and the "Upcoming Trips" count so all three agree.
+  const upcomingBookings = bookings.filter(isUpcomingBooking).slice(0, 3);
 
   const recentBookings = bookings.length > 0 ? bookings.slice(0, 2) : [];
 

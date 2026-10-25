@@ -35,6 +35,7 @@ const Profile: React.FC<ProfileProps> = ({
     phone: "",
     address: "",
     city: "",
+    postal_code: "",
     country: "",
   });
 
@@ -54,6 +55,7 @@ const Profile: React.FC<ProfileProps> = ({
         phone: profile.phone || "",
         address: profile.address || "",
         city: profile.city || "",
+        postal_code: profile.postal_code || "",
         country: profile.country || "",
       });
     }
@@ -87,6 +89,7 @@ const Profile: React.FC<ProfileProps> = ({
         phone: formData.phone,
         address: formData.address,
         city: formData.city,
+        postal_code: formData.postal_code,
         country: formData.country,
       };
       // Only send last_name when present (backend rejects an empty last_name).
@@ -228,6 +231,7 @@ const Profile: React.FC<ProfileProps> = ({
         phone: profile.phone || "",
         address: profile.address || "",
         city: profile.city || "",
+        postal_code: profile.postal_code || "",
         country: profile.country || "",
       });
     }
@@ -408,6 +412,27 @@ const Profile: React.FC<ProfileProps> = ({
               ) : (
                 <p className="text-sm font-medium text-gray-900 dark:text-white py-2">
                   {formData.city || __("Not set", "yatra")}
+                </p>
+              )}
+            </div>
+
+            <div className="yatra-profile-field">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                {__("Postal Code", "yatra")}
+              </label>
+              {isEditing ? (
+                <input
+                  type="text"
+                  value={formData.postal_code}
+                  onChange={(e) =>
+                    handleInputChange("postal_code", e.target.value)
+                  }
+                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-yatra-primary focus:border-transparent"
+                  placeholder={__("Enter your postal code", "yatra")}
+                />
+              ) : (
+                <p className="text-sm font-medium text-gray-900 dark:text-white py-2">
+                  {formData.postal_code || __("Not set", "yatra")}
                 </p>
               )}
             </div>

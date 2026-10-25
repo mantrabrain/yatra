@@ -11,6 +11,7 @@ use Yatra\Database\Tables\ReviewsTable;
 use Yatra\Database\Tables\DiscountsTable;
 use Yatra\Database\Tables\EnquiriesTable;
 use Yatra\Database\Tables\BookingPaymentsTable;
+use Yatra\Database\Tables\PaymentNotesTable;
 use Yatra\Database\Tables\BookingTravellersTable;
 use Yatra\Database\Tables\BookingTravellerMetaTable;
 use Yatra\Database\Tables\BookingDeparturesTable;
@@ -56,6 +57,7 @@ class Database
         // Bookings and payment tables
         dbDelta(BookingsTable::getSchema());
         dbDelta(BookingPaymentsTable::getSchema());
+        dbDelta(PaymentNotesTable::getSchema());
         
         // Customer and traveller management
         dbDelta(CustomersTable::getSchema());

@@ -15,6 +15,7 @@ import {
   Eye,
   CreditCard,
   Download,
+  StickyNote,
 } from "lucide-react";
 import { downloadAdminInvoice } from "../lib/invoice-download";
 import {
@@ -23,7 +24,7 @@ import {
   BulkActionToolbar,
   Table as SharedTable,
 } from "../components/shared";
-import { __ } from "../lib/i18n";
+import { __, sprintf } from "../lib/i18n";
 import { getErrorContext } from "../lib/errors";
 import { apiService } from "../lib/api-client";
 import { usePermissions } from "../hooks/usePermissions";
@@ -34,6 +35,7 @@ import { PageHeader } from "../components/common/PageHeader";
 import { Card, CardContent } from "../components/ui/card";
 import { ConditionalRender } from "../components/ui/conditional-render";
 import { ConfirmationDialog } from "../components/ui/confirmation-dialog";
+import { PaymentNotesModal } from "../components/modals/PaymentNotesModal";
 import { formatYatraMoney } from "../lib/currency-display";
 import { formatDate as formatDateUtil } from "../lib/dateFormat";
 
@@ -61,6 +63,20 @@ interface Payment {
   payment_date: string;
   notes?: string;
   created_at: string;
+  /**
+   * The owning booking's balance and next due date, supplied by Yatra Pro's
+   * Scheduled Payments module. Absent when Pro is inactive, older, or the
+   * feature is switched off — the column then shows nothing rather than
+   * guessing a date.
+   */
+  payment_schedule?: {
+    amount_due?: number;
+    currency?: string;
+    source?: string;
+    next_due_date?: string | null;
+    next_amount?: number | null;
+    is_overdue?: boolean;
+  } | null;
 }
 
 const Payments: React.FC = () => {
@@ -81,6 +97,13 @@ const Payments: React.FC = () => {
     isOpen: false,
     payment: null,
   });
+  const [notesModal, setNotesModal] = useState<{
+    isOpen: boolean;
+    payment: Payment | null;
+  }>({
+    isOpen: false,
+    payment: null,
+  });
   const [visibleColumns, setVisibleColumns] = useState(() => {
     if (typeof window === "undefined") {
       return {
@@ -91,6 +114,7 @@ const Payments: React.FC = () => {
         method: true,
         status: true,
         date: true,
+        next_due: false,
       };
     }
     const saved = window.localStorage.getItem("yatra-payments-visible-columns");
@@ -104,6 +128,7 @@ const Payments: React.FC = () => {
           method: true,
           status: true,
           date: true,
+          next_due: false,
         };
   });
   const queryClient = useQueryClient();
@@ -502,6 +527,11 @@ const Payments: React.FC = () => {
       visible: visibleColumns.status,
     },
     { key: "date", label: __("Date", "yatra"), visible: visibleColumns.date },
+    {
+      key: "next_due",
+      label: __("Next Due", "yatra"),
+      visible: visibleColumns.next_due,
+    },
   ];
 
   const columns = [
@@ -603,6 +633,58 @@ const Payments: React.FC = () => {
         </span>
       ),
     },
+    {
+      key: "next_due",
+      label: __("Next Due", "yatra"),
+      // Not sortable: the date belongs to the booking, not to this payment row,
+      // so the server cannot order payments by it.
+      sortable: false,
+      visible: visibleColumns.next_due,
+      render: (payment: Payment) => {
+        const schedule = payment.payment_schedule;
+
+        // No schedule at all means Pro is not answering (inactive, older, or
+        // the feature is off). Say nothing rather than imply "nothing is due".
+        if (!schedule) {
+          return <span className="text-gray-400 dark:text-gray-500 text-sm">—</span>;
+        }
+
+        if (!schedule.next_due_date) {
+          return (
+            <span className="text-gray-500 dark:text-gray-400 text-sm">
+              {Number(schedule.amount_due ?? 0) > 0
+                ? __("No date set", "yatra")
+                : __("Settled", "yatra")}
+            </span>
+          );
+        }
+
+        return (
+          <div className="text-sm">
+            <div
+              className={
+                schedule.is_overdue
+                  ? "font-medium text-red-600 dark:text-red-400"
+                  : "text-gray-700 dark:text-gray-200"
+              }
+            >
+              {schedule.is_overdue
+                ? /* translators: %s: the date a payment was due. */
+                  sprintf(__("Overdue since %s", "yatra"), formatDate(schedule.next_due_date))
+                : formatDate(schedule.next_due_date)}
+            </div>
+            {schedule.next_amount ? (
+              <div className="text-xs text-gray-500 dark:text-gray-400">
+                {formatYatraMoney(
+                  Number(schedule.next_amount),
+                  schedule.currency || defaultCurrency,
+                )}
+              </div>
+            ) : null}
+          </div>
+        );
+      },
+    },
   ];
 
   const actions = [
@@ -617,6 +699,13 @@ const Payments: React.FC = () => {
       label: __("Edit", "yatra"),
       icon: <Edit className="w-4 h-4" />,
       onClick: (payment: Payment) => handleEdit(payment),
+    },
+    {
+      key: "notes",
+      label: __("Notes", "yatra"),
+      icon: <StickyNote className="w-4 h-4" />,
+      onClick: (payment: Payment) =>
+        setNotesModal({ isOpen: true, payment }),
     },
     {
       key: "download_invoice",
@@ -750,6 +839,18 @@ const Payments: React.FC = () => {
 
   return (
     <div className="space-y-3">
+      <PaymentNotesModal
+        isOpen={notesModal.isOpen}
+        onClose={() => setNotesModal({ isOpen: false, payment: null })}
+        paymentId={notesModal.payment ? Number(notesModal.payment.id) : null}
+        paymentReference={
+          (notesModal.payment as any)?.reference ||
+          (notesModal.payment as any)?.payment_number ||
+          ""
+        }
+        canAdd={can("yatra_edit_bookings")}
+      />
+
       <ConfirmationDialog
         isOpen={deleteConfirm.isOpen}
         onClose={() => setDeleteConfirm({ isOpen: false, payment: null })}

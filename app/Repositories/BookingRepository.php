@@ -476,7 +476,7 @@ class BookingRepository extends BaseRepository
      * @param string $status New status
      * @return bool
      */
-    public function updateStatus(int $id, string $status): bool
+    public function updateStatus(int $id, string $status, string $reason = ''): bool
     {
         $table = $this->getTableName();
 
@@ -499,6 +499,15 @@ class BookingRepository extends BaseRepository
         if ($status === 'cancelled') {
             $data['cancelled_at'] = current_time('mysql');
             $data['cancelled_by'] = get_current_user_id();
+
+            // Why it was cancelled, when the caller knows. The column and the
+            // {{cancellation_reason}} merge tag both existed already, but the
+            // only thing that ever wrote to it was the unpaid-booking expiry
+            // cron — so an operator cancelling a booking by hand could not say
+            // why, and the tag arrived empty in the customer's email.
+            if ($reason !== '') {
+                $data['cancellation_reason'] = $reason;
+            }
         }
 
         $result = $this->wpdb->update($table, $data, ['id' => $id]);
@@ -743,10 +752,12 @@ class BookingRepository extends BaseRepository
     /**
      * Get bookings for reminder emails
      *
-     * @param string $travelDate Target travel date
+     * @param string      $travelDate Target travel date (the last day of the window)
+     * @param string|null $fromDate   First day of the window. Null keeps the old
+     *                                exact-day match on $travelDate.
      * @return array
      */
-    public function getBookingsForReminder(string $travelDate): array
+    public function getBookingsForReminder(string $travelDate, ?string $fromDate = null): array
     {
         $table = $this->getTableName();
 
@@ -765,6 +776,25 @@ class BookingRepository extends BaseRepository
         // previous SELECT threw "Unknown column" — get_results() then returned
         // nothing and the reminder cron silently sent zero emails. The booking's
         // own currency arrives via b.* (and is no longer clobbered by the join).
+        //
+        // With $fromDate the match is a window rather than one day, so a
+        // booking that only became eligible after its reminder day — booked
+        // or confirmed late, or on a day WP-Cron did not run — is still
+        // reminded on the next run instead of never. reminder_sent = 0 keeps
+        // it to one reminder per booking.
+        if ($fromDate !== null) {
+            return $this->wpdb->get_results($this->wpdb->prepare(
+                "SELECT b.*, t.title as trip_title
+                 FROM {$table} b
+                 LEFT JOIN {$tripsTable} t ON b.trip_id = t.id
+                 WHERE (b.status = 'confirmed' OR (b.status = 'pending' AND b.amount_paid > 0))
+                 AND b.travel_date BETWEEN %s AND %s
+                 AND b.reminder_sent = 0",
+                $fromDate,
+                $travelDate
+            ));
+        }
+
         return $this->wpdb->get_results($this->wpdb->prepare(
             "SELECT b.*, t.title as trip_title
              FROM {$table} b

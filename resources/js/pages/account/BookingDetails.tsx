@@ -120,6 +120,21 @@ interface BookingDetailsData {
   amount_paid: number;
   amount_due: number;
   currency: string;
+  payment_schedule?: {
+    amount_due: number;
+    currency: string;
+    /** 'scheduled' = rows that will be charged/chased; 'projected' = implied by settings. */
+    source: "scheduled" | "projected" | "none";
+    next_due_date: string | null;
+    next_amount: number | null;
+    is_overdue: boolean;
+    installments: {
+      number: number | null;
+      amount: number;
+      due_date: string;
+      status: string;
+    }[];
+  } | null;
   discount_amount?: number;
   payment_status: string;
   booking_status: string;
@@ -1006,7 +1021,84 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({
                   </div>
                 </div>
               )}
+              {booking.payment_schedule?.next_due_date && (
+                <div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                    {booking.payment_schedule.is_overdue
+                      ? __("Payment Overdue", "yatra")
+                      : __("Next Payment Due", "yatra")}
+                  </div>
+                  <div
+                    className={`text-sm font-semibold ${
+                      booking.payment_schedule.is_overdue
+                        ? "text-red-600 dark:text-red-400"
+                        : "text-gray-900 dark:text-white"
+                    }`}
+                  >
+                    {formatDate(booking.payment_schedule.next_due_date)}
+                  </div>
+                  {booking.payment_schedule.next_amount !== null && (
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                      {formatPriceForBooking(
+                        booking.payment_schedule.next_amount,
+                        booking.payment_schedule.currency || booking.currency,
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
+
+            {/* Instalment breakdown. Only worth a table when there is more than
+                one; a single balance is already shown above. */}
+            {(booking.payment_schedule?.installments?.length ?? 0) > 1 && (
+              <div className="mt-5 pt-5 border-t border-gray-100 dark:border-gray-700">
+                <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
+                  {__("Payment Schedule", "yatra")}
+                </div>
+                <ul className="divide-y divide-gray-100 dark:divide-gray-700">
+                  {booking.payment_schedule!.installments.map((item, index) => (
+                    <li
+                      key={`${item.due_date}-${index}`}
+                      className="flex items-center justify-between py-2 text-sm"
+                    >
+                      <span className="text-gray-600 dark:text-gray-300">
+                        {item.number !== null
+                          ? sprintf(
+                              /* translators: %d: instalment number. */
+                              __("Instalment %d", "yatra"),
+                              item.number,
+                            )
+                          : __("Balance", "yatra")}
+                        <span className="text-gray-400 dark:text-gray-500 ml-2">
+                          {formatDate(item.due_date)}
+                        </span>
+                      </span>
+                      <span className="text-gray-900 dark:text-white font-medium">
+                        {formatPriceForBooking(
+                          item.amount,
+                          booking.payment_schedule!.currency ||
+                            booking.currency,
+                        )}
+                        {item.status === "paid" && (
+                          <span className="text-green-600 dark:text-green-400 ml-2 text-xs">
+                            {__("Paid", "yatra")}
+                          </span>
+                        )}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                {booking.payment_schedule!.source === "projected" && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                    {__(
+                      "Expected dates based on the payment terms for this booking.",
+                      "yatra",
+                    )}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Timeline */}

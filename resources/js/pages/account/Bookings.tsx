@@ -9,13 +9,13 @@ import {
   Plane,
 } from "lucide-react";
 import { __, sprintf } from "../../lib/i18n";
-import { toDateValue } from "../../lib/dateFormat";
 import {
   formatDate,
   formatTravelDateRange,
   getBadge,
   getStatusLabel,
   currency,
+  isUpcomingBooking,
   phoneToTelHref,
 } from "./utils";
 import { downloadVoucher } from "./utils/downloads";
@@ -175,12 +175,7 @@ const Bookings: React.FC<BookingsProps> = ({
 
   // Apply filter
   if (bookingFilter === "upcoming") {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Set to start of day for accurate comparison
-    filteredDisplayBookings = filteredDisplayBookings.filter((b) => {
-      const travelDate = toDateValue(b.travel_date);
-      return travelDate >= today;
-    });
+    filteredDisplayBookings = filteredDisplayBookings.filter(isUpcomingBooking);
   } else if (bookingFilter === "pending") {
     filteredDisplayBookings = filteredDisplayBookings.filter(
       (b) => b.payment_status === "pending" || b.booking_status === "pending",
@@ -210,9 +205,7 @@ const Bookings: React.FC<BookingsProps> = ({
   // Calculate booking statistics
   const bookingStats = {
     total: displayBookings.length,
-    upcoming: displayBookings.filter(
-      (b) => toDateValue(b.travel_date) >= new Date(),
-    ).length,
+    upcoming: displayBookings.filter(isUpcomingBooking).length,
     pending: displayBookings.filter(
       (b) => b.payment_status === "pending" || b.booking_status === "pending",
     ).length,

@@ -302,6 +302,21 @@ class BookingsController extends BaseController
             }
 
             Logger::info("Booking retrieved successfully", ['booking_id' => $id]);
+
+            // When is the outstanding balance due? Core does not decide payment
+            // schedules; Yatra Pro's Scheduled Payments module does, so core asks
+            // and shows whatever comes back. Nothing answers when Pro is absent,
+            // older, or the feature is off, and the payload is then exactly what
+            // it has always been.
+            $schedule = apply_filters('yatra_booking_payment_schedule', null, (object) $booking);
+            if (is_array($schedule)) {
+                if (is_array($booking)) {
+                    $booking['payment_schedule'] = $schedule;
+                } else {
+                    $booking->payment_schedule = $schedule;
+                }
+            }
+
             return $this->success_response($booking);
             
         } catch (\Exception $e) {
@@ -403,7 +418,13 @@ class BookingsController extends BaseController
             ], 400);
         }
 
-        $result = $this->bookingService->updateStatus($id, $status);
+        // Optional, and only used when cancelling: the reason reaches the
+        // customer's cancellation email through {{cancellation_reason}}.
+        $reason = isset($data['cancellation_reason'])
+            ? sanitize_textarea_field((string) $data['cancellation_reason'])
+            : '';
+
+        $result = $this->bookingService->updateStatus($id, $status, $reason);
 
         if (!$result['success']) {
             return new WP_REST_Response($result, 400);

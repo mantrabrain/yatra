@@ -154,6 +154,10 @@ class AdminAssetsProvider
             'proVersion' => defined('YATRA_PRO_VERSION') ? YATRA_PRO_VERSION : null,
 
             'locale' => get_locale(),
+            // Settings → General → Week Starts On (0 = Sunday), clamped the
+            // same way as the frontend calendars' firstDayOfWeek, so the admin
+            // calendars start on the same day.
+            'startOfWeek' => max(0, min(6, (int) get_option('start_of_week', 1))),
             'currency' => \Yatra\Services\SettingsService::getCurrency(),
             'currencyPosition' => \Yatra\Services\SettingsService::getString('currency_position', 'left'),
             'currency_position' => \Yatra\Services\SettingsService::getString('currency_position', 'left'),

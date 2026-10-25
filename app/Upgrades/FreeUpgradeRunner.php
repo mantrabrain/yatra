@@ -177,6 +177,23 @@ final class FreeUpgradeRunner
         // Additive + idempotent; existing trips get NULL and behave unchanged.
         InstallerService::maybeAddTripDurationHoursColumn();
 
+        // Rebuild the booking statistics stored on customer rows. They were
+        // incremented by hand, and checkout incremented them twice per booking,
+        // so stored counts were double the real number (and never came back
+        // down when a booking was cancelled). One set-based UPDATE, gated by
+        // its own one-shot option.
+        InstallerService::maybeRepairCustomerBookingStats();
+
+        // Re-derive amount_paid / amount_due / payment_status on bookings that
+        // have refunds. Recording a refund used to subtract the same money
+        // twice, leaving a negative amount paid and a 'pending' status on a
+        // booking that had in fact been paid and partly refunded.
+        InstallerService::maybeRepairRefundedBookingTotals();
+
+        // Payment note history table — added without a version bump, so it
+        // needs its own idempotent creation step for existing installs.
+        InstallerService::maybeCreatePaymentNotesTable();
+
         // Widen reviews.status enum to accept 'spam' / 'trash' (and
         // recover rows previously coerced to ''). Called directly here
         // rather than relying on the version-chain in runAdminUpgrades()

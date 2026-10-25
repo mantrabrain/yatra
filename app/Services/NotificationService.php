@@ -100,6 +100,53 @@ class NotificationService
     }
 
     /**
+     * Yatra's own reference for the payment this email is about, e.g. PAY-000004.
+     *
+     * The gateway Transaction ID is empty for anything recorded by hand, so a
+     * template that leads on it shows a labelled blank. This is the number the
+     * Payments screen, the invoice and the customer account already display, so
+     * an operator can quote it and a customer can recognise it.
+     *
+     * There is no `reference` column: the value is derived from the payment row's
+     * id, exactly as {@see PaymentService::formatPayment()} and the invoice do.
+     * Keep those three in step — if the format ever changes it must change in
+     * all of them or the email will cite a number nothing else shows.
+     *
+     * Resolved here rather than threaded through the three call paths that reach
+     * these notifiers (gateway capture, admin status change, manual resend), so
+     * none of their signatures change. An explicit id wins; otherwise the
+     * gateway transaction is looked up; otherwise the booking's most recent
+     * payment, which is the one this email is about in every flow that omits an
+     * id. Returns '' when nothing identifies a payment — the template then
+     * renders an empty value, and {@see EmailTemplateLayout::dropUnfilledRows()}
+     * removes the row rather than showing a blank one.
+     */
+    private static function resolvePaymentReference(array $paymentData): string
+    {
+        $paymentId = (int) ($paymentData['payment_id'] ?? $paymentData['id'] ?? 0);
+
+        if ($paymentId < 1) {
+            $repository = new \Yatra\Repositories\PaymentRepository();
+
+            $transactionId = trim((string) ($paymentData['transaction_id'] ?? ''));
+            if ($transactionId !== '') {
+                $row = $repository->findByTransactionId($transactionId);
+                $paymentId = (int) ($row->id ?? 0);
+            }
+
+            if ($paymentId < 1) {
+                $bookingId = (int) ($paymentData['booking_id'] ?? 0);
+                if ($bookingId > 0) {
+                    $row = $repository->findLatestByBookingId($bookingId);
+                    $paymentId = (int) ($row->id ?? 0);
+                }
+            }
+        }
+
+        return $paymentId > 0 ? sprintf('PAY-%06d', $paymentId) : '';
+    }
+
+    /**
      * Notify admin of payment received (template: admin_payment_received).
      */
     private static function notifyAdminPaymentReceived(array $paymentData): void
@@ -127,6 +174,7 @@ class NotificationService
             __('Online payment', 'yatra')
         );
         $vars['transaction_id'] = (string) ($paymentData['transaction_id'] ?? '');
+        $vars['payment_reference'] = self::resolvePaymentReference($paymentData);
 
         TransactionalEmailTemplateService::sendIfEnabled(
             TransactionalEmailTemplateService::TYPE_ADMIN_PAYMENT_RECEIVED,
@@ -194,6 +242,7 @@ class NotificationService
             __('Online payment', 'yatra')
         );
         $vars['transaction_id'] = (string) ($paymentData['transaction_id'] ?? '');
+        $vars['payment_reference'] = self::resolvePaymentReference($paymentData);
 
         TransactionalEmailTemplateService::sendIfEnabled(
             self::paymentTemplateTypeFor($booking),

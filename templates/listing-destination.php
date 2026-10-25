@@ -60,6 +60,10 @@ $yatra_browse_line = function_exists('yatra_archive_browse_results_line')
 $GLOBALS['yatra_archive_browse_pagination'] = [
     'current_page' => (int) $current_page,
     'total_pages' => (int) $total_pages,
+    // Rows rendered on this page + their list offset — read by SEOService
+    // for the CollectionPage ItemList (wp_head runs after this point).
+    'offset' => (int) $offset,
+    'items' => $paged_destinations,
 ];
 
 yatra_get_header();

@@ -704,8 +704,13 @@ class BookingService
      * received; `payment_type` reflects whether this settles a balance or is the
      * only payment on the booking.
      */
-    private function recordManualPayment(object $booking, int $bookingId, float $amount, float $existingLedger): void
-    {
+    private function recordManualPayment(
+        object $booking,
+        int $bookingId,
+        float $amount,
+        float $existingLedger,
+        string $notes = ''
+    ): int {
         $gateway = (string) ($booking->payment_gateway ?? $booking->payment_method ?? '');
 
         if (trim($gateway) === '') {
@@ -713,7 +718,7 @@ class BookingService
             $gateway = 'manual';
         }
 
-        $this->paymentRepository->create([
+        $paymentId = (int) $this->paymentRepository->create([
             'booking_id'   => $bookingId,
             'customer_id'  => !empty($booking->customer_id) ? (int) $booking->customer_id : null,
             'gateway'      => $gateway,
@@ -721,12 +726,16 @@ class BookingService
             'currency'     => (string) ($booking->currency ?? SettingsService::getCurrency()),
             'status'       => 'completed',
             'payment_type' => $existingLedger > 0 ? 'final' : 'initial',
-            'notes'        => __('Recorded manually when the booking was marked as paid.', 'yatra'),
+            'notes'        => $notes !== ''
+                ? $notes
+                : __('Recorded manually when the booking was marked as paid.', 'yatra'),
             'processed_at' => current_time('mysql'),
             'created_at'   => current_time('mysql'),
         ]);
 
         do_action('yatra_manual_payment_recorded', $bookingId, $amount, $gateway);
+
+        return $paymentId;
     }
 
     /**
@@ -757,6 +766,13 @@ class BookingService
         // left alone, so this can never erase or reduce a real payment. The other
         // statuses are deliberately untouched — "partial" carries no amount to
         // apply, and zeroing on "pending"/"refunded" would destroy payment data.
+
+        // How much money this status change actually brought in, which is what
+        // decides whether a receipt goes out below. Stays zero for "partial",
+        // which carries no amount to record.
+        $recordedNow = 0.0;
+        $recordedPaymentId = 0;
+
         if ($newStatus === 'paid') {
             $total = (float) ($booking->total_amount ?? 0);
             $recorded = (float) ($booking->amount_paid ?? 0);
@@ -775,13 +791,40 @@ class BookingService
                 $alreadyCovered = max($ledger, $recorded);
                 $outstanding = round($total - $alreadyCovered, 2);
 
+                // A booking can carry an amount_paid the ledger knows nothing
+                // about — set by an import, or by a path that predates the
+                // ledger. That money was really received, so give it a row of
+                // its own before recording the balance. Without this the ledger
+                // ends up short by exactly that amount, and because
+                // PaymentService recalculates amount_paid FROM the ledger, the
+                // next payment of any kind would quietly undo the settlement.
+                // It is recorded separately from the balance so the receipt
+                // below still announces only what this change brought in.
+                $unledgered = round($recorded - $ledger, 2);
+
+                if ($unledgered > 0) {
+                    $this->recordManualPayment(
+                        $booking,
+                        $bookingId,
+                        $unledgered,
+                        $ledger,
+                        __('Earlier payment reconciled when the booking was marked as paid.', 'yatra')
+                    );
+                    $ledger = (float) $this->paymentRepository->getTotalPaidForBooking($bookingId);
+                }
+
                 if ($outstanding > 0) {
-                    $this->recordManualPayment($booking, $bookingId, $outstanding, $ledger);
+                    $recordedPaymentId = $this->recordManualPayment($booking, $bookingId, $outstanding, $ledger);
+                    $recordedNow = $outstanding;
                     $ledger = (float) $this->paymentRepository->getTotalPaidForBooking($bookingId);
                 }
 
                 // Never reduce a recorded overpayment: settle up, never down.
-                $newAmountPaid = max($ledger, $recorded);
+                // `$alreadyCovered + $outstanding` is the total actually
+                // received; $ledger alone understated it whenever a pre-ledger
+                // amount_paid had not been backfilled, leaving a fully paid
+                // booking reading as part paid with a balance still due.
+                $newAmountPaid = max($ledger, $alreadyCovered + max(0.0, $outstanding));
 
                 if ($newAmountPaid > $recorded || $recorded < $total) {
                     // Canonical writer — also derives amount_due and keeps
@@ -794,14 +837,24 @@ class BookingService
             }
         }
 
-        if (in_array($newStatus, ['paid', 'partial'], true)) {
-            $paidAmount = (float) ($booking->amount_paid ?? 0);
-            if ($paidAmount <= 0) {
-                $paidAmount = (float) ($booking->total_amount ?? 0);
-            }
+        // A receipt is only honest if money actually arrived. This used to fire
+        // for any change to "paid" or "partial" and announce the booking's
+        // cumulative amount_paid as though it were the payment just made —
+        // falling back to the FULL BOOKING TOTAL whenever amount_paid was zero.
+        // So flipping a status could tell a customer they had paid the whole
+        // trip when they had paid a deposit, or nothing at all. It now reports
+        // the amount this change recorded, and says nothing when it recorded
+        // nothing: re-flagging an already-settled booking, or moving it to
+        // "partial" (which records no amount), is a bookkeeping act, not a
+        // payment. The admin "resend email" action still exists for sending a
+        // receipt deliberately.
+        if ($recordedNow > 0) {
             \Yatra\Services\NotificationService::sendPaymentCompletedNotification([
                 'booking_id' => $bookingId,
-                'amount' => $paidAmount,
+                // Names the exact row just written, so {{payment_reference}}
+                // cites this payment rather than the booking's latest.
+                'payment_id' => $recordedPaymentId,
+                'amount' => $recordedNow,
                 'payment_method' => (string) ($booking->payment_method ?? ''),
                 'transaction_id' => '',
             ]);
@@ -827,7 +880,7 @@ class BookingService
      * @param string $status New status
      * @return array {success: bool, message: string}
      */
-    public function updateStatus(int $id, string $status): array
+    public function updateStatus(int $id, string $status, string $reason = ''): array
     {
         $validStatuses = ['pending', 'confirmed', 'processing', 'completed', 'cancelled', 'refunded', 'failed', 'on_hold'];
 
@@ -842,7 +895,18 @@ class BookingService
         }
 
         $oldStatus = $booking->status;
-        $updated = $this->bookingRepository->updateStatus($id, $status);
+
+        // A reason only means anything on a cancellation, and it must be saved
+        // BEFORE the notification below reads the row — the cancellation email
+        // carries {{cancellation_reason}}.
+        $reason = $status === 'cancelled' ? trim($reason) : '';
+        $updated = $this->bookingRepository->updateStatus($id, $status, $reason);
+
+        if ($reason !== '') {
+            // Keep the in-memory row in step so the email sees the reason even
+            // if it is rendered from $booking rather than re-read.
+            $booking->cancellation_reason = $reason;
+        }
 
         if (!$updated) {
             return ['success' => false, 'message' => __('Failed to update status.', 'yatra')];
@@ -1167,6 +1231,15 @@ class BookingService
         // Add payments
         $formatted['payments'] = $this->getBookingPayments((int) $booking->id);
 
+        // The ledger in three figures, so the booking screen can state what was
+        // received, what went back and what that leaves — rather than leaving an
+        // operator to work it out from a list in which refunds appear as
+        // negative rows. Derived from the payments, never from a stored column.
+        $paymentTotals = $this->paymentRepository->getBookingPaymentTotals((int) $booking->id);
+        $formatted['total_received'] = $paymentTotals['successful'];
+        $formatted['total_refunded'] = $paymentTotals['refunded'];
+        $formatted['net_received'] = max(0.0, $paymentTotals['net']);
+
         // Add tax breakdown
         $formatted['tax_breakdown'] = BookingTaxService::getBookingTaxBreakdown((array) $formatted);
         $formatted['tax_display'] = BookingTaxService::formatBookingTaxDisplay((array) $formatted);
@@ -1292,6 +1365,49 @@ class BookingService
     }
 
     /**
+     * Send the customer their cancellation email, choosing the wording by who
+     * ended the booking.
+     *
+     * `cancelled_by` carries the operator's user id (BookingRepository::updateStatus
+     * writes get_current_user_id() whenever a booking moves to cancelled); the
+     * unpaid-booking expiry job runs with no logged-in user and leaves it at 0,
+     * which is the "not us" case. So a non-zero value means an operator did it.
+     *
+     * The operator-specific email is opt-in and falls back to the ordinary
+     * cancellation email whenever it is switched off or has nothing to send —
+     * so a site that has not asked for the distinction keeps behaving exactly as
+     * it did, and one that has can never end up sending nothing at all.
+     */
+    private function sendCustomerCancellationEmail(object $booking, string $customerEmail): void
+    {
+        $customerEmail = sanitize_email($customerEmail);
+        if ($customerEmail === '' || !is_email($customerEmail)) {
+            return;
+        }
+
+        $vars = TransactionalEmailTemplateService::variablesFromBooking($booking);
+        $vars['cancellation_reason'] = (string) ($booking->cancellation_reason ?? '');
+
+        if ((int) ($booking->cancelled_by ?? 0) > 0) {
+            $sent = TransactionalEmailTemplateService::sendIfEnabled(
+                TransactionalEmailTemplateService::TYPE_BOOKING_CANCELLATION_BY_OPERATOR,
+                $customerEmail,
+                $vars
+            );
+
+            if ($sent) {
+                return;
+            }
+        }
+
+        TransactionalEmailTemplateService::sendIfEnabled(
+            TransactionalEmailTemplateService::TYPE_BOOKING_CANCELLATION,
+            $customerEmail,
+            $vars
+        );
+    }
+
+    /**
      * Send status change notification
      *
      * @param int    $bookingId Booking ID
@@ -1314,13 +1430,7 @@ class BookingService
         }
 
         if ($newStatus === 'cancelled') {
-            $vars = TransactionalEmailTemplateService::variablesFromBooking($booking);
-            $vars['cancellation_reason'] = (string) ($booking->cancellation_reason ?? '');
-            TransactionalEmailTemplateService::sendIfEnabled(
-                TransactionalEmailTemplateService::TYPE_BOOKING_CANCELLATION,
-                $booking->contact_email,
-                $vars
-            );
+            $this->sendCustomerCancellationEmail($booking, (string) $booking->contact_email);
 
             return;
         }
@@ -1427,19 +1537,20 @@ class BookingService
                 break;
 
             case 'reminder':
-                $this->sendBookingReminderEmail($booking);
+                if (!$this->sendBookingReminderEmail($booking)) {
+                    return [
+                        'success' => false,
+                        'message' => __('The trip reminder was not sent. Check that the Trip reminder email is switched on in the email settings.', 'yatra'),
+                    ];
+                }
                 break;
 
             case 'cancellation':
                 // Mirrors sendStatusChangeNotification() so the resent email is
-                // identical to the automated cancellation email.
-                $vars = TransactionalEmailTemplateService::variablesFromBooking($booking);
-                $vars['cancellation_reason'] = (string) ($booking->cancellation_reason ?? '');
-                TransactionalEmailTemplateService::sendIfEnabled(
-                    TransactionalEmailTemplateService::TYPE_BOOKING_CANCELLATION,
-                    $customerEmail,
-                    $vars
-                );
+                // identical to the automated cancellation email — including the
+                // choice between the ordinary wording and the "cancelled by us"
+                // wording, which depends on who cancelled the booking.
+                $this->sendCustomerCancellationEmail($booking, (string) $customerEmail);
                 break;
 
             case 'completed':
@@ -1508,28 +1619,16 @@ class BookingService
 
     /**
      * Send booking reminder email
-     * 
+     *
+     * Same email as the daily reminder sweep (including the outstanding-balance
+     * block), so a manual resend matches the automatic one.
+     *
      * @param object $booking Booking data
+     * @return bool Whether the email was sent
      */
-    private function sendBookingReminderEmail(object $booking): void
+    private function sendBookingReminderEmail(object $booking): bool
     {
-        $daysUntilTrip = (int) ((strtotime((string) $booking->travel_date) - time()) / 86400);
-        $vars = TransactionalEmailTemplateService::variablesFromBooking($booking);
-        $vars['days_until_trip'] = (string) max(0, $daysUntilTrip);
-        $vars['reminder_days'] = (string) SettingsService::getInt('booking_reminder_days', 3);
-
-        $checklist = '<p><strong>' . esc_html__('Preparation checklist', 'yatra') . '</strong></p><ul>'
-            . '<li>' . esc_html__('Valid government-issued ID', 'yatra') . '</li>'
-            . '<li>' . esc_html__('Travel insurance', 'yatra') . '</li>'
-            . '<li>' . esc_html__('Emergency contacts', 'yatra') . '</li>'
-            . '</ul>';
-        $vars['reminder_extra_html'] = $checklist;
-
-        $sent = TransactionalEmailTemplateService::sendIfEnabled(
-            TransactionalEmailTemplateService::TYPE_BOOKING_REMINDER,
-            $booking->contact_email,
-            $vars
-        );
+        $sent = BookingCronService::sendReminderEmail($booking);
 
         if ($sent) {
             $this->bookingRepository->update((int) $booking->id, [
@@ -1537,6 +1636,8 @@ class BookingService
                 'reminder_sent_at' => current_time('mysql'),
             ]);
         }
+
+        return $sent;
     }
 }
 

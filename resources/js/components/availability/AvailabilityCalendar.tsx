@@ -31,6 +31,7 @@ import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { useNavigate } from "../../hooks/useNavigate";
+import { getWeekStartsOn, getWeekdayLabels } from "../../lib/dateFormat";
 
 interface AvailabilityDate {
   id: string;
@@ -137,8 +138,8 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
-  const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
-  const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
+  const calendarStart = startOfWeek(monthStart, { weekStartsOn: getWeekStartsOn() });
+  const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: getWeekStartsOn() });
   const days = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
 
   const previousMonth = () => {
@@ -149,7 +150,7 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
     setCurrentMonth(addMonths(currentMonth, 1));
   };
 
-  const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const weekDays = getWeekdayLabels();
 
   const formatTime = (timeString: string) => {
     if (!timeString) return "";

@@ -75,6 +75,17 @@ if (!empty($booking->id)) {
 // Resolved customer account URL (configurable via Settings → Permalink → Account base).
 $yatra_account_url = home_url('/' . \Yatra\Services\SettingsService::getAccountBase());
 
+// Can this customer actually reach this booking in My Account? Only if the
+// booking belongs to a login — either they are signed in now, or checkout
+// created/linked an account for them. A true guest booking sees the login
+// prompt and none of their own data, so we never send them there as if their
+// booking were waiting.
+$yatra_booking_has_account = is_user_logged_in() || (int) ($booking->user_id ?? 0) > 0;
+
+// Registration closed means a guest has no route to an account at all, so the
+// confirmation email stays their copy of the booking.
+$yatra_can_register = (bool) get_option('users_can_register');
+
 // Get status color
 $status_colors = [
     'pending' => ['bg' => '#fef3c7', 'text' => '#d97706', 'label' => 'Pending'],
@@ -839,11 +850,42 @@ do_action('yatra_booking_confirmation_header', $booking);
                         </div>
                     </div>
                     
+                    <?php
+                    // This step used to promise "a detailed itinerary and
+                    // preparation guide within 24-48 hours". Yatra sends no such
+                    // thing — the booking, its itinerary and any balance due live
+                    // in My Account — so the promise was never kept and the
+                    // customer waited for an email that was not coming.
+                    ?>
                     <div class="yatra-step">
                         <span class="yatra-step-number">2</span>
                         <div class="yatra-step-content">
-                            <h4><?php esc_html_e('Detailed Itinerary', 'yatra'); ?></h4>
-                            <p><?php esc_html_e('You\'ll receive a detailed itinerary and preparation guide within 24-48 hours.', 'yatra'); ?></p>
+                            <?php if ($yatra_booking_has_account) : ?>
+                                <h4><?php esc_html_e('View It In Your Account', 'yatra'); ?></h4>
+                                <p>
+                                    <?php
+                                    printf(
+                                        /* translators: %s: link labelled "My Account" pointing to the customer account page (HTML <a> wrapped). */
+                                        esc_html__('Your booking details, trip itinerary and any balance due are all in %s — open it whenever you need them.', 'yatra'),
+                                        '<a href="' . esc_url($yatra_account_url) . '">' . esc_html__('My Account', 'yatra') . '</a>'
+                                    );
+                                    ?>
+                                </p>
+                            <?php elseif ($yatra_can_register) : ?>
+                                <h4><?php esc_html_e('Create Your Account', 'yatra'); ?></h4>
+                                <p>
+                                    <?php
+                                    printf(
+                                        /* translators: %s: link labelled "create an account" pointing to the registration page (HTML <a> wrapped). */
+                                        esc_html__('Use the email address you booked with to %s, and this booking — with its trip itinerary and any balance due — appears in My Account.', 'yatra'),
+                                        '<a href="' . esc_url(wp_registration_url()) . '">' . esc_html__('create an account', 'yatra') . '</a>'
+                                    );
+                                    ?>
+                                </p>
+                            <?php else : ?>
+                                <h4><?php esc_html_e('Keep Your Confirmation Email', 'yatra'); ?></h4>
+                                <p><?php esc_html_e('It carries your booking reference — quote it whenever you get in touch with us about this trip.', 'yatra'); ?></p>
+                            <?php endif; ?>
                         </div>
                     </div>
                     

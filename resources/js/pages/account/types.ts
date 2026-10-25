@@ -84,6 +84,7 @@ export interface CustomerProfile {
   phone?: string;
   address?: string;
   city?: string;
+  postal_code?: string;
   country?: string;
   /** Member since; API may send `created_at` only. */
   registered_at?: string;

@@ -87,6 +87,49 @@ class PaymentController extends BaseController
                 'permission_callback' => [$this, 'checkCanRefund'],
             ]
         ]);
+
+        // Note history. Reading needs only view rights; adding one is an
+        // ordinary record-keeping action, so it sits with edit rather than with
+        // the refund capability.
+        register_rest_route($this->namespace, '/payments/(?P<id>\d+)/notes', [
+            [
+                'methods' => 'GET',
+                'callback' => [$this, 'getPaymentNotes'],
+                'permission_callback' => [$this, 'checkCanView'],
+            ],
+            [
+                'methods' => 'POST',
+                'callback' => [$this, 'addPaymentNote'],
+                'permission_callback' => [$this, 'checkCanEdit'],
+            ],
+        ]);
+    }
+
+    /**
+     * GET /payments/{id}/notes — the payment's note history, oldest first.
+     */
+    public function getPaymentNotes(WP_REST_Request $request): WP_REST_Response
+    {
+        $paymentId = (int) $request->get_param('id');
+
+        return new WP_REST_Response([
+            'success' => true,
+            'data' => $this->paymentService->getPaymentNotes($paymentId),
+        ]);
+    }
+
+    /**
+     * POST /payments/{id}/notes — add a note without disturbing the ones already there.
+     */
+    public function addPaymentNote(WP_REST_Request $request): WP_REST_Response
+    {
+        $paymentId = (int) $request->get_param('id');
+        $params = (array) $request->get_json_params();
+        $note = (string) ($params['note'] ?? $request->get_param('note') ?? '');
+
+        $result = $this->paymentService->addPaymentNote($paymentId, $note);
+
+        return new WP_REST_Response($result, !empty($result['success']) ? 200 : 400);
     }
 
     /**
@@ -155,6 +198,7 @@ class PaymentController extends BaseController
         ];
 
         $result = $this->paymentService->getPayments($filters);
+        $result['data'] = $this->withBookingPaymentSchedule((array) $result['data']);
 
         return new WP_REST_Response([
             'data' => $result['data'],
@@ -163,6 +207,79 @@ class PaymentController extends BaseController
             'per_page' => $filters['per_page'],
             'total_pages' => ceil($result['total'] / $filters['per_page']),
         ], 200);
+    }
+
+    /**
+     * Attach each payment's booking balance and next due date to the row.
+     *
+     * The Payments screen could say what had been collected but never when the
+     * rest was expected, so an operator had to open each booking to find out.
+     * Core does not decide payment schedules — Yatra Pro's Scheduled Payments
+     * module does — so it asks and passes on whatever comes back. When Pro is
+     * absent, older, or the feature is off nothing answers, no `payment_schedule`
+     * key is added, and the payload is exactly what it has always been.
+     *
+     * The bookings behind the page are read in ONE query and the schedule is
+     * resolved once per booking, so several payments against the same booking do
+     * not each repeat the work.
+     *
+     * @param array<int, array<string, mixed>> $payments
+     * @return array<int, array<string, mixed>>
+     */
+    private function withBookingPaymentSchedule(array $payments): array
+    {
+        if ($payments === []) {
+            return $payments;
+        }
+
+        $bookingIds = [];
+        foreach ($payments as $payment) {
+            $bookingId = (int) ($payment['booking_id'] ?? 0);
+            if ($bookingId > 0) {
+                $bookingIds[$bookingId] = $bookingId;
+            }
+        }
+
+        if ($bookingIds === []) {
+            return $payments;
+        }
+
+        global $wpdb;
+        $table = \Yatra\Database\Tables\BookingsTable::getTableName();
+        $placeholders = implode(',', array_fill(0, count($bookingIds), '%d'));
+
+        $bookings = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT * FROM {$table} WHERE id IN ({$placeholders})",
+                array_values($bookingIds)
+            ),
+            OBJECT_K
+        );
+
+        if (!is_array($bookings) || $bookings === []) {
+            return $payments;
+        }
+
+        $schedules = [];
+        foreach ($bookings as $bookingId => $booking) {
+            $schedule = apply_filters('yatra_booking_payment_schedule', null, $booking);
+            if (is_array($schedule)) {
+                $schedules[(int) $bookingId] = $schedule;
+            }
+        }
+
+        if ($schedules === []) {
+            return $payments;
+        }
+
+        foreach ($payments as $index => $payment) {
+            $bookingId = (int) ($payment['booking_id'] ?? 0);
+            if (isset($schedules[$bookingId])) {
+                $payments[$index]['payment_schedule'] = $schedules[$bookingId];
+            }
+        }
+
+        return $payments;
     }
 
     /**

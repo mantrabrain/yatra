@@ -25,6 +25,40 @@ class CustomerRepository extends BaseRepository
     }
 
     /**
+     * A storable Y-m-d date of birth, or null when there isn't one.
+     *
+     * The column is a DATE, so anything unparseable has to become null rather
+     * than an empty string — MySQL would otherwise store 0000-00-00, which then
+     * reads as "set" and blocks the real value from ever filling in.
+     *
+     * @param mixed $value
+     */
+    private static function sanitizeDateOfBirth($value): ?string
+    {
+        $raw = trim((string) (is_scalar($value) ? $value : ''));
+
+        if ($raw === '' || $raw === '0000-00-00') {
+            return null;
+        }
+
+        $ts = strtotime($raw);
+
+        return $ts === false ? null : date('Y-m-d', $ts);
+    }
+
+    /**
+     * A value the gender enum will accept, or null.
+     *
+     * @param mixed $value
+     */
+    private static function sanitizeGender($value): ?string
+    {
+        $raw = strtolower(trim((string) (is_scalar($value) ? $value : '')));
+
+        return in_array($raw, ['male', 'female', 'other', 'prefer_not_to_say'], true) ? $raw : null;
+    }
+
+    /**
      * Find or create customer by email
      * 
      * @param array $data Customer data
@@ -142,10 +176,18 @@ class CustomerRepository extends BaseRepository
             'city' => sanitize_text_field($data['city'] ?? ''),
             'country' => sanitize_text_field($data['country'] ?? ''),
             'nationality' => sanitize_text_field($data['nationality'] ?? ''),
+            'date_of_birth' => self::sanitizeDateOfBirth($data['date_of_birth'] ?? ''),
+            'gender' => self::sanitizeGender($data['gender'] ?? ''),
             'newsletter_optin' => !empty($data['newsletter_optin']) ? 1 : 0,
             'source' => sanitize_text_field($data['source'] ?? 'booking'),
-            'total_bookings' => 1,
-            'total_spent' => (float) ($data['total_spent'] ?? 0),
+            // Booking statistics are DERIVED from the bookings table by
+            // recalculateStats(), never counted up by hand here. This method
+            // runs before the booking row exists (and also for a customer an
+            // operator adds by hand, who has no booking at all), so seeding a
+            // count of 1 here produced a phantom booking. CustomerStatsHooks
+            // recalculates the moment the booking is actually created.
+            'total_bookings' => 0,
+            'total_spent' => 0,
             'last_booking_date' => current_time('mysql'),
             'created_at' => current_time('mysql'),
             'updated_at' => current_time('mysql'),
@@ -186,11 +228,16 @@ class CustomerRepository extends BaseRepository
             return false;
         }
         
+        // No statistics arithmetic here. findOrCreate() is called twice for a
+        // single checkout — once by BookingSessionController (which carries the
+        // emergency contact and lead-traveller details) and once by
+        // BookingService::createBooking() — so a "+1" counted every booking
+        // twice, and nothing ever subtracted when a booking was cancelled or
+        // deleted. The counters are recalculated from the bookings table
+        // instead; see recalculateStats() and CustomerStatsHooks.
         $updateData = [
             'updated_at' => current_time('mysql'),
             'last_booking_date' => current_time('mysql'),
-            'total_bookings' => ((int) $current->total_bookings) + 1,
-            'total_spent' => ((float) $current->total_spent) + ((float) ($data['total_spent'] ?? 0)),
         ];
         
         // Update phone if provided and not set
@@ -216,6 +263,24 @@ class CustomerRepository extends BaseRepository
         // Update nationality if provided and not set
         if (!empty($data['nationality']) && empty($current->nationality)) {
             $updateData['nationality'] = sanitize_text_field($data['nationality']);
+        }
+
+        // Same rule for date of birth and gender: fill a blank, never overwrite.
+        // A customer who has curated their own profile keeps what they entered,
+        // while a profile that has never held these simply gains them from the
+        // booking instead of asking for them a second time.
+        if (empty($current->date_of_birth) || $current->date_of_birth === '0000-00-00') {
+            $dob = self::sanitizeDateOfBirth($data['date_of_birth'] ?? '');
+            if ($dob !== null) {
+                $updateData['date_of_birth'] = $dob;
+            }
+        }
+
+        if (empty($current->gender)) {
+            $gender = self::sanitizeGender($data['gender'] ?? '');
+            if ($gender !== null) {
+                $updateData['gender'] = $gender;
+            }
         }
         
         // Link WordPress user if not linked and provided
@@ -472,21 +537,30 @@ class CustomerRepository extends BaseRepository
     public function recalculateStats(int $customerId): bool
     {
         global $wpdb;
-        
+
+        if ($customerId <= 0) {
+            return false;
+        }
+
         $bookingRepository = new \Yatra\Repositories\BookingRepository();
         $bookingsTable = $bookingRepository->getTableName();
         $customersTable = $this->getTableName();
-        
-        // Get stats from bookings
+
+        // total_bookings counts EVERY booking the customer holds, because that
+        // is the list they see in My Account and the one on the customer screen
+        // — a cancelled booking is still a booking they made, and leaving it out
+        // made the "Total Bookings" figure disagree with the rows underneath it.
+        // The money and traveller totals keep ignoring cancelled/refunded/failed
+        // bookings: those never represent revenue or seats taken.
         $stats = $wpdb->get_row($wpdb->prepare(
             "SELECT 
                 COUNT(*) as total_bookings,
-                COALESCE(SUM(total_amount), 0) as total_spent,
-                COALESCE(SUM(travelers_count), 0) as total_travelers,
+                COALESCE(SUM(CASE WHEN status NOT IN ('cancelled', 'refunded', 'failed') THEN total_amount ELSE 0 END), 0) as total_spent,
+                COALESCE(SUM(CASE WHEN status NOT IN ('cancelled', 'refunded', 'failed') THEN travelers_count ELSE 0 END), 0) as total_travelers,
                 MAX(created_at) as last_booking_date,
                 MAX(travel_date) as last_travel_date
              FROM {$bookingsTable}
-             WHERE customer_id = %d AND status NOT IN ('cancelled', 'refunded', 'failed')",
+             WHERE customer_id = %d",
             $customerId
         ));
         

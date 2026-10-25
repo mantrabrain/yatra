@@ -961,14 +961,127 @@ class SEOService
      */
     private function generateCollectionPageSchema(array $baseSchema): array
     {
-        return array_merge($baseSchema, [
+        $schema = array_merge($baseSchema, [
             '@type' => 'CollectionPage',
-            'mainEntity' => [
-                '@type' => 'ItemList',
-                'numberOfItems' => 0, // This should be dynamically populated
-                'itemListElement' => []
-            ]
         ]);
+
+        // mainEntity lists exactly the cards rendered on this page (after
+        // filters, sorting and pagination). When nothing is rendered — or a
+        // theme template override didn't expose its rows — it is omitted
+        // rather than emitted as an empty ItemList.
+        $items = $this->collectCollectionPageItems();
+        if (!empty($items)) {
+            $schema['mainEntity'] = [
+                '@type' => 'ItemList',
+                'numberOfItems' => count($items),
+                'itemListElement' => $items,
+            ];
+        }
+
+        /**
+         * Filter the CollectionPage JSON-LD on Yatra archive/listing pages.
+         *
+         * Return the schema with `mainEntity` changed or unset to adjust only
+         * the item list; titles, meta, canonical and robots are unaffected.
+         *
+         * @param array  $schema   CollectionPage schema.
+         * @param string $pageType SEOService::PAGE_TYPE_* listing constant.
+         * @param array  $items    ListItem entries used for mainEntity.
+         */
+        $filtered = apply_filters('yatra_seo_collection_page_schema', $schema, $this->pageType, $items);
+
+        return \is_array($filtered) ? $filtered : $schema;
+    }
+
+    /**
+     * ListItem entries for the cards rendered on the current listing page.
+     *
+     * Reads the rows the listing request already loaded (no extra listing
+     * query); positions continue across pages (page 2 starts at per_page + 1).
+     */
+    private function collectCollectionPageItems(): array
+    {
+        $rows = [];
+        $offset = 0;
+        $permalinkFn = '';
+
+        switch ($this->pageType) {
+            case self::PAGE_TYPE_TRIP_ARCHIVE:
+                $ctx = $GLOBALS['yatra_trip_listing_context'] ?? null;
+                if (!\is_array($ctx) || empty($ctx['trips']) || !\is_array($ctx['trips'])) {
+                    return [];
+                }
+                $rows = $ctx['trips'];
+                $perPage = max(1, (int) ($ctx['results']['per_page'] ?? 1));
+                $offset = (max(1, (int) ($ctx['current_page'] ?? 1)) - 1) * $perPage;
+                $permalinkFn = 'yatra_get_trip_permalink';
+                break;
+
+            case self::PAGE_TYPE_DESTINATION_LISTING:
+            case self::PAGE_TYPE_ACTIVITY_LISTING:
+            case self::PAGE_TYPE_CATEGORY_LISTING:
+                $meta = $GLOBALS['yatra_archive_browse_pagination'] ?? null;
+                if (!\is_array($meta) || empty($meta['items']) || !\is_array($meta['items'])) {
+                    return [];
+                }
+                $rows = $meta['items'];
+                $offset = max(0, (int) ($meta['offset'] ?? 0));
+                $permalinkFn = [
+                    self::PAGE_TYPE_DESTINATION_LISTING => 'yatra_get_destination_permalink',
+                    self::PAGE_TYPE_ACTIVITY_LISTING => 'yatra_get_activity_permalink',
+                    self::PAGE_TYPE_CATEGORY_LISTING => 'yatra_get_category_permalink',
+                ][$this->pageType];
+                break;
+
+            default:
+                return [];
+        }
+
+        if (!\function_exists($permalinkFn)) {
+            return [];
+        }
+
+        $items = [];
+        $position = $offset;
+        foreach (array_values($rows) as $row) {
+            if (!\is_object($row)) {
+                continue;
+            }
+
+            // Same URL source as the rendered card (Trip model or the
+            // permalink helper called with the row id), so links match.
+            if ($row instanceof \Yatra\Models\Trip) {
+                $url = $row->getPermalink();
+                $name = $row->getTitle();
+            } elseif ($this->pageType === self::PAGE_TYPE_TRIP_ARCHIVE) {
+                $url = $permalinkFn($row);
+                $name = (string) ($row->title ?? '');
+            } else {
+                $url = $permalinkFn($row->id ?? $row);
+                $name = (string) ($row->name ?? '');
+            }
+
+            // esc_url_raw, not validateUrl(): JSON needs a literal "&" (not
+            // "&#038;"), and FILTER_VALIDATE_URL rejects non-ASCII slugs.
+            $url = esc_url_raw((string) $url, ['http', 'https']);
+            if ($url === '') {
+                continue;
+            }
+
+            $position++;
+            $item = [
+                '@type' => 'ListItem',
+                'position' => $position,
+                'url' => $url,
+            ];
+            $name = $this->sanitizeText($name);
+            if ($name !== '') {
+                $item['name'] = $name;
+            }
+            $items[] = $item;
+        }
+
+        return $items;
     }
 
     /**

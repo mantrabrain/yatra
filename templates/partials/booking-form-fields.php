@@ -222,7 +222,8 @@ function yatra_render_form_field($field, $prefix = '', $countries = [], $custom_
                 // when set, else a format hint matching flatpickr's Y-m-d output.
                 $date_placeholder = !empty($field['placeholder'])
                     ? yatra_translate_form_string($field['placeholder'])
-                    : 'YYYY-MM-DD';
+                    /* translators: date format hint shown in an empty date field — translate the letters to your locale's convention, e.g. JJJJ-MM-DD in Dutch, keeping the same four-two-two shape flatpickr produces. */
+                    : __('YYYY-MM-DD', 'yatra');
                 ?>
                 <input
                     type="date"

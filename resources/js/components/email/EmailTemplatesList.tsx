@@ -674,6 +674,26 @@ export const EmailTemplatesList: React.FC<EmailTemplatesListProps> = ({
                   {template.name}
                 </button>
               )}
+              {/* An older name for a template that is still in use handles the
+                  same event, so editing this one changes nothing until the other
+                  is switched off. Without saying so, the two are indistinguishable
+                  in this list. */}
+              {template.in_use === false && template.superseded_by && (
+                  <span
+                    className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200"
+                    title={sprintf(
+                      /* translators: %s: the template that handles this event instead. */
+                      __(
+                        "Not sent — \u201c%s\u201d handles this event. Switch that one off to use this wording instead.",
+                        "yatra",
+                      ),
+                      globalByKey.get(template.superseded_by)?.name ||
+                        template.superseded_by,
+                    )}
+                  >
+                    {__("Not in use", "yatra")}
+                  </span>
+                )}
               {template.overrides ? (
                 <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">
                   {__("Override", "yatra")}

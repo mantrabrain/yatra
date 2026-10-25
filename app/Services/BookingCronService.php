@@ -122,10 +122,15 @@ class BookingCronService
         // are the operator's local dates, so near midnight a UTC-derived target
         // picked the wrong day on any site with an offset.
         $target_date = date('Y-m-d', current_time('timestamp') + ($reminder_days * DAY_IN_SECONDS));
+        $today = date('Y-m-d', current_time('timestamp'));
 
         // Confirmed bookings — plus pending ones that have paid a deposit (see
-        // BookingRepository::getBookingsForReminder) — travelling on the target date
-        $bookings = $bookingRepository->getBookingsForReminder($target_date);
+        // BookingRepository::getBookingsForReminder) — travelling between today
+        // and the target date that have not had their reminder yet. Matching
+        // only the target date skipped every booking made (or confirmed)
+        // inside the window: booked 1 day before a 3-day reminder, it never
+        // got one.
+        $bookings = $bookingRepository->getBookingsForReminder($target_date, $today);
 
         if (empty($bookings)) {
             return;
@@ -133,8 +138,22 @@ class BookingCronService
 
         foreach ($bookings as $booking) {
             if (self::sendReminderEmail($booking)) {
-                $bookingRepository->markReminderSent($booking->id);
+                $bookingRepository->markReminderSent((int) $booking->id);
             }
+
+            /**
+             * A booking has reached its trip-reminder day.
+             *
+             * Fired whether or not the reminder email itself went out, because
+             * the moment is the same either way: this is the hook a
+             * pre-departure sequence starts from. Yatra Pro offers
+             * `reminder.trip` as a sequence trigger, and before this there was
+             * nothing to start it — the sequence sat enabled and never ran.
+             *
+             * @param int    $bookingId
+             * @param object $booking
+             */
+            do_action('yatra_trip_reminder_due', (int) $booking->id, $booking);
         }
 
         // Log the operation
@@ -254,10 +273,14 @@ class BookingCronService
 
     /**
      * Send a reminder email to the customer
+     *
+     * Shared by the daily sweep and the admin "Resend email → Trip reminder"
+     * action, so both send the same email. Returns false when nothing was sent
+     * (no address, or the reminder email is switched off).
      */
-    private static function sendReminderEmail(object $booking): bool
+    public static function sendReminderEmail(object $booking): bool
     {
-        $customer_email = $booking->contact_email;
+        $customer_email = $booking->contact_email ?? '';
 
         if (empty($customer_email)) {
             return false;
@@ -265,10 +288,19 @@ class BookingCronService
 
         $reminder_days = (int) SettingsService::get('booking_reminder_days', 3);
         $vars = TransactionalEmailTemplateService::variablesFromBooking($booking);
-        $vars['reminder_days'] = (string) $reminder_days;
-        $vars['days_until_trip'] = (string) $reminder_days;
+        // The real distance, in site-local days: a booking reminded late
+        // (booked inside the window) is fewer than reminder_days away.
+        $today = strtotime(date('Y-m-d', current_time('timestamp')));
+        $travel = strtotime(substr((string) ($booking->travel_date ?? ''), 0, 10));
+        $days_until = $travel ? max(0, (int) round(($travel - $today) / DAY_IN_SECONDS)) : $reminder_days;
+        $vars['days_until_trip'] = (string) $days_until;
+        // The default reminder reads "your departure is in {{reminder_days}}
+        // days", and templates already saved on sites keep that wording. On
+        // the usual reminder day both numbers are the same; on a late reminder
+        // the configured number would tell the guest the wrong date.
+        $vars['reminder_days'] = (string) min($reminder_days, $days_until);
 
-        $amount_due = (float) $booking->amount_due;
+        $amount_due = (float) ($booking->amount_due ?? 0);
         $extra = '';
         if ($amount_due > 0) {
             $extra = '<p><strong>' . esc_html__('Payment reminder', 'yatra') . '</strong></p>'

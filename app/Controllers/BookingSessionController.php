@@ -1591,8 +1591,47 @@ class BookingSessionController extends BaseController
         if ($payment_method === '') {
             $payment_method = 'full';
         }
-        $payment_gateway = strtolower(trim(sanitize_text_field($data['payment_gateway'] ?? 'pay_later')));
-        
+        $payment_gateway = strtolower(trim(sanitize_text_field($data['payment_gateway'] ?? '')));
+
+        // An absent or unknown gateway used to fall through to 'pay_later',
+        // which is an OFFLINE gateway — so a checkout that posted no payment
+        // method at all was quietly booked as "pay on arrival": no card, no
+        // charge, a confirmed-looking booking and a confirmation email. A card
+        // field left empty is the usual way to reach this, which is exactly how
+        // it was reported. Fall back to pay_later only where the operator
+        // actually offers it, and otherwise ask for a payment method rather
+        // than inventing one.
+        $gatewayError = null;
+
+        try {
+            $enabledGateways = \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance()->getEnabledGateways();
+        } catch (\Throwable $e) {
+            // Registry unavailable: keep the long-standing behaviour rather than
+            // blocking checkout on a diagnostic we cannot run.
+            $enabledGateways = [];
+        }
+
+        if ($enabledGateways !== []) {
+            if ($payment_gateway === '') {
+                $payment_gateway = isset($enabledGateways['pay_later']) ? 'pay_later' : '';
+                if ($payment_gateway === '') {
+                    $gatewayError = __('Please choose how you would like to pay.', 'yatra');
+                }
+            } elseif (!isset($enabledGateways[$payment_gateway])) {
+                $gatewayError = __('That payment method is not available. Please choose another.', 'yatra');
+            }
+        } elseif ($payment_gateway === '') {
+            $payment_gateway = 'pay_later';
+        }
+
+        if ($gatewayError !== null) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => $gatewayError,
+                'code' => 'invalid_payment_gateway',
+            ], 400);
+        }
+
         // Get coupon code from request OR session
         $coupon_code = sanitize_text_field($data['coupon_code'] ?? '');
         if (empty($coupon_code) && !empty($session['coupon']['code'])) {
@@ -1996,7 +2035,18 @@ class BookingSessionController extends BaseController
                 'phone' => $contact_data['phone'],
                 'address' => $contact_data['address'],
                 'country' => $contact_data['country'],
-                'nationality' => $contact_data['nationality'],
+                // Date of birth and nationality are collected from the LEAD
+                // TRAVELLER, not the contact section — a default form has no such
+                // contact fields, so reading them from $contact_data meant they
+                // were always blank and the customer was asked for them a second
+                // time on their profile. Index 0 is always the lead traveller.
+                // The repository only ever fills a blank, so a profile the
+                // customer has curated is never overwritten by a booking.
+                'nationality' => $contact_data['nationality'] !== ''
+                    ? $contact_data['nationality']
+                    : (string) ($sanitized_travelers[0]['nationality'] ?? ''),
+                'date_of_birth' => (string) ($sanitized_travelers[0]['date_of_birth'] ?? ''),
+                'gender' => (string) ($sanitized_travelers[0]['gender'] ?? ''),
                 'emergency_name' => $emergency_data['name'],
                 'emergency_phone' => $emergency_data['phone'],
                 'emergency_relationship' => $emergency_data['relationship'],
@@ -2122,24 +2172,67 @@ class BookingSessionController extends BaseController
             }
         }
 
-        try {
-            $booking = $booking_service->createBooking($booking_data);
-            // BookingService returns ['success'=>bool, 'booking_id'=>int, ...]
-            $booking_id = $booking['booking_id'] ?? $booking['id'] ?? null;
-            if (empty($booking['success'])) {
+        // Pressing Book Now twice used to mint a second booking and a second
+        // reference, because nothing here remembered the first one — and with the
+        // card step still ahead, an abandoned or declined attempt left that
+        // booking behind every time. An identical resubmit now resumes the
+        // booking it already created: same reference, no second row, no second
+        // email, and the payment step below runs again so the customer can retry
+        // the card against it.
+        $checkoutKey = $this->checkoutIdempotencyKey([
+            'token'     => (string) ($data['booking_token'] ?? ($_SESSION['yatra_booking_token'] ?? '')),
+            'session'   => (string) ($session['session_id'] ?? ''),
+            'email'     => (string) ($contact_data['email'] ?? ''),
+            'trip'      => (int) $trip_id,
+            'date'      => (string) $travel_date,
+            'travelers' => (int) $travelers_count,
+            'total'     => (string) $total_amount,
+            'method'    => (string) $payment_method,
+            'gateway'   => (string) $payment_gateway,
+            'waitlist'  => $isWaitlistCheckout ? 1 : 0,
+            // The details the customer typed. Included so that correcting any of
+            // them and resubmitting is a new submission rather than a silent
+            // no-op against the booking that still holds the old values. Hashed
+            // because only equality matters and the arrays are large.
+            'details'   => md5((string) wp_json_encode([
+                $contact_data,
+                $emergency_data,
+                $sanitized_travelers,
+            ])),
+        ]);
+
+        $resumedBooking = $this->resumableCheckoutBooking($checkoutKey);
+        $isResumedCheckout = $resumedBooking !== null;
+
+        if ($isResumedCheckout) {
+            $booking_id = (int) $resumedBooking->id;
+        } else {
+            try {
+                $booking = $booking_service->createBooking($booking_data);
+                // BookingService returns ['success'=>bool, 'booking_id'=>int, ...]
+                $booking_id = $booking['booking_id'] ?? $booking['id'] ?? null;
+                if (empty($booking['success'])) {
+                    return new WP_REST_Response([
+                        'success' => false,
+                        'message' => $booking['message'] ?? __('Failed to create booking. Please try again.', 'yatra'),
+                        'error'   => $booking['message'] ?? '',
+                        'errors'  => $booking['errors'] ?? null,
+                    ], 500);
+                }
+            } catch (\Exception $e) {
                 return new WP_REST_Response([
                     'success' => false,
-                    'message' => $booking['message'] ?? __('Failed to create booking. Please try again.', 'yatra'),
-                    'error'   => $booking['message'] ?? '',
-                    'errors'  => $booking['errors'] ?? null,
+                    'message' => __('Failed to create booking. Please try again.', 'yatra'),
+                    'error' => $e->getMessage(),
                 ], 500);
             }
-        } catch (\Exception $e) {
-            return new WP_REST_Response([
-                'success' => false,
-                'message' => __('Failed to create booking. Please try again.', 'yatra'),
-                'error' => $e->getMessage(),
-            ], 500);
+
+            if (!empty($booking_id) && $checkoutKey !== '') {
+                // Long enough to cover a customer going away to fix their card
+                // and coming back, short enough that a later, deliberate booking
+                // of the same trip is never absorbed into it.
+                set_transient($checkoutKey, (int) $booking_id, 30 * MINUTE_IN_SECONDS);
+            }
         }
 
         if (empty($booking_id)) {
@@ -2150,7 +2243,9 @@ class BookingSessionController extends BaseController
             ], 500);
         }
 
-        if ($isWaitlistCheckout && $resolvedAvailabilityForWaitlist) {
+        if (!$isResumedCheckout && $isWaitlistCheckout && $resolvedAvailabilityForWaitlist) {
+            // Counted against the booking, not the submission: a resumed
+            // checkout must not claim the waitlist seats a second time.
             \Yatra\Services\WaitlistService::incrementAvailabilityWaitlistCount(
                 (int) $resolvedAvailabilityForWaitlist->id,
                 $travelers_count
@@ -2201,22 +2296,27 @@ class BookingSessionController extends BaseController
         // ========================================
         // Each traveller is saved to yatra_booking_travellers table
         // Their dynamic fields are saved to yatra_booking_traveller_meta table
-        foreach ($sanitized_travelers as $index => $traveler_fields) {
-            // First traveller (index 0) is always the lead traveller
-            $is_lead = ($index === 0);
-            
-            // Create traveller record with all their fields stored in meta
-            $this->travellerRepository->create(
-                $booking_id,
-                $index,
-                $is_lead,
-                $traveler_fields
-            );
+        // Skipped on a resumed checkout: these rows were written on the first
+        // submission and the idempotency key covers the party, so re-inserting
+        // them would only duplicate the travellers.
+        if (!$isResumedCheckout) {
+            foreach ($sanitized_travelers as $index => $traveler_fields) {
+                // First traveller (index 0) is always the lead traveller
+                $is_lead = ($index === 0);
+
+                // Create traveller record with all their fields stored in meta
+                $this->travellerRepository->create(
+                    $booking_id,
+                    $index,
+                    $is_lead,
+                    $traveler_fields
+                );
+            }
         }
 
         if ($isWaitlistCheckout && $resolvedAvailabilityForWaitlist) {
             yatra_clear_booking_session();
-            if ($settings['booking_confirmation']) {
+            if (!$isResumedCheckout && $settings['booking_confirmation']) {
                 $booking_service->sendNewBookingTransactionalConfirmation((int) $booking_id);
             }
 
@@ -2276,6 +2376,14 @@ class BookingSessionController extends BaseController
         // click on the verify-email endpoint transitions the booking
         // to 'pending' and emits the payment-continuation URL.
         if ($needs_email_verification) {
+            // A resubmit resumes the same booking, so the link that was already
+            // emailed is still valid — but a customer who never received it must
+            // still be able to get another by submitting again. Throttle rather
+            // than suppress: one verification email per booking per few minutes,
+            // so pressing the button repeatedly sends one mail, not one each.
+            $verifyThrottleKey = 'yatra_verify_sent_' . (int) $booking_id;
+            $verifyAlreadySent = $isResumedCheckout && get_transient($verifyThrottleKey);
+
             $verify_url = \Yatra\Services\GuestVerificationTokenService::buildVerifyUrl(
                 (int) $booking_id,
                 (string) $contact_data['email']
@@ -2337,7 +2445,12 @@ class BookingSessionController extends BaseController
                 $email_vars
             )['subject'];
             $verificationEmailSent = false;
-            if (\Yatra\Services\TransactionalEmailTemplateService::templateRendersVerificationLink(
+            if ($verifyAlreadySent) {
+                // Throttled: the link from the first submission is still valid
+                // and still in their inbox. Treat it as sent so the fallback
+                // below does not mail a second copy either.
+                $verificationEmailSent = true;
+            } elseif (\Yatra\Services\TransactionalEmailTemplateService::templateRendersVerificationLink(
                 \Yatra\Services\TransactionalEmailTemplateService::TYPE_CUSTOMER_EMAIL_VERIFICATION
             )) {
                 $verificationEmailSent = \Yatra\Services\TransactionalEmailTemplateService::sendIfEnabled(
@@ -2357,6 +2470,10 @@ class BookingSessionController extends BaseController
                     (string) $contact_data['email'],
                     $email_vars
                 );
+            }
+
+            if (!$verifyAlreadySent) {
+                set_transient($verifyThrottleKey, 1, 5 * MINUTE_IN_SECONDS);
             }
 
             return new WP_REST_Response([
@@ -2397,7 +2514,12 @@ class BookingSessionController extends BaseController
             if ($payment_result['success']) {
                 // Handle redirect-based gateways (PayPal, eSewa, Khalti, etc.)
                 if (!empty($payment_result['payment_url'])) {
-                    if ($settings['booking_confirmation']) {
+                    // Payment has not happened yet — the customer is about to be
+                    // sent to the gateway. See shouldEmailWhilePaymentPending().
+                    if (!$isResumedCheckout
+                        && $settings['booking_confirmation']
+                        && $this->shouldEmailWhilePaymentPending()
+                    ) {
                         $booking_service->sendNewBookingTransactionalConfirmation((int) $booking_id);
                     }
                     return new WP_REST_Response([
@@ -2413,7 +2535,12 @@ class BookingSessionController extends BaseController
                 
                 // Handle client-side payment gateways (Stripe, Razorpay, Square, etc.)
                 if (!empty($payment_result['requires_action'])) {
-                    if ($settings['booking_confirmation']) {
+                    // The card is collected and confirmed in the browser AFTER
+                    // this response, so nothing has been paid at this point.
+                    if (!$isResumedCheckout
+                        && $settings['booking_confirmation']
+                        && $this->shouldEmailWhilePaymentPending()
+                    ) {
                         $booking_service->sendNewBookingTransactionalConfirmation((int) $booking_id);
                     }
                     return new WP_REST_Response([
@@ -2526,7 +2653,9 @@ class BookingSessionController extends BaseController
         // ========================================
         // SEND CONFIRMATION EMAIL
         // ========================================
-        if ($settings['booking_confirmation']) {
+        // Once per booking, not once per submit — a resumed checkout has already
+        // had whatever email its first submission was entitled to.
+        if (!$isResumedCheckout && $settings['booking_confirmation']) {
             $this->sendBookingConfirmationEmail($booking_id, $booking_reference, $trip, [
                 'contact' => $contact_data,
                 'emergency' => $emergency_data,
@@ -2571,6 +2700,122 @@ class BookingSessionController extends BaseController
     private function getConfirmationUrl(string $reference): string
     {
         return yatra_get_booking_confirmation_url($reference);
+    }
+
+    /**
+     * Cache key identifying one checkout submission, for duplicate absorption.
+     *
+     * Deliberately covers everything the customer could have changed — trip,
+     * date, party size, total, method, gateway, and the contact, emergency and
+     * traveller details they typed. The key therefore only repeats for a
+     * submission that is genuinely identical: press the button twice and the
+     * second press is absorbed, but correct a mistyped email and resubmit and you
+     * get a new booking carrying the correction, exactly as Yatra always did.
+     * Leaving the typed details out of the key would have silently thrown that
+     * correction away and handed back the booking with the wrong address on it.
+     *
+     * Scoped to the checkout session where there is one, and otherwise to the
+     * contact email, so two different customers can never collide.
+     *
+     * @return string '' when there is nothing stable to key on, which disables
+     *                duplicate absorption rather than guessing.
+     */
+    private function checkoutIdempotencyKey(array $parts): string
+    {
+        $scope = '';
+        foreach (['token', 'session', 'email'] as $candidate) {
+            $value = trim((string) ($parts[$candidate] ?? ''));
+            if ($value !== '') {
+                $scope = $candidate . ':' . $value;
+                break;
+            }
+        }
+
+        if ($scope === '') {
+            return '';
+        }
+
+        unset($parts['token'], $parts['session'], $parts['email']);
+        ksort($parts);
+
+        // 32 chars of md5 keeps this inside the 172-char option-name limit that
+        // applies to a transient on sites without an object cache.
+        return 'yatra_cko_' . md5($scope . '|' . wp_json_encode($parts));
+    }
+
+    /**
+     * The unpaid booking this submission already created, if it did.
+     *
+     * Only an unpaid booking that is still live is reusable. Once money has been
+     * recorded against it, or it has been cancelled, refunded, failed or
+     * completed, a repeat submission is a new booking and is treated as one.
+     *
+     * `confirmed` counts as reusable, which is not obvious: a pay-later booking
+     * is auto-confirmed at checkout by default, so excluding it would have let
+     * the very case this guard exists for -- pressing Book Now twice -- create a
+     * second booking anyway. The transient is written only by the checkout that
+     * created the booking and lives for 30 minutes, so a row reached through it
+     * is this customer's own in-flight checkout rather than anything an operator
+     * has since worked on.
+     */
+    private function resumableCheckoutBooking(string $key): ?object
+    {
+        if ($key === '') {
+            return null;
+        }
+
+        $bookingId = (int) get_transient($key);
+        if ($bookingId < 1) {
+            return null;
+        }
+
+        $booking = (new \Yatra\Repositories\BookingRepository())->find($bookingId);
+        if (!$booking) {
+            delete_transient($key);
+            return null;
+        }
+
+        $paid = (float) ($booking->amount_paid ?? 0) > 0
+            || (string) ($booking->payment_status ?? '') === 'paid';
+
+        $closed = in_array(
+            (string) ($booking->status ?? ''),
+            ['cancelled', 'refunded', 'failed', 'completed'],
+            true
+        );
+
+        if ($paid || $closed) {
+            delete_transient($key);
+            return null;
+        }
+
+        return $booking;
+    }
+
+    /**
+     * Should the customer be emailed while an online payment is still pending?
+     *
+     * The booking row and its reference are written before the card is charged,
+     * because a gateway needs a booking to charge against. That leaves a window
+     * in which the customer has a reference but has paid nothing, and until now
+     * they were always sent the full booking confirmation in it — so a submit
+     * with no card details produced a "confirmed" email for an unpaid booking,
+     * and every resubmit produced another one.
+     *
+     * `pending_payment_email` lets the operator choose. It defaults to
+     * 'confirmation', which is the long-standing behaviour, so an upgrade changes
+     * nothing until they say otherwise.
+     *
+     * Deliberately consulted only on the online-gateway paths: a pay-later or
+     * bank-transfer booking has no payment to wait for, and neither has a
+     * booking with a zero balance, so suppressing their confirmation would just
+     * lose a message the operator means to send.
+     */
+    private function shouldEmailWhilePaymentPending(): bool
+    {
+        $mode = (string) \Yatra\Services\SettingsService::get('pending_payment_email', 'confirmation');
+
+        return strtolower(trim($mode)) !== 'after_payment';
     }
 
     /**
@@ -3515,7 +3760,22 @@ echo esc_html(sprintf(__('Traveler %1$d: %2$s', 'yatra'), $i + 1, $traveler_name
         ?>
         <h3 style="font-size:16px;"><?php esc_html_e('What’s next?', 'yatra'); ?></h3>
         <ol style="padding-left:20px;">
-            <li><?php esc_html_e('You will receive a detailed trip itinerary within 24–48 hours.', 'yatra'); ?></li>
+            <?php
+            // This line used to promise "a detailed trip itinerary within 24-48
+            // hours". Nothing sends one: the booking, its itinerary and any
+            // balance due are in My Account, so point the customer there
+            // instead of leaving them waiting for an email.
+            ?>
+            <li>
+                <?php
+                printf(
+                    /* translators: %s: link labelled "My Account" pointing to the customer account page (HTML <a> wrapped). */
+                    esc_html__('Your booking details, trip itinerary and any balance due are in %s.', 'yatra'),
+                    '<a href="' . esc_url(home_url('/' . \Yatra\Services\SettingsService::getAccountBase())) . '">'
+                        . esc_html__('My Account', 'yatra') . '</a>'
+                );
+                ?>
+            </li>
             <li><?php esc_html_e('Our team will contact you to confirm any special requirements.', 'yatra'); ?></li>
             <li><?php esc_html_e('Please ensure travel documents meet entry requirements for your destination.', 'yatra'); ?></li>
         </ol>
@@ -3759,7 +4019,17 @@ echo esc_html(sprintf(__('Traveler %1$d: %2$s', 'yatra'), $i + 1, $traveler_name
             // checkout paths use. Only in this fresh-verify branch, so a re-clicked
             // link never re-sends. TYPE_BOOKING_CONFIRMATION is skipped by the Pro
             // booking.created fan-out, so this is the single source of the email.
-            if ((bool) \Yatra\Services\SettingsService::get('booking_confirmation', true)) {
+            // A verified guest whose online payment is still outstanding is in the
+            // same position as the checkout paths above: they have a reference and
+            // have paid nothing. Honour the operator's choice here too, but only
+            // when a payment really is pending — a pay-later or zero-balance
+            // booking has nothing to wait for and must still get its email.
+            $verifiedPaymentPending = !$this->isOfflineGateway((string) ($booking->payment_gateway ?? ''))
+                && (float) ($booking->amount_due ?? 0) > 0;
+
+            if ((bool) \Yatra\Services\SettingsService::get('booking_confirmation', true)
+                && (!$verifiedPaymentPending || $this->shouldEmailWhilePaymentPending())
+            ) {
                 try {
                     (new \Yatra\Services\BookingService())->sendNewBookingTransactionalConfirmation((int) $booking->id);
                 } catch (\Throwable $e) {

@@ -260,6 +260,33 @@ const GoogleCalendarIntegrationSection: React.FC<{
   const [connected, setConnected] = useState(
     formData.google_calendar_connected || gcSettings.connected || false,
   );
+  // Calendars the connected account can write to, for the picker. Stays empty
+  // (and the picker hidden) on a Yatra Pro without the listing endpoint, so
+  // the Calendar ID field below keeps working as before.
+  const [calendars, setCalendars] = useState<
+    Array<{ id: string; summary: string; primary?: boolean }>
+  >([]);
+
+  useEffect(() => {
+    if (!connected) {
+      setCalendars([]);
+      return;
+    }
+    let cancelled = false;
+    apiClient
+      .get("/google-calendar/calendars")
+      .then((response: any) => {
+        if (!cancelled && response?.success && Array.isArray(response.data)) {
+          setCalendars(response.data);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setCalendars([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [connected]);
   const [connecting, setConnecting] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [savingCalendar, setSavingCalendar] = useState(false);
@@ -416,7 +443,7 @@ const GoogleCalendarIntegrationSection: React.FC<{
         <CardContent className="space-y-4">
           <p className="text-sm text-gray-600 dark:text-gray-300">
             {__(
-              "Connect your Google Calendar to automatically sync bookings and departures. Events will be created for each booking with trip details, traveler information, and departure dates.",
+              "Connect your Google Calendar to sync your bookings automatically. Each booking gets an event with the trip, date and traveller details, or, with \"One event per departure\" turned on in the Google Calendar dashboard, each departure gets one event listing its bookings.",
               "yatra",
             )}
           </p>
@@ -569,6 +596,47 @@ const GoogleCalendarIntegrationSection: React.FC<{
                 <CheckCircle className="w-4 h-4" />
                 {__("Connected Calendar", "yatra")}
               </h4>
+              {calendars.length > 0 && (
+                <FormField
+                  id="gc_calendar_pick"
+                  label={__("Choose a calendar", "yatra")}
+                  description={__(
+                    "Calendars this Google account can add events to. Picking one fills in the Calendar ID below — then click Save Calendar. Run Resync Everything afterwards to move existing events to it.",
+                    "yatra",
+                  )}
+                >
+                  <Select
+                    id="gc_calendar_pick"
+                    value={
+                      calendars.some((c) => c.id === calendarId)
+                        ? calendarId
+                        : calendarId === "" || calendarId === "primary"
+                          ? calendars.find((c) => c.primary)?.id || ""
+                          : ""
+                    }
+                    onChange={(e) => {
+                      const picked = calendars.find(
+                        (c) => c.id === e.target.value,
+                      );
+                      if (picked) {
+                        setCalendarId(picked.id);
+                        setCalendarName(picked.summary || "");
+                      }
+                    }}
+                  >
+                    <option value="">
+                      {__("— Select a calendar —", "yatra")}
+                    </option>
+                    {calendars.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.primary
+                          ? sprintf(__("%s (primary)", "yatra"), c.summary || c.id)
+                          : c.summary || c.id}
+                      </option>
+                    ))}
+                  </Select>
+                </FormField>
+              )}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:items-end">
                 <FormField
                   id="gc_calendar_id"
@@ -827,6 +895,7 @@ interface SettingsData {
   booking_confirmation: boolean;
   auto_confirm_bookings: boolean;
   auto_confirm_mode: "none" | "online" | "all";
+  pending_payment_email: "confirmation" | "after_payment";
   require_login: boolean;
   allow_guest_checkout: boolean;
   require_guest_email_verification: boolean;
@@ -1754,6 +1823,7 @@ const Settings: React.FC = () => {
       booking_confirmation: true,
       auto_confirm_bookings: false,
       auto_confirm_mode: "online",
+      pending_payment_email: "confirmation",
       require_login: false,
       allow_guest_checkout: true,
       require_guest_email_verification: false,
@@ -5194,6 +5264,73 @@ const Settings: React.FC = () => {
                                   // Keep the legacy boolean in sync for any
                                   // external reader (all → true, otherwise false).
                                   auto_confirm_bookings: opt.value === "all",
+                                }
+                              : prev,
+                          )
+                        }
+                        className="mt-0.5 w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <div className="flex-1">
+                        <span className="font-medium text-sm">{opt.label}</span>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                          {opt.sub}
+                        </p>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                <div className="font-medium">
+                  {__("Email While Payment Is Pending", "yatra")}
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 mb-2">
+                  {__(
+                    "A booking and its reference are created before the card is charged, because the payment gateway needs a booking to charge against. This is what the customer is sent in that window. Pay-later, bank transfer and zero-balance bookings are unaffected \u2014 they have no payment to wait for.",
+                    "yatra",
+                  )}
+                </p>
+                <div role="radiogroup" className="flex flex-col gap-2">
+                  {[
+                    {
+                      value: "confirmation",
+                      label: __("Send the booking confirmation straight away", "yatra"),
+                      sub: __(
+                        "The customer is emailed as soon as the booking is created, before payment completes.",
+                        "yatra",
+                      ),
+                    },
+                    {
+                      value: "after_payment",
+                      label: __("Wait until the payment succeeds", "yatra"),
+                      sub: __(
+                        "Nothing is emailed while payment is outstanding, so an abandoned or failed card attempt never produces a confirmation.",
+                        "yatra",
+                      ),
+                    },
+                  ].map((opt) => (
+                    <label
+                      key={opt.value}
+                      htmlFor={`pending_payment_email_${opt.value}`}
+                      className="flex items-start gap-2 cursor-pointer"
+                    >
+                      <input
+                        type="radio"
+                        id={`pending_payment_email_${opt.value}`}
+                        name="pending_payment_email"
+                        value={opt.value}
+                        checked={
+                          (formData.pending_payment_email || "confirmation") ===
+                          opt.value
+                        }
+                        onChange={() =>
+                          setFormData((prev) =>
+                            prev
+                              ? {
+                                  ...prev,
+                                  pending_payment_email:
+                                    opt.value as SettingsData["pending_payment_email"],
                                 }
                               : prev,
                           )

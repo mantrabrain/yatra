@@ -365,14 +365,86 @@ class PaymentRepository extends BaseRepository
      */
     public function getTotalPaidForBooking(int $bookingId): float
     {
+        $totals = $this->getBookingPaymentTotals($bookingId);
+
+        // Never hand back a negative "amount paid": amount_due is derived from
+        // it as total - paid, so a negative would report MORE outstanding than
+        // the trip costs. getBookingPaymentTotals() keeps the unclamped figure
+        // for anyone who needs to see an over-refund.
+        return max(0.0, $totals['net']);
+    }
+
+    /**
+     * The payment ledger for one booking: what came in, what went back out, and
+     * the net of the two.
+     *
+     * Refunds exist in two shapes in the wild and this counts both exactly once.
+     *
+     * A refund recorded by {@see \Yatra\Services\PaymentService::processRefund()}
+     * writes a separate negative row of payment_type 'refund'. Older versions
+     * ALSO flipped the original payment to status 'refunded' — so the money was
+     * removed twice over: once by the negative row, and again because the
+     * original dropped out of a "status = completed" sum. A payment of 1000 with
+     * a 150 refund came out as -150 instead of 850, which then reported more
+     * outstanding than the booking's total and reset the payment status to
+     * pending.
+     *
+     * A payment an operator simply marked 'refunded' by hand has no negative row
+     * at all, and there the only record of the reversal IS that status — so it
+     * must stay out of the total. The two cases are told apart by whether the
+     * booking has any refund rows to do the subtracting.
+     *
+     * Known limit, on historical data only: refund rows carry no link to the
+     * payment they reverse, so a booking that has BOTH a hand-flipped payment
+     * (no refund row) and a separately recorded refund cannot be resolved from
+     * the aggregate — the hand-flipped amount is added back as though a refund
+     * row existed for it, and the net reads high by that amount. It errs
+     * towards showing money as still held rather than silently losing it, and
+     * the refund guard in PaymentService::processRefund() still prevents
+     * sending back more than came in. New data cannot reach this state: a
+     * refund is now always its own row and the original is never flipped.
+     *
+     * payment_type is a nullable column, and in SQL `NULL <> 'refund'` is NULL
+     * rather than true — so a row that predates the column being populated
+     * would drop out of the money-in total altogether and under-report what the
+     * customer had paid. COALESCE to the column's own default ('initial') keeps
+     * those rows counted, which is what the previous status-only sum did.
+     *
+     * @return array{successful: float, refunded: float, reversed: float, net: float}
+     *     reversed is the total on payments whose own status says refunded; it
+     *     lets a caller tell "nothing was ever paid" apart from "it was paid and
+     *     sent back" even where no refund row exists.
+     */
+    public function getBookingPaymentTotals(int $bookingId): array
+    {
         $table = $this->getTableName();
 
-        $result = $this->wpdb->get_var($this->wpdb->prepare(
-            "SELECT SUM(amount) FROM {$table} WHERE booking_id = %d AND status = 'completed'",
+        $row = $this->wpdb->get_row($this->wpdb->prepare(
+            "SELECT
+                COALESCE(SUM(CASE WHEN COALESCE(payment_type, 'initial') <> 'refund' AND status IN ('completed', 'paid') THEN amount ELSE 0 END), 0) AS settled,
+                COALESCE(SUM(CASE WHEN COALESCE(payment_type, 'initial') <> 'refund' AND status = 'refunded' THEN amount ELSE 0 END), 0) AS reversed,
+                COALESCE(SUM(CASE WHEN payment_type = 'refund' AND status IN ('completed', 'paid') THEN ABS(amount) ELSE 0 END), 0) AS refunded
+             FROM {$table}
+             WHERE booking_id = %d",
             $bookingId
         ));
 
-        return (float) ($result ?? 0);
+        $settled  = round((float) ($row->settled ?? 0), 2);
+        $reversed = round((float) ($row->reversed ?? 0), 2);
+        $refunded = round((float) ($row->refunded ?? 0), 2);
+
+        // The money on a flipped original did arrive; its matching refund row is
+        // what takes it back again. With no refund row on the booking there is
+        // nothing to take it back, so the status is the whole record and the
+        // amount stays excluded.
+        $successful = $refunded > 0 ? round($settled + $reversed, 2) : $settled;
+
+        return [
+            'successful' => $successful,
+            'refunded' => $refunded,
+            'reversed' => $reversed,
+            'net' => round($successful - $refunded, 2),
+        ];
     }
 
     /**

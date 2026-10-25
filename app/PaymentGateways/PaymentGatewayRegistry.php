@@ -302,9 +302,74 @@ class PaymentGatewayRegistry
         $config = $gateway->getConfig();
         $storedTitle = isset($config['title']) ? (string) $config['title'] : '';
 
-        return ($storedTitle !== '' && $storedTitle !== $gateway->getDefaultTitle())
+        return self::isOperatorLabel($gatewayId, 'title', $storedTitle, $gateway->getDefaultTitle())
             ? $storedTitle
             : $gateway->getTitle();
+    }
+
+    /**
+     * Labels that early installs wrote into `yatra_gateway_configs` as plain
+     * English literals.
+     *
+     * The installer seeded a title and description per gateway, and some of
+     * those seeds never matched the gateway class's own default — pay_later's
+     * description and Stripe's, for instance. A stored value that differs from
+     * the class default looks exactly like an operator customization, so the
+     * checkout preferred the seeded English string and the translated
+     * getTitle()/getDescription() were never reached: the payment section of
+     * the booking form stayed English however complete the translation was.
+     *
+     * Recognising the seeds here fixes existing sites without rewriting their
+     * stored settings, so an operator's genuine custom wording is still
+     * honoured and nothing is lost if they later clear it.
+     */
+    private const LEGACY_SEEDED_LABELS = [
+        'pay_later' => [
+            'title' => ['Book Now, Pay Later'],
+            'description' => ['Allow customers to reserve now and pay before the trip'],
+        ],
+        'stripe' => [
+            'title' => ['Stripe'],
+            'description' => ['Accept credit and debit cards'],
+        ],
+        'paypal' => [
+            'title' => ['PayPal'],
+            'description' => ['Accept PayPal payments'],
+        ],
+        'razorpay' => [
+            'title' => ['Razorpay'],
+            'description' => ['Accept payments via Razorpay'],
+        ],
+        'square' => [
+            'title' => ['Square'],
+            'description' => ['Accept payments via Square'],
+        ],
+        'authorize_net' => [
+            'title' => ['Authorize.net'],
+            'description' => ['Accept payments via Authorize.net'],
+        ],
+        'bank_transfer' => [
+            'title' => ['Bank Transfer'],
+            'description' => ['Accept manual bank transfer payments'],
+        ],
+    ];
+
+    /**
+     * Is this stored label the operator's own wording, rather than a default
+     * that was persisted on their behalf?
+     *
+     * Only an operator's own wording should win over the gateway's translatable
+     * getter — a persisted default must fall through so it can be translated.
+     *
+     * @param string $field 'title' or 'description'
+     */
+    private static function isOperatorLabel(string $gatewayId, string $field, string $stored, string $classDefault): bool
+    {
+        if ($stored === '' || $stored === $classDefault) {
+            return false;
+        }
+
+        return !in_array($stored, self::LEGACY_SEEDED_LABELS[$gatewayId][$field] ?? [], true);
     }
 
     /**
@@ -329,7 +394,7 @@ class PaymentGatewayRegistry
             $checkoutGateways[] = [
                 'id' => $id,
                 'title' => $this->resolveGatewayTitle($id),
-                'description' => ($storedDescription !== '' && $storedDescription !== $gateway->getDefaultDescription())
+                'description' => self::isOperatorLabel($id, 'description', $storedDescription, $gateway->getDefaultDescription())
                     ? $storedDescription
                     : $gateway->getDescription(),
                 'icon' => !empty($config['icon']) ? $config['icon'] : $gateway->getIcon(),

@@ -3,6 +3,8 @@
  * Uses global Yatra settings for consistent date/time formatting across all pages
  */
 
+import { __ } from "./i18n";
+
 // Supported PHP date formats:
 // 'Y-m-d'   -> 2025-12-15
 // 'm/d/Y'   -> 12/15/2025
@@ -45,6 +47,38 @@ export function getTimeFormat(): string {
     w?.yatraAccountPage?.time_format ||
     "H:i"
   );
+}
+
+/**
+ * First day of the week from WordPress (Settings → General → Week Starts On),
+ * as date-fns `weekStartsOn`: 0 = Sunday … 6 = Saturday. The frontend
+ * calendars already honour it; the admin calendars used to hardcode Sunday.
+ */
+export function getWeekStartsOn(): 0 | 1 | 2 | 3 | 4 | 5 | 6 {
+  const w = window as any;
+  const raw = w?.yatraAdmin?.startOfWeek ?? w?.yatraAccountPage?.startOfWeek;
+  const n = Number(raw);
+  if (raw === undefined || raw === null || raw === "" || !Number.isInteger(n) || n < 0 || n > 6) {
+    return 0; // no value from PHP: keep the previous Sunday-first layout
+  }
+  return n as 0 | 1 | 2 | 3 | 4 | 5 | 6;
+}
+
+/**
+ * Short weekday names for a calendar header, starting on getWeekStartsOn().
+ */
+export function getWeekdayLabels(): string[] {
+  const days = [
+    __("Sun", "yatra"),
+    __("Mon", "yatra"),
+    __("Tue", "yatra"),
+    __("Wed", "yatra"),
+    __("Thu", "yatra"),
+    __("Fri", "yatra"),
+    __("Sat", "yatra"),
+  ];
+  const start = getWeekStartsOn();
+  return [...days.slice(start), ...days.slice(0, start)];
 }
 
 /**

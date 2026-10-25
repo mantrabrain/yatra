@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "../lib/api-client";
 import { API_ENDPOINTS } from "../lib/api-endpoints";
 import { __ } from "../lib/i18n";
-import { toDateValue } from "../lib/dateFormat";
 import {
   LayoutDashboard,
   Calendar,
@@ -26,6 +25,7 @@ import type {
 import {
   formatDate,
   getYatraAccountPageGlobals,
+  isUpcomingBooking,
   phoneToTelHref,
   currency as formatAccountCurrency,
 } from "./account/utils";
@@ -440,8 +440,8 @@ const AccountPage: React.FC = () => {
     const outstanding = payments
       .filter((p: Payment) => p.status === "pending")
       .reduce((sum: number, payment: Payment) => sum + payment.amount, 0);
-    const upcoming = bookings.filter(
-      (b: Booking) => toDateValue(b.travel_date) > new Date(),
+    const upcoming = bookings.filter((b: Booking) =>
+      isUpcomingBooking(b),
     ).length;
 
     // Calculate from real data

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yatra\Services;
 
 use Yatra\Repositories\PaymentRepository;
+use Yatra\Repositories\PaymentNoteRepository;
 use Yatra\Repositories\BookingRepository;
 
 /**
@@ -18,11 +19,107 @@ class PaymentService
 {
     private PaymentRepository $paymentRepository;
     private BookingRepository $bookingRepository;
+    private PaymentNoteRepository $noteRepository;
 
     public function __construct()
     {
         $this->paymentRepository = new PaymentRepository();
         $this->bookingRepository = new BookingRepository();
+        $this->noteRepository = new PaymentNoteRepository();
+    }
+
+    /**
+     * A payment's note history, oldest first.
+     *
+     * The payments table's own single `notes` column is included as the first
+     * entry when it holds anything, so a note recorded before there was a
+     * history — including the reason stored against a refund — is not lost from
+     * the view. It is marked `legacy` because there is no author or timestamp
+     * for it: the column never recorded either.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function getPaymentNotes(int $paymentId): array
+    {
+        $payment = $this->paymentRepository->find($paymentId);
+
+        if (!$payment) {
+            return [];
+        }
+
+        $entries = [];
+        $legacy = trim((string) ($payment->notes ?? ''));
+
+        if ($legacy !== '') {
+            $entries[] = [
+                'id' => 0,
+                'note' => $legacy,
+                'author_id' => null,
+                'author_name' => '',
+                'created_at' => (string) ($payment->created_at ?? ''),
+                'legacy' => true,
+            ];
+        }
+
+        foreach ($this->noteRepository->findByPaymentId($paymentId) as $row) {
+            $entries[] = [
+                'id' => (int) $row->id,
+                'note' => (string) $row->note,
+                'author_id' => $row->author_id !== null ? (int) $row->author_id : null,
+                'author_name' => (string) ($row->author_name ?? ''),
+                'created_at' => (string) $row->created_at,
+                'legacy' => false,
+            ];
+        }
+
+        return $entries;
+    }
+
+    /**
+     * Add a note to a payment's history.
+     *
+     * Deliberately additive: the payment's own `notes` column is never
+     * rewritten, so nothing that was already recorded is overwritten or lost —
+     * which is the whole point of keeping a history rather than one field.
+     *
+     * @return array{success: bool, message: string, notes?: array<int, array<string, mixed>>}
+     */
+    public function addPaymentNote(int $paymentId, string $note): array
+    {
+        $note = trim($note);
+
+        if ($note === '') {
+            return ['success' => false, 'message' => __('Please write a note before saving.', 'yatra')];
+        }
+
+        $payment = $this->paymentRepository->find($paymentId);
+
+        if (!$payment) {
+            return ['success' => false, 'message' => __('Payment not found.', 'yatra')];
+        }
+
+        if (!$this->noteRepository->tableExists()) {
+            return [
+                'success' => false,
+                'message' => __('Payment notes are not available yet. Open any Yatra admin page once and try again.', 'yatra'),
+            ];
+        }
+
+        $noteId = $this->noteRepository->add(
+            $paymentId,
+            $note,
+            (int) ($payment->booking_id ?? 0)
+        );
+
+        if ($noteId <= 0) {
+            return ['success' => false, 'message' => __('Failed to save the note.', 'yatra')];
+        }
+
+        return [
+            'success' => true,
+            'message' => __('Note added.', 'yatra'),
+            'notes' => $this->getPaymentNotes($paymentId),
+        ];
     }
 
     /**
@@ -277,9 +374,11 @@ class PaymentService
             return ['success' => false, 'message' => __('Failed to update status.', 'yatra')];
         }
 
-        // Recalculate booking amount paid
-        $totalPaid = $this->paymentRepository->getTotalPaidForBooking((int) $payment->booking_id);
-        $this->bookingRepository->updateAmountPaid((int) $payment->booking_id, $totalPaid);
+        // Marking a payment refunded by hand reverses money just as a recorded
+        // refund does, so the booking's status has to follow — otherwise a fully
+        // reversed booking reads as 'pending', which is what a booking that
+        // never paid at all reads as.
+        $this->syncBookingPaymentState((int) $payment->booking_id);
 
         // "Mark as Completed" on a pending payment = the money arrived.
         if ($status === 'completed' && (string) ($payment->status ?? '') !== 'completed') {
@@ -366,10 +465,39 @@ class PaymentService
             return ['success' => false, 'message' => __('Only completed payments can be refunded.', 'yatra')];
         }
 
-        $refundAmount = $amount ?? (float) $payment->amount;
+        $refundAmount = round((float) ($amount ?? $payment->amount), 2);
 
-        if ($refundAmount > (float) $payment->amount) {
+        if ($refundAmount <= 0) {
+            return ['success' => false, 'message' => __('Refund amount must be greater than zero.', 'yatra')];
+        }
+
+        if ($refundAmount > round((float) $payment->amount, 2)) {
             return ['success' => false, 'message' => __('Refund amount exceeds payment amount.', 'yatra')];
+        }
+
+        // The original payment is no longer flipped to 'refunded' (see below),
+        // so "already refunded?" can no longer be inferred from its status.
+        // Guard on the booking's ledger instead: you can never send back more
+        // than came in, however the refunds are split across payments. Refund
+        // rows carry no link to the payment they reverse, so this is the
+        // strongest guarantee available — and it is the one that matters.
+        $totals = $this->paymentRepository->getBookingPaymentTotals((int) $payment->booking_id);
+        $refundable = round($totals['successful'] - $totals['refunded'], 2);
+
+        if ($refundAmount > $refundable) {
+            return [
+                'success' => false,
+                'message' => $refundable > 0
+                    ? sprintf(
+                        /* translators: %s: the largest amount still available to refund, already formatted with the site currency. */
+                        __('That is more than remains to be refunded on this booking (%s).', 'yatra'),
+                        \Yatra\Helpers\FormatHelper::formatPrice(
+                            $refundable,
+                            (string) ($payment->currency ?: \Yatra\Services\SettingsService::getCurrency())
+                        )
+                    )
+                    : __('Everything received on this booking has already been refunded.', 'yatra'),
+            ];
         }
 
         // Create refund record
@@ -387,18 +515,47 @@ class PaymentService
             return ['success' => false, 'message' => __('Failed to process refund.', 'yatra')];
         }
 
-        // Update original payment status
-        $this->paymentRepository->updateStatus($paymentId, 'refunded');
-
-        // Recalculate booking amount paid
-        $totalPaid = $this->paymentRepository->getTotalPaidForBooking((int) $payment->booking_id);
-        $this->bookingRepository->updateAmountPaid((int) $payment->booking_id, $totalPaid);
+        // The original payment deliberately keeps its 'completed' status. It did
+        // succeed, and the negative row above is the record of the money going
+        // back — flipping it as well removed the same money twice from every
+        // total derived from the ledger, and destroyed the only evidence of what
+        // had been successfully collected. Keeping both rows is also what lets
+        // "total received" and "total refunded" be reported separately, and lets
+        // a second partial refund be taken against the same payment.
+        $this->syncBookingPaymentState((int) $payment->booking_id);
 
         return [
             'success' => true,
             'refund_id' => $refundId,
             'message' => __('Refund processed successfully.', 'yatra'),
         ];
+    }
+
+    /**
+     * Push the booking's stored money columns back in step with its payment
+     * ledger: amount_paid, amount_due and payment_status.
+     *
+     * updateAmountPaid() alone decides the status from the amount only, which
+     * reads a fully refunded booking as 'pending' — indistinguishable from one
+     * that never paid. A booking whose money has been sent back is 'refunded'.
+     */
+    private function syncBookingPaymentState(int $bookingId): void
+    {
+        if ($bookingId <= 0) {
+            return;
+        }
+
+        $totals = $this->paymentRepository->getBookingPaymentTotals($bookingId);
+        $this->bookingRepository->updateAmountPaid($bookingId, max(0.0, $totals['net']));
+
+        // 'reversed' covers a payment an operator marked refunded by hand, which
+        // writes no refund row — without it such a booking reported 'pending',
+        // the same as one that never paid at all.
+        $wasReversed = $totals['refunded'] > 0 || ($totals['reversed'] ?? 0) > 0;
+
+        if ($wasReversed && $totals['net'] <= 0.009) {
+            $this->bookingRepository->update($bookingId, ['payment_status' => 'refunded']);
+        }
     }
 
     /**

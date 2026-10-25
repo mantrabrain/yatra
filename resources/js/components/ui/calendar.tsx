@@ -17,6 +17,7 @@ import {
   getYear,
   isToday,
 } from "date-fns";
+import { getWeekStartsOn, getWeekdayLabels } from "../../lib/dateFormat";
 
 export interface CalendarProps {
   selected?: Date;
@@ -83,8 +84,8 @@ export const Calendar: React.FC<CalendarProps> = ({
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
-  const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
-  const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
+  const calendarStart = startOfWeek(monthStart, { weekStartsOn: getWeekStartsOn() });
+  const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: getWeekStartsOn() });
   const days = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
 
   const isDateDisabled = (date: Date) => {
@@ -107,7 +108,7 @@ export const Calendar: React.FC<CalendarProps> = ({
     setCurrentMonth(addMonths(currentMonth, 1));
   };
 
-  const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const weekDays = getWeekdayLabels();
 
   return (
     <div className={`p-3 ${className}`}>

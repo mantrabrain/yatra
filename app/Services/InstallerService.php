@@ -71,54 +71,48 @@ class InstallerService
         $seed('yatra_payment_test_mode', true);
         $seed('yatra_auto_confirm_pay_later', true);
         $seed('yatra_partial_payment', false);
-        // Set gateway configs with proper structure - only enable pay_later by default
+        // Set gateway configs with proper structure - only enable pay_later by default.
+        // Deliberately no 'title'/'description' here. Each gateway class owns
+        // its own label and exposes it through a translatable getTitle() /
+        // getDescription(); seeding an English literal into the stored config
+        // made the checkout treat it as the operator's own wording, which shut
+        // the translated getter out and left the payment section of the booking
+        // form in English on translated sites. An absent label is an expected
+        // state — the gateways that were never seeded (Mollie, Paystack) have
+        // always worked this way.
         $gateway_configs = [
             'pay_later' => [
                 'enabled' => true,
-                'title' => 'Book Now, Pay Later',
-                'description' => 'Allow customers to reserve now and pay before the trip',
             ],
             // Explicitly disable all other gateways
             'stripe' => [
                 'enabled' => false,
-                'title' => 'Stripe',
-                'description' => 'Accept credit and debit cards',
                 'api_key' => '',
                 'api_secret' => '',
                 'webhook_secret' => '',
             ],
             'paypal' => [
                 'enabled' => false,
-                'title' => 'PayPal',
-                'description' => 'Accept PayPal payments',
                 'api_key' => '',
                 'api_secret' => '',
             ],
             'razorpay' => [
                 'enabled' => false,
-                'title' => 'Razorpay',
-                'description' => 'Accept payments via Razorpay',
                 'api_key' => '',
                 'api_secret' => '',
             ],
             'square' => [
                 'enabled' => false,
-                'title' => 'Square',
-                'description' => 'Accept payments via Square',
                 'api_key' => '',
                 'api_secret' => '',
             ],
             'authorize_net' => [
                 'enabled' => false,
-                'title' => 'Authorize.net',
-                'description' => 'Accept payments via Authorize.net',
                 'api_key' => '',
                 'api_secret' => '',
             ],
             'bank_transfer' => [
                 'enabled' => false,
-                'title' => 'Bank Transfer',
-                'description' => 'Accept manual bank transfer payments',
                 'api_key' => '',
                 'api_secret' => '',
             ]
@@ -241,6 +235,7 @@ class InstallerService
             \Yatra\Database\Tables\TripsTable::class,
             \Yatra\Database\Tables\BookingsTable::class,
             \Yatra\Database\Tables\BookingPaymentsTable::class,
+            \Yatra\Database\Tables\PaymentNotesTable::class,
             \Yatra\Database\Tables\CustomersTable::class,
             \Yatra\Database\Tables\BookingTravellersTable::class,
             \Yatra\Database\Tables\BookingTravellerMetaTable::class,
@@ -581,6 +576,215 @@ class InstallerService
         if ($columnExists) {
             update_option('yatra_trip_duration_hours_v1', '1', false);
         }
+    }
+
+    /**
+     * Create the payment-note history table on sites that already exist.
+     *
+     * Database::createTables() only runs on activation and on a version change,
+     * so a new table added without a version bump would never appear on an
+     * existing install and the note history would silently do nothing. Gated by
+     * its own option, and re-checked cheaply: dbDelta is only called when the
+     * table really is absent.
+     */
+    public static function maybeCreatePaymentNotesTable(): void
+    {
+        if (get_option('yatra_payment_notes_table_v1')) {
+            return;
+        }
+
+        $table = \Yatra\Database\Tables\PaymentNotesTable::getTableName();
+
+        if (self::databaseTableExists($table)) {
+            update_option('yatra_payment_notes_table_v1', '1');
+
+            return;
+        }
+
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+        dbDelta(\Yatra\Database\Tables\PaymentNotesTable::getSchema());
+
+        if (self::databaseTableExists($table)) {
+            update_option('yatra_payment_notes_table_v1', '1');
+
+            return;
+        }
+
+        // Leave the flag unset so the next admin pageview tries again rather
+        // than leaving the feature permanently broken on this site.
+        \Yatra\Utils\Logger::warning('Could not create the payment notes table', [
+            'table' => $table,
+        ]);
+    }
+
+    /**
+     * One-time: put the stored money columns back in step with the payment
+     * ledger on every booking that has a refund.
+     *
+     * Recording a refund used to flip the refunded payment to status 'refunded'
+     * as well as writing the negative refund row, so the same money came off
+     * the total twice: a 1000 payment with a 150 refund stored amount_paid as
+     * -150 instead of 850, amount_due as more than the trip costs, and reset
+     * payment_status to 'pending'. {@see \Yatra\Repositories\PaymentRepository::getBookingPaymentTotals()}
+     * now reads both shapes correctly; this rewrites the figures that were
+     * already stored wrong.
+     *
+     * Only bookings that actually have refund rows are touched, so a site that
+     * has never refunded anything is left completely alone.
+     */
+    public static function maybeRepairRefundedBookingTotals(): void
+    {
+        if (get_option('yatra_refund_totals_repair_v1')) {
+            return;
+        }
+
+        global $wpdb;
+
+        $bookingsTable = $wpdb->prefix . 'yatra_bookings';
+        $paymentsTable = $wpdb->prefix . 'yatra_booking_payments';
+
+        if (!self::databaseTableExists($bookingsTable) || !self::databaseTableExists($paymentsTable)) {
+            return;
+        }
+
+        // Resumable and bounded: a site with a long refund history must not do
+        // the whole table in one admin pageview, and a single unreadable
+        // booking must not be able to block the rest for good.
+        $batchSize = 200;
+        $cursor = (int) get_option('yatra_refund_totals_repair_cursor', 0);
+
+        $bookingIds = $wpdb->get_col($wpdb->prepare(
+            "SELECT DISTINCT booking_id
+               FROM {$paymentsTable}
+              WHERE payment_type = 'refund'
+                AND status IN ('completed', 'paid')
+                AND booking_id > %d
+              ORDER BY booking_id ASC
+              LIMIT %d",
+            $cursor,
+            $batchSize
+        ));
+
+        if ($wpdb->last_error !== '') {
+            \Yatra\Utils\Logger::warning('Refund totals repair could not list bookings', ['error' => $wpdb->last_error]);
+
+            return;
+        }
+
+        if (empty($bookingIds)) {
+            delete_option('yatra_refund_totals_repair_cursor');
+            update_option('yatra_refund_totals_repair_v1', '1');
+
+            return;
+        }
+
+        $paymentRepository = new \Yatra\Repositories\PaymentRepository();
+        $bookingRepository = new \Yatra\Repositories\BookingRepository();
+        $repaired = 0;
+
+        foreach ($bookingIds as $bookingId) {
+            $bookingId = (int) $bookingId;
+            if ($bookingId <= 0) {
+                continue;
+            }
+
+            try {
+                $totals = $paymentRepository->getBookingPaymentTotals($bookingId);
+                $bookingRepository->updateAmountPaid($bookingId, max(0.0, $totals['net']));
+
+                $wasReversed = $totals['refunded'] > 0 || ($totals['reversed'] ?? 0) > 0;
+
+                if ($wasReversed && $totals['net'] <= 0.009) {
+                    $bookingRepository->update($bookingId, ['payment_status' => 'refunded']);
+                }
+
+                $repaired++;
+            } catch (\Throwable $e) {
+                // Skip it and keep going. Stopping here would leave the cursor
+                // where it is and re-run this same batch on every admin
+                // pageview, for ever, without ever getting past the bad row.
+                \Yatra\Utils\Logger::warning('Refund totals repair skipped a booking', [
+                    'booking_id' => $bookingId,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
+            // Advance past this booking whether or not it could be repaired.
+            update_option('yatra_refund_totals_repair_cursor', $bookingId);
+        }
+
+        \Yatra\Utils\Logger::info('Refund totals repair batch done', [
+            'bookings' => $repaired,
+            'through_booking_id' => (int) end($bookingIds),
+        ]);
+
+        // A short batch means that was the last of them.
+        if (count($bookingIds) < $batchSize) {
+            delete_option('yatra_refund_totals_repair_cursor');
+            update_option('yatra_refund_totals_repair_v1', '1');
+        }
+    }
+
+    /**
+     * One-time: rebuild the booking statistics stored on customer rows.
+     *
+     * Those columns used to be incremented by hand on every
+     * CustomerRepository::findOrCreate() call. A single checkout calls it twice
+     * — once in BookingSessionController and once inside
+     * BookingService::createBooking() — so total_bookings came out at twice the
+     * real number, a customer added by hand started life with one phantom
+     * booking, and nothing ever subtracted when a booking was cancelled or
+     * deleted. New bookings now keep these columns derived
+     * ({@see \Yatra\Hooks\CustomerStatsHooks}); this repairs the figures that
+     * were already stored wrong.
+     *
+     * Set-based — one UPDATE for the whole table, no row loop — and gated by its
+     * own option so it costs a single preloaded option read afterwards.
+     */
+    public static function maybeRepairCustomerBookingStats(): void
+    {
+        if (get_option('yatra_customer_stats_repair_v1')) {
+            return;
+        }
+
+        global $wpdb;
+
+        $customersTable = $wpdb->prefix . 'yatra_customers';
+        $bookingsTable = $wpdb->prefix . 'yatra_bookings';
+
+        // A site mid-migration may not have both tables yet; try again next load.
+        if (!self::databaseTableExists($customersTable) || !self::databaseTableExists($bookingsTable)) {
+            return;
+        }
+
+        // Mirrors CustomerRepository::recalculateStats(): every booking counts
+        // towards total_bookings, while money and seats ignore the bookings that
+        // never represented either.
+        $result = $wpdb->query(
+            "UPDATE {$customersTable} c
+             LEFT JOIN (
+                SELECT customer_id,
+                       COUNT(*) AS cnt,
+                       COALESCE(SUM(CASE WHEN status NOT IN ('cancelled', 'refunded', 'failed') THEN total_amount ELSE 0 END), 0) AS spent,
+                       COALESCE(SUM(CASE WHEN status NOT IN ('cancelled', 'refunded', 'failed') THEN travelers_count ELSE 0 END), 0) AS travelers
+                  FROM {$bookingsTable}
+                 WHERE customer_id > 0
+                 GROUP BY customer_id
+             ) b ON b.customer_id = c.id
+                SET c.total_bookings  = COALESCE(b.cnt, 0),
+                    c.total_spent     = COALESCE(b.spent, 0),
+                    c.total_travelers = COALESCE(b.travelers, 0)"
+        );
+
+        if ($result === false) {
+            // Leave the flag unset so the next admin pageview retries rather
+            // than leaving the figures wrong for good.
+            \Yatra\Utils\Logger::warning('Customer booking-stats repair failed', ['error' => $wpdb->last_error]);
+
+            return;
+        }
+
+        update_option('yatra_customer_stats_repair_v1', '1');
     }
 
     /**

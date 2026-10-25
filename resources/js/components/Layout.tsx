@@ -37,6 +37,7 @@ import {
   BadgePercent,
   Plane,
   MessageSquare,
+  Cloud,
   MessageCircle,
   Network,
   Webhook,
@@ -44,7 +45,6 @@ import {
   Puzzle,
   ArrowLeft,
   Gift,
-  Loader2,
   RotateCcw,
   Sun,
   User,
@@ -87,19 +87,8 @@ import {
   type MenuOverrides,
 } from "../lib/sidebar-menu-defaults";
 import { MenuIcon } from "../lib/menu-icon";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "../components/ui/card";
+import { Card, CardContent } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
-import {
-  useModulesQuery,
-  useToggleModule,
-  type ModuleDefinition,
-} from "../hooks/useModules";
 import { isProPluginActive, isModuleActive } from "../lib/plugin-utils";
 import { navigateMenu } from "../hooks/useNavigate";
 import { canCap } from "../hooks/useCapabilities";
@@ -132,9 +121,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     }
   }, [darkMode]);
 
-  const [isModulesPanelOpen, setIsModulesPanelOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
-  const modulesPanelRef = useRef<HTMLDivElement | null>(null);
   const userDropdownRef = useRef<HTMLDivElement | null>(null);
 
   // License status state for real-time updates
@@ -155,24 +142,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       );
     },
   });
-  const { data: modulesData, isLoading: isLoadingModules } = useModulesQuery({
-    enabled: isModulesPanelOpen,
-  });
-  const toggleModuleMutation = useToggleModule();
-  // Ensure modulesData is always an array before slicing
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const safeModulesData = Array.isArray(modulesData) ? modulesData : [];
-  const modulesPreview = useMemo<ModuleDefinition[]>(
-    () => safeModulesData.slice(0, 3),
-    [safeModulesData],
-  );
-  const handleQuickToggle = (module: ModuleDefinition, enabled: boolean) => {
-    toggleModuleMutation.mutate({
-      slug: module.slug,
-      enabled,
-      name: module.name,
-    });
-  };
 
   // Track URL changes to update menu state
   const [urlKey, setUrlKey] = useState(0);
@@ -193,12 +162,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        modulesPanelRef.current &&
-        !modulesPanelRef.current.contains(event.target as Node)
-      ) {
-        setIsModulesPanelOpen(false);
-      }
       if (
         userDropdownRef.current &&
         !userDropdownRef.current.contains(event.target as Node)
@@ -271,22 +234,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       );
     };
   }, []);
-
-  useEffect(() => {
-    if (!isModulesPanelOpen) return;
-
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        modulesPanelRef.current &&
-        !modulesPanelRef.current.contains(event.target as Node)
-      ) {
-        setIsModulesPanelOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isModulesPanelOpen]);
 
   // Get current subpage and tab from URL
   const currentSubpage = useMemo(() => {
@@ -1274,6 +1221,24 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   </a>
                 )}
 
+                {/* Tourtify — the hosted (cloud) edition. A MantraBrain promo, so
+                    it is hidden together with Join Community on white-labelled
+                    dashboards. */}
+                {!uiChrome.hideJoinCommunity && (
+                  <a
+                    href="https://tourtify.com/?utm_source=yatra-plugin&utm_medium=admin-header&utm_campaign=yatra-cloud&utm_content=dashboard-header"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/40 ring-1 ring-blue-200 dark:ring-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-lg transition-colors"
+                  >
+                    <Cloud className="w-4 h-4 shrink-0" aria-hidden />
+                    {__("Cloud", "yatra")}
+                    <span className="rounded-full bg-blue-600 px-1.5 py-0.5 text-[10px] font-semibold uppercase leading-none tracking-wide text-white">
+                      {__("New", "yatra")}
+                    </span>
+                  </a>
+                )}
+
                 {!uiChrome.hideJoinCommunity && (
                   <a
                     href="https://www.facebook.com/groups/yatrawordpressplugin"
@@ -1326,138 +1291,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     <Wrench className="w-4 h-4" />
                     {__("Tools", "yatra")}
                   </Button>
-                </ConditionalRender>
-                <ConditionalRender capability="yatra_edit_trips">
-                  <div className="relative">
-                    <button
-                      onClick={() => setIsModulesPanelOpen((prev) => !prev)}
-                      className={`p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 ${isModulesPanelOpen ? "bg-gray-100 dark:bg-gray-700" : ""}`}
-                      aria-label={__("Toggle modules panel", "yatra")}
-                    >
-                      <Puzzle className="w-5 h-5" />
-                    </button>
-                    {isModulesPanelOpen && (
-                      <div
-                        ref={modulesPanelRef}
-                        className="absolute right-0 top-12 z-50 w-80"
-                      >
-                        <Card className="shadow-xl border border-gray-200 dark:border-gray-700">
-                          <CardHeader className="pb-3">
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <CardTitle className="text-base">
-                                  {__("Modules", "yatra")}
-                                </CardTitle>
-                                <CardDescription>
-                                  {__(
-                                    "Quickly enable or disable feature packs.",
-                                    "yatra",
-                                  )}
-                                </CardDescription>
-                              </div>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => {
-                                  setIsModulesPanelOpen(false);
-                                  navigateMenu("modules");
-                                }}
-                              >
-                                {__("Open", "yatra")}
-                              </Button>
-                            </div>
-                          </CardHeader>
-                          <CardContent className="space-y-3">
-                            {isLoadingModules && (
-                              <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm">
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                                {__("Loading modules…", "yatra")}
-                              </div>
-                            )}
-                            {!isLoadingModules &&
-                              modulesPreview.length === 0 && (
-                                <div className="text-sm text-gray-500 dark:text-gray-400">
-                                  {__("No modules found.", "yatra")}
-                                </div>
-                              )}
-                            {!isLoadingModules && modulesPreview.length > 0 && (
-                              <div className="space-y-3">
-                                {modulesPreview.map((module) => (
-                                  <div
-                                    key={module.slug}
-                                    className="flex items-center justify-between border border-gray-100 dark:border-gray-800 rounded-lg p-2"
-                                  >
-                                    <div>
-                                      <p className="text-sm font-medium text-gray-900 dark:text-white flex items-center gap-2">
-                                        {module.name}
-                                        {module.is_core && (
-                                          <Badge
-                                            variant="outline"
-                                            className="text-[10px]"
-                                          >
-                                            {__("Core", "yatra")}
-                                          </Badge>
-                                        )}
-                                      </p>
-                                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                                        {module.enabled
-                                          ? __("Enabled", "yatra")
-                                          : __("Disabled", "yatra")}
-                                      </p>
-                                    </div>
-                                    <button
-                                      onClick={() =>
-                                        handleQuickToggle(
-                                          module,
-                                          !module.enabled,
-                                        )
-                                      }
-                                      disabled={
-                                        module.is_core ||
-                                        toggleModuleMutation.isPending
-                                      }
-                                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-                                        module.enabled
-                                          ? "bg-blue-600"
-                                          : "bg-gray-300 dark:bg-gray-600"
-                                      } ${module.is_core ? "opacity-60 cursor-not-allowed" : "cursor-pointer"}`}
-                                      aria-pressed={module.enabled}
-                                      aria-label={
-                                        module.enabled
-                                          ? __("Disable module", "yatra")
-                                          : __("Enable module", "yatra")
-                                      }
-                                    >
-                                      <span
-                                        className={`inline-block h-5 w-5 transform rounded-full bg-white transition ${
-                                          module.enabled
-                                            ? "translate-x-5"
-                                            : "translate-x-1"
-                                        }`}
-                                      />
-                                    </button>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                            <div className="pt-2">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="w-full"
-                                onClick={() => {
-                                  setIsModulesPanelOpen(false);
-                                  navigateMenu("modules");
-                                }}
-                              >
-                                {__("Manage all modules", "yatra")}
-                              </Button>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </div>
-                    )}
-                  </div>
                 </ConditionalRender>
                 <button
                   onClick={() => {

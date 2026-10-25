@@ -63,6 +63,18 @@ class SettingsController extends BaseController
         // no stored mode resolve on the fly via yatra_get_auto_confirm_mode()
         // (legacy true->all, false->online), preserving their prior behaviour.
         'auto_confirm_mode' => 'online',
+        // Which customer email goes out at checkout when an online payment is
+        // still outstanding. The booking row and its reference exist before the
+        // card is charged (the gateway needs a booking to charge against), so
+        // this decides what the customer is told in that window.
+        //   'confirmation'  - send the booking confirmation straight away.
+        //   'after_payment' - send nothing until the payment succeeds.
+        // Defaults to 'confirmation', which is what every existing site already
+        // does, so an upgrade changes nothing until the operator chooses.
+        // Only applies to an online gateway with a balance outstanding: a
+        // pay-later or bank-transfer booking has no payment to wait for, and
+        // neither does a booking with nothing left to pay.
+        'pending_payment_email' => 'confirmation',
         'auto_confirm_pay_later' => true,
         'require_login' => false,
         'allow_guest_checkout' => true,
@@ -132,6 +144,10 @@ class SettingsController extends BaseController
         // Separate part-payment email. Off by default so existing sites keep
         // sending the single payment template for every payment.
         'email_template_partial_payment' => false,
+        // Off by default: a site that has not asked for a separate
+        // "cancelled by us" email keeps sending the single cancellation email
+        // it always sent. See TransactionalEmailTemplateService::TYPE_BOOKING_CANCELLATION_BY_OPERATOR.
+        'email_template_cancellation_by_operator' => false,
         'email_template_cancellation' => true,
         'email_template_reminder' => true,
         'email_template_admin_new_booking' => true,
@@ -1007,6 +1023,11 @@ class SettingsController extends BaseController
                 $allowed = ['none', 'online', 'all'];
                 $v = is_string($value) ? strtolower(trim($value)) : '';
                 return in_array($v, $allowed, true) ? $v : 'online';
+            }
+            if ($key === 'pending_payment_email') {
+                $allowed = ['confirmation', 'after_payment'];
+                $v = is_string($value) ? strtolower(trim($value)) : '';
+                return in_array($v, $allowed, true) ? $v : 'confirmation';
             }
             if (is_string($key) && strpos($key, 'email_tpl_') === 0 && substr($key, -5) === '_body') {
                 return wp_kses_post((string) $value);

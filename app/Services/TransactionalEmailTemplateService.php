@@ -25,6 +25,25 @@ class TransactionalEmailTemplateService
 
     public const TYPE_BOOKING_CANCELLATION = 'booking_cancellation';
 
+    /**
+     * Customer-facing cancellation wording for a booking the OPERATOR cancelled,
+     * as opposed to one cancelled by the customer or by the unpaid-booking
+     * expiry job.
+     *
+     * Yatra has only ever had one customer cancellation email, so the same
+     * wording went out whoever ended the booking — an operator cancelling a trip
+     * still told the customer their own cancellation had been received.
+     * `bookings.cancelled_by` has always recorded who did it; this is what finally
+     * uses it.
+     *
+     * Opt-in, exactly like TYPE_PARTIAL_PAYMENT_RECEIVED: until an operator
+     * switches it on, every cancellation keeps using TYPE_BOOKING_CANCELLATION
+     * as before, so no existing site starts sending wording nobody has reviewed.
+     * When it is switched on but has nothing to send, the send falls back to the
+     * ordinary cancellation email rather than going silent.
+     */
+    public const TYPE_BOOKING_CANCELLATION_BY_OPERATOR = 'booking_cancellation_by_operator';
+
     public const TYPE_BOOKING_REMINDER = 'booking_reminder';
 
     public const TYPE_ADMIN_NEW_BOOKING = 'admin_new_booking';
@@ -93,6 +112,7 @@ class TransactionalEmailTemplateService
             'payment_received' => self::TYPE_PAYMENT_CONFIRMATION,
             'partial_payment_received' => self::TYPE_PARTIAL_PAYMENT_RECEIVED,
             'booking_cancelled' => self::TYPE_BOOKING_CANCELLATION,
+            'booking_cancelled_by_operator' => self::TYPE_BOOKING_CANCELLATION_BY_OPERATOR,
             'trip_reminder' => self::TYPE_BOOKING_REMINDER,
             'admin_new_booking' => self::TYPE_ADMIN_NEW_BOOKING,
             'admin_payment_received' => self::TYPE_ADMIN_PAYMENT_RECEIVED,
@@ -193,7 +213,10 @@ class TransactionalEmailTemplateService
 
         return [
             'subject' => $subject,
-            'body' => $body,
+            // Drop any detail row whose merge tag resolved to nothing — most
+            // visibly a Transaction ID on a manually recorded payment, which
+            // otherwise arrives as a labelled blank.
+            'body' => EmailTemplateLayout::dropUnfilledRows($body),
         ];
     }
 
@@ -268,6 +291,11 @@ class TransactionalEmailTemplateService
                 'flag' => 'email_template_cancellation',
                 'subject' => 'email_tpl_cancellation_subject',
                 'body' => 'email_tpl_cancellation_body',
+            ],
+            self::TYPE_BOOKING_CANCELLATION_BY_OPERATOR => [
+                'flag' => 'email_template_cancellation_by_operator',
+                'subject' => 'email_tpl_cancellation_by_operator_subject',
+                'body' => 'email_tpl_cancellation_by_operator_body',
             ],
             self::TYPE_BOOKING_REMINDER => [
                 'flag' => 'email_template_reminder',
@@ -830,6 +858,11 @@ class TransactionalEmailTemplateService
                 return sprintf(__('💳 [%1$s] Part payment received · %2$s', 'yatra'), $site, $ref);
 
             case self::TYPE_BOOKING_CANCELLATION:
+            // The operator-initiated variant has no separate built-in wording:
+            // unless the operator writes their own, it reads exactly like the
+            // ordinary cancellation email. Switching it on can therefore never
+            // produce a blank or half-built message.
+            case self::TYPE_BOOKING_CANCELLATION_BY_OPERATOR:
                 /* translators: 1: site name, 2: booking reference. */
                 return sprintf(__('📋 [%1$s] Booking cancelled · %2$s', 'yatra'), $site, $ref);
 
@@ -969,6 +1002,11 @@ class TransactionalEmailTemplateService
                 return EmailTemplateDefaults::fallbackTransactionalPartialPayment($v);
 
             case self::TYPE_BOOKING_CANCELLATION:
+            // The operator-initiated variant has no separate built-in wording:
+            // unless the operator writes their own, it reads exactly like the
+            // ordinary cancellation email. Switching it on can therefore never
+            // produce a blank or half-built message.
+            case self::TYPE_BOOKING_CANCELLATION_BY_OPERATOR:
                 return EmailTemplateDefaults::fallbackTransactionalCancellation($v);
 
             case self::TYPE_BOOKING_REMINDER:

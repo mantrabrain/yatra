@@ -80,6 +80,7 @@ export const API_ENDPOINTS = {
   PAYMENTS_STATS: "/payments/stats",
   PAYMENT_GET: (id: string | number) => `/payments/${id}`,
   PAYMENT_DELETE: (id: string | number) => `/payments/${id}`,
+  PAYMENT_NOTES: (id: string | number) => `/payments/${id}/notes`,
 
   // Usage tracking (opt-in telemetry)
   USAGE_TRACKING_STATUS: "/usage-tracking/status",

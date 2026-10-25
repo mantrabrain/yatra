@@ -10,6 +10,8 @@ declare global {
       pluginUrl?: string;
       currency: string;
       currencyPosition: string;
+      /** WordPress "Week Starts On": 0 = Sunday … 6 = Saturday. */
+      startOfWeek?: number;
       currencyDecimals: number;
       thousandSeparator: string;
       decimalSeparator: string;

@@ -1,5 +1,5 @@
-import { j as jsxRuntimeExports, q as Calendar, k as FileText, b as Plane, au as ArrowRight, s as MapPin, J as User, z as ChevronRight, S as Sparkles, h as Package, i as CreditCard, bC as LifeBuoy, bh as Bell, aA as AlertCircle, aE as CheckCircle2, as as Clock, X as ExternalLink, U as Users, d as Mail, a_ as Phone, aX as Download, r as reactExports, a6 as React, u as useQuery, aw as CheckCircle, at as DollarSign, aR as Eye, v as useQueryClient, aK as PenSquare, b9 as XCircle, bD as ShieldCheck, bi as Heart, t as LayoutDashboard, bE as LogOut, bz as QueryClient, bA as client, bB as QueryClientProvider } from "./react-vendor-CithbthY.js";
-import { f as formatYatraMoney, _ as __, p as parseDate, e as formatDate$1, k as applyCurrencyPosition, s as sprintf, t as toDateValue, a as apiClient, A as API_ENDPOINTS, u as useToast, S as SearchableSelect, l as getCountrySelectOptions, i as getCountryName$1, T as ToastProvider, E as ErrorBoundary } from "./index-Dec_weLB.js";
+import { j as jsxRuntimeExports, q as Calendar, k as FileText, b as Plane, au as ArrowRight, s as MapPin, J as User, z as ChevronRight, S as Sparkles, h as Package, i as CreditCard, bE as LifeBuoy, bj as Bell, aA as AlertCircle, aF as CheckCircle2, as as Clock, X as ExternalLink, U as Users, d as Mail, a$ as Phone, aY as Download, r as reactExports, a6 as React, w as useQuery, aw as CheckCircle, at as DollarSign, aS as Eye, u as useQueryClient, aL as PenSquare, ba as XCircle, bF as ShieldCheck, bk as Heart, t as LayoutDashboard, bG as LogOut, bB as QueryClient, bC as client, bD as QueryClientProvider } from "./react-vendor-W-_yntDU.js";
+import { t as toDateValue, f as formatYatraMoney, _ as __, p as parseDate, e as formatDate$1, o as applyCurrencyPosition, s as sprintf, a as apiClient, A as API_ENDPOINTS, u as useToast, S as SearchableSelect, q as getCountrySelectOptions, l as getCountryName$1, T as ToastProvider, E as ErrorBoundary } from "./index-Dc5uh_w8.js";
 function toBrowserLocaleTag(locale) {
   const raw = String(locale || "").trim();
   if (!raw) return void 0;
@@ -205,6 +205,19 @@ function phoneToTelHref(phone) {
   const compact = t.replace(/[^\d+]/g, "");
   return compact ? `tel:${compact}` : `tel:${encodeURIComponent(t)}`;
 }
+const CLOSED_BOOKING_STATUSES = ["cancelled", "refunded", "failed"];
+function isUpcomingBooking(booking) {
+  const status = String(booking.booking_status ?? booking.status ?? "").trim().toLowerCase();
+  if (CLOSED_BOOKING_STATUSES.includes(status)) {
+    return false;
+  }
+  if (!booking.travel_date) {
+    return false;
+  }
+  const startOfToday = /* @__PURE__ */ new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+  return toDateValue(booking.travel_date) >= startOfToday;
+}
 const Dashboard = ({
   bookings,
   payments,
@@ -219,7 +232,7 @@ const Dashboard = ({
   var _a;
   const conciergeTel = phoneToTelHref(conciergePhone);
   const conciergeMail = String(conciergeEmail || "").trim();
-  const upcomingBookings = bookings.filter((b) => toDateValue(b.travel_date) > /* @__PURE__ */ new Date()).length > 0 ? bookings.filter((b) => toDateValue(b.travel_date) > /* @__PURE__ */ new Date()).slice(0, 3) : bookings.filter((b) => toDateValue(b.travel_date) > /* @__PURE__ */ new Date()).slice(0, 3);
+  const upcomingBookings = bookings.filter(isUpcomingBooking).slice(0, 3);
   const recentBookings = bookings.length > 0 ? bookings.slice(0, 2) : [];
   const pendingPayments = payments.filter((p) => p.status === "pending").length > 0 ? payments.filter((p) => p.status === "pending").slice(0, 2) : [];
   const displayNotifications = notifications;
@@ -1067,7 +1080,7 @@ const BookingDetails = ({
   isLoading,
   onBack
 }) => {
-  var _a;
+  var _a, _b, _c, _d;
   if (isLoading) {
     return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
@@ -1593,7 +1606,52 @@ const BookingDetails = ({
                 booking.amount_due,
                 booking.currency
               ) })
+            ] }),
+            ((_b = booking.payment_schedule) == null ? void 0 : _b.next_due_date) && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: booking.payment_schedule.is_overdue ? __("Payment Overdue", "yatra") : __("Next Payment Due", "yatra") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "div",
+                {
+                  className: `text-sm font-semibold ${booking.payment_schedule.is_overdue ? "text-red-600 dark:text-red-400" : "text-gray-900 dark:text-white"}`,
+                  children: formatDate(booking.payment_schedule.next_due_date)
+                }
+              ),
+              booking.payment_schedule.next_amount !== null && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: formatPriceForBooking(
+                booking.payment_schedule.next_amount,
+                booking.payment_schedule.currency || booking.currency
+              ) })
             ] })
+          ] }),
+          (((_d = (_c = booking.payment_schedule) == null ? void 0 : _c.installments) == null ? void 0 : _d.length) ?? 0) > 1 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-5 pt-5 border-t border-gray-100 dark:border-gray-700", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2", children: __("Payment Schedule", "yatra") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { className: "divide-y divide-gray-100 dark:divide-gray-700", children: booking.payment_schedule.installments.map((item, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "li",
+              {
+                className: "flex items-center justify-between py-2 text-sm",
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-gray-600 dark:text-gray-300", children: [
+                    item.number !== null ? sprintf(
+                      /* translators: %d: instalment number. */
+                      __("Instalment %d", "yatra"),
+                      item.number
+                    ) : __("Balance", "yatra"),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-400 dark:text-gray-500 ml-2", children: formatDate(item.due_date) })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-gray-900 dark:text-white font-medium", children: [
+                    formatPriceForBooking(
+                      item.amount,
+                      booking.payment_schedule.currency || booking.currency
+                    ),
+                    item.status === "paid" && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-green-600 dark:text-green-400 ml-2 text-xs", children: __("Paid", "yatra") })
+                  ] })
+                ]
+              },
+              `${item.due_date}-${index}`
+            )) }),
+            booking.payment_schedule.source === "projected" && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-2", children: __(
+              "Expected dates based on the payment terms for this booking.",
+              "yatra"
+            ) })
           ] })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6", children: [
@@ -1700,12 +1758,7 @@ const Bookings = ({
   const displayBookings = bookings;
   let filteredDisplayBookings = displayBookings;
   if (bookingFilter === "upcoming") {
-    const today = /* @__PURE__ */ new Date();
-    today.setHours(0, 0, 0, 0);
-    filteredDisplayBookings = filteredDisplayBookings.filter((b) => {
-      const travelDate = toDateValue(b.travel_date);
-      return travelDate >= today;
-    });
+    filteredDisplayBookings = filteredDisplayBookings.filter(isUpcomingBooking);
   } else if (bookingFilter === "pending") {
     filteredDisplayBookings = filteredDisplayBookings.filter(
       (b) => b.payment_status === "pending" || b.booking_status === "pending"
@@ -1723,9 +1776,7 @@ const Bookings = ({
   }
   const bookingStats = {
     total: displayBookings.length,
-    upcoming: displayBookings.filter(
-      (b) => toDateValue(b.travel_date) >= /* @__PURE__ */ new Date()
-    ).length,
+    upcoming: displayBookings.filter(isUpcomingBooking).length,
     pending: displayBookings.filter(
       (b) => b.payment_status === "pending" || b.booking_status === "pending"
     ).length,
@@ -2424,6 +2475,7 @@ const Profile = ({
     phone: "",
     address: "",
     city: "",
+    postal_code: "",
     country: ""
   });
   const [isChangingPassword, setIsChangingPassword] = reactExports.useState(false);
@@ -2440,6 +2492,7 @@ const Profile = ({
         phone: profile.phone || "",
         address: profile.address || "",
         city: profile.city || "",
+        postal_code: profile.postal_code || "",
         country: profile.country || ""
       });
     }
@@ -2464,6 +2517,7 @@ const Profile = ({
         phone: formData.phone,
         address: formData.address,
         city: formData.city,
+        postal_code: formData.postal_code,
         country: formData.country
       };
       if (lastName) {
@@ -2582,6 +2636,7 @@ const Profile = ({
         phone: profile.phone || "",
         address: profile.address || "",
         city: profile.city || "",
+        postal_code: profile.postal_code || "",
         country: profile.country || ""
       });
     }
@@ -2721,6 +2776,19 @@ const Profile = ({
               placeholder: __("Enter your city", "yatra")
             }
           ) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white py-2", children: formData.city || __("Not set", "yatra") })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-profile-field", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: __("Postal Code", "yatra") }),
+          isEditing ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "text",
+              value: formData.postal_code,
+              onChange: (e) => handleInputChange("postal_code", e.target.value),
+              className: "w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 text-sm focus:ring-2 focus:ring-yatra-primary focus:border-transparent",
+              placeholder: __("Enter your postal code", "yatra")
+            }
+          ) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900 dark:text-white py-2", children: formData.postal_code || __("Not set", "yatra") })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-profile-field md:col-span-2", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: __("Address", "yatra") }),
@@ -3342,7 +3410,7 @@ const AccountPage = () => {
   const stats = reactExports.useMemo(() => {
     const outstanding = payments.filter((p) => p.status === "pending").reduce((sum, payment) => sum + payment.amount, 0);
     const upcoming = bookings.filter(
-      (b) => toDateValue(b.travel_date) > /* @__PURE__ */ new Date()
+      (b) => isUpcomingBooking(b)
     ).length;
     const totalSpent = (displayProfile == null ? void 0 : displayProfile.total_spent) ?? 0;
     const totalBookings = bookings.length;

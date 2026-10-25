@@ -152,6 +152,10 @@ class SettingsService
         // exactly as before. Only meaningful when deposits / partial payments
         // are enabled.
         'email_template_partial_payment' => false,
+        // Off by default: a site that has not asked for a separate
+        // "cancelled by us" email keeps sending the single cancellation email
+        // it always sent. See TransactionalEmailTemplateService::TYPE_BOOKING_CANCELLATION_BY_OPERATOR.
+        'email_template_cancellation_by_operator' => false,
         'email_template_cancellation' => true,
         'email_template_reminder' => true,
         'email_template_admin_new_booking' => true,

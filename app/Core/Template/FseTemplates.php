@@ -325,11 +325,23 @@ final class FseTemplates
         }
 
         $post = self::findCustomisedTemplatePost($slug);
-        if ($post === null) {
-            return null;
+        $content = $post !== null ? (string) $post->post_content : '';
+
+        // Nothing saved in the database. Before giving up, ask the active theme
+        // whether it ships a template file for this screen.
+        //
+        // Themes built around Yatra want to own the composition of a trip page
+        // or a checkout — reassurance under the itinerary, nothing to click
+        // away to beside a payment form — the same way a theme ships templates
+        // for a shop. The virtual templates were already offered to the editor,
+        // so such a theme's file appeared in the template list and could be
+        // edited, and then was ignored at render time because only a database
+        // customisation was ever read back. An operator's own saved edit still
+        // wins; this is the fallback beneath it.
+        if ($content === '') {
+            $content = self::themeFileTemplateContent($slug);
         }
 
-        $content = (string) $post->post_content;
         if ($content === '') {
             return null;
         }
@@ -341,6 +353,28 @@ final class FseTemplates
 
         $canvas = ABSPATH . WPINC . '/template-canvas.php';
         return is_readable($canvas) ? $canvas : null;
+    }
+
+    /**
+     * Content of a template file the active theme ships for this slug, or ''.
+     *
+     * Only the theme's own file is accepted: get_block_template() would happily
+     * return the virtual template this class registers, and using that here
+     * would be circular.
+     */
+    private static function themeFileTemplateContent(string $slug): string
+    {
+        if (!function_exists('get_block_template') || !function_exists('get_stylesheet')) {
+            return '';
+        }
+
+        $template = get_block_template(get_stylesheet() . '//' . $slug, 'wp_template');
+
+        if (!$template || ($template->source ?? '') !== 'theme') {
+            return '';
+        }
+
+        return (string) ($template->content ?? '');
     }
 
     /**

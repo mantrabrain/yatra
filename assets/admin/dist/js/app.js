@@ -1,9 +1,9 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-DEQpXvzy.js","../../../dist/js/react-vendor-CithbthY.js","../css/react-vendor.css","../../../dist/js/index-Dec_weLB.js","../css/index.css","../../../dist/js/BuildItineraryModal-CzFq1WTm.js","../../../dist/js/ProFeature-DE6oH70S.js","../../../dist/js/Settings-NDffCp8Q.js","../../../dist/js/Team-M9W1qR00.js","../../../dist/js/Reports-JeXttK0I.js","../../../dist/js/DiscountForm-DYxWHwCn.js","../../../dist/js/ApplicableTripSelector-BZ25j59n.js","../../../dist/js/Itinerary-C1e5Vxj0.js","../../../dist/js/RecurringRuleForm-fKEgpUir.js","./Whatsapp.js","../../../dist/js/module-skeleton-CpoAoviJ.js","../../../dist/js/ChannelManager-DZ64KNZZ.js","../../../dist/js/Webhooks-Cb89OgkB.js","../../../dist/js/ScheduledPayments-BnLNP2BI.js","../../../dist/js/TripConsentForm-C4az7Muo.js","../../../dist/js/BookingForm-hQVneAfI.js","../../../dist/js/ViewBooking-CgYCok3W.js","../../../dist/js/AvailabilityForm-D4S_wB_o.js","../../../dist/js/DynamicPricing-CBtPFtKK.js","../../../dist/js/RuleTypeSelectionModal-_WAr6JyA.js","../../../dist/js/toggle-CKa3ExrH.js","../../../dist/js/DynamicPricingRuleForm-C99aT0Zu.js","../../../dist/js/AiAssistant-Bu_zHUnt.js","../../../dist/js/AbandonedRecovery-BHbQat9C.js","../../../dist/js/WhiteLabel-DsK2IbJo.js"])))=>i.map(i=>d[i]);
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-CXNZs7SO.js","../../../dist/js/react-vendor-W-_yntDU.js","../css/react-vendor.css","../../../dist/js/index-Dc5uh_w8.js","../css/index.css","../../../dist/js/BuildItineraryModal-Bom09KmZ.js","../../../dist/js/ProFeature-iDhjjtAN.js","../../../dist/js/Settings-DpAuooiC.js","../../../dist/js/Team-DlPqu238.js","../../../dist/js/Reports-CfQKXt4i.js","../../../dist/js/DiscountForm-DFtlsNgW.js","../../../dist/js/ApplicableTripSelector-CDyBQsOu.js","../../../dist/js/Itinerary-BwsITON1.js","../../../dist/js/RecurringRuleForm-eQImFFYR.js","./Whatsapp.js","../../../dist/js/module-skeleton-C9FJOcwf.js","../../../dist/js/ChannelManager-DlNjafR6.js","../../../dist/js/Webhooks-BN_RkSiY.js","../../../dist/js/ScheduledPayments-4M-CGDAZ.js","../../../dist/js/TripConsentForm-DI15hclH.js","../../../dist/js/BookingForm-4QBN8wvc.js","../../../dist/js/ViewBooking-Bet5Mx8f.js","../../../dist/js/AvailabilityForm-5ESr8y4b.js","../../../dist/js/DynamicPricing-DfI92xWO.js","../../../dist/js/RuleTypeSelectionModal-BDVc3z6q.js","../../../dist/js/toggle-DcgGKLMp.js","../../../dist/js/DynamicPricingRuleForm-fU9UAUc1.js","../../../dist/js/AiAssistant-CYBX-WDR.js","../../../dist/js/AbandonedRecovery-DYXhry-Z.js","../../../dist/js/WhiteLabel-DmxhqdnP.js"])))=>i.map(i=>d[i]);
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key2, value) => key2 in obj ? __defProp(obj, key2, { enumerable: true, configurable: true, writable: true, value }) : obj[key2] = value;
 var __publicField = (obj, key2, value) => __defNormalProp(obj, typeof key2 !== "symbol" ? key2 + "" : key2, value);
-import { r as reactExports, j as jsxRuntimeExports, W as Wrench, N as Network, M as MessageCircle, S as Sparkles, R as RotateCcw, P as Puzzle, a as MessageSquare, b as Plane, B as BadgePercent, c as Route, F as FileSignature, K as Key, d as Mail, C as Crown, A as Activity, L as List, T as TrendingUp, e as Tag, f as FolderTree, U as Users, g as CircleUser, h as Package, i as CreditCard, k as FileText, l as Settings$1, m as BarChart3, n as Star, o as CalendarDays, p as CalendarClock, q as Calendar$1, s as MapPin, t as LayoutDashboard, u as useQuery, v as useQueryClient, w as useMutation, Z as Zap, x as Webhook, y as ChevronDown, z as ChevronRight, D as ArrowLeft, G as Gift, E as Loader2, H as Sun, I as Moon, J as User, O as RefreshCw, Q as Inbox, V as AlertTriangle, X as ExternalLink, Y as isObjectLike_1, _ as _baseGetTag, $ as isArray_1, a0 as _MapCache, a1 as getDefaultExportFromCjs, a2 as _Symbol, a3 as isObject$5, a4 as isFunction, a5 as reactIsExports, a6 as React, a7 as _Stack, a8 as _baseIsEqual, a9 as isObject_1, aa as keys_1, ab as isLength_1, ac as _isIndex, ad as isArguments_1, ae as _Set, af as _setToArray, ag as _SetCache, ah as _cacheHas, ai as _arrayPush, aj as isArrayLike_1, ak as _baseUnary, al as _getNative, am as eq_1, an as _root, ao as isEqual, ap as Animate, aq as _overArg, ar as _arraySome, as as Clock, at as DollarSign, au as ArrowRight, av as Shield, aw as CheckCircle, ax as Plus, ay as X, az as reactDomExports, aA as AlertCircle, aB as Check, aC as Wand2, aD as ChevronLeft, aE as CheckCircle2, aF as HelpCircle, aG as Info, aH as Copy, aI as MoreVertical, aJ as Columns, aK as PenSquare, aL as ArrowUp, aM as ArrowDown, aN as Archive, aO as Trash2, aP as Search, aQ as ArrowUpDown, aR as Eye, aS as Upload, aT as Image, aU as ReactQuill, aV as Pen, aW as Save, aX as Download, aY as CircleDollarSign, aZ as Undo2, a_ as Phone, a$ as PauseCircle, b0 as ShieldX, b1 as ShieldOff, b2 as Globe, b3 as Award, b4 as Database, b5 as Folder, b6 as Mountain, b7 as UserCheck, b8 as Server, b9 as XCircle, ba as Video, bb as Lock, bc as GripVertical, bd as ChevronUp, be as Play, bf as ClipboardCopy, bg as Ban, bh as Bell, bi as Heart, bj as Scissors, bk as Send, bl as Filter, bm as ArrowUpRight, bn as ClipboardCheck, bo as PenTool, bp as Camera, bq as BarChart$1, br as Megaphone, bs as Compass, bt as GitBranch, bu as Pause, bv as Settings2, bw as Code, bx as Bug, by as EyeOff, bz as QueryClient, bA as client, bB as QueryClientProvider } from "../../../dist/js/react-vendor-CithbthY.js";
-import { a as apiClient, A as API_ENDPOINTS, u as useToast, _ as __, b as apiService, n as normalizeCurrencyPosition, t as toDateValue, f as formatYatraMoney, r as readYatraCurrencyPositionFromWindow, s as sprintf, c as brandName, d as formatDateForInput, I as Input, e as formatDate$1, g as todayYmd, S as SearchableSelect, h as getCurrencySymbol, i as getCountryName, j as ajaxService, T as ToastProvider, E as ErrorBoundary } from "../../../dist/js/index-Dec_weLB.js";
+import { r as reactExports, j as jsxRuntimeExports, W as Wrench, N as Network, M as MessageCircle, S as Sparkles, R as RotateCcw, P as Puzzle, a as MessageSquare, b as Plane, B as BadgePercent, c as Route, F as FileSignature, K as Key, d as Mail, C as Crown, A as Activity, L as List, T as TrendingUp, e as Tag, f as FolderTree, U as Users, g as CircleUser, h as Package, i as CreditCard, k as FileText, l as Settings$1, m as BarChart3, n as Star, o as CalendarDays, p as CalendarClock, q as Calendar$1, s as MapPin, t as LayoutDashboard, u as useQueryClient, v as useMutation, w as useQuery, Z as Zap, x as Webhook, y as ChevronDown, z as ChevronRight, D as ArrowLeft, G as Gift, E as Cloud, H as Sun, I as Moon, J as User, O as RefreshCw, Q as Inbox, V as AlertTriangle, X as ExternalLink, Y as isObjectLike_1, _ as _baseGetTag, $ as isArray_1, a0 as _MapCache, a1 as getDefaultExportFromCjs, a2 as _Symbol, a3 as isObject$5, a4 as isFunction, a5 as reactIsExports, a6 as React, a7 as _Stack, a8 as _baseIsEqual, a9 as isObject_1, aa as keys_1, ab as isLength_1, ac as _isIndex, ad as isArguments_1, ae as _Set, af as _setToArray, ag as _SetCache, ah as _cacheHas, ai as _arrayPush, aj as isArrayLike_1, ak as _baseUnary, al as _getNative, am as eq_1, an as _root, ao as isEqual, ap as Animate, aq as _overArg, ar as _arraySome, as as Clock, at as DollarSign, au as ArrowRight, av as Shield, aw as CheckCircle, ax as Plus, ay as X, az as reactDomExports, aA as AlertCircle, aB as Loader2, aC as Check, aD as Wand2, aE as ChevronLeft, aF as CheckCircle2, aG as HelpCircle, aH as Info, aI as Copy, aJ as MoreVertical, aK as Columns, aL as PenSquare, aM as ArrowUp, aN as ArrowDown, aO as Archive, aP as Trash2, aQ as Search, aR as ArrowUpDown, aS as Eye, aT as Upload, aU as Image, aV as ReactQuill, aW as Pen, aX as Save, aY as Download, aZ as CircleDollarSign, a_ as Undo2, a$ as Phone, b0 as PauseCircle, b1 as ShieldX, b2 as ShieldOff, b3 as Globe, b4 as Award, b5 as Database, b6 as Folder, b7 as Mountain, b8 as UserCheck, b9 as Server, ba as XCircle, bb as Video, bc as Lock, bd as GripVertical, be as ChevronUp, bf as Play, bg as ClipboardCopy, bh as StickyNote, bi as Ban, bj as Bell, bk as Heart, bl as Scissors, bm as Send, bn as Filter, bo as ArrowUpRight, bp as ClipboardCheck, bq as PenTool, br as Camera, bs as BarChart$1, bt as Megaphone, bu as Compass, bv as GitBranch, bw as Pause, bx as Settings2, by as Code, bz as Bug, bA as EyeOff, bB as QueryClient, bC as client, bD as QueryClientProvider } from "../../../dist/js/react-vendor-W-_yntDU.js";
+import { a as apiClient, A as API_ENDPOINTS, b as apiService, _ as __, u as useToast, n as normalizeCurrencyPosition, t as toDateValue, f as formatYatraMoney, r as readYatraCurrencyPositionFromWindow, s as sprintf, c as brandName, d as formatDateForInput, I as Input, e as formatDate$1, g as getWeekStartsOn, h as getWeekdayLabels, i as todayYmd, S as SearchableSelect, j as getCurrencySymbol, k as formatDateTime, l as getCountryName, m as ajaxService, T as ToastProvider, E as ErrorBoundary } from "../../../dist/js/index-Dc5uh_w8.js";
 const scriptRel = "modulepreload";
 const assetsURL = function(dep, importerUrl) {
   return new URL(dep, importerUrl).href;
@@ -3697,245 +3697,6 @@ const Badge = reactExports.forwardRef(
   }
 );
 Badge.displayName = "Badge";
-const fetchModules = async () => {
-  const response = await apiClient.get("/modules");
-  if (Array.isArray(response)) {
-    return response;
-  }
-  if (Array.isArray(response == null ? void 0 : response.data)) {
-    return response.data;
-  }
-  return [];
-};
-const useModulesQuery = (options2) => {
-  return useQuery({
-    queryKey: ["modules"],
-    queryFn: fetchModules,
-    staleTime: 0,
-    ...options2
-  });
-};
-const formatNamesList = (names) => {
-  if (names.length <= 2) {
-    return names.join(", ");
-  }
-  return `${names.slice(0, 2).join(", ")} ${__("and", "yatra")} ${names.length - 2} ${__("more", "yatra")}`;
-};
-const useToggleModule = () => {
-  const queryClient2 = useQueryClient();
-  const { showToast } = useToast();
-  return useMutation({
-    mutationFn: async ({ slug, enabled }) => {
-      const response = await apiClient.post(
-        `/modules/${slug}/toggle`,
-        { enabled }
-      );
-      return Array.isArray(response == null ? void 0 : response.data) ? response.data : [];
-    },
-    onSuccess: (data, variables) => {
-      queryClient2.setQueryData(["modules"], data);
-      if (window.yatraAdmin) {
-        const enabledModules = data.filter((m) => m.enabled);
-        window.yatraAdmin.emailAutomationEnabled = enabledModules.some(
-          (m) => m.slug === "email_automation" || m.slug === "email-automation"
-        );
-        window.yatraAdmin.tripConsentEnabled = enabledModules.some(
-          (m) => m.slug === "trip_consent" || m.slug === "trip-consent"
-        );
-        window.yatraAdmin.additionalServicesEnabled = enabledModules.some(
-          (m) => m.slug === "additional_services" || m.slug === "additional-services"
-        );
-        window.yatraAdmin.abandonedBookingRecoveryEnabled = enabledModules.some(
-          (m) => m.slug === "abandoned_booking_recovery" || m.slug === "abandoned-booking-recovery"
-        );
-        window.yatraAdmin.dynamicPricingEnabled = enabledModules.some(
-          (m) => m.slug === "dynamic_pricing" || m.slug === "dynamic-pricing"
-        );
-        window.yatraAdmin.flexiblePaymentsEnabled = enabledModules.some(
-          (m) => m.slug === "flexible_payments"
-        );
-        window.yatraAdmin.dynamicFormFieldEnabled = enabledModules.some(
-          (m) => m.slug === "dynamic_form_field"
-        );
-        window.yatraAdmin.customLandingPagesModuleEnabled = enabledModules.some(
-          (m) => m.slug === "custom_landing_pages"
-        );
-        window.yatraAdmin.showGoogleCalendarSettingsUI = enabledModules.some(
-          (m) => m.slug === "google_calendar" || m.slug === "google-calendar"
-        );
-        window.yatraAdmin.advancedDiscountEnabled = enabledModules.some(
-          (m) => m.slug === "advanced_discount" || m.slug === "advanced-discount"
-        );
-        window.yatraAdmin.aiAssistantEnabled = enabledModules.some(
-          (m) => m.slug === "ai_assistant" || m.slug === "ai-assistant"
-        );
-        window.yatraAdmin.whiteLabelEnabled = enabledModules.some(
-          (m) => m.slug === "white_label" || m.slug === "white-label"
-        );
-        window.yatraAdmin.whatsappEnabled = enabledModules.some(
-          (m) => m.slug === "whatsapp"
-        );
-        window.yatraAdmin.channelManagerEnabled = enabledModules.some(
-          (m) => m.slug === "channel_manager" || m.slug === "channel-manager"
-        );
-        window.yatraAdmin.webhooksEnabled = enabledModules.some(
-          (m) => m.slug === "webhooks"
-        );
-        window.yatraAdmin.scheduledPaymentsEnabled = enabledModules.some(
-          (m) => m.slug === "scheduled_payments" || m.slug === "scheduled-payments"
-        );
-        window.yatraAdmin.teamEnabled = enabledModules.some(
-          (m) => m.slug === "team"
-        );
-        window.yatraAdmin.showMailchimpSettingsUI = enabledModules.some(
-          (m) => m.slug === "mailchimp"
-        );
-        window.yatraAdmin.showFacebookPixelSettingsUI = enabledModules.some(
-          (m) => m.slug === "facebook_pixel"
-        );
-        window.yatraAdmin.showGoogleAnalyticsSettingsUI = enabledModules.some(
-          (m) => m.slug === "google_analytics"
-        );
-        window.dispatchEvent(
-          new CustomEvent("yatra-modules-updated", {
-            detail: {
-              enabledModules,
-              updatedModule: variables
-            }
-          })
-        );
-        const urlKey = window.__yatraUrlKey || 0;
-        window.__yatraUrlKey = urlKey + 1;
-        window.dispatchEvent(new CustomEvent("yatra-force-nav-refresh"));
-      }
-      const label = variables.name || variables.slug;
-      showToast(
-        variables.enabled ? __("{module} enabled successfully.", "yatra").replace(
-          "{module}",
-          label
-        ) : __("{module} disabled successfully.", "yatra").replace(
-          "{module}",
-          label
-        ),
-        "success"
-      );
-    },
-    onError: (error) => {
-      showToast(
-        error.message || __("Failed to update module.", "yatra"),
-        "error"
-      );
-    }
-  });
-};
-const useBulkToggleModules = () => {
-  const queryClient2 = useQueryClient();
-  const { showToast } = useToast();
-  return useMutation({
-    mutationFn: async (items) => {
-      const response = await apiClient.post(
-        "/modules/bulk-toggle",
-        { items }
-      );
-      return Array.isArray(response == null ? void 0 : response.data) ? response.data : [];
-    },
-    onSuccess: (data, variables = [], context) => {
-      queryClient2.setQueryData(["modules"], data);
-      const response = context;
-      if (response == null ? void 0 : response.message) {
-        showToast(response.message, "warning");
-      }
-      if (window.yatraAdmin && data) {
-        const enabledModules = data.filter((m) => m.enabled);
-        window.yatraAdmin.emailAutomationEnabled = enabledModules.some(
-          (m) => m.slug === "email_automation" || m.slug === "email-automation"
-        );
-        window.yatraAdmin.tripConsentEnabled = enabledModules.some(
-          (m) => m.slug === "trip_consent" || m.slug === "trip-consent"
-        );
-        window.yatraAdmin.additionalServicesEnabled = enabledModules.some(
-          (m) => m.slug === "additional_services" || m.slug === "additional-services"
-        );
-        window.yatraAdmin.abandonedBookingRecoveryEnabled = enabledModules.some(
-          (m) => m.slug === "abandoned_booking_recovery" || m.slug === "abandoned-booking-recovery"
-        );
-        window.yatraAdmin.dynamicPricingEnabled = enabledModules.some(
-          (m) => m.slug === "dynamic_pricing" || m.slug === "dynamic-pricing"
-        );
-        window.yatraAdmin.flexiblePaymentsEnabled = enabledModules.some(
-          (m) => m.slug === "flexible_payments"
-        );
-        window.yatraAdmin.dynamicFormFieldEnabled = enabledModules.some(
-          (m) => m.slug === "dynamic_form_field"
-        );
-        window.yatraAdmin.customLandingPagesModuleEnabled = enabledModules.some(
-          (m) => m.slug === "custom_landing_pages"
-        );
-        window.yatraAdmin.showGoogleCalendarSettingsUI = enabledModules.some(
-          (m) => m.slug === "google_calendar" || m.slug === "google-calendar"
-        );
-        window.yatraAdmin.advancedDiscountEnabled = enabledModules.some(
-          (m) => m.slug === "advanced_discount" || m.slug === "advanced-discount"
-        );
-        window.yatraAdmin.aiAssistantEnabled = enabledModules.some(
-          (m) => m.slug === "ai_assistant" || m.slug === "ai-assistant"
-        );
-        window.yatraAdmin.whiteLabelEnabled = enabledModules.some(
-          (m) => m.slug === "white_label" || m.slug === "white-label"
-        );
-        window.yatraAdmin.whatsappEnabled = enabledModules.some(
-          (m) => m.slug === "whatsapp"
-        );
-        window.yatraAdmin.channelManagerEnabled = enabledModules.some(
-          (m) => m.slug === "channel_manager" || m.slug === "channel-manager"
-        );
-        window.yatraAdmin.webhooksEnabled = enabledModules.some(
-          (m) => m.slug === "webhooks"
-        );
-        window.yatraAdmin.scheduledPaymentsEnabled = enabledModules.some(
-          (m) => m.slug === "scheduled_payments" || m.slug === "scheduled-payments"
-        );
-        window.yatraAdmin.teamEnabled = enabledModules.some(
-          (m) => m.slug === "team"
-        );
-        window.yatraAdmin.showMailchimpSettingsUI = enabledModules.some(
-          (m) => m.slug === "mailchimp"
-        );
-        window.yatraAdmin.showFacebookPixelSettingsUI = enabledModules.some(
-          (m) => m.slug === "facebook_pixel"
-        );
-        window.yatraAdmin.showGoogleAnalyticsSettingsUI = enabledModules.some(
-          (m) => m.slug === "google_analytics"
-        );
-        window.dispatchEvent(
-          new CustomEvent("yatra-modules-updated", {
-            detail: {
-              enabledModules,
-              updatedModules: variables || []
-            }
-          })
-        );
-        const urlKey = window.__yatraUrlKey || 0;
-        window.__yatraUrlKey = urlKey + 1;
-        window.dispatchEvent(new CustomEvent("yatra-force-nav-refresh"));
-      }
-      if (!(response == null ? void 0 : response.message) && variables.length > 0) {
-        const names = variables.map((item) => item.name || item.slug);
-        const summary = formatNamesList(names);
-        const message2 = variables[0].enabled ? __("Enabled: {modules}", "yatra").replace("{modules}", summary) : __("Disabled: {modules}", "yatra").replace("{modules}", summary);
-        showToast(message2, "success");
-      } else if (!(response == null ? void 0 : response.message)) {
-        showToast(__("Modules updated successfully.", "yatra"), "success");
-      }
-    },
-    onError: (error) => {
-      showToast(
-        error.message || __("Failed to update modules.", "yatra"),
-        "error"
-      );
-    }
-  });
-};
 const isProPluginActive = () => {
   var _a;
   const raw = (_a = window.yatraAdmin) == null ? void 0 : _a.isPro;
@@ -4256,9 +4017,7 @@ const Layout = ({ children }) => {
       localStorage.setItem("yatra-dark-mode", "false");
     }
   }, [darkMode]);
-  const [isModulesPanelOpen, setIsModulesPanelOpen] = reactExports.useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = reactExports.useState(false);
-  const modulesPanelRef = reactExports.useRef(null);
   const userDropdownRef = reactExports.useRef(null);
   const [licenseStatus, setLicenseStatus] = reactExports.useState(
     ((_a = window.yatraAdmin) == null ? void 0 : _a.licenseStatus) || null
@@ -4276,22 +4035,6 @@ const Layout = ({ children }) => {
       );
     }
   });
-  const { data: modulesData, isLoading: isLoadingModules } = useModulesQuery({
-    enabled: isModulesPanelOpen
-  });
-  const toggleModuleMutation = useToggleModule();
-  const safeModulesData = Array.isArray(modulesData) ? modulesData : [];
-  const modulesPreview = reactExports.useMemo(
-    () => safeModulesData.slice(0, 3),
-    [safeModulesData]
-  );
-  const handleQuickToggle = (module, enabled) => {
-    toggleModuleMutation.mutate({
-      slug: module.slug,
-      enabled,
-      name: module.name
-    });
-  };
   const [urlKey, setUrlKey] = reactExports.useState(0);
   const [navRefreshKey, setNavRefreshKey] = reactExports.useState(0);
   const handleMenuNavClick = reactExports.useCallback(
@@ -4306,9 +4049,6 @@ const Layout = ({ children }) => {
   );
   reactExports.useEffect(() => {
     const handleClickOutside = (event) => {
-      if (modulesPanelRef.current && !modulesPanelRef.current.contains(event.target)) {
-        setIsModulesPanelOpen(false);
-      }
       if (userDropdownRef.current && !userDropdownRef.current.contains(event.target)) {
         setIsUserDropdownOpen(false);
       }
@@ -4364,16 +4104,6 @@ const Layout = ({ children }) => {
       );
     };
   }, []);
-  reactExports.useEffect(() => {
-    if (!isModulesPanelOpen) return;
-    const handleClickOutside = (event) => {
-      if (modulesPanelRef.current && !modulesPanelRef.current.contains(event.target)) {
-        setIsModulesPanelOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isModulesPanelOpen]);
   const currentSubpage = reactExports.useMemo(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get("subpage") || "dashboard";
@@ -5132,6 +4862,20 @@ const Layout = ({ children }) => {
                   !uiChrome.hideJoinCommunity && /* @__PURE__ */ jsxRuntimeExports.jsxs(
                     "a",
                     {
+                      href: "https://tourtify.com/?utm_source=yatra-plugin&utm_medium=admin-header&utm_campaign=yatra-cloud&utm_content=dashboard-header",
+                      target: "_blank",
+                      rel: "noopener noreferrer",
+                      className: "inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/40 ring-1 ring-blue-200 dark:ring-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-lg transition-colors",
+                      children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(Cloud, { className: "w-4 h-4 shrink-0", "aria-hidden": true }),
+                        __("Cloud", "yatra"),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "rounded-full bg-blue-600 px-1.5 py-0.5 text-[10px] font-semibold uppercase leading-none tracking-wide text-white", children: __("New", "yatra") })
+                      ]
+                    }
+                  ),
+                  !uiChrome.hideJoinCommunity && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    "a",
+                    {
                       href: "https://www.facebook.com/groups/yatrawordpressplugin",
                       target: "_blank",
                       rel: "noopener noreferrer",
@@ -5176,109 +4920,6 @@ const Layout = ({ children }) => {
                       ]
                     }
                   ) }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      "button",
-                      {
-                        onClick: () => setIsModulesPanelOpen((prev) => !prev),
-                        className: `p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 ${isModulesPanelOpen ? "bg-gray-100 dark:bg-gray-700" : ""}`,
-                        "aria-label": __("Toggle modules panel", "yatra"),
-                        children: /* @__PURE__ */ jsxRuntimeExports.jsx(Puzzle, { className: "w-5 h-5" })
-                      }
-                    ),
-                    isModulesPanelOpen && /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      "div",
-                      {
-                        ref: modulesPanelRef,
-                        className: "absolute right-0 top-12 z-50 w-80",
-                        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "shadow-xl border border-gray-200 dark:border-gray-700", children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
-                            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                              /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base", children: __("Modules", "yatra") }),
-                              /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { children: __(
-                                "Quickly enable or disable feature packs.",
-                                "yatra"
-                              ) })
-                            ] }),
-                            /* @__PURE__ */ jsxRuntimeExports.jsx(
-                              Button,
-                              {
-                                size: "sm",
-                                variant: "ghost",
-                                onClick: () => {
-                                  setIsModulesPanelOpen(false);
-                                  navigateMenu("modules");
-                                },
-                                children: __("Open", "yatra")
-                              }
-                            )
-                          ] }) }),
-                          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3", children: [
-                            isLoadingModules && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm", children: [
-                              /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "w-4 h-4 animate-spin" }),
-                              __("Loading modules…", "yatra")
-                            ] }),
-                            !isLoadingModules && modulesPreview.length === 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-500 dark:text-gray-400", children: __("No modules found.", "yatra") }),
-                            !isLoadingModules && modulesPreview.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-3", children: modulesPreview.map((module) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                              "div",
-                              {
-                                className: "flex items-center justify-between border border-gray-100 dark:border-gray-800 rounded-lg p-2",
-                                children: [
-                                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                                    /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm font-medium text-gray-900 dark:text-white flex items-center gap-2", children: [
-                                      module.name,
-                                      module.is_core && /* @__PURE__ */ jsxRuntimeExports.jsx(
-                                        Badge,
-                                        {
-                                          variant: "outline",
-                                          className: "text-[10px]",
-                                          children: __("Core", "yatra")
-                                        }
-                                      )
-                                    ] }),
-                                    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400", children: module.enabled ? __("Enabled", "yatra") : __("Disabled", "yatra") })
-                                  ] }),
-                                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                                    "button",
-                                    {
-                                      onClick: () => handleQuickToggle(
-                                        module,
-                                        !module.enabled
-                                      ),
-                                      disabled: module.is_core || toggleModuleMutation.isPending,
-                                      className: `relative inline-flex h-6 w-11 items-center rounded-full transition ${module.enabled ? "bg-blue-600" : "bg-gray-300 dark:bg-gray-600"} ${module.is_core ? "opacity-60 cursor-not-allowed" : "cursor-pointer"}`,
-                                      "aria-pressed": module.enabled,
-                                      "aria-label": module.enabled ? __("Disable module", "yatra") : __("Enable module", "yatra"),
-                                      children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                                        "span",
-                                        {
-                                          className: `inline-block h-5 w-5 transform rounded-full bg-white transition ${module.enabled ? "translate-x-5" : "translate-x-1"}`
-                                        }
-                                      )
-                                    }
-                                  )
-                                ]
-                              },
-                              module.slug
-                            )) }),
-                            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "pt-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                              Button,
-                              {
-                                variant: "outline",
-                                size: "sm",
-                                className: "w-full",
-                                onClick: () => {
-                                  setIsModulesPanelOpen(false);
-                                  navigateMenu("modules");
-                                },
-                                children: __("Manage all modules", "yatra")
-                              }
-                            ) })
-                          ] })
-                        ] })
-                      }
-                    )
-                  ] }) }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx(
                     "button",
                     {
@@ -42818,8 +42459,8 @@ const Calendar = ({
   };
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
-  const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
-  const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
+  const calendarStart = startOfWeek(monthStart, { weekStartsOn: getWeekStartsOn() });
+  const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: getWeekStartsOn() });
   const days = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
   const isDateDisabled = (date2) => {
     if (disabled && disabled(date2)) return true;
@@ -42837,7 +42478,7 @@ const Calendar = ({
   const nextMonth = () => {
     setCurrentMonth(addMonths(currentMonth, 1));
   };
-  const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const weekDays = getWeekdayLabels();
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `p-3 ${className}`, children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-1 mb-4", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -56464,8 +56105,127 @@ const Discounts = () => {
     ] }) })
   ] });
 };
+const PaymentNotesModal = ({
+  isOpen,
+  onClose,
+  paymentId,
+  paymentReference,
+  canAdd = true
+}) => {
+  const [draft, setDraft] = reactExports.useState("");
+  const { showToast } = useToast();
+  const queryClient2 = useQueryClient();
+  const { data, isLoading } = useQuery({
+    queryKey: ["payment-notes", paymentId],
+    enabled: isOpen && !!paymentId,
+    queryFn: async () => {
+      const response = await apiService.getPaymentNotes(paymentId);
+      const rows = (response == null ? void 0 : response.data) ?? response;
+      return Array.isArray(rows) ? rows : [];
+    }
+  });
+  const notes = data ?? [];
+  const addNote = useMutation({
+    mutationFn: async (note) => apiService.addPaymentNote(paymentId, note),
+    onSuccess: (response) => {
+      if (response && response.success === false) {
+        showToast(
+          response.message || __("Failed to save the note.", "yatra"),
+          "error"
+        );
+        return;
+      }
+      setDraft("");
+      queryClient2.invalidateQueries({ queryKey: ["payment-notes", paymentId] });
+      queryClient2.invalidateQueries({ queryKey: ["payments"] });
+      showToast(__("Note added.", "yatra"), "success");
+    },
+    onError: (error) => {
+      showToast(
+        (error == null ? void 0 : error.message) || __("Failed to save the note.", "yatra"),
+        "error"
+      );
+    }
+  });
+  const handleSubmit = () => {
+    const note = draft.trim();
+    if (!note) {
+      showToast(__("Please write a note before saving.", "yatra"), "error");
+      return;
+    }
+    addNote.mutate(note);
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    Modal,
+    {
+      isOpen,
+      onClose,
+      size: "lg",
+      title: /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(StickyNote, { className: "w-5 h-5" }),
+        __("Payment Notes", "yatra"),
+        paymentReference ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-normal text-gray-500 dark:text-gray-400", children: paymentReference }) : null
+      ] }),
+      description: __(
+        "Everything recorded against this payment, oldest first. Adding a note never changes the ones already here.",
+        "yatra"
+      ),
+      children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+        isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400", children: __("Loading notes…", "yatra") }) : notes.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400", children: __("No notes recorded against this payment yet.", "yatra") }) : /* @__PURE__ */ jsxRuntimeExports.jsx("ol", { className: "space-y-3", children: notes.map((note, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "li",
+          {
+            className: "rounded-lg border border-gray-200 dark:border-gray-700 p-3 bg-white dark:bg-gray-800",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap", children: note.note }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-2 flex flex-wrap items-center gap-3 text-xs text-gray-500 dark:text-gray-400", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "inline-flex items-center gap-1", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(User, { className: "w-3 h-3" }),
+                  note.author_name || __("Unknown", "yatra")
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "inline-flex items-center gap-1", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Clock, { className: "w-3 h-3" }),
+                  formatDateTime(note.created_at)
+                ] }),
+                note.legacy ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700", children: __(
+                  "Recorded before notes were kept as a history",
+                  "yatra"
+                ) }) : null
+              ] })
+            ]
+          },
+          `${note.id}-${index}`
+        )) }),
+        canAdd ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "pt-2 border-t border-gray-200 dark:border-gray-700", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "label",
+            {
+              htmlFor: "yatra-payment-note",
+              className: "block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1",
+              children: __("Add a note", "yatra")
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "textarea",
+            {
+              id: "yatra-payment-note",
+              value: draft,
+              onChange: (e) => setDraft(e.target.value),
+              rows: 3,
+              className: "w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 p-2 text-sm text-gray-900 dark:text-gray-100",
+              placeholder: __(
+                "e.g. why a refund was issued, or how a manual payment arrived",
+                "yatra"
+              )
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-2 flex justify-end", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: handleSubmit, disabled: addNote.isPending, children: addNote.isPending ? __("Saving…", "yatra") : __("Add Note", "yatra") }) })
+        ] }) : null
+      ] })
+    }
+  );
+};
 const Payments = () => {
-  var _a, _b;
+  var _a, _b, _c, _d;
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [statusFilter, setStatusFilter] = reactExports.useState("all");
   const [methodFilter, setMethodFilter] = reactExports.useState("all");
@@ -56480,6 +56240,10 @@ const Payments = () => {
     isOpen: false,
     payment: null
   });
+  const [notesModal, setNotesModal] = reactExports.useState({
+    isOpen: false,
+    payment: null
+  });
   const [visibleColumns, setVisibleColumns] = reactExports.useState(() => {
     if (typeof window === "undefined") {
       return {
@@ -56489,7 +56253,8 @@ const Payments = () => {
         amount: true,
         method: true,
         status: true,
-        date: true
+        date: true,
+        next_due: false
       };
     }
     const saved = window.localStorage.getItem("yatra-payments-visible-columns");
@@ -56500,7 +56265,8 @@ const Payments = () => {
       amount: true,
       method: true,
       status: true,
-      date: true
+      date: true,
+      next_due: false
     };
   });
   const queryClient2 = useQueryClient();
@@ -56826,7 +56592,12 @@ const Payments = () => {
       label: __("Status", "yatra"),
       visible: visibleColumns.status
     },
-    { key: "date", label: __("Date", "yatra"), visible: visibleColumns.date }
+    { key: "date", label: __("Date", "yatra"), visible: visibleColumns.date },
+    {
+      key: "next_due",
+      label: __("Next Due", "yatra"),
+      visible: visibleColumns.next_due
+    }
   ];
   const columns = [
     {
@@ -56902,6 +56673,39 @@ const Payments = () => {
       sortable: true,
       visible: visibleColumns.date,
       render: (payment) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate2(payment.payment_date) })
+    },
+    {
+      key: "next_due",
+      label: __("Next Due", "yatra"),
+      // Not sortable: the date belongs to the booking, not to this payment row,
+      // so the server cannot order payments by it.
+      sortable: false,
+      visible: visibleColumns.next_due,
+      render: (payment) => {
+        const schedule = payment.payment_schedule;
+        if (!schedule) {
+          return /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-400 dark:text-gray-500 text-sm", children: "—" });
+        }
+        if (!schedule.next_due_date) {
+          return /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-500 dark:text-gray-400 text-sm", children: Number(schedule.amount_due ?? 0) > 0 ? __("No date set", "yatra") : __("Settled", "yatra") });
+        }
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "div",
+            {
+              className: schedule.is_overdue ? "font-medium text-red-600 dark:text-red-400" : "text-gray-700 dark:text-gray-200",
+              children: schedule.is_overdue ? (
+                /* translators: %s: the date a payment was due. */
+                sprintf(__("Overdue since %s", "yatra"), formatDate2(schedule.next_due_date))
+              ) : formatDate2(schedule.next_due_date)
+            }
+          ),
+          schedule.next_amount ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400", children: formatYatraMoney(
+            Number(schedule.next_amount),
+            schedule.currency || defaultCurrency
+          ) }) : null
+        ] });
+      }
     }
   ];
   const actions = [
@@ -56916,6 +56720,12 @@ const Payments = () => {
       label: __("Edit", "yatra"),
       icon: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" }),
       onClick: (payment) => handleEdit(payment)
+    },
+    {
+      key: "notes",
+      label: __("Notes", "yatra"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(StickyNote, { className: "w-4 h-4" }),
+      onClick: (payment) => setNotesModal({ isOpen: true, payment })
     },
     {
       key: "download_invoice",
@@ -57042,6 +56852,16 @@ const Payments = () => {
     }
   ];
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      PaymentNotesModal,
+      {
+        isOpen: notesModal.isOpen,
+        onClose: () => setNotesModal({ isOpen: false, payment: null }),
+        paymentId: notesModal.payment ? Number(notesModal.payment.id) : null,
+        paymentReference: ((_c = notesModal.payment) == null ? void 0 : _c.reference) || ((_d = notesModal.payment) == null ? void 0 : _d.payment_number) || "",
+        canAdd: can("yatra_edit_bookings")
+      }
+    ),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       ConfirmationDialog,
       {
@@ -59824,8 +59644,8 @@ const AvailabilityCalendar = ({
   };
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
-  const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
-  const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
+  const calendarStart = startOfWeek(monthStart, { weekStartsOn: getWeekStartsOn() });
+  const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: getWeekStartsOn() });
   const days = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
   const previousMonth = () => {
     setCurrentMonth(subMonths(currentMonth));
@@ -59833,7 +59653,7 @@ const AvailabilityCalendar = ({
   const nextMonth = () => {
     setCurrentMonth(addMonths(currentMonth, 1));
   };
-  const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const weekDays = getWeekdayLabels();
   const formatTime = (timeString) => {
     if (!timeString) return "";
     const [hours, minutes] = timeString.split(":");
@@ -62361,14 +62181,14 @@ const DateRangePicker = ({
   const getDaysForMonth = (monthDate) => {
     const monthStart = startOfMonth(monthDate);
     const monthEnd = endOfMonth(monthDate);
-    const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
-    const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
+    const calendarStart = startOfWeek(monthStart, { weekStartsOn: getWeekStartsOn() });
+    const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: getWeekStartsOn() });
     return eachDayOfInterval({ start: calendarStart, end: calendarEnd });
   };
   const nextMonthDate = addMonths(currentMonth, 1);
   const currentMonthDays = getDaysForMonth(currentMonth);
   const nextMonthDays = getDaysForMonth(nextMonthDate);
-  const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const weekDays = getWeekdayLabels();
   let displayValue = "";
   if (fromDate && !isNaN(fromDate.getTime())) {
     try {
@@ -66528,6 +66348,245 @@ const EnquiryForm = () => {
     ] }) })
   ] });
 };
+const fetchModules = async () => {
+  const response = await apiClient.get("/modules");
+  if (Array.isArray(response)) {
+    return response;
+  }
+  if (Array.isArray(response == null ? void 0 : response.data)) {
+    return response.data;
+  }
+  return [];
+};
+const useModulesQuery = (options2) => {
+  return useQuery({
+    queryKey: ["modules"],
+    queryFn: fetchModules,
+    staleTime: 0,
+    ...options2
+  });
+};
+const formatNamesList = (names) => {
+  if (names.length <= 2) {
+    return names.join(", ");
+  }
+  return `${names.slice(0, 2).join(", ")} ${__("and", "yatra")} ${names.length - 2} ${__("more", "yatra")}`;
+};
+const useToggleModule = () => {
+  const queryClient2 = useQueryClient();
+  const { showToast } = useToast();
+  return useMutation({
+    mutationFn: async ({ slug, enabled }) => {
+      const response = await apiClient.post(
+        `/modules/${slug}/toggle`,
+        { enabled }
+      );
+      return Array.isArray(response == null ? void 0 : response.data) ? response.data : [];
+    },
+    onSuccess: (data, variables) => {
+      queryClient2.setQueryData(["modules"], data);
+      if (window.yatraAdmin) {
+        const enabledModules = data.filter((m) => m.enabled);
+        window.yatraAdmin.emailAutomationEnabled = enabledModules.some(
+          (m) => m.slug === "email_automation" || m.slug === "email-automation"
+        );
+        window.yatraAdmin.tripConsentEnabled = enabledModules.some(
+          (m) => m.slug === "trip_consent" || m.slug === "trip-consent"
+        );
+        window.yatraAdmin.additionalServicesEnabled = enabledModules.some(
+          (m) => m.slug === "additional_services" || m.slug === "additional-services"
+        );
+        window.yatraAdmin.abandonedBookingRecoveryEnabled = enabledModules.some(
+          (m) => m.slug === "abandoned_booking_recovery" || m.slug === "abandoned-booking-recovery"
+        );
+        window.yatraAdmin.dynamicPricingEnabled = enabledModules.some(
+          (m) => m.slug === "dynamic_pricing" || m.slug === "dynamic-pricing"
+        );
+        window.yatraAdmin.flexiblePaymentsEnabled = enabledModules.some(
+          (m) => m.slug === "flexible_payments"
+        );
+        window.yatraAdmin.dynamicFormFieldEnabled = enabledModules.some(
+          (m) => m.slug === "dynamic_form_field"
+        );
+        window.yatraAdmin.customLandingPagesModuleEnabled = enabledModules.some(
+          (m) => m.slug === "custom_landing_pages"
+        );
+        window.yatraAdmin.showGoogleCalendarSettingsUI = enabledModules.some(
+          (m) => m.slug === "google_calendar" || m.slug === "google-calendar"
+        );
+        window.yatraAdmin.advancedDiscountEnabled = enabledModules.some(
+          (m) => m.slug === "advanced_discount" || m.slug === "advanced-discount"
+        );
+        window.yatraAdmin.aiAssistantEnabled = enabledModules.some(
+          (m) => m.slug === "ai_assistant" || m.slug === "ai-assistant"
+        );
+        window.yatraAdmin.whiteLabelEnabled = enabledModules.some(
+          (m) => m.slug === "white_label" || m.slug === "white-label"
+        );
+        window.yatraAdmin.whatsappEnabled = enabledModules.some(
+          (m) => m.slug === "whatsapp"
+        );
+        window.yatraAdmin.channelManagerEnabled = enabledModules.some(
+          (m) => m.slug === "channel_manager" || m.slug === "channel-manager"
+        );
+        window.yatraAdmin.webhooksEnabled = enabledModules.some(
+          (m) => m.slug === "webhooks"
+        );
+        window.yatraAdmin.scheduledPaymentsEnabled = enabledModules.some(
+          (m) => m.slug === "scheduled_payments" || m.slug === "scheduled-payments"
+        );
+        window.yatraAdmin.teamEnabled = enabledModules.some(
+          (m) => m.slug === "team"
+        );
+        window.yatraAdmin.showMailchimpSettingsUI = enabledModules.some(
+          (m) => m.slug === "mailchimp"
+        );
+        window.yatraAdmin.showFacebookPixelSettingsUI = enabledModules.some(
+          (m) => m.slug === "facebook_pixel"
+        );
+        window.yatraAdmin.showGoogleAnalyticsSettingsUI = enabledModules.some(
+          (m) => m.slug === "google_analytics"
+        );
+        window.dispatchEvent(
+          new CustomEvent("yatra-modules-updated", {
+            detail: {
+              enabledModules,
+              updatedModule: variables
+            }
+          })
+        );
+        const urlKey = window.__yatraUrlKey || 0;
+        window.__yatraUrlKey = urlKey + 1;
+        window.dispatchEvent(new CustomEvent("yatra-force-nav-refresh"));
+      }
+      const label = variables.name || variables.slug;
+      showToast(
+        variables.enabled ? __("{module} enabled successfully.", "yatra").replace(
+          "{module}",
+          label
+        ) : __("{module} disabled successfully.", "yatra").replace(
+          "{module}",
+          label
+        ),
+        "success"
+      );
+    },
+    onError: (error) => {
+      showToast(
+        error.message || __("Failed to update module.", "yatra"),
+        "error"
+      );
+    }
+  });
+};
+const useBulkToggleModules = () => {
+  const queryClient2 = useQueryClient();
+  const { showToast } = useToast();
+  return useMutation({
+    mutationFn: async (items) => {
+      const response = await apiClient.post(
+        "/modules/bulk-toggle",
+        { items }
+      );
+      return Array.isArray(response == null ? void 0 : response.data) ? response.data : [];
+    },
+    onSuccess: (data, variables = [], context) => {
+      queryClient2.setQueryData(["modules"], data);
+      const response = context;
+      if (response == null ? void 0 : response.message) {
+        showToast(response.message, "warning");
+      }
+      if (window.yatraAdmin && data) {
+        const enabledModules = data.filter((m) => m.enabled);
+        window.yatraAdmin.emailAutomationEnabled = enabledModules.some(
+          (m) => m.slug === "email_automation" || m.slug === "email-automation"
+        );
+        window.yatraAdmin.tripConsentEnabled = enabledModules.some(
+          (m) => m.slug === "trip_consent" || m.slug === "trip-consent"
+        );
+        window.yatraAdmin.additionalServicesEnabled = enabledModules.some(
+          (m) => m.slug === "additional_services" || m.slug === "additional-services"
+        );
+        window.yatraAdmin.abandonedBookingRecoveryEnabled = enabledModules.some(
+          (m) => m.slug === "abandoned_booking_recovery" || m.slug === "abandoned-booking-recovery"
+        );
+        window.yatraAdmin.dynamicPricingEnabled = enabledModules.some(
+          (m) => m.slug === "dynamic_pricing" || m.slug === "dynamic-pricing"
+        );
+        window.yatraAdmin.flexiblePaymentsEnabled = enabledModules.some(
+          (m) => m.slug === "flexible_payments"
+        );
+        window.yatraAdmin.dynamicFormFieldEnabled = enabledModules.some(
+          (m) => m.slug === "dynamic_form_field"
+        );
+        window.yatraAdmin.customLandingPagesModuleEnabled = enabledModules.some(
+          (m) => m.slug === "custom_landing_pages"
+        );
+        window.yatraAdmin.showGoogleCalendarSettingsUI = enabledModules.some(
+          (m) => m.slug === "google_calendar" || m.slug === "google-calendar"
+        );
+        window.yatraAdmin.advancedDiscountEnabled = enabledModules.some(
+          (m) => m.slug === "advanced_discount" || m.slug === "advanced-discount"
+        );
+        window.yatraAdmin.aiAssistantEnabled = enabledModules.some(
+          (m) => m.slug === "ai_assistant" || m.slug === "ai-assistant"
+        );
+        window.yatraAdmin.whiteLabelEnabled = enabledModules.some(
+          (m) => m.slug === "white_label" || m.slug === "white-label"
+        );
+        window.yatraAdmin.whatsappEnabled = enabledModules.some(
+          (m) => m.slug === "whatsapp"
+        );
+        window.yatraAdmin.channelManagerEnabled = enabledModules.some(
+          (m) => m.slug === "channel_manager" || m.slug === "channel-manager"
+        );
+        window.yatraAdmin.webhooksEnabled = enabledModules.some(
+          (m) => m.slug === "webhooks"
+        );
+        window.yatraAdmin.scheduledPaymentsEnabled = enabledModules.some(
+          (m) => m.slug === "scheduled_payments" || m.slug === "scheduled-payments"
+        );
+        window.yatraAdmin.teamEnabled = enabledModules.some(
+          (m) => m.slug === "team"
+        );
+        window.yatraAdmin.showMailchimpSettingsUI = enabledModules.some(
+          (m) => m.slug === "mailchimp"
+        );
+        window.yatraAdmin.showFacebookPixelSettingsUI = enabledModules.some(
+          (m) => m.slug === "facebook_pixel"
+        );
+        window.yatraAdmin.showGoogleAnalyticsSettingsUI = enabledModules.some(
+          (m) => m.slug === "google_analytics"
+        );
+        window.dispatchEvent(
+          new CustomEvent("yatra-modules-updated", {
+            detail: {
+              enabledModules,
+              updatedModules: variables || []
+            }
+          })
+        );
+        const urlKey = window.__yatraUrlKey || 0;
+        window.__yatraUrlKey = urlKey + 1;
+        window.dispatchEvent(new CustomEvent("yatra-force-nav-refresh"));
+      }
+      if (!(response == null ? void 0 : response.message) && variables.length > 0) {
+        const names = variables.map((item) => item.name || item.slug);
+        const summary = formatNamesList(names);
+        const message2 = variables[0].enabled ? __("Enabled: {modules}", "yatra").replace("{modules}", summary) : __("Disabled: {modules}", "yatra").replace("{modules}", summary);
+        showToast(message2, "success");
+      } else if (!(response == null ? void 0 : response.message)) {
+        showToast(__("Modules updated successfully.", "yatra"), "success");
+      }
+    },
+    onError: (error) => {
+      showToast(
+        error.message || __("Failed to update modules.", "yatra"),
+        "error"
+      );
+    }
+  });
+};
 const featureUrlFromDocs = (docsUrl) => {
   if (!docsUrl) return null;
   const slug = docsUrl.replace(/\/+$/, "").split("/").pop();
@@ -67576,8 +67635,47 @@ const GoogleCalendar = () => {
   const [resyncing, setResyncing] = reactExports.useState(false);
   const [resyncProgress, setResyncProgress] = reactExports.useState(null);
   const { showToast } = useToast();
+  const timeZoneIds = (() => {
+    var _a2;
+    const raw = (_a2 = window.yatraAdmin) == null ? void 0 : _a2.timeZoneIdentifiers;
+    const ids = Array.isArray(raw) ? raw.filter((x2) => typeof x2 === "string" && x2 !== "") : [];
+    const saved = (settings2 == null ? void 0 : settings2.timezone) || "";
+    return saved !== "" && !ids.includes(saved) ? [saved, ...ids] : ids;
+  })();
   const adminUrl = ((_a = window.yatraAdmin) == null ? void 0 : _a.adminUrl) || "admin.php";
   const settingsIntegrationUrl = `${adminUrl}?page=yatra&subpage=settings&section=integration`;
+  const [templates, setTemplates] = reactExports.useState({
+    event_title_template: "",
+    event_details_template: "",
+    departure_title_template: ""
+  });
+  const [savingTemplates, setSavingTemplates] = reactExports.useState(false);
+  const templatesLoaded = reactExports.useRef(false);
+  reactExports.useEffect(() => {
+    if (settings2 && !templatesLoaded.current) {
+      templatesLoaded.current = true;
+      setTemplates({
+        event_title_template: settings2.event_title_template || "",
+        event_details_template: settings2.event_details_template || "",
+        departure_title_template: settings2.departure_title_template || ""
+      });
+    }
+  }, [settings2]);
+  const saveTemplates = async () => {
+    setSavingTemplates(true);
+    try {
+      const response = await apiService.updateGoogleCalendarSettings(templates);
+      if (response && response.success === false) {
+        throw new Error(response.message || "");
+      }
+      setSettings((prev) => prev ? { ...prev, ...templates } : null);
+      showToast(__("Event text saved"), "success");
+    } catch (error) {
+      showToast((error == null ? void 0 : error.message) || __("Failed to update settings"), "error");
+    } finally {
+      setSavingTemplates(false);
+    }
+  };
   reactExports.useEffect(() => {
     fetchSettings2();
   }, []);
@@ -67899,26 +67997,15 @@ const GoogleCalendar = () => {
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "font-medium text-gray-900 dark:text-white", children: __("Sync Bookings") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: __("Create calendar events for new bookings") })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: settings2.combine_bookings !== void 0 ? __(
+              'Creates a calendar event for each booking. Turn on "One event per departure" below to get one event per departure instead, with its bookings listed in the description. Required by Sync All Bookings and Resync Everything.'
+            ) : __("Create calendar events for new bookings") })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             Switch,
             {
               checked: settings2.sync_bookings,
               onCheckedChange: (checked) => handleSettingChange("sync_bookings", checked)
-            }
-          )
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "font-medium text-gray-900 dark:text-white", children: __("Sync Departures") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: __("Create calendar events for departures") })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Switch,
-            {
-              checked: settings2.sync_departures,
-              onCheckedChange: (checked) => handleSettingChange("sync_departures", checked)
             }
           )
         ] }),
@@ -67962,6 +68049,32 @@ const GoogleCalendar = () => {
             {
               checked: settings2.combine_bookings,
               onCheckedChange: (checked) => handleSettingChange("combine_bookings", checked)
+            }
+          )
+        ] }),
+        settings2.timezone !== void 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "pt-4 border-t border-gray-200 dark:border-gray-700", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "label",
+            {
+              htmlFor: "gc_timezone",
+              className: "font-medium text-gray-900 dark:text-white",
+              children: __("Calendar time zone")
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400 mb-3", children: __(
+            "The time zone tour times are written in on calendar events — e.g. America/Los_Angeles for tours that run in Los Angeles. Daylight saving time is handled automatically. Leave it on the site time zone if your tours run where your site is. Changes apply to new events; run Resync Everything to update existing ones."
+          ) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "select",
+            {
+              id: "gc_timezone",
+              value: settings2.timezone,
+              onChange: (e) => handleSettingChange("timezone", e.target.value),
+              className: "w-full max-w-md rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: __("Site time zone (default)") }),
+                timeZoneIds.map((tz) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: tz, children: tz }, tz))
+              ]
             }
           )
         ] }),
@@ -68024,6 +68137,102 @@ const GoogleCalendar = () => {
           )) })
         ] })
       ] }) })
+    ] }),
+    settings2 && settings2.event_details_template !== void 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { children: __("Event text") }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { children: __(
+          "Write your own event title and details with variables, like an email template. Leave a field empty to keep the standard text. Changes apply to new events; run Resync Everything to update existing ones."
+        ) })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-5", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "label",
+            {
+              htmlFor: "gc_tpl_title",
+              className: "font-medium text-gray-900 dark:text-white",
+              children: __("Event title")
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400 mb-2", children: __("Used for an event per booking.") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              id: "gc_tpl_title",
+              type: "text",
+              value: templates.event_title_template,
+              maxLength: 300,
+              onChange: (e) => setTemplates((t) => ({ ...t, event_title_template: e.target.value })),
+              placeholder: "{{trip_name}} - {{customer_name}} ({{travelers_count}})",
+              className: "w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white"
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "label",
+            {
+              htmlFor: "gc_tpl_departure_title",
+              className: "font-medium text-gray-900 dark:text-white",
+              children: __("Departure event title")
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400 mb-2", children: __(
+            'Used with "One event per departure". Variables: {{trip_name}}, {{travel_date}}, {{bookings_count}}, {{travellers_count}}.'
+          ) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              id: "gc_tpl_departure_title",
+              type: "text",
+              value: templates.departure_title_template,
+              maxLength: 300,
+              onChange: (e) => setTemplates((t) => ({
+                ...t,
+                departure_title_template: e.target.value
+              })),
+              placeholder: "{{trip_name}} – {{travellers_count}} pax",
+              className: "w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white"
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "label",
+            {
+              htmlFor: "gc_tpl_details",
+              className: "font-medium text-gray-900 dark:text-white",
+              children: __("Booking details")
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400 mb-2", children: __(
+            "The event description for an event per booking, and each booking's section in a departure event."
+          ) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "textarea",
+            {
+              id: "gc_tpl_details",
+              rows: 8,
+              value: templates.event_details_template,
+              maxLength: 4e3,
+              onChange: (e) => setTemplates((t) => ({
+                ...t,
+                event_details_template: e.target.value
+              })),
+              placeholder: "{{customer_name}} · {{travelers_count}} pax\n{{contact_phone}}\nWhatsApp: https://wa.me/{{guest_phone_digits}}\nSignal: https://signal.me/#p/+{{guest_phone_digits}}\nTelegram: https://t.me/+{{guest_phone_digits}}",
+              className: "w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-mono text-gray-900 dark:text-white"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-2", children: __(
+            "Variables: the same as in booking emails — e.g. {{customer_name}}, {{customer_phone}}, {{customer_email}}, {{booking_reference}}, {{trip_name}}, {{travel_date}}, {{travelers_count}}, {{travelers_list}}, {{amount_due}}, {{special_requests}}, {{admin_url}}, and your booking-form answers ({{contact_…}}, {{emergency_…}}, {{lead_traveler_…}})."
+          ) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: __(
+            "{{guest_phone_digits}} is the guest's phone number as digits with the country code (e.g. 491512345678) — for links such as https://wa.me/{{guest_phone_digits}}. It stays empty when a number was saved without its country code, so a link never points at the wrong person. Whether a guest can be reached this way also depends on their own app settings."
+          ) })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex justify-end", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: saveTemplates, disabled: savingTemplates, children: savingTemplates ? __("Saving…") : __("Save event text") }) })
+      ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { children: [
@@ -73130,6 +73339,7 @@ const EmailTemplatesList = ({
       label: __("Template"),
       visible: visibleColumns.name,
       render: (template) => {
+        var _a2;
         const CategoryIcon = categoryIcons[template.category] || Mail;
         return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CategoryIcon, { className: "w-4 h-4 text-blue-600 dark:text-blue-400" }) }),
@@ -73155,11 +73365,26 @@ const EmailTemplatesList = ({
                 children: template.name
               }
             ),
+            template.in_use === false && template.superseded_by && /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "span",
+              {
+                className: "ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200",
+                title: sprintf(
+                  /* translators: %s: the template that handles this event instead. */
+                  __(
+                    "Not sent — “%s” handles this event. Switch that one off to use this wording instead.",
+                    "yatra"
+                  ),
+                  ((_a2 = globalByKey.get(template.superseded_by)) == null ? void 0 : _a2.name) || template.superseded_by
+                ),
+                children: __("Not in use", "yatra")
+              }
+            ),
             template.overrides ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400", children: __("Override", "yatra") }) : template.is_system ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400", children: overridesSupported ? __("Global", "yatra") : __("System") }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400", children: __("Custom") }),
             (() => {
-              var _a2, _b, _c;
+              var _a3, _b, _c;
               const mark = sentForTrip(template);
-              const tripName = ((_a2 = tripOptions.find((t) => t.id === asTrip)) == null ? void 0 : _a2.label) || "";
+              const tripName = ((_a3 = tripOptions.find((t) => t.id === asTrip)) == null ? void 0 : _a3.label) || "";
               if (mark === "hit") {
                 return /* @__PURE__ */ jsxRuntimeExports.jsxs(
                   "span",
@@ -79129,28 +79354,28 @@ const License = () => {
     ] }) }) })
   ] });
 };
-const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-DEQpXvzy.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
-const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-NDffCp8Q.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
-const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-M9W1qR00.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
-const Reports = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Reports-JeXttK0I.js"), true ? __vite__mapDeps([9,1,2,3,4]) : void 0, import.meta.url));
-const DiscountForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DiscountForm-DYxWHwCn.js"), true ? __vite__mapDeps([10,1,2,3,4,11]) : void 0, import.meta.url));
-const Itinerary = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Itinerary-C1e5Vxj0.js"), true ? __vite__mapDeps([12,1,2,3,4,5]) : void 0, import.meta.url));
-const RecurringRuleForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/RecurringRuleForm-fKEgpUir.js"), true ? __vite__mapDeps([13,1,2,3,4]) : void 0, import.meta.url));
+const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-CXNZs7SO.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
+const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-DpAuooiC.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
+const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-DlPqu238.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
+const Reports = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Reports-CfQKXt4i.js"), true ? __vite__mapDeps([9,1,2,3,4]) : void 0, import.meta.url));
+const DiscountForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DiscountForm-DFtlsNgW.js"), true ? __vite__mapDeps([10,1,2,3,4,11]) : void 0, import.meta.url));
+const Itinerary = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Itinerary-BwsITON1.js"), true ? __vite__mapDeps([12,1,2,3,4,5]) : void 0, import.meta.url));
+const RecurringRuleForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/RecurringRuleForm-eQImFFYR.js"), true ? __vite__mapDeps([13,1,2,3,4]) : void 0, import.meta.url));
 const Whatsapp = reactExports.lazy(() => __vitePreload(() => import("./Whatsapp.js"), true ? __vite__mapDeps([14,1,2,3,4,15]) : void 0, import.meta.url));
-const ChannelManager = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ChannelManager-DZ64KNZZ.js"), true ? __vite__mapDeps([16,1,2,3,4,15]) : void 0, import.meta.url));
-const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Webhooks-Cb89OgkB.js"), true ? __vite__mapDeps([17,1,2,3,4,15]) : void 0, import.meta.url));
-const ScheduledPayments = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ScheduledPayments-BnLNP2BI.js"), true ? __vite__mapDeps([18,1,2,3,4]) : void 0, import.meta.url));
-const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-C4az7Muo.js"), true ? __vite__mapDeps([19,1,2,3,4,11]) : void 0, import.meta.url));
-const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-hQVneAfI.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
-const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-CgYCok3W.js"), true ? __vite__mapDeps([21,1,2,3,4]) : void 0, import.meta.url));
-const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-D4S_wB_o.js"), true ? __vite__mapDeps([22,1,2,3,4]) : void 0, import.meta.url));
-const DynamicPricing = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DynamicPricing-CBtPFtKK.js"), true ? __vite__mapDeps([23,1,2,24,3,4,25]) : void 0, import.meta.url));
+const ChannelManager = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ChannelManager-DlNjafR6.js"), true ? __vite__mapDeps([16,1,2,3,4,15]) : void 0, import.meta.url));
+const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Webhooks-BN_RkSiY.js"), true ? __vite__mapDeps([17,1,2,3,4,15]) : void 0, import.meta.url));
+const ScheduledPayments = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ScheduledPayments-4M-CGDAZ.js"), true ? __vite__mapDeps([18,1,2,3,4]) : void 0, import.meta.url));
+const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-DI15hclH.js"), true ? __vite__mapDeps([19,1,2,3,4,11]) : void 0, import.meta.url));
+const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-4QBN8wvc.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
+const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-Bet5Mx8f.js"), true ? __vite__mapDeps([21,1,2,3,4]) : void 0, import.meta.url));
+const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-5ESr8y4b.js"), true ? __vite__mapDeps([22,1,2,3,4]) : void 0, import.meta.url));
+const DynamicPricing = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DynamicPricing-DfI92xWO.js"), true ? __vite__mapDeps([23,1,2,24,3,4,25]) : void 0, import.meta.url));
 const DynamicPricingRuleForm = reactExports.lazy(
-  () => __vitePreload(() => import("../../../dist/js/DynamicPricingRuleForm-C99aT0Zu.js"), true ? __vite__mapDeps([26,1,2,3,4,24]) : void 0, import.meta.url)
+  () => __vitePreload(() => import("../../../dist/js/DynamicPricingRuleForm-fU9UAUc1.js"), true ? __vite__mapDeps([26,1,2,3,4,24]) : void 0, import.meta.url)
 );
-const AiAssistant = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AiAssistant-Bu_zHUnt.js"), true ? __vite__mapDeps([27,1,2,3,4,15]) : void 0, import.meta.url));
-const AbandonedRecovery = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AbandonedRecovery-BHbQat9C.js"), true ? __vite__mapDeps([28,1,2,3,4,25]) : void 0, import.meta.url));
-const WhiteLabel = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/WhiteLabel-DsK2IbJo.js"), true ? __vite__mapDeps([29,1,2,3,4,15]) : void 0, import.meta.url));
+const AiAssistant = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AiAssistant-CYBX-WDR.js"), true ? __vite__mapDeps([27,1,2,3,4,15]) : void 0, import.meta.url));
+const AbandonedRecovery = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AbandonedRecovery-DYXhry-Z.js"), true ? __vite__mapDeps([28,1,2,3,4,25]) : void 0, import.meta.url));
+const WhiteLabel = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/WhiteLabel-DmxhqdnP.js"), true ? __vite__mapDeps([29,1,2,3,4,15]) : void 0, import.meta.url));
 const PageLoadingFallback = () => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-1/3" }),

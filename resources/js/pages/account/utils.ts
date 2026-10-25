@@ -6,6 +6,7 @@ import {
 import {
   formatDate as formatGlobalDate,
   parseDate,
+  toDateValue,
 } from "../../lib/dateFormat";
 
 function toBrowserLocaleTag(
@@ -307,4 +308,40 @@ export function phoneToTelHref(phone: string): string {
   }
   const compact = t.replace(/[^\d+]/g, "");
   return compact ? `tel:${compact}` : `tel:${encodeURIComponent(t)}`;
+}
+
+/**
+ * Booking statuses that end a booking's life. A booking in one of these is
+ * never an upcoming trip, however far in the future its travel date is.
+ */
+const CLOSED_BOOKING_STATUSES = ["cancelled", "refunded", "failed"];
+
+/**
+ * Is this booking an upcoming trip?
+ *
+ * Travel date today or later, and the booking still live. The count used to
+ * look only at the date, so a cancelled trip kept inflating "Upcoming Trips",
+ * and the Dashboard and Bookings pages disagreed about a trip departing today
+ * because one compared with `>` and the other with `>=`. Both now call this.
+ */
+export function isUpcomingBooking(booking: {
+  travel_date?: string | null;
+  booking_status?: string | null;
+  status?: string | null;
+}): boolean {
+  const status = String(booking.booking_status ?? booking.status ?? "")
+    .trim()
+    .toLowerCase();
+  if (CLOSED_BOOKING_STATUSES.includes(status)) {
+    return false;
+  }
+
+  if (!booking.travel_date) {
+    return false;
+  }
+
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+
+  return toDateValue(booking.travel_date) >= startOfToday;
 }

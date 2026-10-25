@@ -320,6 +320,44 @@ class RecurringAvailabilityRepository extends BaseRepository
     }
 
     /**
+     * Clean an excluded_dates list before it is stored.
+     *
+     * Entries are a 'Y-m-d' string or a period ['start', 'end'], optionally
+     * with an admin-only 'note' saying why it is excluded. A single date with
+     * a note is stored as a one-day period, which every reader already
+     * understands ({@see RecurringAvailabilityService::isDateExcluded()}).
+     * Strings and anything unrecognised pass through unchanged; only the note
+     * is sanitised, and an empty note is dropped.
+     */
+    private function normalizeExcludedDates(array $entries): array
+    {
+        $out = [];
+
+        foreach ($entries as $entry) {
+            if (!is_array($entry) || !isset($entry['start'], $entry['end'])) {
+                $out[] = $entry;
+                continue;
+            }
+
+            $clean = [
+                'start' => (string) $entry['start'],
+                'end' => (string) $entry['end'],
+            ];
+
+            $note = isset($entry['note']) && is_scalar($entry['note'])
+                ? trim(sanitize_text_field((string) $entry['note']))
+                : '';
+            if ($note !== '') {
+                $clean['note'] = function_exists('mb_substr') ? mb_substr($note, 0, 200) : substr($note, 0, 200);
+            }
+
+            $out[] = $clean;
+        }
+
+        return $out;
+    }
+
+    /**
      * Prepare data for database
      */
     private function prepareData(array $data): array
@@ -370,6 +408,10 @@ class RecurringAvailabilityRepository extends BaseRepository
                     if ($value === '' || $value === null) {
                         $value = null;
                     }
+                }
+
+                if ($field === 'excluded_dates' && is_array($value)) {
+                    $value = $this->normalizeExcludedDates($value);
                 }
 
                 if (in_array($field, $jsonColumns, true)) {

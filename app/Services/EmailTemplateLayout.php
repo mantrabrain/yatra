@@ -105,6 +105,11 @@ final class EmailTemplateLayout
             $label = $row['label'] ?? '';
             $value = $row['value'] ?? '';
             $borderBottom = $i < $last ? 'border-bottom:1px solid #e2e8f0;' : '';
+            // Deliberately no marker attribute on the row. Tagging rows here
+            // changes the bundled body, and that body is the yardstick for
+            // "has the operator edited this template?" — every seeded template
+            // on every existing site would suddenly read as hand-edited.
+            // {@see dropUnfilledRows} matches this markup structurally instead.
             $out .= '<tr><td style="padding:14px 20px;' . $borderBottom . '">'
                 . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0">'
                 . '<tr>'
@@ -115,6 +120,45 @@ final class EmailTemplateLayout
         $out .= '</table>';
 
         return $out;
+    }
+
+    /**
+     * Remove detail rows whose value came out empty after merge tags were filled.
+     *
+     * {@see detailCard} filters empty values while the template is being built,
+     * which is too early for a stored template: at that point the value is the
+     * literal "{{transaction_id}}", so the row is kept, and substitution then
+     * leaves the customer looking at a labelled but blank Transaction ID. A
+     * manually recorded payment has no transaction id to show, so the row
+     * should not be there at all.
+     *
+     * Matched on this class's own markup, and on bodies seeded before rows
+     * began declaring what they depend on, so existing sites are covered too.
+     */
+    public static function dropUnfilledRows(string $html): string
+    {
+        if ($html === '' || strpos($html, 'font-size:15px;') === false) {
+            return $html;
+        }
+
+        // The label cell is matched with [^<]* rather than .*? — a dot-all
+        // wildcard runs straight past the end of its own row and happily pairs
+        // row one's label with a later row's empty value, taking everything in
+        // between with it. That emptied the whole detail card.
+        // Style attributes are matched with a trailing [^"]* and no closing
+        // semicolon. Stored bodies currently keep the declarations verbatim,
+        // so this is tolerance rather than necessity: it survives a sanitiser
+        // that drops a final `;`, reorders declarations or appends its own,
+        // which is cheaper than discovering the hard way that one did.
+        $pattern = '#<tr(?:\s[^>]*)?>\s*<td style="padding:14px 20px[^"]*">\s*'
+            . '<table[^>]*>\s*<tr>\s*'
+            . '<td style="font-size:13px[^"]*">[^<]*</td>\s*'
+            . '<td style="font-size:15px[^"]*">\s*</td>\s*'
+            . '</tr>\s*</table>\s*</td>\s*</tr>#';
+
+        $cleaned = preg_replace($pattern, '', $html);
+
+        return is_string($cleaned) ? $cleaned : $html;
     }
 
     /**

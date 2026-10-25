@@ -85,6 +85,10 @@ class AppServiceProvider extends ServiceProvider
         // Initialize availability inventory hooks
         \Yatra\Hooks\AvailabilityInventoryHooks::init();
 
+        // Keep a customer's booking statistics derived from the bookings table
+        // instead of counted up by hand (which double-counted every checkout).
+        \Yatra\Hooks\CustomerStatsHooks::init();
+
         // Initialize cache hooks
         \Yatra\Hooks\CacheHooks::init();
 

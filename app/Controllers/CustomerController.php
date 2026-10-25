@@ -458,6 +458,46 @@ class CustomerController extends BaseController
     }
 
     /**
+     * Attach "when is the balance due?" to a booking payload, if anything knows.
+     *
+     * Yatra core does not decide payment schedules — Yatra Pro's Scheduled
+     * Payments module does, and it owns both the stored instalments and the
+     * settings that date a plain balance. So core asks, and renders whatever
+     * comes back. With Pro absent, older, or the feature switched off the filter
+     * answers null and the payload is byte-for-byte what it was before, which is
+     * what keeps this safe to ship to every existing site.
+     *
+     * `source` tells the caller how much to trust the dates: 'scheduled' means
+     * rows that will actually be charged or chased, 'projected' means the dates
+     * the operator's own settings imply. Display them differently.
+     *
+     * @param object|array $booking
+     * @return object|array The same payload, with payment_schedule set when known.
+     */
+    private function withPaymentSchedule($booking)
+    {
+        if (!$booking) {
+            return $booking;
+        }
+
+        $schedule = apply_filters('yatra_booking_payment_schedule', null, (object) $booking);
+
+        if (!is_array($schedule)) {
+            return $booking;
+        }
+
+        if (is_array($booking)) {
+            $booking['payment_schedule'] = $schedule;
+
+            return $booking;
+        }
+
+        $booking->payment_schedule = $schedule;
+
+        return $booking;
+    }
+
+    /**
      * GET /customers/my-bookings - Get current customer's bookings
      */
     public function getMyBookings(WP_REST_Request $request): WP_REST_Response
@@ -466,6 +506,11 @@ class CustomerController extends BaseController
 
         // Get bookings by user ID (checks both customer_id and user_id)
         $bookings = $this->customerService->getBookingsByUserId($userId);
+
+        // So the list can show the next payment due, not only the amount.
+        foreach ($bookings as $i => $row) {
+            $bookings[$i] = $this->withPaymentSchedule($row);
+        }
 
         return new WP_REST_Response([
             'success' => true,
@@ -489,7 +534,7 @@ class CustomerController extends BaseController
 
         return new WP_REST_Response([
             'success' => true,
-            'data' => $booking,
+            'data' => $this->withPaymentSchedule($booking),
         ]);
     }
 

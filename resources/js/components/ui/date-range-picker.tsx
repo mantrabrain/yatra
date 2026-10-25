@@ -15,6 +15,7 @@ import {
   isToday,
 } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { getWeekStartsOn, getWeekdayLabels } from "../../lib/dateFormat";
 
 export interface DateRangePickerProps {
   dateFrom?: string; // YYYY-MM-DD format
@@ -123,15 +124,15 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
   const getDaysForMonth = (monthDate: Date) => {
     const monthStart = startOfMonth(monthDate);
     const monthEnd = endOfMonth(monthDate);
-    const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
-    const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
+    const calendarStart = startOfWeek(monthStart, { weekStartsOn: getWeekStartsOn() });
+    const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: getWeekStartsOn() });
     return eachDayOfInterval({ start: calendarStart, end: calendarEnd });
   };
 
   const nextMonthDate = addMonths(currentMonth, 1);
   const currentMonthDays = getDaysForMonth(currentMonth);
   const nextMonthDays = getDaysForMonth(nextMonthDate);
-  const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const weekDays = getWeekdayLabels();
 
   // Format display value
   let displayValue = "";

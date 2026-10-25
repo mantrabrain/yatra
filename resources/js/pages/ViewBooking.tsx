@@ -159,6 +159,8 @@ const ViewBooking: React.FC = () => {
           total_amount: data.total_amount,
           amount_paid: data.amount_paid || 0,
           amount_due: data.amount_due || 0,
+          // Set by Yatra Pro's Scheduled Payments module; absent otherwise.
+          payment_schedule: (data as any).payment_schedule || null,
           discount_amount: data.discount_amount || 0,
           discount_code: data.discount_code || null,
           currency: data.currency || "USD",
@@ -953,6 +955,74 @@ const ViewBooking: React.FC = () => {
                             </span>
                           </div>
                         )}
+
+                        {/* When that balance is actually due, and the instalment
+                            breakdown behind it. Present only when Scheduled
+                            Payments is active and the booking still owes. */}
+                        {(() => {
+                          const sched = (booking as any).payment_schedule;
+                          if (!sched?.next_due_date) return null;
+                          const items = Array.isArray(sched.installments)
+                            ? sched.installments
+                            : [];
+                          return (
+                            <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700 space-y-1">
+                              <div className="flex justify-between text-sm">
+                                <span
+                                  className={
+                                    sched.is_overdue
+                                      ? "text-red-600 dark:text-red-400 font-semibold"
+                                      : "text-gray-600 dark:text-gray-300"
+                                  }
+                                >
+                                  {sched.is_overdue
+                                    ? __("Overdue since", "yatra")
+                                    : __("Next payment due", "yatra")}
+                                </span>
+                                <span
+                                  className={
+                                    sched.is_overdue
+                                      ? "text-red-600 dark:text-red-400 font-semibold"
+                                      : "text-gray-900 dark:text-white"
+                                  }
+                                >
+                                  {formatDateUtil(sched.next_due_date)}
+                                </span>
+                              </div>
+                              {items.length > 1 &&
+                                items.map((item: any, index: number) => (
+                                  <div
+                                    key={`${item.due_date}-${index}`}
+                                    className="flex justify-between text-xs text-gray-500 dark:text-gray-400"
+                                  >
+                                    <span>
+                                      {item.number !== null
+                                        ? __("Instalment", "yatra") +
+                                          " " +
+                                          item.number
+                                        : __("Balance", "yatra")}
+                                      {" · "}
+                                      {formatDateUtil(item.due_date)}
+                                      {item.status === "paid"
+                                        ? " · " + __("Paid", "yatra")
+                                        : ""}
+                                    </span>
+                                    <span>
+                                      {formatPrice(item.amount, booking.currency)}
+                                    </span>
+                                  </div>
+                                ))}
+                              {sched.source === "projected" && (
+                                <p className="text-xs text-gray-400 dark:text-gray-500 pt-1">
+                                  {__(
+                                    "Expected from your payment terms — no charge is scheduled.",
+                                    "yatra",
+                                  )}
+                                </p>
+                              )}
+                            </div>
+                          );
+                        })()}
                       </div>
                     );
                   })()}
