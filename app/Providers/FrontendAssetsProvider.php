@@ -974,13 +974,25 @@ class FrontendAssetsProvider
                 true
             );
 
-            // Add currency formatting function
+            // Currency formatting for prices the filters redraw. It read a
+            // `window.yatraSettings` object nothing defines, so every redraw
+            // showed "$"; it now carries the store's format and matches
+            // yatra_format_price().
+            $priceFormat = function_exists('yatra_get_price_format_settings') ? yatra_get_price_format_settings() : [];
             wp_add_inline_script('yatra-listing-filters', "
                 window.yatra_format_price = function(amount) {
                     if (!amount || amount == 0) return '" . esc_js(__('Contact for pricing', 'yatra')) . "';
-                    const currency = window.yatraSettings?.currency || 'USD';
-                    const symbol = window.yatraSettings?.currencySymbol || '$';
-                    return symbol + amount.toLocaleString();
+                    var fmt = " . wp_json_encode($priceFormat) . ";
+                    if (!fmt || typeof fmt.symbol !== 'string') return Number(amount).toLocaleString();
+                    var decimals = Math.max(0, Math.min(4, parseInt(fmt.decimals, 10) || 0));
+                    var parts = (Math.round(Math.abs(Number(amount)) * Math.pow(10, decimals)) / Math.pow(10, decimals)).toFixed(decimals).split('.');
+                    var number = parts[0].replace(/\\B(?=(\\d{3})+(?!\\d))/g, fmt.thousand_separator);
+                    if (decimals > 0) number += fmt.decimal_separator + parts[1];
+                    if (Number(amount) < 0) number = '-' + number;
+                    if (fmt.position === 'right') return number + fmt.symbol;
+                    if (fmt.position === 'right_space') return number + ' ' + fmt.symbol;
+                    if (fmt.position === 'left') return fmt.symbol + number;
+                    return fmt.symbol + ' ' + number;
                 };
             ");
         }

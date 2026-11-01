@@ -103,6 +103,32 @@ class AvailabilityResolutionService
             return $this->buildAvailabilityObject($trip, $recurring, 'recurring_rule');
         }
 
+        // Priority 2.4: A rule departure kept off the calendar only by its booking
+        // window — inside "Booking Cutoff (hours before)", or further ahead than
+        // bookings open.
+        //
+        // The calendar never offers these dates, but without this the date fell
+        // through to the trip default below and reported free seats, so a booking
+        // from an old link or a page left open went through. Inside the cutoff the
+        // rule's own row is returned, so the booking guard's cutoff check refuses
+        // it with its usual message; a date not open yet (or already departed) is
+        // closed outright.
+        $outsideWindow = $this->resolveRecurringAvailabilityForDate($tripId, $date, $departureTime, true);
+        if ($outsideWindow !== null) {
+            $closed = $this->buildAvailabilityObject($trip, $outsideWindow, 'recurring_rule');
+            $cutoffHours = (int) ($outsideWindow['cutoff_hours'] ?? 24);
+            $departureTs = strtotime($date . ' ' . (string) ($outsideWindow['departure_time'] ?? '00:00:00'));
+            $insideCutoff = $departureTs !== false
+                && $cutoffHours > 0
+                && time() >= $departureTs - ($cutoffHours * 3600)
+                && time() < $departureTs;
+            if (!$insideCutoff) {
+                $closed->status = 'closed';
+                $closed->seats_available = 0;
+            }
+            return $closed;
+        }
+
         // Priority 2.5: A date the operator explicitly excluded on a recurring
         // rule — a holiday, or a period such as a business vacation.
         //
@@ -722,9 +748,11 @@ class AvailabilityResolutionService
      *
      * @return array|null A generated availability row (array shape) or null if no rule applies
      */
-    private function resolveRecurringAvailabilityForDate(int $tripId, string $date, ?string $departureTime = null): ?array
+    private function resolveRecurringAvailabilityForDate(int $tripId, string $date, ?string $departureTime = null, bool $ignoreBookingWindow = false): ?array
     {
-        $generated = $this->recurringAvailabilityService->generateDatesForTrip($tripId, $date, $date);
+        $generated = $ignoreBookingWindow
+            ? $this->recurringAvailabilityService->generateDatesForTripIgnoringBookingWindow($tripId, $date, $date)
+            : $this->recurringAvailabilityService->generateDatesForTrip($tripId, $date, $date);
         if (empty($generated)) {
             return null;
         }

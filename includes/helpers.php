@@ -364,39 +364,13 @@ if (!function_exists('yatra_format_price')) {
         if ($zero_is_unknown && (empty($amount) || $amount == 0)) {
             return __('Contact for pricing', 'yatra');
         }
-        
-        // Get currency from global settings if not provided
-        if (empty($currency)) {
-            $currency = SettingsService::getCurrency();
-        }
-        
-        // Get formatting settings from global settings
-        $currency_position = SettingsService::getCurrencyPosition();
-        // Single source of truth: honors the admin "Number of decimals" field and
-        // stays in sync with the JS price formatter (already clamped to 0–4).
-        $decimal_places = SettingsService::getPriceDecimals();
-        $thousand_separator = SettingsService::getString('thousand_separator', ',');
-        $decimal_separator = SettingsService::getString('decimal_separator', '.');
-        
-        // Format the amount with proper separators
-        $formatted_amount = number_format($amount, $decimal_places, $decimal_separator, $thousand_separator);
-        
-        // Get currency symbol
-        $currency_symbol = yatra_get_currency_symbol($currency);
 
-        // Placement: Settings UI uses left, right, left_space, right_space; legacy uses before/after.
-        $raw = strtolower(trim((string) $currency_position));
-        if ($raw === 'before') {
-            $pos = 'left_space';
-        } elseif ($raw === 'after') {
-            $pos = 'right_space';
-        } else {
-            $pos = $raw;
-        }
-        $allowed = ['left', 'right', 'left_space', 'right_space'];
-        if (!in_array($pos, $allowed, true)) {
-            $pos = 'left_space';
-        }
+        $format = yatra_get_price_format_settings($currency);
+
+        // Format the amount with proper separators
+        $formatted_amount = number_format($amount, $format['decimals'], $format['decimal_separator'], $format['thousand_separator']);
+        $currency_symbol = $format['symbol'];
+        $pos = $format['position'];
 
         if ($pos === 'right') {
             return $formatted_amount . $currency_symbol;
@@ -409,6 +383,47 @@ if (!function_exists('yatra_format_price')) {
         }
 
         return $currency_symbol . ' ' . $formatted_amount;
+    }
+}
+
+/**
+ * The store's price format, as used by yatra_format_price().
+ *
+ * Also handed to frontend scripts (e.g. the listing price filter) so prices they
+ * redraw match the ones PHP printed, instead of assuming "$".
+ *
+ * @param string|null $currency Currency code; the global setting when omitted.
+ * @return array{symbol: string, position: string, decimals: int, thousand_separator: string, decimal_separator: string}
+ */
+if (!function_exists('yatra_get_price_format_settings')) {
+    function yatra_get_price_format_settings(?string $currency = null): array
+    {
+        if (empty($currency)) {
+            $currency = SettingsService::getCurrency();
+        }
+
+        // Placement: Settings UI uses left, right, left_space, right_space; legacy uses before/after.
+        $raw = strtolower(trim((string) SettingsService::getCurrencyPosition()));
+        if ($raw === 'before') {
+            $pos = 'left_space';
+        } elseif ($raw === 'after') {
+            $pos = 'right_space';
+        } else {
+            $pos = $raw;
+        }
+        if (!in_array($pos, ['left', 'right', 'left_space', 'right_space'], true)) {
+            $pos = 'left_space';
+        }
+
+        return [
+            'symbol' => yatra_get_currency_symbol((string) $currency),
+            'position' => $pos,
+            // Single source of truth: honors the admin "Number of decimals" field and
+            // stays in sync with the JS price formatter (already clamped to 0–4).
+            'decimals' => SettingsService::getPriceDecimals(),
+            'thousand_separator' => SettingsService::getString('thousand_separator', ','),
+            'decimal_separator' => SettingsService::getString('decimal_separator', '.'),
+        ];
     }
 }
 

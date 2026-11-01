@@ -118,6 +118,19 @@ const fieldTypeIcons: Record<string, React.ElementType> = {
   number: Hash,
 };
 
+// Tooltip for the "add field" buttons — the raw type keys are not words to show.
+const fieldTypeLabel = (type: string): string =>
+  ({
+    text: __("Text"),
+    textarea: __("Text area"),
+    checkbox: __("Checkbox"),
+    select: __("Dropdown"),
+    date: __("Date"),
+    email: __("Email"),
+    phone: __("Phone"),
+    number: __("Number"),
+  })[type] || type;
+
 // Check if module is available
 const isModuleAvailable = (): boolean => {
   const yatraAdmin = (window as any)?.yatraAdmin;
@@ -1080,7 +1093,7 @@ const TripConsentForm: React.FC = () => {
                         variant="outline"
                         size="sm"
                         onClick={() => addField(type as FormField["type"])}
-                        title={type}
+                        title={fieldTypeLabel(type)}
                       >
                         <Icon className="w-4 h-4" />
                       </Button>

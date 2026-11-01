@@ -565,9 +565,15 @@ class AdminAssetsProvider
      * the plugin ignoring the translation altogether.
      *
      * The strings are the same ones the PHP catalogue already holds, so they are
-     * handed to wp.i18n directly. Core is asked first and left in charge
-     * whenever it can find a JSON file: that path is cached by the browser as a
-     * separate request, and this one is not.
+     * handed to wp.i18n directly.
+     *
+     * A JSON file, when there is one, is still printed by core and wins for every
+     * string it holds — but it only ever holds the strings of the one file it is
+     * named after (app.js). Screens split into their own chunks (the consent form
+     * editor, for one) have JSON files keyed by their own file names, which
+     * WordPress never loads, so they stayed English on every site with a
+     * WordPress.org language pack. Whatever the JSON lacks is filled in from the
+     * PHP catalogue, without touching the JSON's own plural rules.
      *
      * Nothing is emitted on an untranslated site — the map comes back empty and
      * English sites carry no extra weight.
@@ -578,14 +584,29 @@ class AdminAssetsProvider
             return;
         }
 
-        // A real JSON file beats this: let WordPress load it as it normally would.
-        if (load_script_textdomain($handle, 'yatra', YATRA_PLUGIN_PATH . 'i18n/languages')) {
-            return;
-        }
+        $json = load_script_textdomain($handle, 'yatra', YATRA_PLUGIN_PATH . 'i18n/languages');
 
         $localeData = $this->localeDataFromTextdomain('yatra');
         if ($localeData === []) {
             return;
+        }
+
+        if (is_string($json) && $json !== '') {
+            $decoded = json_decode($json, true);
+            $known = [];
+            if (is_array($decoded) && isset($decoded['locale_data']) && is_array($decoded['locale_data'])) {
+                foreach ($decoded['locale_data'] as $domainData) {
+                    if (is_array($domainData)) {
+                        $known += $domainData;
+                    }
+                }
+            }
+            // Core's JSON sets the domain header (plural rules) — keep it.
+            unset($localeData['']);
+            $localeData = array_diff_key($localeData, $known);
+            if ($localeData === []) {
+                return;
+            }
         }
 
         wp_add_inline_script(
@@ -655,10 +676,16 @@ class AdminAssetsProvider
             return [];
         }
 
+        // The catalogue's own plural rule (Polish, Russian, Arabic… have more than two forms).
+        $headers = $translations->headers;
+        $pluralForms = is_array($headers) && !empty($headers['Plural-Forms']) && is_string($headers['Plural-Forms'])
+            ? $headers['Plural-Forms']
+            : 'nplurals=2; plural=(n != 1);';
+
         $data[''] = [
             'domain' => $domain,
             'lang' => determine_locale(),
-            'plural-forms' => 'nplurals=2; plural=(n != 1);',
+            'plural-forms' => $pluralForms,
         ];
 
         return $data;

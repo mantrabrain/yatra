@@ -49,7 +49,7 @@ import {
   Sun,
   User,
 } from "lucide-react";
-import { __ } from "../lib/i18n";
+import { __, sprintf } from "../lib/i18n";
 import { Button } from "../components/ui/button";
 import { Tooltip } from "../components/ui/tooltip";
 import { useToast } from "../components/ui/toast";
@@ -911,7 +911,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                       <span>v{window.yatraAdmin?.version || "1.0.0"}</span>
                       {(window as any).yatraAdmin?.proVersion && (
                         <span className="px-1.5 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded font-medium">
-                          Pro v{(window as any).yatraAdmin?.proVersion}
+                          {sprintf(
+                            /* translators: %s: Yatra Pro version number. */
+                            __("Pro v%s", "yatra"),
+                            (window as any).yatraAdmin?.proVersion,
+                          )}
                         </span>
                       )}
                     </div>
@@ -1088,12 +1092,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                             className="text-[10px] px-2 py-0.5"
                           >
                             {licenseStatus === "active"
-                              ? "Active"
+                              ? __("Active", "yatra")
                               : licenseStatus === "expired"
-                                ? "Expired"
+                                ? __("Expired", "yatra")
                                 : licenseStatus === "invalid"
-                                  ? "Invalid"
-                                  : "Inactive"}
+                                  ? __("Invalid", "yatra")
+                                  : __("Inactive", "yatra")}
                           </Badge>
                         )}
                     </a>
@@ -1171,7 +1175,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                       );
                       return activeSubItem?.label || activeItem.label;
                     }
-                    return activeItem?.label || "Dashboard";
+                    return activeItem?.label || __("Dashboard", "yatra");
                   })()}
                 </h1>
 
@@ -1298,7 +1302,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   }}
                   className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400"
                   aria-label={
-                    darkMode ? "Switch to light mode" : "Switch to dark mode"
+                    darkMode
+                      ? __("Switch to light mode", "yatra")
+                      : __("Switch to dark mode", "yatra")
                   }
                 >
                   {darkMode ? (

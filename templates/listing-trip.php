@@ -223,7 +223,7 @@ $yatra_listing_layout_class = \Yatra\Providers\FrontendAssetsProvider::listingLa
                                     <input type="range" min="<?php echo $min_price; ?>" max="<?php echo $max_price; ?>" step="<?php echo $step; ?>" value="<?php echo !empty($active_filters['price_min']) ? esc_attr($active_filters['price_min']) : $min_price; ?>" class="yatra-range-min" id="priceRangeMin" data-default="<?php echo $min_price; ?>" data-user-set="<?php echo !empty($active_filters['price_min']) ? 'true' : 'false'; ?>">
                                     <input type="range" min="<?php echo $min_price; ?>" max="<?php echo $max_price; ?>" step="<?php echo $step; ?>" value="<?php echo !empty($active_filters['price_max']) ? esc_attr($active_filters['price_max']) : $max_price; ?>" class="yatra-range-max" id="priceRangeMax" data-default="<?php echo $max_price; ?>" data-user-set="<?php echo !empty($active_filters['price_max']) ? 'true' : 'false'; ?>">
                                 </div>
-                                <div class="yatra-price-display"><?php echo yatra_format_price($min_price); ?> - <?php echo yatra_format_price($max_price); ?></div>
+                                <div class="yatra-price-display" data-price-format="<?php echo esc_attr(wp_json_encode(function_exists('yatra_get_price_format_settings') ? yatra_get_price_format_settings() : [])); ?>"><?php echo yatra_format_price($min_price); ?> - <?php echo yatra_format_price($max_price); ?></div>
                             </div>
                         </div>
                     </div>

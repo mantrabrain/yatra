@@ -1,9 +1,9 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-tjvg5vmz.js","../../../dist/js/react-vendor-W-_yntDU.js","../css/react-vendor.css","../../../dist/js/index-BepRZmXV.js","../css/index.css","../../../dist/js/BuildItineraryModal-YugDA9cT.js","../../../dist/js/ProFeature-eW2EIwqA.js","../../../dist/js/Settings-5xW46lQt.js","../../../dist/js/Team-DyYUid5I.js","../../../dist/js/Reports-DJFFzVlx.js","../../../dist/js/DiscountForm-DEhimB0H.js","../../../dist/js/ApplicableTripSelector-D2QW_HaZ.js","../../../dist/js/Itinerary-CF5aaNMY.js","../../../dist/js/RecurringRuleForm-DQBxA5fX.js","./Whatsapp.js","../../../dist/js/module-skeleton-C9FJOcwf.js","../../../dist/js/ChannelManager-Fb0ex6IR.js","../../../dist/js/Webhooks-CwK81HRm.js","../../../dist/js/ScheduledPayments-DdSUOyEb.js","../../../dist/js/TripConsentForm-RRs36c9f.js","../../../dist/js/BookingForm-WRfLP_5t.js","../../../dist/js/ViewBooking-D0EgePSD.js","../../../dist/js/AvailabilityForm-C05OEgNS.js","../../../dist/js/DynamicPricing-PAm1uvCr.js","../../../dist/js/RuleTypeSelectionModal-DSWZlmcG.js","../../../dist/js/toggle-DcgGKLMp.js","../../../dist/js/DynamicPricingRuleForm-BNVsNOcm.js","../../../dist/js/AiAssistant-DONS3P3T.js","../../../dist/js/AbandonedRecovery-a5eULyr-.js","../../../dist/js/WhiteLabel-BzFhb8A5.js"])))=>i.map(i=>d[i]);
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-tjvg5vmz.js","../../../dist/js/react-vendor-W-_yntDU.js","../css/react-vendor.css","../../../dist/js/index-BepRZmXV.js","../css/index.css","../../../dist/js/BuildItineraryModal-YugDA9cT.js","../../../dist/js/ProFeature-eW2EIwqA.js","../../../dist/js/Settings-5xW46lQt.js","../../../dist/js/Team-DyYUid5I.js","../../../dist/js/Reports-DJFFzVlx.js","../../../dist/js/DiscountForm-DEhimB0H.js","../../../dist/js/ApplicableTripSelector-D2QW_HaZ.js","../../../dist/js/Itinerary-CF5aaNMY.js","../../../dist/js/RecurringRuleForm-DQBxA5fX.js","./Whatsapp.js","../../../dist/js/module-skeleton-C9FJOcwf.js","../../../dist/js/ChannelManager-Fb0ex6IR.js","../../../dist/js/Webhooks-CwK81HRm.js","../../../dist/js/ScheduledPayments-DdSUOyEb.js","../../../dist/js/TripConsentForm-BAKrDitH.js","../../../dist/js/BookingForm-WRfLP_5t.js","../../../dist/js/ViewBooking-D0EgePSD.js","../../../dist/js/AvailabilityForm-C05OEgNS.js","../../../dist/js/DynamicPricing-PAm1uvCr.js","../../../dist/js/RuleTypeSelectionModal-DSWZlmcG.js","../../../dist/js/toggle-DcgGKLMp.js","../../../dist/js/DynamicPricingRuleForm-BNVsNOcm.js","../../../dist/js/AiAssistant-DONS3P3T.js","../../../dist/js/AbandonedRecovery-a5eULyr-.js","../../../dist/js/WhiteLabel-BzFhb8A5.js"])))=>i.map(i=>d[i]);
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key2, value) => key2 in obj ? __defProp(obj, key2, { enumerable: true, configurable: true, writable: true, value }) : obj[key2] = value;
 var __publicField = (obj, key2, value) => __defNormalProp(obj, typeof key2 !== "symbol" ? key2 + "" : key2, value);
 import { r as reactExports, j as jsxRuntimeExports, W as Wrench, N as Network, M as MessageCircle, S as Sparkles, R as RotateCcw, P as Puzzle, a as MessageSquare, b as Plane, B as BadgePercent, c as Route, F as FileSignature, K as Key, d as Mail, C as Crown, A as Activity, L as List, T as TrendingUp, e as Tag, f as FolderTree, U as Users, g as CircleUser, h as Package, i as CreditCard, k as FileText, l as Settings$1, m as BarChart3, n as Star, o as CalendarDays, p as CalendarClock, q as Calendar$1, s as MapPin, t as LayoutDashboard, u as useQueryClient, v as useMutation, w as useQuery, Z as Zap, x as Webhook, y as ChevronDown, z as ChevronRight, D as ArrowLeft, G as Gift, E as Cloud, H as Sun, I as Moon, J as User, O as RefreshCw, Q as Inbox, V as AlertTriangle, X as ExternalLink, Y as isObjectLike_1, _ as _baseGetTag, $ as isArray_1, a0 as _MapCache, a1 as getDefaultExportFromCjs, a2 as _Symbol, a3 as isObject$5, a4 as isFunction, a5 as reactIsExports, a6 as React, a7 as _Stack, a8 as _baseIsEqual, a9 as isObject_1, aa as keys_1, ab as isLength_1, ac as _isIndex, ad as isArguments_1, ae as _Set, af as _setToArray, ag as _SetCache, ah as _cacheHas, ai as _arrayPush, aj as isArrayLike_1, ak as _baseUnary, al as _getNative, am as eq_1, an as _root, ao as isEqual, ap as Animate, aq as _overArg, ar as _arraySome, as as Clock, at as DollarSign, au as ArrowRight, av as Shield, aw as CheckCircle, ax as Plus, ay as X, az as reactDomExports, aA as AlertCircle, aB as Loader2, aC as Check, aD as Wand2, aE as ChevronLeft, aF as CheckCircle2, aG as HelpCircle, aH as Info, aI as Copy, aJ as MoreVertical, aK as Columns, aL as PenSquare, aM as ArrowUp, aN as ArrowDown, aO as Archive, aP as Trash2, aQ as Search, aR as ArrowUpDown, aS as Eye, aT as Upload, aU as Image, aV as ReactQuill, aW as Pen, aX as Save, aY as Download, aZ as CircleDollarSign, a_ as Undo2, a$ as Phone, b0 as PauseCircle, b1 as ShieldX, b2 as ShieldOff, b3 as Globe, b4 as Award, b5 as Database, b6 as Folder, b7 as Mountain, b8 as UserCheck, b9 as Server, ba as XCircle, bb as Video, bc as Lock, bd as GripVertical, be as ChevronUp, bf as Play, bg as ClipboardCopy, bh as StickyNote, bi as Ban, bj as Bell, bk as Heart, bl as Scissors, bm as Send, bn as Filter, bo as ArrowUpRight, bp as ClipboardCheck, bq as PenTool, br as Camera, bs as BarChart$1, bt as Megaphone, bu as Compass, bv as GitBranch, bw as Pause, bx as Settings2, by as Code, bz as Bug, bA as EyeOff, bB as QueryClient, bC as client, bD as QueryClientProvider } from "../../../dist/js/react-vendor-W-_yntDU.js";
-import { a as apiClient, A as API_ENDPOINTS, b as apiService, _ as __, u as useToast, n as normalizeCurrencyPosition, t as toDateValue, f as formatYatraMoney, r as readYatraCurrencyPositionFromWindow, s as sprintf, c as brandName, d as formatDateForInput, I as Input, e as formatDate$1, g as getWeekStartsOn, h as getWeekdayLabels, i as todayYmd, S as SearchableSelect, j as getCurrencySymbol, k as formatDateTime, l as getCountryName, m as ajaxService, T as ToastProvider, E as ErrorBoundary } from "../../../dist/js/index-BepRZmXV.js";
+import { a as apiClient, A as API_ENDPOINTS, b as apiService, _ as __, u as useToast, s as sprintf, n as normalizeCurrencyPosition, t as toDateValue, f as formatYatraMoney, r as readYatraCurrencyPositionFromWindow, c as brandName, d as formatDateForInput, I as Input, e as formatDate$1, g as getWeekStartsOn, h as getWeekdayLabels, i as todayYmd, S as SearchableSelect, j as getCurrencySymbol, k as formatDateTime, l as getCountryName, m as ajaxService, T as ToastProvider, E as ErrorBoundary } from "../../../dist/js/index-BepRZmXV.js";
 const scriptRel = "modulepreload";
 const assetsURL = function(dep, importerUrl) {
   return new URL(dep, importerUrl).href;
@@ -4640,10 +4640,11 @@ const Layout = ({ children }) => {
                   "v",
                   ((_c = window.yatraAdmin) == null ? void 0 : _c.version) || "1.0.0"
                 ] }),
-                ((_d = window.yatraAdmin) == null ? void 0 : _d.proVersion) && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "px-1.5 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded font-medium", children: [
-                  "Pro v",
+                ((_d = window.yatraAdmin) == null ? void 0 : _d.proVersion) && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "px-1.5 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded font-medium", children: sprintf(
+                  /* translators: %s: Yatra Pro version number. */
+                  __("Pro v%s", "yatra"),
                   (_e = window.yatraAdmin) == null ? void 0 : _e.proVersion
-                ] })
+                ) })
               ] })
             ] })
           ] }) }) }),
@@ -4754,7 +4755,7 @@ const Layout = ({ children }) => {
                           {
                             variant: licenseStatus === "active" ? "success" : licenseStatus === "expired" ? "error" : licenseStatus === "invalid" ? "error" : "error",
                             className: "text-[10px] px-2 py-0.5",
-                            children: licenseStatus === "active" ? "Active" : licenseStatus === "expired" ? "Expired" : licenseStatus === "invalid" ? "Invalid" : "Inactive"
+                            children: licenseStatus === "active" ? __("Active", "yatra") : licenseStatus === "expired" ? __("Expired", "yatra") : licenseStatus === "invalid" ? __("Invalid", "yatra") : __("Inactive", "yatra")
                           }
                         )
                       ]
@@ -4819,7 +4820,7 @@ const Layout = ({ children }) => {
                       );
                       return (activeSubItem == null ? void 0 : activeSubItem.label) || activeItem.label;
                     }
-                    return (activeItem == null ? void 0 : activeItem.label) || "Dashboard";
+                    return (activeItem == null ? void 0 : activeItem.label) || __("Dashboard", "yatra");
                   })() }),
                   !isProPluginActive() && /* @__PURE__ */ jsxRuntimeExports.jsx(
                     Tooltip$1,
@@ -4927,7 +4928,7 @@ const Layout = ({ children }) => {
                         setDarkMode(!darkMode);
                       },
                       className: "p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400",
-                      "aria-label": darkMode ? "Switch to light mode" : "Switch to dark mode",
+                      "aria-label": darkMode ? __("Switch to light mode", "yatra") : __("Switch to dark mode", "yatra"),
                       children: darkMode ? /* @__PURE__ */ jsxRuntimeExports.jsx(Sun, { className: "w-5 h-5" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Moon, { className: "w-5 h-5" })
                     }
                   ),
@@ -79397,7 +79398,7 @@ const Whatsapp = reactExports.lazy(() => __vitePreload(() => import("./Whatsapp.
 const ChannelManager = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ChannelManager-Fb0ex6IR.js"), true ? __vite__mapDeps([16,1,2,3,4,15]) : void 0, import.meta.url));
 const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Webhooks-CwK81HRm.js"), true ? __vite__mapDeps([17,1,2,3,4,15]) : void 0, import.meta.url));
 const ScheduledPayments = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ScheduledPayments-DdSUOyEb.js"), true ? __vite__mapDeps([18,1,2,3,4]) : void 0, import.meta.url));
-const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-RRs36c9f.js"), true ? __vite__mapDeps([19,1,2,3,4,11]) : void 0, import.meta.url));
+const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-BAKrDitH.js"), true ? __vite__mapDeps([19,1,2,3,4,11]) : void 0, import.meta.url));
 const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-WRfLP_5t.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
 const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-D0EgePSD.js"), true ? __vite__mapDeps([21,1,2,3,4]) : void 0, import.meta.url));
 const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-C05OEgNS.js"), true ? __vite__mapDeps([22,1,2,3,4]) : void 0, import.meta.url));

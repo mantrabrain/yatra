@@ -8,6 +8,31 @@
 (function() {
     'use strict';
 
+    /**
+     * Same output as PHP yatra_format_price() for the given format settings
+     * (see yatra_get_price_format_settings()): number_format() then placement.
+     */
+    function formatWithSettings(amount, fmt) {
+        const decimals = Math.max(0, Math.min(4, parseInt(fmt.decimals, 10) || 0));
+        const fixed = (Math.round(Math.abs(Number(amount) || 0) * Math.pow(10, decimals)) / Math.pow(10, decimals)).toFixed(decimals);
+        const parts = fixed.split('.');
+        const thousands = typeof fmt.thousand_separator === 'string' ? fmt.thousand_separator : ',';
+        const decimalSep = typeof fmt.decimal_separator === 'string' ? fmt.decimal_separator : '.';
+        let number = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thousands);
+        if (decimals > 0) {
+            number += decimalSep + parts[1];
+        }
+        if ((Number(amount) || 0) < 0) {
+            number = '-' + number;
+        }
+        switch (fmt.position) {
+            case 'right': return number + fmt.symbol;
+            case 'right_space': return number + ' ' + fmt.symbol;
+            case 'left': return fmt.symbol + number;
+            default: return fmt.symbol + ' ' + number;
+        }
+    }
+
     // Initialize when DOM is ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
@@ -238,15 +263,30 @@
 
         if (!minRange || !maxRange || !priceDisplay) return;
 
+        // The store's currency format, printed by PHP next to the display, so a
+        // redrawn range matches the prices PHP rendered (it used to assume "$").
+        let priceFormat = null;
+        try {
+            priceFormat = JSON.parse(priceDisplay.getAttribute('data-price-format') || 'null');
+        } catch (e) {
+            priceFormat = null;
+        }
+
+        function formatPrice(amount) {
+            if (!priceFormat || typeof priceFormat.symbol !== 'string') {
+                // Older template override without the format attribute.
+                return typeof window.yatra_format_price === 'function'
+                    ? window.yatra_format_price(amount)
+                    : amount.toLocaleString();
+            }
+            return formatWithSettings(amount, priceFormat);
+        }
+
         function updatePriceDisplay() {
             const min = parseInt(minRange.value) || 0;
             const max = parseInt(maxRange.value) || 10000;
-            
-            // Format with commas
-            const minFormatted = min.toLocaleString();
-            const maxFormatted = max.toLocaleString();
-            
-            priceDisplay.textContent = `$${minFormatted} - $${maxFormatted}`;
+
+            priceDisplay.textContent = formatPrice(min) + ' - ' + formatPrice(max);
             
             if (minInput) minInput.value = min;
             if (maxInput) maxInput.value = max;

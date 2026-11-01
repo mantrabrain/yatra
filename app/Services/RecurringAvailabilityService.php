@@ -17,6 +17,9 @@ use Yatra\Repositories\RecurringAvailabilityRepository;
 
 class RecurringAvailabilityService
 {
+    /** Set only inside generateDatesForTripIgnoringBookingWindow(). */
+    private bool $ignoreBookingWindow = false;
+
     private RecurringAvailabilityRepository $repository;
 
     public function __construct(RecurringAvailabilityRepository $repository)
@@ -551,10 +554,32 @@ class RecurringAvailabilityService
     }
 
     /**
+     * Departures a rule runs in this range, including the ones its booking window
+     * keeps off the calendar — inside "Booking Cutoff (hours before)", or further
+     * ahead than `advance_booking_days` opens bookings. The booking resolver uses
+     * this to refuse those dates instead of treating them as an open trip.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function generateDatesForTripIgnoringBookingWindow(int $tripId, string $fromDate, string $toDate): array
+    {
+        $this->ignoreBookingWindow = true;
+        try {
+            return $this->generateDatesForTrip($tripId, $fromDate, $toDate);
+        } finally {
+            $this->ignoreBookingWindow = false;
+        }
+    }
+
+    /**
      * Check if a date is bookable based on cutoff rules
      */
     private function isBookable(int $timestamp, object $rule): bool
     {
+        if ($this->ignoreBookingWindow) {
+            return true;
+        }
+
         $cutoffHours = (int) ($rule->cutoff_hours ?? 24);
         $departureTime = $rule->departure_time ?? '00:00:00';
         

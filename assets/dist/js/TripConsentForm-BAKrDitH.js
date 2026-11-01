@@ -27,6 +27,16 @@ const fieldTypeIcons = {
   phone: Phone,
   number: Hash
 };
+const fieldTypeLabel = (type) => ({
+  text: __("Text"),
+  textarea: __("Text area"),
+  checkbox: __("Checkbox"),
+  select: __("Dropdown"),
+  date: __("Date"),
+  email: __("Email"),
+  phone: __("Phone"),
+  number: __("Number")
+})[type] || type;
 const isModuleAvailable = () => {
   const yatraAdmin = window == null ? void 0 : window.yatraAdmin;
   return Boolean((yatraAdmin == null ? void 0 : yatraAdmin.isPro) && (yatraAdmin == null ? void 0 : yatraAdmin.tripConsentEnabled));
@@ -821,7 +831,7 @@ const TripConsentForm = () => {
               variant: "outline",
               size: "sm",
               onClick: () => addField(type),
-              title: type,
+              title: fieldTypeLabel(type),
               children: /* @__PURE__ */ jsxRuntimeExports.jsx(Icon, { className: "w-4 h-4" })
             },
             type
@@ -1654,4 +1664,4 @@ const PreviewForm = ({
 export {
   TripConsentForm as default
 };
-//# sourceMappingURL=TripConsentForm-RRs36c9f.js.map
+//# sourceMappingURL=TripConsentForm-BAKrDitH.js.map
