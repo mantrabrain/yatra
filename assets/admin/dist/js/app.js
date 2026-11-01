@@ -1,9 +1,9 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-CXNZs7SO.js","../../../dist/js/react-vendor-W-_yntDU.js","../css/react-vendor.css","../../../dist/js/index-Dc5uh_w8.js","../css/index.css","../../../dist/js/BuildItineraryModal-Bom09KmZ.js","../../../dist/js/ProFeature-iDhjjtAN.js","../../../dist/js/Settings-DpAuooiC.js","../../../dist/js/Team-DlPqu238.js","../../../dist/js/Reports-CfQKXt4i.js","../../../dist/js/DiscountForm-DFtlsNgW.js","../../../dist/js/ApplicableTripSelector-CDyBQsOu.js","../../../dist/js/Itinerary-BwsITON1.js","../../../dist/js/RecurringRuleForm-eQImFFYR.js","./Whatsapp.js","../../../dist/js/module-skeleton-C9FJOcwf.js","../../../dist/js/ChannelManager-DlNjafR6.js","../../../dist/js/Webhooks-BN_RkSiY.js","../../../dist/js/ScheduledPayments-4M-CGDAZ.js","../../../dist/js/TripConsentForm-DI15hclH.js","../../../dist/js/BookingForm-4QBN8wvc.js","../../../dist/js/ViewBooking-Bet5Mx8f.js","../../../dist/js/AvailabilityForm-5ESr8y4b.js","../../../dist/js/DynamicPricing-DfI92xWO.js","../../../dist/js/RuleTypeSelectionModal-BDVc3z6q.js","../../../dist/js/toggle-DcgGKLMp.js","../../../dist/js/DynamicPricingRuleForm-fU9UAUc1.js","../../../dist/js/AiAssistant-CYBX-WDR.js","../../../dist/js/AbandonedRecovery-DYXhry-Z.js","../../../dist/js/WhiteLabel-DmxhqdnP.js"])))=>i.map(i=>d[i]);
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-tjvg5vmz.js","../../../dist/js/react-vendor-W-_yntDU.js","../css/react-vendor.css","../../../dist/js/index-BepRZmXV.js","../css/index.css","../../../dist/js/BuildItineraryModal-YugDA9cT.js","../../../dist/js/ProFeature-eW2EIwqA.js","../../../dist/js/Settings-5xW46lQt.js","../../../dist/js/Team-DyYUid5I.js","../../../dist/js/Reports-DJFFzVlx.js","../../../dist/js/DiscountForm-DEhimB0H.js","../../../dist/js/ApplicableTripSelector-D2QW_HaZ.js","../../../dist/js/Itinerary-CF5aaNMY.js","../../../dist/js/RecurringRuleForm-DQBxA5fX.js","./Whatsapp.js","../../../dist/js/module-skeleton-C9FJOcwf.js","../../../dist/js/ChannelManager-Fb0ex6IR.js","../../../dist/js/Webhooks-CwK81HRm.js","../../../dist/js/ScheduledPayments-DdSUOyEb.js","../../../dist/js/TripConsentForm-RRs36c9f.js","../../../dist/js/BookingForm-WRfLP_5t.js","../../../dist/js/ViewBooking-D0EgePSD.js","../../../dist/js/AvailabilityForm-C05OEgNS.js","../../../dist/js/DynamicPricing-PAm1uvCr.js","../../../dist/js/RuleTypeSelectionModal-DSWZlmcG.js","../../../dist/js/toggle-DcgGKLMp.js","../../../dist/js/DynamicPricingRuleForm-BNVsNOcm.js","../../../dist/js/AiAssistant-DONS3P3T.js","../../../dist/js/AbandonedRecovery-a5eULyr-.js","../../../dist/js/WhiteLabel-BzFhb8A5.js"])))=>i.map(i=>d[i]);
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key2, value) => key2 in obj ? __defProp(obj, key2, { enumerable: true, configurable: true, writable: true, value }) : obj[key2] = value;
 var __publicField = (obj, key2, value) => __defNormalProp(obj, typeof key2 !== "symbol" ? key2 + "" : key2, value);
 import { r as reactExports, j as jsxRuntimeExports, W as Wrench, N as Network, M as MessageCircle, S as Sparkles, R as RotateCcw, P as Puzzle, a as MessageSquare, b as Plane, B as BadgePercent, c as Route, F as FileSignature, K as Key, d as Mail, C as Crown, A as Activity, L as List, T as TrendingUp, e as Tag, f as FolderTree, U as Users, g as CircleUser, h as Package, i as CreditCard, k as FileText, l as Settings$1, m as BarChart3, n as Star, o as CalendarDays, p as CalendarClock, q as Calendar$1, s as MapPin, t as LayoutDashboard, u as useQueryClient, v as useMutation, w as useQuery, Z as Zap, x as Webhook, y as ChevronDown, z as ChevronRight, D as ArrowLeft, G as Gift, E as Cloud, H as Sun, I as Moon, J as User, O as RefreshCw, Q as Inbox, V as AlertTriangle, X as ExternalLink, Y as isObjectLike_1, _ as _baseGetTag, $ as isArray_1, a0 as _MapCache, a1 as getDefaultExportFromCjs, a2 as _Symbol, a3 as isObject$5, a4 as isFunction, a5 as reactIsExports, a6 as React, a7 as _Stack, a8 as _baseIsEqual, a9 as isObject_1, aa as keys_1, ab as isLength_1, ac as _isIndex, ad as isArguments_1, ae as _Set, af as _setToArray, ag as _SetCache, ah as _cacheHas, ai as _arrayPush, aj as isArrayLike_1, ak as _baseUnary, al as _getNative, am as eq_1, an as _root, ao as isEqual, ap as Animate, aq as _overArg, ar as _arraySome, as as Clock, at as DollarSign, au as ArrowRight, av as Shield, aw as CheckCircle, ax as Plus, ay as X, az as reactDomExports, aA as AlertCircle, aB as Loader2, aC as Check, aD as Wand2, aE as ChevronLeft, aF as CheckCircle2, aG as HelpCircle, aH as Info, aI as Copy, aJ as MoreVertical, aK as Columns, aL as PenSquare, aM as ArrowUp, aN as ArrowDown, aO as Archive, aP as Trash2, aQ as Search, aR as ArrowUpDown, aS as Eye, aT as Upload, aU as Image, aV as ReactQuill, aW as Pen, aX as Save, aY as Download, aZ as CircleDollarSign, a_ as Undo2, a$ as Phone, b0 as PauseCircle, b1 as ShieldX, b2 as ShieldOff, b3 as Globe, b4 as Award, b5 as Database, b6 as Folder, b7 as Mountain, b8 as UserCheck, b9 as Server, ba as XCircle, bb as Video, bc as Lock, bd as GripVertical, be as ChevronUp, bf as Play, bg as ClipboardCopy, bh as StickyNote, bi as Ban, bj as Bell, bk as Heart, bl as Scissors, bm as Send, bn as Filter, bo as ArrowUpRight, bp as ClipboardCheck, bq as PenTool, br as Camera, bs as BarChart$1, bt as Megaphone, bu as Compass, bv as GitBranch, bw as Pause, bx as Settings2, by as Code, bz as Bug, bA as EyeOff, bB as QueryClient, bC as client, bD as QueryClientProvider } from "../../../dist/js/react-vendor-W-_yntDU.js";
-import { a as apiClient, A as API_ENDPOINTS, b as apiService, _ as __, u as useToast, n as normalizeCurrencyPosition, t as toDateValue, f as formatYatraMoney, r as readYatraCurrencyPositionFromWindow, s as sprintf, c as brandName, d as formatDateForInput, I as Input, e as formatDate$1, g as getWeekStartsOn, h as getWeekdayLabels, i as todayYmd, S as SearchableSelect, j as getCurrencySymbol, k as formatDateTime, l as getCountryName, m as ajaxService, T as ToastProvider, E as ErrorBoundary } from "../../../dist/js/index-Dc5uh_w8.js";
+import { a as apiClient, A as API_ENDPOINTS, b as apiService, _ as __, u as useToast, n as normalizeCurrencyPosition, t as toDateValue, f as formatYatraMoney, r as readYatraCurrencyPositionFromWindow, s as sprintf, c as brandName, d as formatDateForInput, I as Input, e as formatDate$1, g as getWeekStartsOn, h as getWeekdayLabels, i as todayYmd, S as SearchableSelect, j as getCurrencySymbol, k as formatDateTime, l as getCountryName, m as ajaxService, T as ToastProvider, E as ErrorBoundary } from "../../../dist/js/index-BepRZmXV.js";
 const scriptRel = "modulepreload";
 const assetsURL = function(dep, importerUrl) {
   return new URL(dep, importerUrl).href;
@@ -38117,6 +38117,28 @@ const Bookings = () => {
       condition: (booking) => can("yatra_edit_bookings") && !!booking.customer_email && Number(booking.amount_paid || 0) > 0
     },
     {
+      key: "resend_reminder",
+      label: __2("Resend trip reminder"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { className: "w-4 h-4" }),
+      onClick: (booking) => resendBookingEmail(booking.id, "reminder"),
+      // Only for a trip still to come: "your trip is coming up" makes no
+      // sense to a cancelled guest or after the travel date.
+      condition: (booking) => {
+        if (!can("yatra_edit_bookings") || !booking.customer_email) {
+          return false;
+        }
+        if (["cancelled", "refunded", "completed", "failed"].includes(
+          (booking.booking_status || "").toLowerCase()
+        )) {
+          return false;
+        }
+        const travel = (booking.travel_date || "").slice(0, 10);
+        const now2 = /* @__PURE__ */ new Date();
+        const today = `${now2.getFullYear()}-${String(now2.getMonth() + 1).padStart(2, "0")}-${String(now2.getDate()).padStart(2, "0")}`;
+        return travel === "" || travel >= today;
+      }
+    },
+    {
       key: "delete",
       label: __2("Delete"),
       icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
@@ -56323,6 +56345,13 @@ const Payments = () => {
     queryFn: () => apiService.getPaymentsStats(),
     enabled: can("yatra_view_bookings")
   });
+  const { data: paymentMethodsRaw } = useQuery({
+    queryKey: ["payments-methods"],
+    queryFn: () => apiService.getPaymentMethods(),
+    enabled: can("yatra_view_bookings"),
+    staleTime: 0
+  });
+  const paymentMethodOptions = Array.isArray(paymentMethodsRaw) ? paymentMethodsRaw : [];
   const deleteMutation = useMutation({
     mutationFn: async (id) => {
       await apiService.deletePayment(id);
@@ -56330,6 +56359,7 @@ const Payments = () => {
     onSuccess: () => {
       queryClient2.invalidateQueries({ queryKey: ["payments"] });
       queryClient2.invalidateQueries({ queryKey: ["payments-stats"] });
+      queryClient2.invalidateQueries({ queryKey: ["payments-methods"] });
       queryClient2.invalidateQueries({ queryKey: ["bookings"] });
       showToast(__("Payment deleted successfully", "yatra"), "success");
       setDeleteConfirm({ isOpen: false, payment: null });
@@ -56494,6 +56524,7 @@ const Payments = () => {
       }
       queryClient2.invalidateQueries({ queryKey: ["payments"] });
       queryClient2.invalidateQueries({ queryKey: ["payments-stats"] });
+      queryClient2.invalidateQueries({ queryKey: ["payments-methods"] });
       queryClient2.invalidateQueries({ queryKey: ["bookings"] });
       setSelectedIds([]);
       setBulkAction("");
@@ -56755,6 +56786,7 @@ const Payments = () => {
           await updateStatusForIds([payment.id], "completed");
           queryClient2.invalidateQueries({ queryKey: ["payments"] });
           queryClient2.invalidateQueries({ queryKey: ["payments-stats"] });
+          queryClient2.invalidateQueries({ queryKey: ["payments-methods"] });
           queryClient2.invalidateQueries({ queryKey: ["bookings"] });
           showToast(__("Payment status updated", "yatra"), "success");
         } catch (error2) {
@@ -56778,6 +56810,7 @@ const Payments = () => {
           await updateStatusForIds([payment.id], "failed");
           queryClient2.invalidateQueries({ queryKey: ["payments"] });
           queryClient2.invalidateQueries({ queryKey: ["payments-stats"] });
+          queryClient2.invalidateQueries({ queryKey: ["payments-methods"] });
           queryClient2.invalidateQueries({ queryKey: ["bookings"] });
           showToast(__("Payment status updated", "yatra"), "success");
         } catch (error2) {
@@ -56801,6 +56834,7 @@ const Payments = () => {
           await updateStatusForIds([payment.id], "refunded");
           queryClient2.invalidateQueries({ queryKey: ["payments"] });
           queryClient2.invalidateQueries({ queryKey: ["payments-stats"] });
+          queryClient2.invalidateQueries({ queryKey: ["payments-methods"] });
           queryClient2.invalidateQueries({ queryKey: ["bookings"] });
           showToast(__("Payment status updated", "yatra"), "success");
         } catch (error2) {
@@ -56830,6 +56864,7 @@ const Payments = () => {
           await updateStatusForIds([payment.id], "cancelled");
           queryClient2.invalidateQueries({ queryKey: ["payments"] });
           queryClient2.invalidateQueries({ queryKey: ["payments-stats"] });
+          queryClient2.invalidateQueries({ queryKey: ["payments-methods"] });
           queryClient2.invalidateQueries({ queryKey: ["bookings"] });
           showToast(__("Payment status updated", "yatra"), "success");
         } catch (error2) {
@@ -56940,10 +56975,7 @@ const Payments = () => {
           className: "w-full lg:w-48 max-w-xs",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Methods", "yatra") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "Credit Card", children: __("Credit Card", "yatra") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "PayPal", children: __("PayPal", "yatra") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "Bank Transfer", children: __("Bank Transfer", "yatra") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "Cash", children: __("Cash", "yatra") })
+            paymentMethodOptions.map((option) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: option.value, children: option.label }, option.value))
           ]
         }
       ) })
@@ -79354,28 +79386,28 @@ const License = () => {
     ] }) }) })
   ] });
 };
-const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-CXNZs7SO.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
-const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-DpAuooiC.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
-const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-DlPqu238.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
-const Reports = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Reports-CfQKXt4i.js"), true ? __vite__mapDeps([9,1,2,3,4]) : void 0, import.meta.url));
-const DiscountForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DiscountForm-DFtlsNgW.js"), true ? __vite__mapDeps([10,1,2,3,4,11]) : void 0, import.meta.url));
-const Itinerary = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Itinerary-BwsITON1.js"), true ? __vite__mapDeps([12,1,2,3,4,5]) : void 0, import.meta.url));
-const RecurringRuleForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/RecurringRuleForm-eQImFFYR.js"), true ? __vite__mapDeps([13,1,2,3,4]) : void 0, import.meta.url));
+const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-tjvg5vmz.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
+const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-5xW46lQt.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
+const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-DyYUid5I.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
+const Reports = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Reports-DJFFzVlx.js"), true ? __vite__mapDeps([9,1,2,3,4]) : void 0, import.meta.url));
+const DiscountForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DiscountForm-DEhimB0H.js"), true ? __vite__mapDeps([10,1,2,3,4,11]) : void 0, import.meta.url));
+const Itinerary = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Itinerary-CF5aaNMY.js"), true ? __vite__mapDeps([12,1,2,3,4,5]) : void 0, import.meta.url));
+const RecurringRuleForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/RecurringRuleForm-DQBxA5fX.js"), true ? __vite__mapDeps([13,1,2,3,4]) : void 0, import.meta.url));
 const Whatsapp = reactExports.lazy(() => __vitePreload(() => import("./Whatsapp.js"), true ? __vite__mapDeps([14,1,2,3,4,15]) : void 0, import.meta.url));
-const ChannelManager = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ChannelManager-DlNjafR6.js"), true ? __vite__mapDeps([16,1,2,3,4,15]) : void 0, import.meta.url));
-const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Webhooks-BN_RkSiY.js"), true ? __vite__mapDeps([17,1,2,3,4,15]) : void 0, import.meta.url));
-const ScheduledPayments = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ScheduledPayments-4M-CGDAZ.js"), true ? __vite__mapDeps([18,1,2,3,4]) : void 0, import.meta.url));
-const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-DI15hclH.js"), true ? __vite__mapDeps([19,1,2,3,4,11]) : void 0, import.meta.url));
-const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-4QBN8wvc.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
-const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-Bet5Mx8f.js"), true ? __vite__mapDeps([21,1,2,3,4]) : void 0, import.meta.url));
-const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-5ESr8y4b.js"), true ? __vite__mapDeps([22,1,2,3,4]) : void 0, import.meta.url));
-const DynamicPricing = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DynamicPricing-DfI92xWO.js"), true ? __vite__mapDeps([23,1,2,24,3,4,25]) : void 0, import.meta.url));
+const ChannelManager = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ChannelManager-Fb0ex6IR.js"), true ? __vite__mapDeps([16,1,2,3,4,15]) : void 0, import.meta.url));
+const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Webhooks-CwK81HRm.js"), true ? __vite__mapDeps([17,1,2,3,4,15]) : void 0, import.meta.url));
+const ScheduledPayments = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ScheduledPayments-DdSUOyEb.js"), true ? __vite__mapDeps([18,1,2,3,4]) : void 0, import.meta.url));
+const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-RRs36c9f.js"), true ? __vite__mapDeps([19,1,2,3,4,11]) : void 0, import.meta.url));
+const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-WRfLP_5t.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
+const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-D0EgePSD.js"), true ? __vite__mapDeps([21,1,2,3,4]) : void 0, import.meta.url));
+const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-C05OEgNS.js"), true ? __vite__mapDeps([22,1,2,3,4]) : void 0, import.meta.url));
+const DynamicPricing = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DynamicPricing-PAm1uvCr.js"), true ? __vite__mapDeps([23,1,2,24,3,4,25]) : void 0, import.meta.url));
 const DynamicPricingRuleForm = reactExports.lazy(
-  () => __vitePreload(() => import("../../../dist/js/DynamicPricingRuleForm-fU9UAUc1.js"), true ? __vite__mapDeps([26,1,2,3,4,24]) : void 0, import.meta.url)
+  () => __vitePreload(() => import("../../../dist/js/DynamicPricingRuleForm-BNVsNOcm.js"), true ? __vite__mapDeps([26,1,2,3,4,24]) : void 0, import.meta.url)
 );
-const AiAssistant = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AiAssistant-CYBX-WDR.js"), true ? __vite__mapDeps([27,1,2,3,4,15]) : void 0, import.meta.url));
-const AbandonedRecovery = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AbandonedRecovery-DYXhry-Z.js"), true ? __vite__mapDeps([28,1,2,3,4,25]) : void 0, import.meta.url));
-const WhiteLabel = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/WhiteLabel-DmxhqdnP.js"), true ? __vite__mapDeps([29,1,2,3,4,15]) : void 0, import.meta.url));
+const AiAssistant = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AiAssistant-DONS3P3T.js"), true ? __vite__mapDeps([27,1,2,3,4,15]) : void 0, import.meta.url));
+const AbandonedRecovery = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AbandonedRecovery-a5eULyr-.js"), true ? __vite__mapDeps([28,1,2,3,4,25]) : void 0, import.meta.url));
+const WhiteLabel = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/WhiteLabel-BzFhb8A5.js"), true ? __vite__mapDeps([29,1,2,3,4,15]) : void 0, import.meta.url));
 const PageLoadingFallback = () => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-1/3" }),

@@ -204,6 +204,18 @@ const Payments: React.FC = () => {
     enabled: can("yatra_view_bookings"),
   });
 
+  // Enabled gateways plus any method that already has payments, labelled the
+  // way the table prints them. Always refetched on opening the screen, so a
+  // gateway just enabled in Settings shows up without a reload.
+  const { data: paymentMethodsRaw } = useQuery({
+    queryKey: ["payments-methods"],
+    queryFn: () => apiService.getPaymentMethods(),
+    enabled: can("yatra_view_bookings"),
+    staleTime: 0,
+  });
+  const paymentMethodOptions: { value: string; label: string }[] =
+    Array.isArray(paymentMethodsRaw) ? paymentMethodsRaw : [];
+
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
@@ -212,6 +224,7 @@ const Payments: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["payments"] });
       queryClient.invalidateQueries({ queryKey: ["payments-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["payments-methods"] });
       queryClient.invalidateQueries({ queryKey: ["bookings"] });
       showToast(__("Payment deleted successfully", "yatra"), "success");
       setDeleteConfirm({ isOpen: false, payment: null });
@@ -421,6 +434,7 @@ const Payments: React.FC = () => {
 
       queryClient.invalidateQueries({ queryKey: ["payments"] });
       queryClient.invalidateQueries({ queryKey: ["payments-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["payments-methods"] });
       queryClient.invalidateQueries({ queryKey: ["bookings"] });
       setSelectedIds([]);
       setBulkAction("");
@@ -736,6 +750,7 @@ const Payments: React.FC = () => {
           await updateStatusForIds([payment.id], "completed");
           queryClient.invalidateQueries({ queryKey: ["payments"] });
           queryClient.invalidateQueries({ queryKey: ["payments-stats"] });
+          queryClient.invalidateQueries({ queryKey: ["payments-methods"] });
           queryClient.invalidateQueries({ queryKey: ["bookings"] });
           showToast(__("Payment status updated", "yatra"), "success");
         } catch (error: any) {
@@ -760,6 +775,7 @@ const Payments: React.FC = () => {
           await updateStatusForIds([payment.id], "failed");
           queryClient.invalidateQueries({ queryKey: ["payments"] });
           queryClient.invalidateQueries({ queryKey: ["payments-stats"] });
+          queryClient.invalidateQueries({ queryKey: ["payments-methods"] });
           queryClient.invalidateQueries({ queryKey: ["bookings"] });
           showToast(__("Payment status updated", "yatra"), "success");
         } catch (error: any) {
@@ -784,6 +800,7 @@ const Payments: React.FC = () => {
           await updateStatusForIds([payment.id], "refunded");
           queryClient.invalidateQueries({ queryKey: ["payments"] });
           queryClient.invalidateQueries({ queryKey: ["payments-stats"] });
+          queryClient.invalidateQueries({ queryKey: ["payments-methods"] });
           queryClient.invalidateQueries({ queryKey: ["bookings"] });
           showToast(__("Payment status updated", "yatra"), "success");
         } catch (error: any) {
@@ -814,6 +831,7 @@ const Payments: React.FC = () => {
           await updateStatusForIds([payment.id], "cancelled");
           queryClient.invalidateQueries({ queryKey: ["payments"] });
           queryClient.invalidateQueries({ queryKey: ["payments-stats"] });
+          queryClient.invalidateQueries({ queryKey: ["payments-methods"] });
           queryClient.invalidateQueries({ queryKey: ["bookings"] });
           showToast(__("Payment status updated", "yatra"), "success");
         } catch (error: any) {
@@ -928,14 +946,11 @@ const Payments: React.FC = () => {
                 className="w-full lg:w-48 max-w-xs"
               >
                 <option value="all">{__("All Methods", "yatra")}</option>
-                <option value="Credit Card">
-                  {__("Credit Card", "yatra")}
-                </option>
-                <option value="PayPal">{__("PayPal", "yatra")}</option>
-                <option value="Bank Transfer">
-                  {__("Bank Transfer", "yatra")}
-                </option>
-                <option value="Cash">{__("Cash", "yatra")}</option>
+                {paymentMethodOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
               </Select>
             </div>
           </div>

@@ -48,6 +48,15 @@ class PaymentController extends BaseController
             ],
         ]);
 
+        // Method filter choices — view cap, same data the list already exposes.
+        register_rest_route($this->namespace, '/payments/methods', [
+            [
+                'methods' => 'GET',
+                'callback' => [$this, 'getPaymentMethods'],
+                'permission_callback' => [$this, 'checkCanView'],
+            ],
+        ]);
+
         // List + create payments. Create needs the edit-bookings cap
         // because adding a payment mutates the booking's payment state.
         register_rest_route($this->namespace, '/payments', [
@@ -175,6 +184,14 @@ class PaymentController extends BaseController
         $counts = $this->paymentService->getAdminStatusCounts();
 
         return new WP_REST_Response($counts, 200);
+    }
+
+    /**
+     * GET /payments/methods - Choices for the method filter
+     */
+    public function getPaymentMethods(WP_REST_Request $request): WP_REST_Response
+    {
+        return new WP_REST_Response($this->paymentService->getPaymentMethodOptions(), 200);
     }
 
     /**

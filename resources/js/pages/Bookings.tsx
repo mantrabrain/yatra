@@ -949,6 +949,31 @@ const Bookings: React.FC = () => {
         Number(booking.amount_paid || 0) > 0,
     },
     {
+      key: "resend_reminder",
+      label: __("Resend trip reminder"),
+      icon: <Mail className="w-4 h-4" />,
+      onClick: (booking: Booking) =>
+        resendBookingEmail(booking.id, "reminder"),
+      // Only for a trip still to come: "your trip is coming up" makes no
+      // sense to a cancelled guest or after the travel date.
+      condition: (booking: Booking) => {
+        if (!can("yatra_edit_bookings") || !booking.customer_email) {
+          return false;
+        }
+        if (
+          ["cancelled", "refunded", "completed", "failed"].includes(
+            (booking.booking_status || "").toLowerCase(),
+          )
+        ) {
+          return false;
+        }
+        const travel = (booking.travel_date || "").slice(0, 10);
+        const now = new Date();
+        const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+        return travel === "" || travel >= today;
+      },
+    },
+    {
       key: "delete",
       label: __("Delete"),
       icon: <Trash2 className="w-4 h-4" />,

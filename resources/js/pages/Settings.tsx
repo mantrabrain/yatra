@@ -1117,6 +1117,7 @@ interface SettingsData {
   ga4_track_begin_checkout?: boolean;
   ga4_track_purchase?: boolean;
   ga4_use_measurement_protocol?: boolean;
+  ga4_require_consent?: boolean;
   ga4_api_secret?: string;
   ga4_debug_mode?: boolean;
   ga4_custom_dimensions?: Array<{
@@ -7633,6 +7634,37 @@ const Settings: React.FC = () => {
 
                       {formData.ga4_use_measurement_protocol && (
                         <div className="mt-4 space-y-4 border-t border-gray-100 pt-4 dark:border-gray-800">
+                          {/* Only a Yatra Pro that honours the option advertises it. */}
+                          {(window as any).yatraAdmin?.googleAnalytics
+                            ?.requireConsentSupported && (
+                          <div className="flex gap-3 rounded-lg border border-gray-100 bg-gray-50/80 p-3 dark:border-gray-700 dark:bg-gray-900/50">
+                            <input
+                              type="checkbox"
+                              id="ga4_require_consent"
+                              checked={formData.ga4_require_consent ?? false}
+                              name="ga4_require_consent"
+                              onChange={handleFieldChange}
+                              className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            />
+                            <div className="min-w-0 flex-1">
+                              <Label
+                                htmlFor="ga4_require_consent"
+                                className="cursor-pointer text-sm font-medium text-gray-900 dark:text-white"
+                              >
+                                {__(
+                                  "Only send when consent can be verified",
+                                  "yatra",
+                                )}
+                              </Label>
+                              <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                                {__(
+                                  "Server-side events always follow visitor consent recorded through the WP Consent API (used by WPConsent, Complianz, CookieYes and others). Turn this on to send nothing server-side when that plugin is not active.",
+                                  "yatra",
+                                )}
+                              </p>
+                            </div>
+                          </div>
+                          )}
                           <div className="flex gap-3 rounded-lg border border-amber-100 bg-amber-50/60 p-3 dark:border-amber-900/40 dark:bg-amber-950/20">
                             <input
                               type="checkbox"

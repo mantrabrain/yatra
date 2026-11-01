@@ -595,6 +595,7 @@ export const apiService = {
   addPaymentNote: (id: string | number, note: string) =>
     apiClient.post(API_ENDPOINTS.PAYMENT_NOTES(id), { note }),
   getPaymentsStats: () => apiClient.get(API_ENDPOINTS.PAYMENTS_STATS),
+  getPaymentMethods: () => apiClient.get(API_ENDPOINTS.PAYMENTS_METHODS),
   createPayment: (data: any) => apiClient.post(API_ENDPOINTS.PAYMENTS, data),
   updatePayment: (id: string | number, data: any) =>
     apiClient.put(API_ENDPOINTS.PAYMENT_GET(id), data),

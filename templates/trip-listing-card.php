@@ -170,26 +170,18 @@ $yatra_view_details_icon_slug = function_exists('yatra_trip_listing_card_cta_ico
 $has_group_discounts = false;
 $group_discount_summary = '';
 try {
-    // Call the group discount API to check availability
-    $api_url = rest_url('yatra/v1/discounts/group-discounts');
-    $response = wp_remote_post($api_url, [
-        'method' => 'GET',
-        'body' => [
-            'trip_ids' => [$trip->id]
-        ],
-        'headers' => [
-            'Content-Type' => 'application/json',
-        ],
-    ]);
-
-    if (!is_wp_error($response) && wp_remote_retrieve_response_code($response) === 200) {
-        $data = json_decode(wp_remote_retrieve_body($response), true);
-        if (isset($data[$trip->id]) && $data[$trip->id]['has_group_discounts']) {
+    // Same payload as GET /discounts/group-discounts, read in-process. This used to
+    // be an HTTP request back to the site for every card, which slowed listings and
+    // could hang until timeout on hosts that block loopback requests.
+    if (class_exists(\Yatra\Controllers\DiscountController::class)) {
+        $yatra_group_discounts = (new \Yatra\Controllers\DiscountController())
+            ->getPublicGroupDiscountDiscoverabilityForTrip((int) $trip->id);
+        if (!empty($yatra_group_discounts['has_group_discounts'])) {
             $has_group_discounts = true;
-            $group_discount_summary = $data[$trip->id]['summary'];
+            $group_discount_summary = (string) ($yatra_group_discounts['summary'] ?? '');
         }
     }
-} catch (Exception $e) {
+} catch (\Throwable $e) {
     // Silently fail if API call fails - don't break the page
     $has_group_discounts = false;
 }

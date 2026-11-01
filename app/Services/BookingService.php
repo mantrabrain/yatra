@@ -492,6 +492,18 @@ class BookingService
             // action (they're called directly above), so seat-holding
             // continues to work while the customer is in the holding
             // state.
+            /**
+             * A booking has been stored — fired for every booking, including
+             * one still in `pending_verification`, which defers
+             * yatra_booking_created until the e-mail is verified. For
+             * listeners that must act at checkout time (e.g. recording the
+             * visitor's consent choice), not for notifications.
+             *
+             * @param int    $bookingId
+             * @param object $booking
+             */
+            do_action('yatra_booking_inserted', (int) $bookingId, $booking);
+
             $bookingStatus = (string) ($data['status'] ?? ($booking->status ?? ''));
             if ($bookingStatus !== 'pending_verification') {
                 do_action(\Yatra\Hooks\TelemetryHookNames::BOOKING_CREATED, (int) $bookingId, $booking);

@@ -678,6 +678,15 @@ class InstallerService
             return;
         }
 
+        // Every booking's figures are copied to a backup table before they
+        // change (created only on a site that has refunds to repair). No backup table, no repair (retried later, with a pause).
+        $backupTable = $wpdb->prefix . 'yatra_refund_totals_repair_backup_v1';
+        if (!self::ensureRepairBackupTable($backupTable,
+            "booking_id bigint(20) UNSIGNED NOT NULL, amount_paid decimal(12,2) DEFAULT NULL, amount_due decimal(12,2) DEFAULT NULL, payment_status varchar(32) DEFAULT NULL, backed_up_at datetime NOT NULL, PRIMARY KEY (booking_id)",
+            'yatra_refund_totals_repair_retry_at')) {
+            return;
+        }
+
         $paymentRepository = new \Yatra\Repositories\PaymentRepository();
         $bookingRepository = new \Yatra\Repositories\BookingRepository();
         $repaired = 0;
@@ -686,6 +695,26 @@ class InstallerService
             $bookingId = (int) $bookingId;
             if ($bookingId <= 0) {
                 continue;
+            }
+
+            // Back up this booking's figures first (INSERT IGNORE keeps the very
+            // first copy). If the copy fails, stop the batch without moving
+            // the cursor: nothing is changed without a backup, and the same
+            // booking is tried again on a later pageview.
+            $copied = $wpdb->query($wpdb->prepare(
+                "INSERT IGNORE INTO {$backupTable} (booking_id, amount_paid, amount_due, payment_status, backed_up_at)
+                 SELECT id, amount_paid, amount_due, payment_status, %s FROM {$bookingsTable} WHERE id = %d",
+                current_time('mysql'),
+                $bookingId
+            ));
+            if ($copied === false) {
+                \Yatra\Utils\Logger::warning('Refund totals repair paused: backup copy failed', [
+                    'booking_id' => $bookingId,
+                    'error' => $wpdb->last_error,
+                ]);
+                update_option('yatra_refund_totals_repair_retry_at', time() + HOUR_IN_SECONDS, false);
+
+                return;
             }
 
             try {
@@ -726,6 +755,39 @@ class InstallerService
     }
 
     /**
+     * Make sure a repair's backup table exists. Returns false (and pauses that
+     * repair for an hour, so a host that refuses is not retried on every admin
+     * pageview) when it cannot be created.
+     */
+    private static function ensureRepairBackupTable(string $table, string $columns, string $retryOption): bool
+    {
+        global $wpdb;
+
+        $retryAt = (int) get_option($retryOption, 0);
+        if ($retryAt > time()) {
+            return false;
+        }
+        if (self::databaseTableExists($table)) {
+            return true;
+        }
+
+        $wpdb->query("CREATE TABLE IF NOT EXISTS {$table} ({$columns}) " . $wpdb->get_charset_collate());
+        if (self::databaseTableExists($table)) {
+            delete_option($retryOption);
+
+            return true;
+        }
+
+        \Yatra\Utils\Logger::warning('Repair backup table could not be created; repair paused', [
+            'table' => $table,
+            'error' => $wpdb->last_error,
+        ]);
+        update_option($retryOption, time() + HOUR_IN_SECONDS, false);
+
+        return false;
+    }
+
+    /**
      * One-time: rebuild the booking statistics stored on customer rows.
      *
      * Those columns used to be incremented by hand on every
@@ -757,6 +819,30 @@ class InstallerService
             return;
         }
 
+        // Copy the current figures aside first, so the rebuild can be audited
+        // and undone. If the copy cannot be made, the rebuild does not run
+        // (and is retried on a later admin pageview).
+        // Explicit table + INSERT ... SELECT rather than CREATE TABLE ... AS
+        // SELECT, which hosts enforcing GTID consistency or primary keys
+        // (common on managed MySQL) reject.
+        $backupTable = $wpdb->prefix . 'yatra_customers_stats_backup_v1';
+        if (!self::ensureRepairBackupTable($backupTable,
+            "id bigint(20) UNSIGNED NOT NULL, total_bookings int(11) UNSIGNED DEFAULT NULL, total_spent decimal(12,2) DEFAULT NULL, total_travelers int(11) UNSIGNED DEFAULT NULL, backed_up_at datetime NOT NULL, PRIMARY KEY (id)",
+            'yatra_customer_stats_repair_retry_at')) {
+            return;
+        }
+        $copied = $wpdb->query($wpdb->prepare(
+            "INSERT IGNORE INTO {$backupTable} (id, total_bookings, total_spent, total_travelers, backed_up_at)
+             SELECT id, total_bookings, total_spent, total_travelers, %s FROM {$customersTable}",
+            current_time('mysql')
+        ));
+        if ($copied === false) {
+            \Yatra\Utils\Logger::warning('Customer booking-stats repair postponed: backup copy failed', ['error' => $wpdb->last_error]);
+            update_option('yatra_customer_stats_repair_retry_at', time() + HOUR_IN_SECONDS, false);
+
+            return;
+        }
+
         // Mirrors CustomerRepository::recalculateStats(): every booking counts
         // towards total_bookings, while money and seats ignore the bookings that
         // never represented either.
@@ -777,9 +863,11 @@ class InstallerService
         );
 
         if ($result === false) {
-            // Leave the flag unset so the next admin pageview retries rather
-            // than leaving the figures wrong for good.
+            // Leave the flag unset so it is retried rather than leaving the
+            // figures wrong for good — after an hour, like a failed backup, so
+            // the full-table copy above is not repeated on every pageview.
             \Yatra\Utils\Logger::warning('Customer booking-stats repair failed', ['error' => $wpdb->last_error]);
+            update_option('yatra_customer_stats_repair_retry_at', time() + HOUR_IN_SECONDS, false);
 
             return;
         }

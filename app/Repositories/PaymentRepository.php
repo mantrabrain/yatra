@@ -52,6 +52,19 @@ class PaymentRepository extends BaseRepository
     }
 
     /**
+     * Every gateway value stored on at least one payment.
+     *
+     * @return string[]
+     */
+    public function getDistinctGateways(): array
+    {
+        $table = $this->getTableName();
+        $values = $this->wpdb->get_col("SELECT DISTINCT gateway FROM {$table} WHERE gateway IS NOT NULL AND gateway <> ''");
+
+        return is_array($values) ? array_map('strval', $values) : [];
+    }
+
+    /**
      * Get bookings table name
      */
     protected function getBookingsTable(): string
@@ -101,6 +114,16 @@ class PaymentRepository extends BaseRepository
         if (!empty($filters['gateway'])) {
             $where_clauses[] = 'p.gateway = %s';
             $where_values[] = sanitize_text_field($filters['gateway']);
+        }
+
+        // Several stored spellings of one method (e.g. "bank_transfer" from checkout
+        // and "Bank Transfer" typed into a manual payment). See PaymentService::getPayments().
+        if (!empty($filters['gateway_in']) && is_array($filters['gateway_in'])) {
+            $gateways = array_values(array_map(static function ($gateway) {
+                return (string) $gateway;
+            }, $filters['gateway_in']));
+            $where_clauses[] = 'p.gateway IN (' . implode(',', array_fill(0, count($gateways), '%s')) . ')';
+            $where_values = array_merge($where_values, $gateways);
         }
 
         if (!empty($filters['search'])) {

@@ -130,6 +130,24 @@ class PaymentService
      */
     public function getPayments(array $filters = []): array
     {
+        // The method filter offers one entry per method (see getPaymentMethodOptions()),
+        // so match every stored spelling of it — otherwise picking "Bank Transfer"
+        // would miss checkout payments stored as "bank_transfer".
+        $gateway = is_string($filters['gateway'] ?? null) ? trim($filters['gateway']) : '';
+        if ($gateway !== '') {
+            $key = self::gatewayKey($gateway);
+            $matches = array_values(array_filter(
+                $this->paymentRepository->getDistinctGateways(),
+                static function (string $stored) use ($key): bool {
+                    return self::gatewayKey($stored) === $key;
+                }
+            ));
+            if ($matches !== []) {
+                unset($filters['gateway']);
+                $filters['gateway_in'] = $matches;
+            }
+        }
+
         $result = $this->paymentRepository->paginate($filters);
 
         $result['data'] = array_map([$this, 'formatPayment'], $result['data']);
@@ -639,6 +657,65 @@ class PaymentService
     }
 
     /**
+     * Choices for the Payments screen's method filter.
+     *
+     * The gateways enabled now plus every method that already has payments, so a
+     * switched-off gateway stays filterable for its history and nothing is offered
+     * that can only ever return an empty list. Labels are the same ones the table
+     * prints; spellings of one method ("bank_transfer", "Bank Transfer") are offered once.
+     *
+     * @return array<int, array{value: string, label: string}>
+     */
+    public function getPaymentMethodOptions(): array
+    {
+        $values = [];
+        if (class_exists(\Yatra\PaymentGateways\PaymentGatewayRegistry::class)) {
+            try {
+                foreach (\Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance()->getEnabledGateways() as $id => $enabled) {
+                    // "Pay later" reserves the booking without recording a payment,
+                    // so it has nothing to filter unless history says otherwise.
+                    $supports = method_exists($enabled, 'getSupports') ? (array) $enabled->getSupports() : [];
+                    if (!in_array('pay_later', $supports, true)) {
+                        $values[] = (string) $id;
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Registry unavailable — history alone still gives a usable list.
+            }
+        }
+        $values = array_merge($values, $this->paymentRepository->getDistinctGateways());
+
+        $options = [];
+        foreach ($values as $value) {
+            $label = self::gatewayLabel($value);
+            $key = self::gatewayKey($value);
+            if ($label === '' || isset($options[$key])) {
+                continue;
+            }
+            $options[$key] = ['value' => $value, 'label' => $label];
+        }
+
+        uasort($options, static function (array $a, array $b): int {
+            return strcasecmp($a['label'], $b['label']);
+        });
+
+        return array_values($options);
+    }
+
+    /**
+     * One key per method, whatever the spelling: checkout stores gateway ids
+     * ("bank_transfer") while the Add Payment form stores English names
+     * ("Bank Transfer"). Deliberately not the translated label, so grouping is the
+     * same in every language and with Yatra Pro active or not.
+     */
+    private static function gatewayKey(string $gateway): string
+    {
+        $key = strtolower(trim($gateway));
+
+        return trim((string) preg_replace('/[\s.\-]+/', '_', $key), '_');
+    }
+
+    /**
      * Human label for a stored gateway value.
      *
      * Resolves through the gateway registry first so the wording matches what the
@@ -659,7 +736,7 @@ class PaymentService
 
         if (class_exists(\Yatra\PaymentGateways\PaymentGatewayRegistry::class)) {
             try {
-                $registered = \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance()->get(strtolower($gateway));
+                $registered = \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance()->get(self::gatewayKey($gateway));
                 if ($registered !== null) {
                     $title = trim((string) $registered->getTitle());
                     if ($title !== '') {

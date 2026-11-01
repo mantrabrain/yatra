@@ -144,7 +144,8 @@ class EnquiryService
                 // Accept both wrapped {classifications: [...]} and direct array [...]
                 if (isset($metaValue['classifications']) && is_array($metaValue['classifications'])) {
                     $classifications = $metaValue['classifications'];
-                } elseif (array_is_list($metaValue)) {
+                } elseif (function_exists('array_is_list') ? array_is_list($metaValue) : array_values($metaValue) === $metaValue) {
+                    // array_is_list() is PHP 8.1 (WordPress polyfills it only from 6.5).
                     $classifications = $metaValue;
                 }
             }
