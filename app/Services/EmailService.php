@@ -35,6 +35,10 @@ class EmailService
         // cannot be forgotten by a sender added later.
         $headers = self::withAlwaysBcc($headers);
 
+        // Subjects are plain text, but WordPress stores the site title HTML-escaped,
+        // so "[Tom &amp; Jerry&#039;s]" reached customers literally.
+        $subject = wp_specialchars_decode($subject, ENT_QUOTES);
+
         // Check if SMTP is enabled
         $smtp_enabled = SettingsService::isEnabled('smtp_enabled');
         
@@ -153,8 +157,8 @@ class EmailService
         }
         
         try {
-            $mail = new PHPMailer(true);
-            
+            $mail = self::newMailer();
+
             // Server settings
             $mail->isSMTP();
             $mail->Host = $smtp_host;
@@ -165,7 +169,7 @@ class EmailService
             $mail->Port = $smtp_port;
             
             // Recipients
-            $mail->setFrom($from_email, $from_name);
+            $mail->setFrom($from_email, wp_specialchars_decode($from_name, ENT_QUOTES));
             
             if (is_array($to)) {
                 foreach ($to as $recipient) {
@@ -182,14 +186,17 @@ class EmailService
                         $mail->isHTML(true);
                     }
                 } elseif (stripos($header, 'cc:') === 0) {
-                    $cc = trim(substr($header, 3));
-                    $mail->addCC($cc);
+                    foreach (self::headerAddresses(substr($header, 3)) as $address => $name) {
+                        $mail->addCC($address, $name);
+                    }
                 } elseif (stripos($header, 'bcc:') === 0) {
-                    $bcc = trim(substr($header, 4));
-                    $mail->addBCC($bcc);
+                    foreach (self::headerAddresses(substr($header, 4)) as $address => $name) {
+                        $mail->addBCC($address, $name);
+                    }
                 } elseif (stripos($header, 'reply-to:') === 0) {
-                    $reply_to = trim(substr($header, 9));
-                    $mail->addReplyTo($reply_to);
+                    foreach (self::headerAddresses(substr($header, 9)) as $address => $name) {
+                        $mail->addReplyTo($address, $name);
+                    }
                 }
             }
             
@@ -210,6 +217,58 @@ class EmailService
         }
     }
     
+    /**
+     * A PHPMailer ready for Yatra's own SMTP sending.
+     *
+     * WordPress only loads PHPMailer inside wp_mail(), so it may not be loaded yet.
+     * PHPMailer also defaults to ISO-8859-1, while Yatra's emails are UTF-8: without
+     * this, accented letters, dashes and emoji arrived as symbols like "Ã©".
+     */
+    private static function newMailer(): PHPMailer
+    {
+        if (!class_exists(PHPMailer::class)) {
+            require_once ABSPATH . WPINC . '/PHPMailer/PHPMailer.php';
+            require_once ABSPATH . WPINC . '/PHPMailer/SMTP.php';
+            require_once ABSPATH . WPINC . '/PHPMailer/Exception.php';
+        }
+
+        $mail = new PHPMailer(true);
+        $mail->CharSet = 'UTF-8';
+
+        return $mail;
+    }
+
+    /**
+     * The addresses in one Cc, Bcc or Reply-To header value.
+     *
+     * A header may hold several addresses ("a@x.com, b@x.com") or a named one
+     * ("Ana <a@x.com>"). Passing the whole value to PHPMailer made it reject the
+     * header, and with exceptions on, the email was silently not sent.
+     *
+     * @return array<string, string> address => name
+     */
+    private static function headerAddresses(string $value): array
+    {
+        // Split by hand: PHPMailer::parseAddresses() raises a notice on every
+        // call without the IMAP extension, which would flood the log (the
+        // always-Bcc setting adds this header to every email).
+        $out = [];
+        foreach (preg_split('/,(?=(?:[^"]*"[^"]*")*[^"]*$)/', $value) ?: [] as $part) {
+            $part = trim($part);
+            $name = '';
+            $address = $part;
+            if (preg_match('/^(.*)<([^>]+)>\s*$/', $part, $m)) {
+                $name = trim(trim($m[1]), "\" ");
+                $address = trim($m[2]);
+            }
+            if ($address !== '' && is_email($address)) {
+                $out[$address] = $name;
+            }
+        }
+
+        return $out;
+    }
+
     private static function configureSmtpEncryption(PHPMailer $mail, string $smtp_encryption): void
     {
         if ($smtp_encryption === 'ssl') {
@@ -267,7 +326,7 @@ class EmailService
         }
         
         try {
-            $mail = new PHPMailer(true);
+            $mail = self::newMailer();
             $mail->isSMTP();
             $mail->Host = $smtp_host;
             $mail->SMTPAuth = true;

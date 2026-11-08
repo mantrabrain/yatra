@@ -451,7 +451,8 @@ final class EmailTemplateDefaults
             return $row['value'] !== '';
         }));
 
-        $balanceRow = (!empty($v['amount_due_formatted']) && isset($v['amount_due_formatted']) && $v['amount_due_formatted'] !== yatra_format_price(0))
+        $balanceRow = (!empty($v['amount_due_formatted']) && isset($v['amount_due_formatted']) && $v['amount_due_formatted'] !== yatra_format_price(0)
+            && $v['amount_due_formatted'] !== yatra_format_price(0, null, false))
             ? [['label' => __('Balance due', 'yatra'), 'value' => esc_html((string) $v['amount_due_formatted'])]]
             : [];
         if ($balanceRow !== []) {

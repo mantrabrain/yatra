@@ -251,6 +251,11 @@ class Bootstrap
      */
     private function setupWordPressHooks(): void
     {
+        // The first admin request after activating; admin only, so the front end skips the lookup.
+        if (is_admin()) {
+            add_action('init', [$this, 'flushRewriteRulesAfterActivation'], 99);
+        }
+
         // Register activation/deactivation hooks
         register_activation_hook(YATRA_PLUGIN_FILE, [$this, 'activate']);
         register_deactivation_hook(YATRA_PLUGIN_FILE, [$this, 'deactivate']);
@@ -340,8 +345,22 @@ class Bootstrap
             set_transient('yatra_setup_wizard_redirect', 1, 30);
         }
         
-        // Flush rewrite rules
+        // Flush rewrite rules. Yatra's rules aren't registered yet on the request that
+        // activates it, so this alone leaves trip pages 404ing: flush again on the next
+        // request, once they are (see flushRewriteRulesAfterActivation).
         flush_rewrite_rules();
+        update_option('yatra_flush_rewrite_rules', 1, false);
+    }
+
+    /**
+     * Second half of the activation flush, on the first request after activating.
+     */
+    public function flushRewriteRulesAfterActivation(): void
+    {
+        if (get_option('yatra_flush_rewrite_rules')) {
+            delete_option('yatra_flush_rewrite_rules');
+            flush_rewrite_rules();
+        }
     }
 
     /**

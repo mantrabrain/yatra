@@ -4,7 +4,7 @@ Tags: tour-booking, travel-booking, tour-operator, travel, travel-agency
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 3.1.0
+Stable tag: 3.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -281,6 +281,42 @@ Pricing starts at **$99/yr** (Starter, sale) and goes up to **$599/yr** (Scale 1
 9. Run offers without spreadsheets — coupon codes with usage limits, expiry dates and live status
 
 == Changelog ==
+
+= 3.1.1 — 8 November 2026 =
+* Fix - Creating or updating a group discount with size ranges logged a PHP warning ("Undefined array key min_group_size"), which could break the save on sites that display PHP warnings.
+* Fix - With Yatra's Timezone set west of UTC (for example the Americas), departure cards, the checkout summary and the booking confirmation page showed the day before the booked date, so the confirmation email seemed to show the next day. Dates now show as booked.
+* Fix - Travel dates in emails, invoices and PDFs could shift by a day when another plugin changed PHP's timezone. They now always show the booked date.
+* Fix - Emails sent through Yatra's own SMTP setting showed accented letters, dashes and emoji as garbled symbols (such as "Ã©"). They're now sent as UTF-8.
+* Fix - Sending through Yatra's own SMTP setting could stop with a critical error when no other plugin had loaded WordPress's mailer first.
+* Fix - With Yatra's own SMTP setting on, an email with several Cc or Bcc addresses (including the "always Bcc" archive address) or a named Reply-To was silently not sent.
+* Fix - A site title containing "&" or an apostrophe appeared in email subjects as "&amp;" or "&#039;".
+* Fix - Emails showed "Contact for pricing" instead of $0.00 for a fully paid booking's amount due, a zero payment or a zero scheduled amount. Reminder emails still leave out the balance line when nothing is due.
+* Fix - The booking date and time on the confirmation page were shifted by the site's timezone offset.
+* Improvement - Editing an email template that isn't sent, such as "New Booking Confirmation", now says so and links to the one customers receive.
+* Fix - When a trip had an additional service, checkout showed that service's price as the "Price per person" (for example $40.00 on a $1,350 trip). Totals were correct, but the line was wrong.
+* Fix - A trip's Minimum Travelers setting is now enforced. Before, it was only displayed, and customers could book fewer. The counter now starts at the minimum and smaller bookings are refused. **If you accept solo travelers on a trip, check that its Minimum Travelers is set to 1.** Bookings you create yourself in the admin aren't affected.
+* Fix - Group discounts now apply to trips using Regular Pricing. Before, they only worked with Traveler-Based Pricing and silently gave no discount otherwise.
+* Fix - On a new install, trip pages returned "page not found" until permalinks were saved once. Activating Yatra now sets this up by itself.
+* Fix - On trips with fixed departures, the booking card preselected today, so Check Availability usually said no departures were available. It now opens on the next departure.
+* Fix - Adding one specific date to a trip hid all of its recurring dates from customers, though they could still be booked. Both are now listed, and a specific date replaces a rule only on its own day.
+* Fix - Saving an availability date or recurring rule left you on the form instead of returning to the list, so saving again reported a duplicate date.
+* Fix - "Save for Review", "Mark as Approved", "Suspend" and "Archive" in the trip status menu published the trip instead. Each now saves the status it says.
+* Fix - The Archive action in the Trips list was refused when saving.
+* Fix - Draft trips could be opened by logged-out visitors. Unpublished trips are now visible only to staff.
+* Fix - The trip editor's main button now says "Publish Trip" until a trip is published.
+* Fix - "Update Draft" on a published trip took it offline without warning, so its page returned "page not found". The button no longer appears on published trips. To take a trip offline, choose "Save as Draft" from the status menu.
+* Improvement - Publishing a trip with no price now asks you to confirm first.
+* Improvement - Sections with nothing in them are no longer shown on the trip page, and age limits left at their defaults are hidden. To show a section anyway, use the `yatra_trip_tab_has_content` filter.
+* Fix - The Create Trip window previewed the wrong web address for the trip.
+* Fix - Hidden screen-reader text appeared inside the WordPress media window on Yatra screens.
+
+**Fixed**
+* **The phone country defaulted to the United States on German "Sie" sites.** The booking form picks the phone country from the site language, but a language variant such as *Deutsch (Sie)* (`de_DE_formal`) or `de_CH_informal` was not recognised, so it fell back to +1. It now uses the country part of the locale (Germany, Switzerland).
+* **A Stripe card payment skipped guest email verification and charged the full amount.** With *Require guest email verification* on, the booking form correctly held a guest's booking until they clicked the link in their inbox — but the Stripe card form ignored that and went on to create a payment anyway, charging the card before the email was verified and for the full price, whatever deposit or part payment the guest had chosen. The guest now sees the same "Check your email" screen as with any other payment method, and nothing is charged until they verify. Apple Pay and Google Pay behave the same way.
+* **"Show more reviews" did nothing.** The button on a trip page had no code behind it. It now loads the next reviews below the ones shown, in the same order and style, and hides itself when there are no more. It also no longer appears on trips whose reviews already fit on the page.
+* **Reviewers' email addresses were visible through the public reviews API.** `GET /wp-json/yatra/v1/trips/{id}/reviews` — reachable without logging in — included every reviewer's email address. It is now left out for visitors; staff who can view reviews still see it.
+* **"Similar Adventures" showed the regular price instead of the discounted one.** The cards worked out their own price from the trip's legacy sale price and ignored the current discount and traveller-category prices. They now use the same price, struck-through original and discount badge as the trip's own card on the listing page.
+* **Google Calendar failures are now explained.** After *Sync All Bookings* or *Resync Everything*, any booking that could not be synced is listed under the buttons with the reason — for example Google refusing access to the calendar, a booking whose trip has been deleted, or a booking without a travel date — and each failure is written to Tools → Logs when Settings → Advanced → *Enable Logging* is on. Previously only the number of failures was shown, and the reasons reached no log you could see. The reasons come from the matching Yatra Pro update; with an older Yatra Pro the screen works as before.
 
 = 3.1.0 — 1 November 2026 =
 

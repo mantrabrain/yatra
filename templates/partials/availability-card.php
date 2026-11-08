@@ -12,6 +12,7 @@ $pricing_type = $pricing_type ?? 'regular';
 $selected_date_filter = $selected_date_filter ?? '';
 $trip_id = !empty($trip_data->id) ? (int) $trip_data->id : 0;
 $max_travelers = (int) ($trip_data->max_travelers ?? 20);
+$min_travelers = \Yatra\Controllers\SingleTripController::getEffectiveMinTravelers($trip_data);
 $item_id = isset($card['id']) ? (string) $card['id'] : (string) $index;
 
 // Get pricing from card (already calculated with dynamic pricing in Controller)
@@ -136,6 +137,7 @@ $initial_total_price = $display_sale_price;
              data-date="<?php echo esc_attr($card['data_date'] ?? ''); ?>"
              data-price="<?php echo esc_attr($display_sale_price); ?>"
              data-seats="<?php echo esc_attr($seats_available); ?>"
+             data-min-travelers="<?php echo esc_attr($min_travelers); ?>"
              data-item="<?php echo esc_attr($item_id); ?>"
              data-index="<?php echo esc_attr($index); ?>">
             
@@ -354,7 +356,7 @@ $initial_total_price = $display_sale_price;
                             $pt_pricing_mode = $pt->pricing_mode ?? 'per_person';
                             $pt_is_per_group = ($pt_pricing_mode === 'per_group');
                             $pt_category_id = $pt->category_id ?? $pt_index;
-                            $pt_default = $pt_index === 0 ? 1 : 0;
+                            $pt_default = $pt_index === 0 ? $min_travelers : 0;
                             $pt_min_qty = 0;
                             $pt_max_qty = (int) min($seats_available, $max_travelers);
                             // Cap a per-group "block" category at its max group
@@ -528,7 +530,7 @@ $initial_total_price = $display_sale_price;
                         // was capacity-aware before, which left sold-out cards showing a
                         // selectable traveler.
                         $simple_max_qty = (int) min($seats_available, $max_travelers);
-                        $simple_qty = $simple_max_qty > 0 ? 1 : 0;
+                        $simple_qty = $simple_max_qty > 0 ? min($min_travelers, $simple_max_qty) : 0;
                         $simple_min_qty = $simple_qty;
                         ?>
                         <div class="yatra-booking-travelers-simple yatra-availability-travelers-simple" data-item="<?php echo esc_attr($item_id); ?>">

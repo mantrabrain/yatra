@@ -590,6 +590,8 @@ const AvailabilityForm: React.FC = () => {
       navigate({
         subpage: "trips",
         tab: "availability",
+        action: undefined,
+        id: undefined,
         trip_id: tripId?.toString(),
       });
       // Show toast after a brief delay to ensure navigation happens first
@@ -678,6 +680,8 @@ const AvailabilityForm: React.FC = () => {
                 navigate({
                   subpage: "trips",
                   tab: "availability",
+                  action: undefined,
+                  id: undefined,
                   trip_id: tripId.toString(),
                 })
               }
@@ -1723,10 +1727,17 @@ const AvailabilityForm: React.FC = () => {
                 navigate({
                   subpage: "trips",
                   tab: "availability",
+                  action: undefined,
+                  id: undefined,
                   trip_id: tripId.toString(),
                 });
               } else {
-                navigate({ subpage: "trips", tab: "availability" });
+                navigate({
+                  subpage: "trips",
+                  tab: "availability",
+                  action: undefined,
+                  id: undefined,
+                });
               }
             }}
           >

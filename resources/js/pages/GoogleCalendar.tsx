@@ -45,6 +45,24 @@ interface GoogleCalendarSettings {
   last_sync: string | null;
 }
 
+/** Why one booking failed to sync. Sent by a Pro that reports failures. */
+interface SyncFailure {
+  booking_id: number;
+  reference?: string;
+  reason: string;
+}
+
+/** Most failures listed on screen; the rest are in the log. */
+const MAX_FAILURES_SHOWN = 50;
+
+/** The `failures` list from a sync response; [] from an older Pro. */
+const readFailures = (data: any): SyncFailure[] =>
+  Array.isArray(data?.failures)
+    ? data.failures.filter(
+        (f: any) => f && typeof f.reason === "string" && f.reason !== "",
+      )
+    : [];
+
 const GoogleCalendar: React.FC = () => {
   const [settings, setSettings] = useState<GoogleCalendarSettings | null>(null);
   const [loading, setLoading] = useState(true);
@@ -61,6 +79,7 @@ const GoogleCalendar: React.FC = () => {
     deleted: number;
     failed: number;
   } | null>(null);
+  const [syncFailures, setSyncFailures] = useState<SyncFailure[]>([]);
   const { showToast } = useToast();
   // Named zones from PHP (timezone_identifiers_list), already sorted. Keep a
   // saved value selectable even if this list somehow lacks it.
@@ -166,11 +185,19 @@ const GoogleCalendar: React.FC = () => {
 
   const handleSyncAll = async () => {
     setSyncing(true);
+    setSyncFailures([]);
     try {
       const data = await apiService.syncAllGoogleCalendar();
 
       if (data.success) {
-        showToast(__("Sync completed successfully"), "success");
+        const failures = readFailures(data.data);
+        setSyncFailures(failures);
+        // Say how many failed instead of a plain "successfully" when some did.
+        if (Number(data.data?.failed) > 0) {
+          showToast(data.message || __("Sync finished with failures"), "warning");
+        } else {
+          showToast(__("Sync completed successfully"), "success");
+        }
         fetchSettings();
       } else {
         showToast(data.message || __("Sync failed"), "error");
@@ -199,6 +226,8 @@ const GoogleCalendar: React.FC = () => {
     }
 
     setResyncing(true);
+    setSyncFailures([]);
+    const failures: SyncFailure[] = [];
     const totals = {
       processed: 0,
       total: 0,
@@ -225,6 +254,7 @@ const GoogleCalendar: React.FC = () => {
         totals.updated += Number(data.updated) || 0;
         totals.deleted += Number(data.deleted) || 0;
         totals.failed += Number(data.failed) || 0;
+        failures.push(...readFailures(data));
         if (data.total) {
           totals.total = Number(data.total) || 0;
         }
@@ -273,6 +303,8 @@ const GoogleCalendar: React.FC = () => {
         "error",
       );
     } finally {
+      // Also after an error: what failed before it is still worth showing.
+      setSyncFailures(failures);
       setResyncing(false);
     }
   };
@@ -471,6 +503,36 @@ const GoogleCalendar: React.FC = () => {
                     resyncProgress.failed,
                   )}
                 </p>
+              )}
+              {syncFailures.length > 0 && (
+                <div className="mt-2 rounded-md border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900 dark:border-amber-800 dark:bg-amber-900/10 dark:text-amber-200">
+                  <p className="font-medium">
+                    {__("Bookings that could not be synced:")}
+                  </p>
+                  <ul className="mt-1 list-disc space-y-1 pl-5">
+                    {syncFailures.slice(0, MAX_FAILURES_SHOWN).map((f, i) => (
+                      <li key={`${f.booking_id}-${i}`}>
+                        {sprintf(
+                          /* translators: %1$s: booking ID with its reference, %2$s: why it failed. */
+                          __("Booking %1$s: %2$s"),
+                          f.reference
+                            ? `#${f.booking_id} (${f.reference})`
+                            : `#${f.booking_id}`,
+                          f.reason,
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                  {syncFailures.length > MAX_FAILURES_SHOWN && (
+                    <p className="mt-1">
+                      {sprintf(
+                        /* translators: %d: number of failures not listed. */
+                        __("…and %d more. See Tools → Logs for the full list."),
+                        syncFailures.length - MAX_FAILURES_SHOWN,
+                      )}
+                    </p>
+                  )}
+                </div>
               )}
             </>
           ) : (

@@ -74,29 +74,34 @@ if (!defined('ABSPATH')) {
                         $similar_trip->difficulty_icon ?? null
                     );
                     
-                    // Pricing
-                    $original_price = (float) ($similar_trip->original_price ?? 0);
-                    $sale_price = (float) ($similar_trip->sale_price ?? $original_price);
-                    $current_price = $sale_price > 0 ? $sale_price : $original_price;
-                    $discount_pct = 0;
-                    $has_discount = false;
-                    
-                    if ($original_price > 0 && $sale_price < $original_price) {
-                        $discount_pct = round((($original_price - $sale_price) / $original_price) * 100);
-                        // Only show discount if percentage is greater than 0
-                        $has_discount = $discount_pct > 0;
+                    // Pricing — same source as the listing card (trip-listing-card.php):
+                    // Trip::getPricing() / getDiscount() resolve discounted_price (legacy sale_price
+                    // fallback) and traveler-based category prices, so "From" shows the current price.
+                    // SingleTripController pre-computes them from the raw row; resolve here otherwise.
+                    if (isset($similar_trip->card_pricing, $similar_trip->card_discount)
+                        && is_array($similar_trip->card_pricing) && is_array($similar_trip->card_discount)) {
+                        $similar_pricing = $similar_trip->card_pricing;
+                        $similar_discount = $similar_trip->card_discount;
+                    } else {
+                        $similar_trip_model = $similar_trip instanceof \Yatra\Models\Trip
+                            ? $similar_trip
+                            : \Yatra\Models\Trip::fromStdClass($similar_trip);
+                        $similar_pricing = $similar_trip_model->getPricing();
+                        $similar_discount = $similar_trip_model->getDiscount();
                     }
-                    
+                    $current_price = (float) ($similar_pricing['raw_current_price'] ?? 0);
+                    $original_price = (float) ($similar_pricing['raw_original_price'] ?? 0);
+
                     $pricing = [
-                        'has_price' => $current_price > 0,
-                        'current_price' => yatra_format_price($current_price),
-                        'original_price' => $has_discount ? yatra_format_price($original_price) : '',
-                        'has_discount' => $has_discount,
+                        'has_price' => !empty($similar_pricing['has_price']),
+                        'current_price' => (string) ($similar_pricing['current_price'] ?? ''),
+                        'original_price' => !empty($similar_pricing['has_discount']) ? (string) ($similar_pricing['original_price'] ?? '') : '',
+                        'has_discount' => !empty($similar_pricing['has_discount']),
                     ];
-                    
+
                     $discount = [
-                        'has_discount' => $has_discount,
-                        'discount_text' => $has_discount ? $discount_pct . '%' : ''
+                        'has_discount' => !empty($similar_discount['has_discount']),
+                        'discount_text' => (string) ($similar_discount['discount_text'] ?? ''),
                     ];
 
                     $yatra_similar_urgency = [];

@@ -238,7 +238,7 @@ class DiscountService extends BaseService
                 }
 
                 // Validate min/max group size logic
-                if ($data['min_group_size'] && $data['max_group_size'] && $data['min_group_size'] >= $data['max_group_size']) {
+                if (!empty($data['min_group_size']) && !empty($data['max_group_size']) && $data['min_group_size'] >= $data['max_group_size']) {
                     throw new \InvalidArgumentException('Minimum group size must be less than maximum group size');
                 }
 
@@ -479,7 +479,7 @@ class DiscountService extends BaseService
                 }
 
                 // Validate min/max group size logic
-                if ($data['min_group_size'] && $data['max_group_size'] && $data['min_group_size'] >= $data['max_group_size']) {
+                if (!empty($data['min_group_size']) && !empty($data['max_group_size']) && $data['min_group_size'] >= $data['max_group_size']) {
                     throw new \InvalidArgumentException('Minimum group size must be less than maximum group size');
                 }
 

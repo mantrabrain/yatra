@@ -442,6 +442,8 @@ const AvailabilityForm = () => {
       navigate({
         subpage: "trips",
         tab: "availability",
+        action: void 0,
+        id: void 0,
         trip_id: tripId == null ? void 0 : tripId.toString()
       });
       setTimeout(() => {
@@ -506,6 +508,8 @@ const AvailabilityForm = () => {
             onClick: () => navigate({
               subpage: "trips",
               tab: "availability",
+              action: void 0,
+              id: void 0,
               trip_id: tripId.toString()
             }),
             children: [
@@ -1380,10 +1384,17 @@ const AvailabilityForm = () => {
                 navigate({
                   subpage: "trips",
                   tab: "availability",
+                  action: void 0,
+                  id: void 0,
                   trip_id: tripId.toString()
                 });
               } else {
-                navigate({ subpage: "trips", tab: "availability" });
+                navigate({
+                  subpage: "trips",
+                  tab: "availability",
+                  action: void 0,
+                  id: void 0
+                });
               }
             },
             children: __("Cancel", "yatra")
@@ -1403,4 +1414,4 @@ const AvailabilityForm = () => {
 export {
   AvailabilityForm as default
 };
-//# sourceMappingURL=AvailabilityForm-C05OEgNS.js.map
+//# sourceMappingURL=AvailabilityForm-p5NPshvM.js.map

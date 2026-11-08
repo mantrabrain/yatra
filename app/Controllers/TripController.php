@@ -1760,10 +1760,14 @@ class TripController extends BaseController
                     $by_source[$src][] = $a;
                 }
             }
-            if (!empty($by_source['availability_date'])) {
-                $availability_dates_for_render = $by_source['availability_date'];
-            } elseif (!empty($by_source['recurring_rule'])) {
-                $availability_dates_for_render = $by_source['recurring_rule'];
+            if (!empty($by_source['availability_date']) || !empty($by_source['recurring_rule'])) {
+                // The resolver has already let a specific date replace a rule on the same day,
+                // so list both. Dropping every rule date because one specific date exists
+                // would hide departures that can still be booked.
+                $availability_dates_for_render = array_filter($trip_data->availability_dates, static function ($a) {
+                    $src = is_object($a) ? strtolower(trim((string) ($a->source ?? ''))) : '';
+                    return $src === 'availability_date' || $src === 'recurring_rule';
+                });
             } elseif (!empty($by_source['trip_default'])) {
                 $availability_dates_for_render = $by_source['trip_default'];
             }
@@ -2011,7 +2015,7 @@ class TripController extends BaseController
                 // Use month-based filters for both day trips and multi-day trips for better navigation
                 // This prevents overwhelming users with too many individual date filters
                 $month_key = strtolower(date('M-Y', $departure_date));
-                $month_filters[$month_key] = date_i18n('M Y', $departure_date);
+                $month_filters[$month_key] = mysql2date('M Y', (string) $avail->departure_date);
                 
                 $from_location = !empty($avail->from_location) ? $avail->from_location : ($trip_data->starting_location ?? '');
                 $to_location = !empty($avail->to_location) ? $avail->to_location : ($trip_data->ending_location ?? $from_location);
@@ -2026,16 +2030,16 @@ class TripController extends BaseController
 
                 if ($is_single_day && $departure_time) {
                     // Day trip: Show time as main value, date as sub-label
-                    $from_display = date_i18n($yatra_time_format, strtotime($departure_time)); // e.g., "14:30" or "2:30 PM"
-                    $to_display = $arrival_time ? date_i18n($yatra_time_format, strtotime($arrival_time)) : '';
+                    $from_display = mysql2date($yatra_time_format, (string) $departure_time); // e.g., "14:30" or "2:30 PM"
+                    $to_display = $arrival_time ? mysql2date($yatra_time_format, (string) $arrival_time) : '';
                     // Show day-trip header date using configured format
-                    $date_display = date_i18n($yatra_date_format, $departure_date);
+                    $date_display = mysql2date($yatra_date_format, (string) $avail->departure_date);
                     $from_label = __('Start', 'yatra');
                     $to_label = __('End', 'yatra');
                 } else {
                     // Multi-day trip: Show dates
-                    $from_display = date_i18n($yatra_date_format, $departure_date);
-                    $to_display = date_i18n($yatra_date_format, $return_date);
+                    $from_display = mysql2date($yatra_date_format, (string) $avail->departure_date);
+                    $to_display = ($return_date ? (string) mysql2date($yatra_date_format, date('Y-m-d', $return_date)) : '');
                     $date_display = ''; // Not needed for multi-day
                     $from_label = __('Departure', 'yatra');
                     $to_label = __('Return', 'yatra');
@@ -2476,7 +2480,8 @@ class TripController extends BaseController
                 // Regular pricing - simple number input
                 echo '<div class="yatra-booking-field">';
                 echo '<label for="num_travelers">' . esc_html__('Number of Travelers', 'yatra') . '</label>';
-                echo '<input type="number" id="num_travelers" name="num_travelers" value="1" min="1" max="' . esc_attr($trip->max_travelers ?? 20) . '" />';
+                $min_travelers = SingleTripController::getEffectiveMinTravelers($trip);
+                echo '<input type="number" id="num_travelers" name="num_travelers" value="' . esc_attr($min_travelers) . '" min="' . esc_attr($min_travelers) . '" max="' . esc_attr($trip->max_travelers ?? 20) . '" />';
                 echo '</div>';
             }
             

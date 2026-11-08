@@ -87,10 +87,10 @@ if (!defined('ABSPATH')) {
                                 }
                                 break;
                             case 'date':
-                                echo esc_html(date_i18n(get_option('date_format'), strtotime($attribute['value'])));
+                                echo esc_html(mysql2date(get_option('date_format'), (string) $attribute['value']));
                                 break;
                             case 'time':
-                                echo esc_html(date_i18n(get_option('time_format'), strtotime($attribute['value'])));
+                                echo esc_html(mysql2date(get_option('time_format'), (string) $attribute['value']));
                                 break;
                             case 'color':
                                 echo '<span class="yatra-color-swatch" style="background-color: ' . esc_attr($attribute['value']) . ';" title="' . esc_attr($attribute['value']) . '"></span>' . esc_html($attribute['value']);

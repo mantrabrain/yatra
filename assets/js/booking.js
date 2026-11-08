@@ -957,6 +957,38 @@ if (typeof window.yatraNumOr !== 'function') {
         };
         
         /**
+         * "Check your email" screen for a booking held until the guest verifies.
+         * @param {{ message?: string, data?: { reference?: string, email?: string } }} response
+         */
+        function showEmailVerificationScreen(response) {
+            const data = response.data || {};
+            const reference = data.reference || __('N/A', 'yatra');
+            const email = data.email || '';
+            showSuccessMessage(
+                response.message || __("We've sent a verification email. Click the link to complete your booking.", 'yatra'),
+                reference,
+                {
+                    heading: __('Check your email', 'yatra'),
+                    iconColor: '#2563eb',
+                    footerHtml:
+                        '<p style="margin-top: 20px; color: #374151;">' +
+                        __('We sent a verification link to:', 'yatra') +
+                        ' <strong>' + (email || __('your email', 'yatra')) + '</strong>' +
+                        '</p>' +
+                        '<p style="margin-top: 12px; color: #6b7280; font-size: 14px;">' +
+                        __("Didn't see it? Check your spam folder. The link expires in 48 hours.", 'yatra') +
+                        '</p>'
+                }
+            );
+        }
+
+        // Card gateways (Stripe) post the booking themselves; they hand the
+        // verification reply back here so the guest sees the same screen.
+        document.addEventListener('yatra_email_verification_required', function (e) {
+            showEmailVerificationScreen((e && e.detail) || {});
+        });
+
+        /**
          * Handle payment response from server
          */
         function handlePaymentResponse(response, originalBtnHtml) {
@@ -975,25 +1007,7 @@ if (typeof window.yatraNumOr !== 'function') {
             // magic link in their inbox. Render a "check your email"
             // success screen and DO NOT redirect to payment.
             if (response.code === 'email_verification_required') {
-                const data = response.data || {};
-                const reference = data.reference || __('N/A', 'yatra');
-                const email = data.email || '';
-                showSuccessMessage(
-                    response.message || __("We've sent a verification email. Click the link to complete your booking.", 'yatra'),
-                    reference,
-                    {
-                        heading: __('Check your email', 'yatra'),
-                        iconColor: '#2563eb',
-                        footerHtml:
-                            '<p style="margin-top: 20px; color: #374151;">' +
-                            __('We sent a verification link to:', 'yatra') +
-                            ' <strong>' + (email || __('your email', 'yatra')) + '</strong>' +
-                            '</p>' +
-                            '<p style="margin-top: 12px; color: #6b7280; font-size: 14px;">' +
-                            __("Didn't see it? Check your spam folder. The link expires in 48 hours.", 'yatra') +
-                            '</p>'
-                    }
-                );
+                showEmailVerificationScreen(response);
                 return;
             }
 

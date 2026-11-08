@@ -498,6 +498,8 @@ const RecurringRuleForm: React.FC = () => {
       navigate({
         subpage: "trips",
         tab: "availability",
+        action: undefined,
+        id: undefined,
         trip_id: formData.trip_id.toString(),
       });
     },
@@ -533,6 +535,8 @@ const RecurringRuleForm: React.FC = () => {
       navigate({
         subpage: "trips",
         tab: "availability",
+        action: undefined,
+        id: undefined,
         trip_id: formData.trip_id.toString(),
       });
     },
@@ -715,6 +719,8 @@ const RecurringRuleForm: React.FC = () => {
               navigate({
                 subpage: "trips",
                 tab: "availability",
+                action: undefined,
+                id: undefined,
                 trip_id: formData.trip_id?.toString() || tripIdFromUrl || "",
               })
             }
@@ -2799,6 +2805,8 @@ const RecurringRuleForm: React.FC = () => {
                       navigate({
                         subpage: "trips",
                         tab: "availability",
+                        action: undefined,
+                        id: undefined,
                         trip_id:
                           formData.trip_id?.toString() || tripIdFromUrl || "",
                       })

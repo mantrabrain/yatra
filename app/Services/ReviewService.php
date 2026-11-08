@@ -72,6 +72,47 @@ class ReviewService
     }
 
     /**
+     * Get one slice of a trip's approved reviews for the single-trip page
+     * ("Show more reviews"). Rows are returned raw (same shape as the
+     * initial server-rendered list) so the shared review-item template
+     * renders them identically.
+     *
+     * Returns null when the trip does not exist or is not public, so a
+     * draft trip's reviews are not exposed through the public endpoint.
+     *
+     * @param int $tripId Trip ID
+     * @param int $limit  Page size
+     * @param int $offset Rows already shown
+     * @return array|null {reviews: object[], has_more: bool}
+     */
+    public function getTripReviewsSlice(int $tripId, int $limit, int $offset): ?array
+    {
+        $trip = $this->tripRepository->find($tripId);
+        if (!$trip) {
+            return null;
+        }
+
+        // Unpublished trips only for users who can edit trips (admin fallback
+        // as in SingleTripController, for sites without the Team module).
+        if (
+            !in_array($trip->status ?? '', ['publish', 'published'], true)
+            && !current_user_can('manage_options')
+            && !current_user_can('yatra_edit_trips')
+        ) {
+            return null;
+        }
+
+        // Fetch one extra row to know whether another page exists.
+        $rows = $this->reviewRepository->findApprovedByTripId($tripId, $limit + 1, $offset);
+        $hasMore = count($rows) > $limit;
+
+        return [
+            'reviews' => array_slice($rows, 0, $limit),
+            'has_more' => $hasMore,
+        ];
+    }
+
+    /**
      * Get trip rating summary
      * 
      * @param int $tripId Trip ID

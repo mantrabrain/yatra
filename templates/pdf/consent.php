@@ -22,7 +22,7 @@ $formatDate = static function (?string $date): string {
     if (!$date) {
         return '';
     }
-    return esc_html(date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($date)));
+    return esc_html(mysql2date(get_option('date_format') . ' ' . get_option('time_format'), (string) $date));
 };
 ?>
 <!DOCTYPE html>

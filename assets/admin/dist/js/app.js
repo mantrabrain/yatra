@@ -1,4 +1,4 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-tjvg5vmz.js","../../../dist/js/react-vendor-W-_yntDU.js","../css/react-vendor.css","../../../dist/js/index-BepRZmXV.js","../css/index.css","../../../dist/js/BuildItineraryModal-YugDA9cT.js","../../../dist/js/ProFeature-eW2EIwqA.js","../../../dist/js/Settings-5xW46lQt.js","../../../dist/js/Team-DyYUid5I.js","../../../dist/js/Reports-DJFFzVlx.js","../../../dist/js/DiscountForm-DEhimB0H.js","../../../dist/js/ApplicableTripSelector-D2QW_HaZ.js","../../../dist/js/Itinerary-CF5aaNMY.js","../../../dist/js/RecurringRuleForm-DQBxA5fX.js","./Whatsapp.js","../../../dist/js/module-skeleton-C9FJOcwf.js","../../../dist/js/ChannelManager-Fb0ex6IR.js","../../../dist/js/Webhooks-CwK81HRm.js","../../../dist/js/ScheduledPayments-DdSUOyEb.js","../../../dist/js/TripConsentForm-BAKrDitH.js","../../../dist/js/BookingForm-WRfLP_5t.js","../../../dist/js/ViewBooking-D0EgePSD.js","../../../dist/js/AvailabilityForm-C05OEgNS.js","../../../dist/js/DynamicPricing-PAm1uvCr.js","../../../dist/js/RuleTypeSelectionModal-DSWZlmcG.js","../../../dist/js/toggle-DcgGKLMp.js","../../../dist/js/DynamicPricingRuleForm-BNVsNOcm.js","../../../dist/js/AiAssistant-DONS3P3T.js","../../../dist/js/AbandonedRecovery-a5eULyr-.js","../../../dist/js/WhiteLabel-BzFhb8A5.js"])))=>i.map(i=>d[i]);
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-DLxDKlIL.js","../../../dist/js/react-vendor-W-_yntDU.js","../css/react-vendor.css","../../../dist/js/index-BepRZmXV.js","../css/index.css","../../../dist/js/BuildItineraryModal-YugDA9cT.js","../../../dist/js/ProFeature-eW2EIwqA.js","../../../dist/js/Settings-5xW46lQt.js","../../../dist/js/Team-DyYUid5I.js","../../../dist/js/Reports-DJFFzVlx.js","../../../dist/js/DiscountForm-DEhimB0H.js","../../../dist/js/ApplicableTripSelector-D2QW_HaZ.js","../../../dist/js/Itinerary-CF5aaNMY.js","../../../dist/js/RecurringRuleForm-DGAFIGuV.js","./Whatsapp.js","../../../dist/js/module-skeleton-C9FJOcwf.js","../../../dist/js/ChannelManager-Fb0ex6IR.js","../../../dist/js/Webhooks-CwK81HRm.js","../../../dist/js/ScheduledPayments-DdSUOyEb.js","../../../dist/js/TripConsentForm-BAKrDitH.js","../../../dist/js/BookingForm-WRfLP_5t.js","../../../dist/js/ViewBooking-D0EgePSD.js","../../../dist/js/AvailabilityForm-p5NPshvM.js","../../../dist/js/DynamicPricing-PAm1uvCr.js","../../../dist/js/RuleTypeSelectionModal-DSWZlmcG.js","../../../dist/js/toggle-DcgGKLMp.js","../../../dist/js/DynamicPricingRuleForm-BNVsNOcm.js","../../../dist/js/AiAssistant-DONS3P3T.js","../../../dist/js/AbandonedRecovery-a5eULyr-.js","../../../dist/js/WhiteLabel-BzFhb8A5.js"])))=>i.map(i=>d[i]);
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key2, value) => key2 in obj ? __defProp(obj, key2, { enumerable: true, configurable: true, writable: true, value }) : obj[key2] = value;
 var __publicField = (obj, key2, value) => __defNormalProp(obj, typeof key2 !== "symbol" ? key2 + "" : key2, value);
@@ -30844,7 +30844,9 @@ const Trips = () => {
               /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 dark:text-gray-400 mb-1", children: __("Preview:", "yatra") }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-gray-900 dark:text-white font-mono break-all", children: [
                 ((_e = window.yatraAdmin) == null ? void 0 : _e.siteUrl) || "https://example.com",
-                "/trips/",
+                "/",
+                resolveYatraPermalinkBases().trip_base,
+                "/",
                 newTripSlug || generateSlug(newTripTitle)
               ] })
             ] })
@@ -33283,7 +33285,7 @@ const ActivityForm = () => {
                 __("Saving...", "yatra")
               ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(Save, { className: "w-4 h-4" }),
-                isEditMode ? __("Update Activity", "yatra") : __("Create Itinerary Activity", "yatra")
+                isEditMode ? __("Update Activity", "yatra") : __("Create Activity", "yatra")
               ] })
             }
           ),
@@ -67657,6 +67659,10 @@ const Switch = ({
     }
   );
 };
+const MAX_FAILURES_SHOWN = 50;
+const readFailures = (data) => Array.isArray(data == null ? void 0 : data.failures) ? data.failures.filter(
+  (f) => f && typeof f.reason === "string" && f.reason !== ""
+) : [];
 const GoogleCalendar = () => {
   var _a, _b;
   const [settings2, setSettings] = reactExports.useState(null);
@@ -67667,6 +67673,7 @@ const GoogleCalendar = () => {
   const [reminderError, setReminderError] = reactExports.useState("");
   const [resyncing, setResyncing] = reactExports.useState(false);
   const [resyncProgress, setResyncProgress] = reactExports.useState(null);
+  const [syncFailures, setSyncFailures] = reactExports.useState([]);
   const { showToast } = useToast();
   const timeZoneIds = (() => {
     var _a2;
@@ -67750,11 +67757,19 @@ const GoogleCalendar = () => {
     }
   };
   const handleSyncAll = async () => {
+    var _a2;
     setSyncing(true);
+    setSyncFailures([]);
     try {
       const data = await apiService.syncAllGoogleCalendar();
       if (data.success) {
-        showToast(__("Sync completed successfully"), "success");
+        const failures = readFailures(data.data);
+        setSyncFailures(failures);
+        if (Number((_a2 = data.data) == null ? void 0 : _a2.failed) > 0) {
+          showToast(data.message || __("Sync finished with failures"), "warning");
+        } else {
+          showToast(__("Sync completed successfully"), "success");
+        }
         fetchSettings2();
       } else {
         showToast(data.message || __("Sync failed"), "error");
@@ -67776,6 +67791,8 @@ const GoogleCalendar = () => {
       return;
     }
     setResyncing(true);
+    setSyncFailures([]);
+    const failures = [];
     const totals = {
       processed: 0,
       total: 0,
@@ -67798,6 +67815,7 @@ const GoogleCalendar = () => {
         totals.updated += Number(data.updated) || 0;
         totals.deleted += Number(data.deleted) || 0;
         totals.failed += Number(data.failed) || 0;
+        failures.push(...readFailures(data));
         if (data.total) {
           totals.total = Number(data.total) || 0;
         }
@@ -67830,6 +67848,7 @@ const GoogleCalendar = () => {
         "error"
       );
     } finally {
+      setSyncFailures(failures);
       setResyncing(false);
     }
   };
@@ -67987,7 +68006,21 @@ const GoogleCalendar = () => {
           resyncProgress.updated,
           resyncProgress.deleted,
           resyncProgress.failed
-        ) })
+        ) }),
+        syncFailures.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-2 rounded-md border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900 dark:border-amber-800 dark:bg-amber-900/10 dark:text-amber-200", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium", children: __("Bookings that could not be synced:") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { className: "mt-1 list-disc space-y-1 pl-5", children: syncFailures.slice(0, MAX_FAILURES_SHOWN).map((f, i) => /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: sprintf(
+            /* translators: %1$s: booking ID with its reference, %2$s: why it failed. */
+            __("Booking %1$s: %2$s"),
+            f.reference ? `#${f.booking_id} (${f.reference})` : `#${f.booking_id}`,
+            f.reason
+          ) }, `${f.booking_id}-${i}`)) }),
+          syncFailures.length > MAX_FAILURES_SHOWN && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1", children: sprintf(
+            /* translators: %d: number of failures not listed. */
+            __("…and %d more. See Tools → Logs for the full list."),
+            syncFailures.length - MAX_FAILURES_SHOWN
+          ) })
+        ] })
       ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx(
         Button,
         {
@@ -74977,7 +75010,9 @@ const EmailTemplateForm = () => {
   const { data: allTemplatesData } = useQuery({
     queryKey: ["email-templates"],
     queryFn: () => fetchEmailTemplates(),
-    enabled: overridesSupported && !isCreateMode
+    // Also read without override support: it says whether this template is sent.
+    // Core-template edits have no Pro list to read (the endpoint isn't there).
+    enabled: !isCreateMode && !isCoreSettingsEdit
   });
   const allTemplates = reactExports.useMemo(
     () => Array.isArray(allTemplatesData) ? allTemplatesData : [],
@@ -74987,6 +75022,19 @@ const EmailTemplateForm = () => {
     () => allTemplates.find((t) => t.template_key === overrideOf) || null,
     [allTemplates, overrideOf]
   );
+  const replacedBy = reactExports.useMemo(() => {
+    const self = allTemplates.find(
+      (t) => String(t.id) === String((templateData == null ? void 0 : templateData.id) ?? "")
+    );
+    if (!self || self.in_use !== false || !self.superseded_by) {
+      return null;
+    }
+    const current = allTemplates.find(
+      (t) => t.template_key === self.superseded_by
+    );
+    const on = current && (current.is_active === true || String(current.is_active) === "1");
+    return on ? current : null;
+  }, [allTemplates, templateData]);
   const myOverrides = reactExports.useMemo(
     () => allTemplates.filter(
       (t) => t.overrides && t.overrides === (templateData == null ? void 0 : templateData.template_key)
@@ -75530,6 +75578,36 @@ const EmailTemplateForm = () => {
                   children: __("+ Add override", "yatra")
                 }
               )
+            ]
+          }
+        ),
+        replacedBy && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            className: "rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-700 p-4 text-sm text-amber-900 dark:text-amber-200",
+            "data-testid": "template-not-in-use",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium", children: __("This template isn't sent, so changes here won't reach anyone.", "yatra") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-1", children: [
+                sprintf(
+                  /* translators: %s: name of the template that is sent instead. */
+                  __("Customers get “%s” for this email instead. Edit that template, or switch it off to use this one.", "yatra"),
+                  String(replacedBy.name || "")
+                ),
+                " ",
+                replacedBy.id && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "a",
+                  {
+                    href: `admin.php?page=yatra&subpage=email-automation&tab=templates&action=edit&id=${replacedBy.id}`,
+                    className: "font-medium underline",
+                    children: sprintf(
+                      /* translators: %s: name of the template that is sent instead. */
+                      __("Edit “%s”", "yatra"),
+                      String(replacedBy.name || "")
+                    )
+                  }
+                )
+              ] })
             ]
           }
         ),
@@ -79387,13 +79465,13 @@ const License = () => {
     ] }) }) })
   ] });
 };
-const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-tjvg5vmz.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
+const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-DLxDKlIL.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
 const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-5xW46lQt.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
 const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-DyYUid5I.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
 const Reports = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Reports-DJFFzVlx.js"), true ? __vite__mapDeps([9,1,2,3,4]) : void 0, import.meta.url));
 const DiscountForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DiscountForm-DEhimB0H.js"), true ? __vite__mapDeps([10,1,2,3,4,11]) : void 0, import.meta.url));
 const Itinerary = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Itinerary-CF5aaNMY.js"), true ? __vite__mapDeps([12,1,2,3,4,5]) : void 0, import.meta.url));
-const RecurringRuleForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/RecurringRuleForm-DQBxA5fX.js"), true ? __vite__mapDeps([13,1,2,3,4]) : void 0, import.meta.url));
+const RecurringRuleForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/RecurringRuleForm-DGAFIGuV.js"), true ? __vite__mapDeps([13,1,2,3,4]) : void 0, import.meta.url));
 const Whatsapp = reactExports.lazy(() => __vitePreload(() => import("./Whatsapp.js"), true ? __vite__mapDeps([14,1,2,3,4,15]) : void 0, import.meta.url));
 const ChannelManager = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ChannelManager-Fb0ex6IR.js"), true ? __vite__mapDeps([16,1,2,3,4,15]) : void 0, import.meta.url));
 const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Webhooks-CwK81HRm.js"), true ? __vite__mapDeps([17,1,2,3,4,15]) : void 0, import.meta.url));
@@ -79401,7 +79479,7 @@ const ScheduledPayments = reactExports.lazy(() => __vitePreload(() => import("..
 const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-BAKrDitH.js"), true ? __vite__mapDeps([19,1,2,3,4,11]) : void 0, import.meta.url));
 const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-WRfLP_5t.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
 const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-D0EgePSD.js"), true ? __vite__mapDeps([21,1,2,3,4]) : void 0, import.meta.url));
-const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-C05OEgNS.js"), true ? __vite__mapDeps([22,1,2,3,4]) : void 0, import.meta.url));
+const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-p5NPshvM.js"), true ? __vite__mapDeps([22,1,2,3,4]) : void 0, import.meta.url));
 const DynamicPricing = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DynamicPricing-PAm1uvCr.js"), true ? __vite__mapDeps([23,1,2,24,3,4,25]) : void 0, import.meta.url));
 const DynamicPricingRuleForm = reactExports.lazy(
   () => __vitePreload(() => import("../../../dist/js/DynamicPricingRuleForm-BNVsNOcm.js"), true ? __vite__mapDeps([26,1,2,3,4,24]) : void 0, import.meta.url)

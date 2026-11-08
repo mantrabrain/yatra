@@ -223,8 +223,8 @@ $yatra_mobile_use_date_dropdown = (bool) apply_filters('yatra_use_date_dropdown'
                                    id="mobile_num_travelers"
                                    name="num_travelers"
                                    class="yatra-mobile-quantity-input"
-                                   value="1"
-                                   min="<?php echo esc_attr($trip->getMinTravelers() ?: 1); ?>"
+                                   value="<?php echo esc_attr(\Yatra\Controllers\SingleTripController::getEffectiveMinTravelers($trip)); ?>"
+                                   min="<?php echo esc_attr(\Yatra\Controllers\SingleTripController::getEffectiveMinTravelers($trip)); ?>"
                                    max="<?php echo esc_attr($trip->getMaxTravelers() ?: 20); ?>"
                                    readonly
                                    data-price="<?php echo esc_attr($base_price); ?>">

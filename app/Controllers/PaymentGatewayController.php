@@ -923,8 +923,8 @@ class PaymentGatewayController extends BaseController
         $currencySymbol = FormatHelper::getCurrencySymbol($currency);
 
         // Format dates
-        $paymentDate = !empty($payment->created_at) ? date_i18n(get_option('date_format'), strtotime($payment->created_at)) : '';
-        $travelDate = !empty($payment->travel_date) ? date_i18n(get_option('date_format'), strtotime($payment->travel_date)) : '';
+        $paymentDate = !empty($payment->created_at) ? mysql2date(get_option('date_format'), (string) $payment->created_at) : '';
+        $travelDate = !empty($payment->travel_date) ? mysql2date(get_option('date_format'), (string) $payment->travel_date) : '';
 
 
         $bookingRef = (string) ($payment->booking_reference ?? $payment->booking_number ?? $payment->reference ?? (string) $paymentId);
@@ -1111,7 +1111,7 @@ class PaymentGatewayController extends BaseController
         $currencySymbol = FormatHelper::getCurrencySymbol($currency);
         $bookingRef = (string) ($booking->reference ?? $booking->booking_number ?? (string) $bookingId);
         $filename = 'Invoice #' . $bookingRef . '.pdf';
-        $travelDate = !empty($booking->travel_date) ? date_i18n(get_option('date_format'), strtotime((string) $booking->travel_date)) : '';
+        $travelDate = !empty($booking->travel_date) ? mysql2date(get_option('date_format'), (string) $booking->travel_date) : '';
 
         $total = (float) ($booking->total_amount ?? 0);
         $paid  = (float) ($booking->amount_paid ?? 0);
@@ -1130,7 +1130,7 @@ class PaymentGatewayController extends BaseController
             'customer_email'  => $booking->contact_email ?? '',
             'customer_address_lines' => FormatHelper::customerAddressLines($booking),
             'payment_ref'     => $bookingRef,
-            'payment_date'    => !empty($booking->created_at) ? date_i18n(get_option('date_format'), strtotime((string) $booking->created_at)) : '',
+            'payment_date'    => !empty($booking->created_at) ? mysql2date(get_option('date_format'), (string) $booking->created_at) : '',
             // Reflect the booking's real payment state rather than a fixed
             // "Payment Pending" — a deposit-paid booking is Partially Paid.
             'payment_status'  => $due <= 0.0
@@ -1221,8 +1221,8 @@ class PaymentGatewayController extends BaseController
         $currencySymbol = FormatHelper::getCurrencySymbol($currency);
 
         // Format dates
-        $bookingDate = !empty($payment->created_at) ? date_i18n(get_option('date_format'), strtotime($payment->created_at)) : '';
-        $travelDate = !empty($payment->travel_date) ? date_i18n(get_option('date_format'), strtotime($payment->travel_date)) : '';
+        $bookingDate = !empty($payment->created_at) ? mysql2date(get_option('date_format'), (string) $payment->created_at) : '';
+        $travelDate = !empty($payment->travel_date) ? mysql2date(get_option('date_format'), (string) $payment->travel_date) : '';
         
         // Return date. Prefer the booking's STORED end_date — that is the actual
         // booked return (it already accounts for a flexible window or a trip
@@ -1235,13 +1235,13 @@ class PaymentGatewayController extends BaseController
         $storedEnd = isset($payment->booking_end_date) ? (string) $payment->booking_end_date : '';
         $travelStart = (string) ($payment->travel_date ?? '');
         if ($storedEnd !== '' && ($travelStart === '' || $storedEnd >= $travelStart)) {
-            $returnDate = date_i18n(get_option('date_format'), strtotime($storedEnd));
+            $returnDate = mysql2date(get_option('date_format'), (string) $storedEnd);
         } else {
             $durationDaysForReturn = (int) ($payment->trip_duration_days ?? ($trip->duration_days ?? 0));
             if (!empty($payment->travel_date) && $durationDaysForReturn > 0) {
                 $returnOffset = max(0, $durationDaysForReturn - 1);
                 $returnTimestamp = strtotime($payment->travel_date . ' +' . $returnOffset . ' days');
-                $returnDate = date_i18n(get_option('date_format'), $returnTimestamp);
+                $returnDate = ($returnTimestamp ? (string) mysql2date(get_option('date_format'), date('Y-m-d', $returnTimestamp)) : '');
             }
         }
 

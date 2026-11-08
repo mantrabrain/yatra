@@ -799,9 +799,9 @@ class BookingsController extends BaseController
         $currencySymbol = FormatHelper::getCurrencySymbol($currency);
 
         $createdAt = $booking['created_at'] ?? $booking['booking_date'] ?? '';
-        $bookingDate = !empty($createdAt) ? date_i18n(get_option('date_format'), strtotime((string) $createdAt)) : '';
+        $bookingDate = !empty($createdAt) ? mysql2date(get_option('date_format'), (string) $createdAt) : '';
         $travelDateRaw = $booking['travel_date'] ?? '';
-        $travelDate = !empty($travelDateRaw) ? date_i18n(get_option('date_format'), strtotime((string) $travelDateRaw)) : '';
+        $travelDate = !empty($travelDateRaw) ? mysql2date(get_option('date_format'), (string) $travelDateRaw) : '';
 
         // Return date. Prefer the booking's STORED end_date — the actual booked
         // return (accounts for a flexible window or a trip duration changed after
@@ -812,11 +812,11 @@ class BookingsController extends BaseController
         $returnDate = '';
         $storedEnd = (string) ($booking['end_date'] ?? '');
         if ($storedEnd !== '' && ($travelDateRaw === '' || $storedEnd >= $travelDateRaw)) {
-            $returnDate = date_i18n(get_option('date_format'), strtotime($storedEnd));
+            $returnDate = mysql2date(get_option('date_format'), (string) $storedEnd);
         } elseif (!empty($travelDateRaw) && $trip && !empty($trip->duration_days)) {
             $returnOffset = max(0, (int) $trip->duration_days - 1);
             $returnTimestamp = strtotime((string) $travelDateRaw . ' +' . $returnOffset . ' days');
-            $returnDate = date_i18n(get_option('date_format'), $returnTimestamp);
+            $returnDate = ($returnTimestamp ? (string) mysql2date(get_option('date_format'), date('Y-m-d', $returnTimestamp)) : '');
         }
 
         $statusRaw = (string) ($booking['booking_status'] ?? $booking['status'] ?? '');

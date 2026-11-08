@@ -77,44 +77,23 @@ class SingleTripController
      */
     public function getBySlug(string $slug): ?object
     {
+        // Staff can preview unpublished trips; everyone else only sees published ones.
+        // Admin fallback so site owners always can, even when the Team module isn't
+        // active and yatra_edit_trips isn't on the admin role.
+        $statuses = current_user_can('manage_options') || current_user_can('yatra_edit_trips')
+            ? "'publish', 'published', 'draft', 'review', 'approved'"
+            : "'publish', 'published'";
+
         $trip = $this->wpdb->get_row(
             $this->wpdb->prepare(
                 "SELECT * FROM {$this->table_trips} 
                  WHERE slug = %s 
-                 AND status IN ('publish', 'published', 'draft') 
+                 AND status IN ({$statuses}) 
                  LIMIT 1",
                 $slug
             )
         );
 
-
-
-        // Check if trip exists but has other status - return null to show "not found"
-        if (!$trip) {
-            // Try to find trip regardless of status to check if it exists
-            $existingTrip = $this->wpdb->get_row(
-                $this->wpdb->prepare(
-                    "SELECT status FROM {$this->table_trips} 
-                     WHERE slug = %s 
-                     LIMIT 1",
-                    $slug
-                )
-            );
-            
-            // If trip exists but viewer can't preview drafts, hide it.
-            // Admin fallback so site owners always see drafts even when
-            // the Team module isn't active and yatra_edit_trips isn't
-            // on the admin role.
-            if (
-                $existingTrip
-                && !current_user_can('manage_options')
-                && !current_user_can('yatra_edit_trips')
-            ) {
-                return null;
-            }
-        }
-
-        // Return null if no trip found or if trip has other status
         if (!$trip) {
             return null;
         }
@@ -1151,6 +1130,11 @@ class SingleTripController
     /**
      * Get reviews for trip
      *
+     * First page of the list. Ordering (incl. the id tiebreak) must match
+     * ReviewRepository::findApprovedByTripId(), which serves the later pages
+     * for "Show more reviews" — otherwise rows sharing a created_at could
+     * repeat or be skipped across the page boundary.
+     *
      * @param int $trip_id Trip ID
      * @return array Reviews
      */
@@ -1168,7 +1152,7 @@ class SingleTripController
                 "SELECT * FROM {$this->table_reviews} 
                  WHERE trip_id = %d 
                  AND {$approved}
-                 ORDER BY created_at DESC 
+                 ORDER BY created_at DESC, id DESC
                  LIMIT 10",
                 $trip_id
             )
@@ -1241,11 +1225,13 @@ class SingleTripController
             ? ', duration_hours'
             : '';
         
-        // Get similar trips based on category or difficulty
+        // Get similar trips based on category or difficulty.
+        // discounted_price / pricing_type / price_types feed Trip::getPricing() in the
+        // similar-trips partial so the card shows the same price as the listing card.
         $similar = $this->wpdb->get_results(
             $this->wpdb->prepare(
                 "SELECT id, title, slug, featured_image AS featured_image_id, '' AS featured_image_url, duration_days, duration_nights{$duration_hours_col}, 
-                        original_price, sale_price, difficulty_level, 
+                        original_price, sale_price, discounted_price, pricing_type, price_types, difficulty_level, 
                         short_description
                  FROM {$this->table_trips} t
                  WHERE t.id != %d 
@@ -1278,7 +1264,7 @@ class SingleTripController
             $similar = $this->wpdb->get_results(
                 $this->wpdb->prepare(
                     "SELECT id, title, slug, featured_image AS featured_image_id, '' AS featured_image_url, duration_days, duration_nights{$duration_hours_col}, 
-                            original_price, sale_price, difficulty_level, 
+                            original_price, sale_price, discounted_price, pricing_type, price_types, difficulty_level, 
                             short_description
                      FROM {$this->table_trips} 
                      WHERE id != %d 
@@ -1293,6 +1279,12 @@ class SingleTripController
 
         // Prepare each similar trip
         foreach ($similar as &$s) {
+            // Card price/badge from the raw row (before the sale_price fill below), using the
+            // same Trip model getters as trip-listing-card.php so both cards always agree.
+            $similar_model = \Yatra\Models\Trip::fromStdClass($s);
+            $s->card_pricing = $similar_model->getPricing();
+            $s->card_discount = $similar_model->getDiscount();
+
             $s->highlights = []; // Empty array as default
             $s->duration_days = (int) ($s->duration_days ?? 1);
             $s->duration_nights = (int) ($s->duration_nights ?? 0);
@@ -1671,10 +1663,92 @@ class SingleTripController
             return ($a->order ?? 999) - ($b->order ?? 999);
         });
 
-        // Render each enabled tab
+        // Render each enabled tab that has something to show
         foreach ($enabled_tabs as $tab) {
-            self::renderTabContent($tab, $trip);
+            if (self::tabHasContent($tab, $trip)) {
+                self::renderTabContent($tab, $trip);
+            }
         }
+    }
+
+    /**
+     * Whether a tab has anything to show. An unfilled section would otherwise
+     * render a "nothing here yet" box on the public page. Return true from the
+     * yatra_trip_tab_has_content filter to show a section regardless.
+     *
+     * @param object $tab Tab configuration
+     * @param object $trip Trip object
+     * @return bool
+     */
+    private static function tabHasContent($tab, $trip): bool
+    {
+        switch ($tab->content_type ?? '') {
+            case 'itinerary':
+                $has_content = !empty($trip->getItineraryDays());
+                break;
+
+            case 'included_excluded':
+                $has_content = !empty($trip->getIncludedItems()) || !empty($trip->getExcludedItems());
+                break;
+
+            case 'location':
+                $has_content = (!empty($trip->getStartingLatitude()) && !empty($trip->getStartingLongitude()))
+                    || !empty((new \Yatra\Repositories\ItineraryRepository())->getEntriesWithCoordinatesForMap((int) $trip->id));
+                break;
+
+            case 'important_info':
+                $has_content = !empty($trip->getPhysicalRequirements())
+                    || !empty($trip->getVisaRequirements())
+                    || !empty($trip->getVaccinationRequirements())
+                    || !empty($trip->getCancellationPolicy())
+                    || self::hasAgeLimits($trip)
+                    || !empty($trip->accommodation_type)
+                    || !empty($trip->meal_plan)
+                    || !empty($trip->accommodation_details)
+                    || !empty($trip->pickup_location)
+                    || !empty($trip->dropoff_location)
+                    || !empty($trip->transportation_details);
+                break;
+
+            case 'downloads':
+                $has_content = !empty($trip->getDownloadableItems());
+                break;
+
+            case 'faq':
+                $has_content = !empty($trip->getFaqs());
+                break;
+
+            case 'trip_story':
+                $has_content = !empty($trip->getTripStory());
+                break;
+
+            case 'what_makes_special':
+                $has_content = !empty($trip->getWhatMakesSpecial());
+                break;
+
+            case 'testimonials':
+                $has_content = !empty($trip->getTestimonials());
+                break;
+
+            default:
+                $has_content = true;
+        }
+
+        return (bool) apply_filters('yatra_trip_tab_has_content', $has_content, $tab, $trip);
+    }
+
+    /**
+     * Whether a trip sets real age limits, as opposed to the 0 and 99 defaults.
+     *
+     * @param object $trip Trip object
+     * @return bool
+     */
+    public static function hasAgeLimits($trip): bool
+    {
+        $min = (int) ($trip->age_min ?? 0);
+        $max = (int) ($trip->age_max ?? 0);
+
+        return $min > 0 || ($max > 0 && $max !== 99);
     }
 
     /**
@@ -1797,6 +1871,9 @@ class SingleTripController
         $navigation_items = [];
         
         foreach ($enabled_tabs as $tab) {
+            if (!self::tabHasContent($tab, $trip)) {
+                continue;
+            }
             $nav_item = self::getNavigationItemForTab($tab, $trip);
             if ($nav_item) {
                 $navigation_items[] = $nav_item;
@@ -1804,6 +1881,22 @@ class SingleTripController
         }
 
         return $navigation_items;
+    }
+
+    /**
+     * The fewest travelers one booking of this trip may have.
+     *
+     * A minimum above the trip's maximum is a configuration slip. It's capped at
+     * the maximum so the trip stays bookable.
+     *
+     * @param object $trip Trip model or row.
+     */
+    public static function getEffectiveMinTravelers($trip): int
+    {
+        $min = max(1, (int) ($trip->min_travelers ?? 1));
+        $max = (int) ($trip->max_travelers ?? 0);
+
+        return $max > 0 ? min($min, $max) : $min;
     }
 
     /**
@@ -1906,7 +1999,7 @@ class SingleTripController
                     && (($price_type->group_overflow ?? 'block') !== 'per_block')) {
                     $pt_max_qty = (int) $price_type->max_pax;
                 }
-                $pt_value = ($index === $default_index) ? 1 : 0;
+                $pt_value = ($index === $default_index) ? min(self::getEffectiveMinTravelers($trip), max(1, $pt_max_qty)) : 0;
 
                 $traveler_rows[] = [
                     'label' => $price_type->category_label ?: __('Traveler', 'yatra'),

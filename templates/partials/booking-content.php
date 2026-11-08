@@ -226,7 +226,7 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                                         <line x1="8" y1="2" x2="8" y2="6"></line>
                                         <line x1="3" y1="10" x2="21" y2="10"></line>
                                     </svg>
-                                    <?php echo esc_html(date_i18n(get_option('date_format'), strtotime($travel_date))); ?>
+                                    <?php echo esc_html(mysql2date(get_option('date_format'), (string) $travel_date)); ?>
                                 </span>
                                 <span>
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -538,7 +538,7 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                                                     }
                                                     break;
                                                 case 'date':
-                                                    echo esc_html(date_i18n(get_option('date_format'), strtotime($attribute['value'])));
+                                                    echo esc_html(mysql2date(get_option('date_format'), (string) $attribute['value']));
                                                     break;
                                                 case 'color':
                                                     echo '<span class="yatra-booking-color-swatch" style="background-color: ' . esc_attr($attribute['value']) . ';" title="' . esc_attr($attribute['value']) . '"></span>';

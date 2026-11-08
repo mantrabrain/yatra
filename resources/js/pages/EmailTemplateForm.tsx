@@ -212,7 +212,9 @@ const EmailTemplateForm: React.FC = () => {
   const { data: allTemplatesData } = useQuery({
     queryKey: ["email-templates"],
     queryFn: () => fetchEmailTemplates(),
-    enabled: overridesSupported && !isCreateMode,
+    // Also read without override support: it says whether this template is sent.
+    // Core-template edits have no Pro list to read (the endpoint isn't there).
+    enabled: !isCreateMode && !isCoreSettingsEdit,
   });
   const allTemplates = useMemo(
     () => (Array.isArray(allTemplatesData) ? (allTemplatesData as any[]) : []),
@@ -222,6 +224,25 @@ const EmailTemplateForm: React.FC = () => {
     () => allTemplates.find((t) => t.template_key === overrideOf) || null,
     [allTemplates, overrideOf],
   );
+  // An older template for the same email (e.g. "New Booking Confirmation")
+  // isn't sent while its replacement is on, so edits to it never reach anyone.
+  // The list marks it, but this screen said nothing and saved without warning.
+  const replacedBy = useMemo(() => {
+    const self = allTemplates.find(
+      (t) => String(t.id) === String((templateData as any)?.id ?? ""),
+    );
+    if (!self || self.in_use !== false || !self.superseded_by) {
+      return null;
+    }
+    // Only say customers get the other one when it is actually switched on.
+    const current = allTemplates.find(
+      (t) => t.template_key === self.superseded_by,
+    );
+    const on =
+      current &&
+      (current.is_active === true || String(current.is_active) === "1");
+    return on ? current : null;
+  }, [allTemplates, templateData]);
   const myOverrides = useMemo(
     () =>
       allTemplates
@@ -929,6 +950,35 @@ const EmailTemplateForm: React.FC = () => {
               >
                 {__("+ Add override", "yatra")}
               </Button>
+            </div>
+          )}
+          {replacedBy && (
+            <div
+              className="rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-700 p-4 text-sm text-amber-900 dark:text-amber-200"
+              data-testid="template-not-in-use"
+            >
+              <p className="font-medium">
+                {__("This template isn't sent, so changes here won't reach anyone.", "yatra")}
+              </p>
+              <p className="mt-1">
+                {sprintf(
+                  /* translators: %s: name of the template that is sent instead. */
+                  __("Customers get \u201c%s\u201d for this email instead. Edit that template, or switch it off to use this one.", "yatra"),
+                  String((replacedBy as any).name || ""),
+                )}{" "}
+                {(replacedBy as any).id && (
+                  <a
+                    href={`admin.php?page=yatra&subpage=email-automation&tab=templates&action=edit&id=${(replacedBy as any).id}`}
+                    className="font-medium underline"
+                  >
+                    {sprintf(
+                      /* translators: %s: name of the template that is sent instead. */
+                      __("Edit \u201c%s\u201d", "yatra"),
+                      String((replacedBy as any).name || ""),
+                    )}
+                  </a>
+                )}
+              </p>
             </div>
           )}
           <Card>

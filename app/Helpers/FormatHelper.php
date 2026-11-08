@@ -171,13 +171,8 @@ class FormatHelper
         }
 
         $format = $format ?: SettingsService::getString('date_format', (string) get_option('date_format', 'F j, Y'));
-        
-        $timestamp = strtotime($date);
-        if ($timestamp === false) {
-            return $date;
-        }
 
-        return self::formatTimestampWithTz($timestamp, $format);
+        return self::formatWallClock($date, $format);
     }
 
     /**
@@ -197,12 +192,20 @@ class FormatHelper
         $timeFormat = SettingsService::getString('time_format', (string) get_option('time_format', 'g:i a'));
         $format = $format ?: $dateFormat . ' ' . $timeFormat;
         
-        $timestamp = strtotime($datetime);
-        if ($timestamp === false) {
+        // Stored datetimes such as created_at are WordPress local time
+        // (current_time('mysql')), so read them in the site timezone before
+        // showing them in Yatra's. Reading them as UTC moved the time by the
+        // site's offset, which could also change the day.
+        $dt = date_create($datetime, function_exists('wp_timezone') ? wp_timezone() : new \DateTimeZone('UTC'));
+        if ($dt === false) {
             return $datetime;
         }
 
-        return self::formatTimestampWithTz($timestamp, $format);
+        $tz = self::displayTimezone();
+
+        return function_exists('wp_date')
+            ? (string) wp_date($format, $dt->getTimestamp(), $tz)
+            : $dt->setTimezone($tz)->format($format);
     }
 
     /**
@@ -228,48 +231,54 @@ class FormatHelper
             return '';
         }
         
-        $timestamp = strtotime($time);
-        if ($timestamp === false) {
-            return $time;
-        }
-        
         $format = SettingsService::getString('time_format', (string) get_option('time_format', 'g:i a'));
-        return self::formatTimestampWithTz($timestamp, $format);
+
+        return self::formatWallClock($time, $format);
     }
 
     /**
-     * Format a timestamp using Yatra timezone when set.
+     * Format a date or time that is already in local time, such as a travel
+     * date or a departure time, without moving it to another timezone.
      *
-     * @param int $timestamp Unix timestamp
-     * @param string $format PHP date format
-     * @return string
+     * Reading "2026-11-14" as UTC midnight and then showing it in a timezone
+     * west of UTC turned it into November 13, so a departure card showed the
+     * day before the one being booked.
+     *
+     * @param string $value  Date, date-time or time string.
+     * @param string $format PHP date format.
      */
-    private static function formatTimestampWithTz(int $timestamp, string $format): string
+    private static function formatWallClock(string $value, string $format): string
+    {
+        $tz = self::displayTimezone();
+        $dt = date_create($value, $tz);
+        if ($dt === false) {
+            return $value;
+        }
+
+        return function_exists('wp_date')
+            ? (string) wp_date($format, $dt->getTimestamp(), $tz)
+            : $dt->format($format);
+    }
+
+    /**
+     * The timezone dates are shown in: Yatra's own setting, else the site's.
+     *
+     * "UTC" is Yatra's default and is also what a settings save stores when
+     * nobody chose a timezone, so it means "not set" here. Times then stay in
+     * the site's timezone, as before.
+     */
+    private static function displayTimezone(): \DateTimeZone
     {
         $tz = trim((string) SettingsService::getString('timezone', ''));
-        if ($tz === '') {
-            // WP site timezone fallback
-            return function_exists('wp_date')
-                ? wp_date($format, $timestamp)
-                : date_i18n($format, $timestamp);
+        if ($tz !== '' && strtoupper($tz) !== 'UTC') {
+            try {
+                return new \DateTimeZone($tz);
+            } catch (\Exception $e) {
+                // Unknown name: fall back to the site timezone.
+            }
         }
 
-        try {
-            $dtz = new \DateTimeZone($tz);
-        } catch (\Exception $e) {
-            return function_exists('wp_date')
-                ? wp_date($format, $timestamp)
-                : date_i18n($format, $timestamp);
-        }
-
-        if (function_exists('wp_date')) {
-            return wp_date($format, $timestamp, $dtz);
-        }
-
-        // Older WP fallback: shift timestamp into requested timezone via DateTime.
-        $d = new \DateTime('@' . $timestamp);
-        $d->setTimezone($dtz);
-        return $d->format($format);
+        return function_exists('wp_timezone') ? wp_timezone() : new \DateTimeZone('UTC');
     }
 
     /**
@@ -640,7 +649,10 @@ class FormatHelper
             }
         }
         if ($default === '' && \function_exists('get_locale')) {
-            if (preg_match('/_([A-Z]{2})$/', (string) get_locale(), $m) && isset($codes[$m[1]])) {
+            // Region is the second part, also for variant locales such as
+            // de_DE_formal ("Deutsch (Sie)") or de_CH_informal, which used to fall
+            // through to "US".
+            if (preg_match('/^[a-z]{2,3}_([A-Z]{2})(?:_|$)/', (string) get_locale(), $m) && isset($codes[$m[1]])) {
                 $default = $m[1];
             }
         }

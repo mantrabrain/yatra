@@ -343,6 +343,15 @@ class AdminAssetsProvider
             );
         }
 
+        // The WordPress admin stylesheet is removed on these screens, and with it the rule
+        // hiding screen-reader text, which then shows up inside the media window.
+        wp_register_style('yatra-admin-media-modal', false);
+        wp_enqueue_style('yatra-admin-media-modal');
+        wp_add_inline_style(
+            'yatra-admin-media-modal',
+            '.media-modal .screen-reader-text{border:0;clip-path:inset(50%);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px;word-wrap:normal}'
+        );
+
         $basePath = YATRA_PLUGIN_PATH . 'assets/admin/dist/css/';
         $faHandle = file_exists($faPath) ? 'yatra-fontawesome-6-admin' : false;
 

@@ -699,6 +699,14 @@ class BookingSessionController extends BaseController
             ], 400);
         }
 
+        $min_travelers_error = $this->validateMinTravelers($trip, $travelers_count);
+        if ($min_travelers_error !== null) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => $min_travelers_error,
+            ], 400);
+        }
+
         // Determine if day trip - prefer frontend value, fallback to trip duration
         $is_day_trip = isset($data['is_day_trip']) ? (bool) $data['is_day_trip'] : (($trip->duration_days ?? 1) <= 1);
         
@@ -1151,6 +1159,27 @@ class BookingSessionController extends BaseController
         }
 
         return null;
+    }
+
+    /**
+     * Refuse a customer booking below the trip's minimum travelers.
+     *
+     * @param object $trip  Trip row.
+     * @param int    $count Travelers in the booking.
+     * @return string|null Error message when below the minimum, otherwise null.
+     */
+    private function validateMinTravelers($trip, int $count): ?string
+    {
+        $min = SingleTripController::getEffectiveMinTravelers($trip);
+        if ($count >= $min) {
+            return null;
+        }
+
+        return sprintf(
+            /* translators: %d: minimum number of travelers for one booking. */
+            _n('This trip needs at least %d traveler per booking.', 'This trip needs at least %d travelers per booking.', $min, 'yatra'),
+            $min
+        );
     }
 
     /**
@@ -1744,6 +1773,19 @@ class BookingSessionController extends BaseController
             return new WP_REST_Response([
                 'success' => false,
                 'message' => $group_size_error,
+            ], 400);
+        }
+
+        // The trip's minimum, checked here too because the session can be edited
+        // or skipped after it was created. Staff bookings don't come through here.
+        $min_travelers_error = $this->validateMinTravelers(
+            $trip,
+            !empty($traveler_counts) ? (int) array_sum(array_map('intval', $traveler_counts)) : $travelers_count
+        );
+        if ($min_travelers_error !== null) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => $min_travelers_error,
             ], 400);
         }
 
@@ -3701,7 +3743,7 @@ class BookingSessionController extends BaseController
             $intro_paragraph .= ' ' . sprintf(
                 /* translators: %s: payment expiry date and time (formatted). */
                 __('Please complete your payment before %s to avoid automatic cancellation.', 'yatra'),
-                date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($expiry_datetime))
+                mysql2date(get_option('date_format') . ' ' . get_option('time_format'), (string) $expiry_datetime)
             );
         }
 
@@ -3710,7 +3752,7 @@ class BookingSessionController extends BaseController
         <div style="background:#f3f4f6;padding:20px;border-radius:8px;margin:16px 0;">
             <p style="margin:0 0 8px;"><strong><?php esc_html_e('Booking reference', 'yatra'); ?>:</strong> <?php echo esc_html($reference); ?></p>
             <p style="margin:0 0 8px;"><strong><?php esc_html_e('Trip', 'yatra'); ?>:</strong> <?php echo esc_html($trip->title); ?></p>
-            <p style="margin:0 0 8px;"><strong><?php esc_html_e('Travel date', 'yatra'); ?>:</strong> <?php echo esc_html(date_i18n(get_option('date_format'), strtotime($travel_date))); ?></p>
+            <p style="margin:0 0 8px;"><strong><?php esc_html_e('Travel date', 'yatra'); ?>:</strong> <?php echo esc_html(mysql2date(get_option('date_format'), (string) $travel_date)); ?></p>
             <p style="margin:0 0 8px;"><strong><?php esc_html_e('Duration', 'yatra'); ?>:</strong> <?php /* translators: 1: number of days, 2: number of nights. */
 echo esc_html(yatra_format_duration((int) $trip->duration_days, (int) $trip->duration_nights, (int) ($trip->duration_hours ?? 0))); ?></p>
             <p style="margin:0;"><strong><?php esc_html_e('Travelers', 'yatra'); ?>:</strong> <?php echo esc_html((string) count($travelers)); ?></p>
@@ -3810,7 +3852,7 @@ echo esc_html(sprintf(__('Traveler %1$d: %2$s', 'yatra'), $i + 1, $traveler_name
             'booking_id' => (string) $booking_id,
             'trip_name' => (string) $trip->title,
             'trip_url' => home_url('/' . SettingsService::getTripBase() . '/' . rawurlencode((string) ($trip->slug ?? '')) . '/'),
-            'travel_date' => date_i18n(get_option('date_format'), strtotime($travel_date)),
+            'travel_date' => (string) mysql2date(get_option('date_format'), (string) $travel_date),
             'travelers_count' => (string) count($travelers),
             'total_amount_formatted' => $formatted_total,
             'amount_due_formatted' => $formatted_due,

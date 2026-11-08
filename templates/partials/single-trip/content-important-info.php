@@ -75,7 +75,7 @@ if (!defined('ABSPATH')) {
             </div>
         <?php endif; ?>
 
-        <?php if (!empty($trip->age_min) || !empty($trip->age_max)): ?>
+        <?php if (\Yatra\Controllers\SingleTripController::hasAgeLimits($trip)): ?>
             <div class="yatra-important-info-card">
                 <div class="yatra-important-info-icon yatra-icon-age">
                     <?php echo yatra_svg_icon('users', 'yatra-icon-lg'); ?>

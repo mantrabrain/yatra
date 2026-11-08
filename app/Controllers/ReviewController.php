@@ -128,6 +128,28 @@ class ReviewController extends BaseController
             ],
         ]);
 
+        // Rendered review cards for the single-trip "Show more reviews"
+        // button (public, read-only; approved reviews of public trips only).
+        register_rest_route($namespace, '/trips/(?P<trip_id>[\d]+)/reviews-template', [
+            [
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => [$this, 'getTripReviewsTemplate'],
+                'permission_callback' => '__return_true',
+                'args' => [
+                    'offset' => [
+                        'type' => 'integer',
+                        'default' => 0,
+                        'sanitize_callback' => 'absint',
+                    ],
+                    'per_page' => [
+                        'type' => 'integer',
+                        'default' => 10,
+                        'sanitize_callback' => 'absint',
+                    ],
+                ],
+            ],
+        ]);
+
         // Submit review (authenticated)
         register_rest_route($namespace, '/trips/(?P<trip_id>[\d]+)/reviews', [
             [
@@ -513,12 +535,58 @@ class ReviewController extends BaseController
         $reviews = $this->reviewService->getTripReviews($tripId, $limit);
         $summary = $this->reviewService->getTripRatingSummary($tripId);
 
+        // This route is public (no login), so reviewers' email addresses must not
+        // be in it — anyone could list every reviewer's address trip by trip.
+        // Staff keep seeing them, as in the admin reviews list.
+        if (!$this->checkCanView() && is_array($reviews)) {
+            foreach ($reviews as &$review) {
+                if (is_array($review)) {
+                    unset($review['author_email']);
+                }
+            }
+            unset($review);
+        }
+
         return new WP_REST_Response([
             'success' => true,
             'data' => [
                 'reviews' => $reviews,
                 'summary' => $summary,
             ],
+        ]);
+    }
+
+    /**
+     * GET /trips/{trip_id}/reviews-template - Next slice of review cards (HTML)
+     *
+     * Renders the same review-item template as the initial list so appended
+     * reviews look identical (stars, dates, translations, theme overrides).
+     */
+    public function getTripReviewsTemplate(WP_REST_Request $request): WP_REST_Response
+    {
+        $tripId = (int) $request->get_param('trip_id');
+        $offset = (int) $request->get_param('offset');
+        $perPage = max(1, min(50, (int) $request->get_param('per_page')));
+
+        $slice = $this->reviewService->getTripReviewsSlice($tripId, $perPage, $offset);
+        if ($slice === null) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Trip not found.', 'yatra'),
+            ], 404);
+        }
+
+        ob_start();
+        foreach ($slice['reviews'] as $review) {
+            yatra_get_template('partials/single-trip/review-item', ['review' => $review]);
+        }
+        $html = (string) ob_get_clean();
+
+        return new WP_REST_Response([
+            'success' => true,
+            'html' => $html,
+            'loaded_count' => $offset + count($slice['reviews']),
+            'has_more' => $slice['has_more'],
         ]);
     }
 

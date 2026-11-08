@@ -1126,7 +1126,7 @@ class TransactionalEmailTemplateService
     {
         $currency = $booking->currency ?? SettingsService::getCurrency();
         $travelDate = !empty($booking->travel_date)
-            ? date_i18n(get_option('date_format'), strtotime((string) $booking->travel_date))
+            ? mysql2date(get_option('date_format'), (string) $booking->travel_date)
             : '';
 
         $bookingId = (int) ($booking->id ?? 0);
@@ -1148,8 +1148,8 @@ class TransactionalEmailTemplateService
                 : home_url('/'),
             'travel_date' => $travelDate,
             'travelers_count' => (string) (int) ($booking->travelers_count ?? 0),
-            'total_amount_formatted' => yatra_format_price((float) ($booking->total_amount ?? 0)),
-            'amount_due_formatted' => yatra_format_price((float) ($booking->amount_due ?? 0)),
+            'total_amount_formatted' => yatra_format_price((float) ($booking->total_amount ?? 0), null, false),
+            'amount_due_formatted' => yatra_format_price((float) ($booking->amount_due ?? 0), null, false),
             // Aliases for the legacy / customer-customised template
             // syntax: many templates (including ones edited via Settings
             // → Email Templates) reference `{{total_amount}}` and
@@ -1159,11 +1159,11 @@ class TransactionalEmailTemplateService
             // email body. Aliases use the same formatted-with-currency
             // value as the canonical keys above so templates remain
             // visually consistent regardless of which name is used.
-            'total_amount' => yatra_format_price((float) ($booking->total_amount ?? 0)),
-            'balance_due' => yatra_format_price((float) ($booking->amount_due ?? 0)),
-            'amount_due' => yatra_format_price((float) ($booking->amount_due ?? 0)),
-            'amount_paid' => yatra_format_price((float) ($booking->amount_paid ?? 0)),
-            'amount_paid_formatted' => yatra_format_price((float) ($booking->amount_paid ?? 0)),
+            'total_amount' => yatra_format_price((float) ($booking->total_amount ?? 0), null, false),
+            'balance_due' => yatra_format_price((float) ($booking->amount_due ?? 0), null, false),
+            'amount_due' => yatra_format_price((float) ($booking->amount_due ?? 0), null, false),
+            'amount_paid' => yatra_format_price((float) ($booking->amount_paid ?? 0), null, false),
+            'amount_paid_formatted' => yatra_format_price((float) ($booking->amount_paid ?? 0), null, false),
             'currency' => $currency,
             'booking_status' => (string) ($booking->status ?? ''),
             'payment_status' => (string) ($booking->payment_status ?? ''),
@@ -1215,7 +1215,7 @@ class TransactionalEmailTemplateService
 
         $created = (string) ($enquiry->created_at ?? '');
         $enquiryDate = $created !== ''
-            ? date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($created) ?: time())
+            ? (mysql2date(get_option('date_format') . ' ' . get_option('time_format'), (string) $created) ?: date_i18n(get_option('date_format') . ' ' . get_option('time_format')))
             : '';
 
         $vars = [
@@ -1265,11 +1265,11 @@ class TransactionalEmailTemplateService
         $currency = (string) ($scheduledRow->currency ?? $booking->currency ?? SettingsService::getCurrency());
         $amount = (float) ($scheduledRow->amount ?? 0);
         $schedDate = !empty($scheduledRow->scheduled_date)
-            ? date_i18n(get_option('date_format'), strtotime((string) $scheduledRow->scheduled_date))
+            ? mysql2date(get_option('date_format'), (string) $scheduledRow->scheduled_date)
             : '';
 
         $base = self::variablesFromBooking($booking);
-        $base['scheduled_amount_formatted'] = yatra_format_price($amount, $currency);
+        $base['scheduled_amount_formatted'] = yatra_format_price($amount, $currency, false);
         $base['scheduled_date_formatted'] = $schedDate;
         $base['payment_type_label'] = (string) ($scheduledRow->payment_type ?? '');
         $base['scheduled_payment_id'] = (string) (int) ($scheduledRow->id ?? 0);

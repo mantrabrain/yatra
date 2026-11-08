@@ -669,7 +669,7 @@ const ActivityForm: React.FC = () => {
                             <Save className="w-4 h-4" />
                             {isEditMode
                               ? __("Update Activity", "yatra")
-                              : __("Create Itinerary Activity", "yatra")}
+                              : __("Create Activity", "yatra")}
                           </>
                         )}
                       </Button>

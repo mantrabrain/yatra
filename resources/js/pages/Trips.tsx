@@ -41,6 +41,7 @@ import { fetchSettings } from "../api/settings-api";
 import { apiClient } from "../lib/api-client";
 import { getErrorContext } from "../lib/errors";
 import {
+  resolveYatraPermalinkBases,
   buildYatraSinglePublicUrls,
   isWordPressPlainPermalink,
 } from "../lib/frontend-permalink-urls";
@@ -1813,7 +1814,8 @@ const Trips: React.FC = () => {
                 </p>
                 <p className="text-xs text-gray-900 dark:text-white font-mono break-all">
                   {(window as any).yatraAdmin?.siteUrl || "https://example.com"}
-                  /trips/{newTripSlug || generateSlug(newTripTitle)}
+                  /{resolveYatraPermalinkBases().trip_base}/
+                  {newTripSlug || generateSlug(newTripTitle)}
                 </p>
               </div>
             )}

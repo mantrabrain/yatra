@@ -2718,7 +2718,7 @@ const TripForm = () => {
     deposit_percentage: "",
     payment_terms: "",
     max_travelers: "10",
-    min_travelers: "2",
+    min_travelers: "1",
     booking_deadline_hours: "24",
     cancellation_policy: "Flexible",
     age_min: "18",
@@ -4252,7 +4252,7 @@ const TripForm = () => {
           to_latitude: avail.to_latitude || null,
           to_longitude: avail.to_longitude || null
         })),
-        status: data.status === "publish" ? "publish" : "draft",
+        status: data.status || "draft",
         scheduled_publish_date: data.scheduled_publish_date || null,
         scheduled_unpublish_date: data.scheduled_unpublish_date || null,
         version: data.version || 1,
@@ -4319,6 +4319,10 @@ const TripForm = () => {
       setIsSubmitting(false);
     }
   });
+  const isPublished = formData.status === "publish";
+  const hasPrice = () => formData.pricing_type === "traveler_based" ? (formData.price_types || []).some(
+    (type) => parseFloat(String(type.original_price)) > 0
+  ) : parseFloat(String(formData.original_price)) > 0;
   const validateDraft = () => {
     const newErrors = buildEssentialFieldErrors();
     setErrors(newErrors);
@@ -4335,7 +4339,7 @@ const TripForm = () => {
     setIsSubmitting(true);
     saveMutation.mutate({ ...formData, status: "draft" });
   };
-  const handlePublish = async () => {
+  const handlePublish = async (status = "publish") => {
     if (!validateForm()) {
       const firstError = Object.keys(errors)[0];
       if (firstError) {
@@ -4352,8 +4356,19 @@ const TripForm = () => {
       }
       return;
     }
+    if (status === "publish" && !isPublished && !hasPrice()) {
+      const confirmed = window.confirm(
+        __$1(
+          "This trip has no price, so customers will see it as free. Publish anyway?",
+          "yatra"
+        )
+      );
+      if (!confirmed) {
+        return;
+      }
+    }
     setIsSubmitting(true);
-    saveMutation.mutate({ ...formData, status: "publish" });
+    saveMutation.mutate({ ...formData, status });
   };
   reactExports.useEffect(() => {
     const onKeyDown = (e) => {
@@ -9053,7 +9068,7 @@ A: ${f.answer}`).join("\n\n"),
             ]
           }
         ),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        !isPublished && /* @__PURE__ */ jsxRuntimeExports.jsxs(
           Button,
           {
             variant: "outline",
@@ -9070,12 +9085,12 @@ A: ${f.answer}`).join("\n\n"),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             Button,
             {
-              onClick: handlePublish,
+              onClick: () => handlePublish(),
               disabled: isSubmitting,
               className: "bg-blue-600 hover:bg-blue-700 text-white border-0 relative",
               children: isSubmitting ? /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "w-4 h-4 mr-2 animate-spin" }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(Send, { className: "w-4 h-4 mr-2" }),
-                isEditMode ? __$1("Update Trip", "yatra") : __$1("Publish Trip", "yatra"),
+                isEditMode && isPublished ? __$1("Update Trip", "yatra") : __$1("Publish Trip", "yatra"),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { className: "w-4 h-4 ml-2" })
               ] })
             }
@@ -9098,8 +9113,7 @@ A: ${f.answer}`).join("\n\n"),
               {
                 type: "button",
                 onClick: () => {
-                  handleFieldChange("status", "review");
-                  handlePublish();
+                  handlePublish("review");
                 },
                 className: "w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2",
                 children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: __$1("Save for Review", "yatra") })
@@ -9110,8 +9124,7 @@ A: ${f.answer}`).join("\n\n"),
               {
                 type: "button",
                 onClick: () => {
-                  handleFieldChange("status", "approved");
-                  handlePublish();
+                  handlePublish("approved");
                 },
                 className: "w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2",
                 children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: __$1("Mark as Approved", "yatra") })
@@ -9121,11 +9134,11 @@ A: ${f.answer}`).join("\n\n"),
               "button",
               {
                 type: "button",
-                onClick: handlePublish,
+                onClick: () => handlePublish(),
                 className: "w-full text-left px-4 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium flex items-center gap-2",
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(Sparkles, { className: "w-4 h-4" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: isEditMode ? __$1("Update & Publish", "yatra") : __$1("Publish", "yatra") })
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: isEditMode && isPublished ? __$1("Update & Publish", "yatra") : __$1("Publish", "yatra") })
                 ]
               }
             ),
@@ -9134,8 +9147,7 @@ A: ${f.answer}`).join("\n\n"),
               {
                 type: "button",
                 onClick: () => {
-                  handleFieldChange("status", "suspended");
-                  handlePublish();
+                  handlePublish("suspended");
                 },
                 className: "w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2",
                 children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: __$1("Suspend", "yatra") })
@@ -9146,8 +9158,7 @@ A: ${f.answer}`).join("\n\n"),
               {
                 type: "button",
                 onClick: () => {
-                  handleFieldChange("status", "archived");
-                  handlePublish();
+                  handlePublish("archived");
                 },
                 className: "w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2",
                 children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: __$1("Archive", "yatra") })
@@ -9686,4 +9697,4 @@ A: ${f.answer}`).join("\n\n"),
 export {
   TripForm as default
 };
-//# sourceMappingURL=TripForm-tjvg5vmz.js.map
+//# sourceMappingURL=TripForm-DLxDKlIL.js.map

@@ -187,6 +187,26 @@ if (typeof window.yatraNumOr !== 'function') {
     return `${baseUrl}/yatra/v1/trips/${tripId}/availability-template?${qs}`;
   };
 
+  /**
+   * Build public REST URL for the next slice of rendered review cards.
+   * @param {string|number} tripId
+   * @param {{offset?: number, per_page?: number}} params
+   */
+  const buildReviewsTemplateUrl = (tripId, params = {}) => {
+    const { base: baseUrl, isPlain } = getRestBase();
+    const q = new URLSearchParams();
+    q.set('offset', String(Math.max(0, parseInt(params.offset, 10) || 0)));
+    q.set('per_page', String(Math.min(50, Math.max(1, parseInt(params.per_page, 10) || 10))));
+    const qs = q.toString();
+    if (isPlain && baseUrl.includes('rest_route=')) {
+      return `${baseUrl}/trips/${tripId}/reviews-template&${qs}`;
+    }
+    if (baseUrl.includes('/yatra/v1')) {
+      return `${baseUrl}/trips/${tripId}/reviews-template?${qs}`;
+    }
+    return `${baseUrl}/yatra/v1/trips/${tripId}/reviews-template?${qs}`;
+  };
+
   // Currency formatting helper for trip page (uses localized yatraTripData)
   if (typeof window.yatra_format_price_js !== 'function') {
     window.yatra_format_price_js = function(amount) {
@@ -1525,8 +1545,9 @@ if (typeof window.yatraNumOr !== 'function') {
           String(today.getMonth() + 1).padStart(2, '0') + '-' +
           String(today.getDate()).padStart(2, '0');
 
-      // Set today's date as default value
-      this.dateInput.value = todayStr;
+      // Default to the next departure when the trip has fixed dates, otherwise today
+      const defaultDateStr = this.dateInput.dataset.firstDeparture || todayStr;
+      this.dateInput.value = defaultDateStr;
 
       // Enable button since we have a default date
       if (this.checkAvailabilityBtn) {
@@ -1547,7 +1568,7 @@ if (typeof window.yatraNumOr !== 'function') {
         altInput: true,
         altFormat,
         minDate: today,
-        defaultDate: today,
+        defaultDate: defaultDateStr,
         enableTime: false,
         clickOpens: true,
         allowInput: false,
@@ -3348,6 +3369,16 @@ if (typeof window.yatraNumOr !== 'function') {
         return;
       }
 
+      const minTravelers = parseInt(card?.getAttribute('data-min-travelers'), 10) || 1;
+      if (travelers < minTravelers) {
+        this.showBookingError(btn, sprintf(
+          /* translators: %d: minimum number of travelers for one booking. */
+          _n('This trip needs at least %d traveler per booking.', 'This trip needs at least %d travelers per booking.', minTravelers, 'yatra'),
+          minTravelers
+        ));
+        return;
+      }
+
       const originalText = btn.innerHTML;
       btn.innerHTML = '<svg class="animate-spin" width="18" height="18" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"></circle><path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> ' + __('Processing...', 'yatra');
       btn.disabled = true;
@@ -4644,6 +4675,88 @@ if (typeof window.yatraNumOr !== 'function') {
     }
   }
 
+  // ============================================
+  // REVIEWS "SHOW MORE"
+  // ============================================
+  /**
+   * Appends the next slice of server-rendered review cards. The button had
+   * no handler before, so clicking it did nothing.
+   */
+  class ReviewsLoadMore {
+    constructor() {
+      this.container = document.querySelector('.yatra-reviews-load-more');
+      this.btn = this.container ? this.container.querySelector('.yatra-load-more-btn') : null;
+      this.list = document.querySelector('.yatra-reviews-items');
+      if (this.container && this.btn && this.list) {
+        this.btn.addEventListener('click', () => this.handleLoadMore());
+      }
+    }
+
+    handleLoadMore() {
+      if (this.btn.disabled) return;
+
+      // data-* come from reviews.php; fall back for theme overrides of the
+      // older template that render the button without them.
+      const tripId = this.container.dataset.tripId || window.yatraTripData?.tripId || 0;
+      if (!tripId) return;
+      const offset = parseInt(this.container.dataset.offset, 10)
+        || this.list.querySelectorAll('.yatra-review-item').length;
+      const perPage = parseInt(this.container.dataset.perPage, 10) || 10;
+
+      const originalHTML = this.btn.innerHTML;
+      this.btn.innerHTML = '<span class="yatra-loading-spinner"></span> ' + __('Loading...', 'yatra');
+      this.btn.disabled = true;
+
+      const nonce = (window.yatraTripData && window.yatraTripData.nonce) || '';
+
+      fetch(buildReviewsTemplateUrl(tripId, { offset, per_page: perPage }), {
+        method: 'GET',
+        headers: {
+          'X-WP-Nonce': nonce,
+        },
+        credentials: 'same-origin',
+      })
+          .then((resp) => {
+            if (!resp.ok) {
+              throw new Error(__('Load more failed', 'yatra'));
+            }
+            return resp.json();
+          })
+          .then((data) => {
+            if (!data || typeof data.html !== 'string') {
+              throw new Error('No HTML returned');
+            }
+
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = data.html.trim();
+            tempDiv.querySelectorAll('.yatra-review-item').forEach((item) => {
+              // Skip a card already on the page (e.g. a review approved
+              // between clicks shifts the offset by one).
+              const id = item.getAttribute('data-review-id');
+              if (id && this.list.querySelector(`.yatra-review-item[data-review-id="${id}"]`)) {
+                return;
+              }
+              this.list.appendChild(item);
+            });
+
+            const loaded = Number(data.loaded_count);
+            this.container.dataset.offset = String(Number.isFinite(loaded) ? loaded : offset + perPage);
+
+            if (!data.has_more) {
+              this.container.style.display = 'none';
+              return;
+            }
+            this.btn.innerHTML = originalHTML;
+            this.btn.disabled = false;
+          })
+          .catch((err) => {
+            console.error('[Yatra] Load more reviews failed:', err);
+            this.btn.innerHTML = originalHTML;
+            this.btn.disabled = false;
+          });
+    }
+  }
+
   /**
    * Similar Adventures Carousel
    * Handles carousel navigation for similar trips section
@@ -5070,6 +5183,7 @@ class TripPage {
     this.instances.availabilitySection = new AvailabilitySection();
     this.instances.itinerarySection = new ItinerarySection();
     this.instances.reviewForm = new ReviewForm();
+    this.instances.reviewsLoadMore = new ReviewsLoadMore();
     this.instances.similarTripsCarousel = new SimilarTripsCarousel();
 
     // Expose for legacy access (existing templates rely on window.*)

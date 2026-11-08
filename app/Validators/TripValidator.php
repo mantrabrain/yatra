@@ -27,7 +27,7 @@ class TripValidator
 
         if (empty($data['status'])) {
             $errors['status'][] = __('Status is required', 'yatra');
-        } elseif (!in_array($data['status'], ['draft', 'publish', 'private', 'trash'])) {
+        } elseif (!in_array($data['status'], ['draft', 'publish', 'private', 'trash', 'review', 'approved', 'suspended', 'archived'])) {
             $errors['status'][] = __('Invalid status value', 'yatra');
         }
 
@@ -109,7 +109,7 @@ class TripValidator
         }
 
         // Optional field validation (same rules as create, but fields are optional)
-        if (isset($data['status']) && !in_array($data['status'], ['draft', 'publish', 'private', 'trash'])) {
+        if (isset($data['status']) && !in_array($data['status'], ['draft', 'publish', 'private', 'trash', 'review', 'approved', 'suspended', 'archived'])) {
             $errors['status'][] = __('Invalid status value', 'yatra');
         }
 
@@ -434,7 +434,7 @@ class TripValidator
 
         // Enum fields
         if (isset($data['status'])) {
-            $sanitized['status'] = in_array($data['status'], ['draft', 'publish', 'private', 'trash']) 
+            $sanitized['status'] = in_array($data['status'], ['draft', 'publish', 'private', 'trash', 'review', 'approved', 'suspended', 'archived']) 
                 ? $data['status'] 
                 : 'draft';
         }

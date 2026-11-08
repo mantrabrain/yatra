@@ -171,7 +171,7 @@ class CalculationService
         
         // ── Group Discount (AdvancedDiscount Pro module enables this) ───
         $group_discount_data = $this->calculateGroupDiscount(
-            $trip_id, $subtotal, $travelers_count, $traveler_counts, $pricing_type, $price_types
+            $trip_id, $subtotal, $travelers_count, $traveler_counts, $pricing_type, $price_types, $base_amount
         );
         
         // ── Coupon Discount ─────────────────────────────────────────────
@@ -308,27 +308,27 @@ class CalculationService
                 // already accounts for travelers/categories, so Price Per is NOT
                 // applied (it would double-count). Matches the "Percentage of
                 // Trip Price" label and the free booking-services fallback.
-                $unit_price = round(($base_price / 100) * $base_amount, 2);
-                $calculated_price = $unit_price;
+                $service_unit_price = round(($base_price / 100) * $base_amount, 2);
+                $calculated_price = $service_unit_price;
             } else {
                 // Fixed: Price Per multiplies the entered flat amount.
-                $unit_price = $base_price;
+                $service_unit_price = $base_price;
                 switch ($price_per) {
                     case 'person':
-                        $calculated_price = round($unit_price * max(1, $travelers_count), 2);
+                        $calculated_price = round($service_unit_price * max(1, $travelers_count), 2);
                         break;
                     case 'day':
-                        $calculated_price = round($unit_price * max(1, $duration_days_for_services), 2);
+                        $calculated_price = round($service_unit_price * max(1, $duration_days_for_services), 2);
                         break;
                     case 'booking':
                     default:
-                        $calculated_price = round($unit_price, 2);
+                        $calculated_price = round($service_unit_price, 2);
                         break;
                 }
             }
 
             $svc['selected'] = $is_selected;
-            $svc['unit_price'] = $unit_price;
+            $svc['unit_price'] = $service_unit_price;
             $svc['calculated_price'] = $calculated_price;
             $additional_services_resolved[] = $svc;
 
@@ -785,8 +785,20 @@ class CalculationService
         int $travelers_count,
         array $traveler_counts,
         string $pricing_type,
-        array $price_types
+        array $price_types,
+        float $base_amount = 0.0
     ): array {
+        // Regular pricing has no traveler categories, which is what the discount is
+        // worked out from: describe the party as one category at the trip's own price.
+        // The base excludes add-on services, as it does for traveler-based pricing.
+        if ($pricing_type !== 'traveler_based' && $travelers_count > 0 && $base_amount > 0) {
+            $traveler_counts = ['regular' => $travelers_count];
+            $price_types = [[
+                'category_id'     => 'regular',
+                'effective_price' => $base_amount / $travelers_count,
+            ]];
+        }
+
         $group_discount_data = [
             'amount' => 0,
             'label'  => __('Group Discount', 'yatra'),

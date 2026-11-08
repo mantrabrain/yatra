@@ -82,7 +82,7 @@ $is_remaining_payment = true;
                 </div>
                 <div class="yatra-remaining-detail">
                     <span><?php esc_html_e('Travel Date', 'yatra'); ?></span>
-                    <strong><?php echo esc_html(date_i18n(get_option('date_format'), strtotime($travel_date))); ?></strong>
+                    <strong><?php echo esc_html(mysql2date(get_option('date_format'), (string) $travel_date)); ?></strong>
                 </div>
                 <div class="yatra-remaining-detail">
                     <span><?php esc_html_e('Travelers', 'yatra'); ?></span>
@@ -141,7 +141,7 @@ $is_remaining_payment = true;
                 </li>
                 <li>
                     <span><?php esc_html_e('Travel Date', 'yatra'); ?>:</span>
-                    <strong><?php echo esc_html(date_i18n(get_option('date_format'), strtotime($travel_date))); ?></strong>
+                    <strong><?php echo esc_html(mysql2date(get_option('date_format'), (string) $travel_date)); ?></strong>
                 </li>
                 <li>
                     <span><?php esc_html_e('Travelers', 'yatra'); ?>:</span>

@@ -430,6 +430,8 @@ const RecurringRuleForm = () => {
       navigate({
         subpage: "trips",
         tab: "availability",
+        action: void 0,
+        id: void 0,
         trip_id: formData.trip_id.toString()
       });
     },
@@ -458,6 +460,8 @@ const RecurringRuleForm = () => {
       navigate({
         subpage: "trips",
         tab: "availability",
+        action: void 0,
+        id: void 0,
         trip_id: formData.trip_id.toString()
       });
     },
@@ -601,6 +605,8 @@ const RecurringRuleForm = () => {
               return navigate({
                 subpage: "trips",
                 tab: "availability",
+                action: void 0,
+                id: void 0,
                 trip_id: ((_a2 = formData.trip_id) == null ? void 0 : _a2.toString()) || tripIdFromUrl || ""
               });
             },
@@ -2267,6 +2273,8 @@ const RecurringRuleForm = () => {
                 return navigate({
                   subpage: "trips",
                   tab: "availability",
+                  action: void 0,
+                  id: void 0,
                   trip_id: ((_a2 = formData.trip_id) == null ? void 0 : _a2.toString()) || tripIdFromUrl || ""
                 });
               },
@@ -2288,4 +2296,4 @@ const RecurringRuleForm = () => {
 export {
   RecurringRuleForm as default
 };
-//# sourceMappingURL=RecurringRuleForm-DQBxA5fX.js.map
+//# sourceMappingURL=RecurringRuleForm-DGAFIGuV.js.map

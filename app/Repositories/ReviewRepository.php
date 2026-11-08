@@ -164,11 +164,16 @@ class ReviewRepository extends BaseRepository
     /**
      * Find approved reviews for a trip
      * 
+     * Newest first; the id tiebreak keeps the order stable so offset-based
+     * pages ("Show more reviews") never repeat or skip rows that share a
+     * created_at.
+     *
      * @param int $tripId Trip ID
      * @param int $limit  Limit results
+     * @param int $offset Rows to skip (0 = first page)
      * @return array
      */
-    public function findApprovedByTripId(int $tripId, int $limit = 10): array
+    public function findApprovedByTripId(int $tripId, int $limit = 10, int $offset = 0): array
     {
         $table = $this->getTableName();
         $users_table = $this->getUsersTable();
@@ -178,10 +183,11 @@ class ReviewRepository extends BaseRepository
              FROM {$table} r
              LEFT JOIN {$users_table} u ON r.user_id = u.ID
              WHERE r.trip_id = %d AND {$this->sqlApprovedReviewsWhere('r.status')}
-             ORDER BY r.created_at DESC
-             LIMIT %d",
+             ORDER BY r.created_at DESC, r.id DESC
+             LIMIT %d OFFSET %d",
             $tripId,
-            $limit
+            $limit,
+            max(0, $offset)
         );
 
         return $this->wpdb->get_results($query) ?: [];

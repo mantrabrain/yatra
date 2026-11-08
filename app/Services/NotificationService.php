@@ -163,7 +163,7 @@ class NotificationService
         }
 
         $vars = TransactionalEmailTemplateService::variablesFromBooking($booking);
-        $vars['payment_amount_formatted'] = yatra_format_price((float) ($paymentData['amount'] ?? 0));
+        $vars['payment_amount_formatted'] = yatra_format_price((float) ($paymentData['amount'] ?? 0), null, false);
         // Name the gateway the way the customer saw it at checkout (the
         // operator's Gateway Title), not its internal id — a Stripe capture
         // passes the slug "stripe" here. A manually recorded payment passes
@@ -231,7 +231,7 @@ class NotificationService
         }
 
         $vars = TransactionalEmailTemplateService::variablesFromBooking($booking);
-        $vars['payment_amount_formatted'] = yatra_format_price((float) ($paymentData['amount'] ?? 0));
+        $vars['payment_amount_formatted'] = yatra_format_price((float) ($paymentData['amount'] ?? 0), null, false);
         // Name the gateway the way the customer saw it at checkout (the
         // operator's Gateway Title), not its internal id — a Stripe capture
         // passes the slug "stripe" here. A manually recorded payment passes

@@ -201,11 +201,11 @@ if (!defined('ABSPATH')) {
                             $bySource[$src][] = $a;
                         }
 
+                        // Specific dates and recurring rules are both real departures, listed
+                        // together in the availability section; count them the same way here.
                         $pick = [];
-                        if (!empty($bySource['availability_date'])) {
-                            $pick = $bySource['availability_date'];
-                        } elseif (!empty($bySource['recurring_rule'])) {
-                            $pick = $bySource['recurring_rule'];
+                        if (!empty($bySource['availability_date']) || !empty($bySource['recurring_rule'])) {
+                            $pick = array_merge($bySource['availability_date'], $bySource['recurring_rule']);
                         } elseif (!empty($bySource['trip_default'])) {
                             $pick = $bySource['trip_default'];
                         } else {
@@ -287,6 +287,20 @@ if (!defined('ABSPATH')) {
                            name="travel_date"
                            class="yatra-booking-select yatra-datepicker"
                            placeholder="<?php esc_attr_e('Select date', 'yatra'); ?>"
+                           <?php
+                           // Open on the next real departure: today usually isn't one, and
+                           // checking it would report that nothing is available.
+                           $yatra_first_departure = '';
+                           foreach ($pick as $yatra_departure) {
+                               $yatra_departure_date = (string) ($yatra_departure->departure_date ?? '');
+                               if ($yatra_departure_date !== '' && ($yatra_first_departure === '' || $yatra_departure_date < $yatra_first_departure)) {
+                                   $yatra_first_departure = $yatra_departure_date;
+                               }
+                           }
+                           if ($yatra_first_departure !== ''):
+                           ?>
+                           data-first-departure="<?php echo esc_attr($yatra_first_departure); ?>"
+                           <?php endif; ?>
                            readonly
                            required>
                 <?php endif; ?>
@@ -328,8 +342,8 @@ if (!defined('ABSPATH')) {
                     // Setup variables for traveler-input-simple.php
                     $input_id = 'num_travelers';
                     $input_name = 'num_travelers';
-                    $value = 1;
-                    $min = $trip->getMinTravelers() ?: 1;
+                    $min = \Yatra\Controllers\SingleTripController::getEffectiveMinTravelers($trip);
+                    $value = $min;
                     $max = $trip->getMaxTravelers() ?: 20;
                     $data_price = $base_price;
 
@@ -352,20 +366,20 @@ if (!defined('ABSPATH')) {
                             echo esc_html(sprintf(
                                 /* translators: 1: available-from date, 2: available-to date. */
                                 __('Available: %1$s - %2$s', 'yatra'),
-                                date_i18n(get_option('date_format'), strtotime($trip->getAvailableFrom())),
-                                date_i18n(get_option('date_format'), strtotime($trip->getAvailableTo()))
+                                mysql2date(get_option('date_format'), (string) $trip->getAvailableFrom()),
+                                mysql2date(get_option('date_format'), (string) $trip->getAvailableTo())
                             ));
                         } elseif (!empty($trip->getAvailableFrom())) {
                             echo esc_html(sprintf(
                                 /* translators: %s: available-from date. */
                                 __('Available from: %s', 'yatra'),
-                                date_i18n(get_option('date_format'), strtotime($trip->getAvailableFrom()))
+                                mysql2date(get_option('date_format'), (string) $trip->getAvailableFrom())
                             ));
                         } else {
                             echo esc_html(sprintf(
                                 /* translators: %s: available-until date. */
                                 __('Available until: %s', 'yatra'),
-                                date_i18n(get_option('date_format'), strtotime($trip->getAvailableTo()))
+                                mysql2date(get_option('date_format'), (string) $trip->getAvailableTo())
                             ));
                         }
                         ?>
@@ -450,8 +464,8 @@ if (!defined('ABSPATH')) {
                         // Setup variables for traveler-input-simple.php
                         $input_id = 'num_travelers';
                         $input_name = 'num_travelers';
-                        $value = 1;
-                        $min = $trip->getMinTravelers() ?: 1;
+                        $min = \Yatra\Controllers\SingleTripController::getEffectiveMinTravelers($trip);
+                        $value = $min;
                         $max = $trip->getMaxTravelers() ?: 20;
                         $data_price = $base_price;
 

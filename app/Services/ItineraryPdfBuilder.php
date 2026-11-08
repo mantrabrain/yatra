@@ -72,9 +72,9 @@ class ItineraryPdfBuilder
             : '';
 
         $createdAt    = (string) ($source['created_at'] ?? $source['booking_date'] ?? '');
-        $bookingDate  = $createdAt !== '' ? date_i18n(get_option('date_format'), strtotime($createdAt)) : '';
+        $bookingDate  = $createdAt !== '' ? mysql2date(get_option('date_format'), (string) $createdAt) : '';
         $travelRaw    = (string) ($source['travel_date'] ?? '');
-        $travelDate   = $travelRaw !== '' ? date_i18n(get_option('date_format'), strtotime($travelRaw)) : '';
+        $travelDate   = $travelRaw !== '' ? mysql2date(get_option('date_format'), (string) $travelRaw) : '';
 
         // Departure / return date. The booking already stores the real
         // trip end (`end_date`, written at booking time from the selected
@@ -98,7 +98,7 @@ class ItineraryPdfBuilder
         // arrival date. Single-day bookings store end_date == start_date,
         // so the timeline renders one item instead of two identical dates.
         if ($endRaw !== '' && $endRaw !== $travelRaw) {
-            $returnDate = date_i18n(get_option('date_format'), strtotime($endRaw));
+            $returnDate = mysql2date(get_option('date_format'), (string) $endRaw);
         }
 
         $statusRaw = strtolower((string) ($source['booking_status'] ?? $source['status'] ?? ''));

@@ -435,6 +435,10 @@ class YatraStripe {
 
         try {
             const paymentContext = await this.prepareStripePayment(bookingData, event?.detail?.form || this.paymentForm);
+            if (paymentContext.verificationRequired) {
+                this.setLoadingState(false);
+                return false;
+            }
             const { bookingInfo, clientSecret, billingDetails, effectiveAmount } = paymentContext;
 
             const { error, paymentIntent } = await this.stripe.confirmCardPayment(clientSecret, {
@@ -866,6 +870,12 @@ class YatraStripe {
 
             this.setLoadingState(true);
             const paymentContext = await this.prepareStripePayment(bookingData, this.paymentForm);
+            if (paymentContext.verificationRequired) {
+                // Nothing is charged until the guest verifies their email.
+                event.complete('fail');
+                this.setLoadingState(false);
+                return;
+            }
             const { bookingInfo, clientSecret, effectiveAmount } = paymentContext;
 
             const confirmation = await this.stripe.confirmCardPayment(clientSecret, {
@@ -958,6 +968,16 @@ class YatraStripe {
 
         if (!bookingResult.success) {
             throw new Error(bookingResult.message || __('Failed to process request. Please try again.', 'yatra'));
+        }
+
+        // Guest email verification: the booking is held until the guest clicks
+        // the link in their inbox, and nothing may be charged before that. Going
+        // on to create a payment here charged the card anyway — for the full
+        // amount, since the held booking is saved as "pay later, full". Show the
+        // booking form's "check your email" screen instead.
+        if (bookingResult.code === 'email_verification_required') {
+            document.dispatchEvent(new CustomEvent('yatra_email_verification_required', { detail: bookingResult }));
+            return { verificationRequired: true };
         }
 
         const bookingInfo = bookingResult.data;
@@ -1222,6 +1242,13 @@ class YatraStripe {
 
     getAmountInCents(amount) {
         const value = isNaN(amount) ? 0 : amount;
+        // Zero-decimal currencies (JPY, KRW, …) are whole units to Stripe; must
+        // match ZERO_DECIMAL_CURRENCIES in Yatra Pro's StripeGateway.
+        const zeroDecimal = ['bif', 'clp', 'djf', 'gnf', 'jpy', 'kmf', 'krw', 'mga', 'pyg', 'rwf', 'ugx', 'vnd', 'vuv', 'xaf', 'xof', 'xpf'];
+        const currency = String(window.yatraBookingData?.currency || 'USD').toLowerCase();
+        if (zeroDecimal.includes(currency)) {
+            return Math.max(1, Math.round(value));
+        }
         return Math.max(50, Math.round(value * 100));
     }
 
