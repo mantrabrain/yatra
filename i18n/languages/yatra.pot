@@ -2,14 +2,14 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Yatra - Travel Booking & Tour Operator Software 3.1.1\n"
+"Project-Id-Version: Yatra - Travel Booking & Tour Operator Software 3.1.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/yatra\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-08T04:57:46+00:00\n"
+"POT-Creation-Date: 2026-11-15T02:11:44+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
@@ -9799,6 +9799,7 @@ msgstr ""
 
 # Source: resources/js/pages/account/Payments.tsx:25
 #: assets/admin/dist/js/app.js
+#: app/Services/TransactionalEmailTemplateService.php:1285
 #: assets/dist/js/account-page.js:2018
 msgid "Deposit"
 msgstr ""
@@ -16280,6 +16281,7 @@ msgstr ""
 # Source: resources/js/pages/account/Payments.tsx:29
 #: assets/admin/dist/js/app.js
 #: app/Services/EmailTemplateSampleData.php:130
+#: app/Services/TransactionalEmailTemplateService.php:1279
 #: assets/dist/js/account-page.js:2022
 msgid "Installment"
 msgstr ""
@@ -42004,6 +42006,30 @@ msgstr ""
 
 #: app/Services/TransactionalEmailTemplateService.php:1106
 msgid "This is an automated message from your travel site."
+msgstr ""
+
+#. translators: 1: installment number, 2: number of installments.
+#: app/Services/TransactionalEmailTemplateService.php:1273
+#, php-format
+msgid "Installment %1$d of %2$d"
+msgstr ""
+
+#. translators: %d: installment number.
+#: app/Services/TransactionalEmailTemplateService.php:1277
+#, php-format
+msgid "Installment %d"
+msgstr ""
+
+#: app/Services/TransactionalEmailTemplateService.php:1281
+msgid "Final payment"
+msgstr ""
+
+#: app/Services/TransactionalEmailTemplateService.php:1283
+msgid "Balance payment"
+msgstr ""
+
+#: app/Services/TransactionalEmailTemplateService.php:1287
+msgid "Recurring payment"
 msgstr ""
 
 #. translators: %s is destination name

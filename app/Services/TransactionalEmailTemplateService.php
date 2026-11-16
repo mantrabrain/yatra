@@ -1255,6 +1255,44 @@ class TransactionalEmailTemplateService
     }
 
     /**
+     * The {{payment_type_label}} merge tag: a customer-facing name for a
+     * scheduled payment. It used to print the stored type as is ("installment",
+     * "final", "manual"), although the tag is documented as "Deposit, Final,
+     * Installment 2 of 4".
+     *
+     * @param string   $type   Stored payment_type.
+     * @param int|null $number Installment number, when it is one of several.
+     * @param int|null $total  How many installments the booking has, if known.
+     */
+    public static function paymentTypeLabel(string $type, ?int $number = null, ?int $total = null): string
+    {
+        switch ($type) {
+            case 'installment':
+                if ($number !== null && $number > 0 && $total !== null && $total >= $number) {
+                    /* translators: 1: installment number, 2: number of installments. */
+                    return sprintf(__('Installment %1$d of %2$d', 'yatra'), $number, $total);
+                }
+                if ($number !== null && $number > 0) {
+                    /* translators: %d: installment number. */
+                    return sprintf(__('Installment %d', 'yatra'), $number);
+                }
+                return __('Installment', 'yatra');
+            case 'final':
+                return __('Final payment', 'yatra');
+            case 'manual':
+                return __('Balance payment', 'yatra');
+            case 'deposit':
+                return __('Deposit', 'yatra');
+            case 'recurring':
+                return __('Recurring payment', 'yatra');
+            case '':
+                return '';
+            default:
+                return ucfirst(str_replace('_', ' ', $type));
+        }
+    }
+
+    /**
      * @param object $booking      Booking row
      * @param object $scheduledRow Scheduled payment row (amount, currency, scheduled_date, payment_type, …)
      * @param array<string, string> $extra failure_reason, balance_after_formatted, permanent_failure, …
@@ -1271,7 +1309,11 @@ class TransactionalEmailTemplateService
         $base = self::variablesFromBooking($booking);
         $base['scheduled_amount_formatted'] = yatra_format_price($amount, $currency, false);
         $base['scheduled_date_formatted'] = $schedDate;
-        $base['payment_type_label'] = (string) ($scheduledRow->payment_type ?? '');
+        $base['payment_type_label'] = self::paymentTypeLabel(
+            (string) ($scheduledRow->payment_type ?? ''),
+            isset($scheduledRow->installment_number) && $scheduledRow->installment_number !== null ? (int) $scheduledRow->installment_number : null,
+            isset($scheduledRow->installment_total) ? (int) $scheduledRow->installment_total : null
+        );
         $base['scheduled_payment_id'] = (string) (int) ($scheduledRow->id ?? 0);
 
         return array_merge($base, $extra);

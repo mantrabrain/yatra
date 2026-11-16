@@ -4,7 +4,7 @@ Tags: tour-booking, travel-booking, tour-operator, travel, travel-agency
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 3.1.1
+Stable tag: 3.1.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -281,6 +281,9 @@ Pricing starts at **$99/yr** (Starter, sale) and goes up to **$599/yr** (Scale 1
 9. Run offers without spreadsheets — coupon codes with usage limits, expiry dates and live status
 
 == Changelog ==
+
+= 3.1.2 — 15 November 2026 =
+* Fix - The {{payment_type_label}} email tag printed the stored type ("installment", "final", "manual") instead of a readable name. It now shows "Installment 2 of 4", "Final payment" or "Balance payment".
 
 = 3.1.1 — 8 November 2026 =
 * Fix - Creating or updating a group discount with size ranges logged a PHP warning ("Undefined array key min_group_size"), which could break the save on sites that display PHP warnings.
