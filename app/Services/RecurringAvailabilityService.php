@@ -725,41 +725,7 @@ class RecurringAvailabilityService
      */
     public function isDateExcluded(string $date, $excluded): bool
     {
-        if (!is_array($excluded)) {
-            return false;
-        }
-
-        foreach ($excluded as $entry) {
-            if (is_string($entry)) {
-                if ($entry === $date) {
-                    return true;
-                }
-
-                continue;
-            }
-
-            if (!is_array($entry)) {
-                continue;
-            }
-
-            $start = isset($entry['start']) ? (string) $entry['start'] : '';
-            $end = isset($entry['end']) ? (string) $entry['end'] : '';
-
-            if ($start === '' || $end === '') {
-                continue;
-            }
-
-            // Tolerate a reversed period rather than silently ignoring it.
-            if ($start > $end) {
-                [$start, $end] = [$end, $start];
-            }
-
-            if ($date >= $start && $date <= $end) {
-                return true;
-            }
-        }
-
-        return false;
+        return \Yatra\Models\RecurringRule::isDateInExclusions($date, $excluded);
     }
 
     public function previewDates(array $ruleData, int $limit = 20): array

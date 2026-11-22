@@ -3,14 +3,15 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { __, sprintf } from "../lib/i18n";
 import { MultiSelect } from "../components/ui/multi-select";
 import { SearchableSelect } from "../components/ui/searchable-select";
+import { encodeTargets, useTripTargets } from "../hooks/useTripTargets";
 import {
-  decodeTargets,
-  describeTargets,
-  encodeTargets,
-  hasTargets,
-  useTripTargets,
-  type TripTargets,
-} from "../hooks/useTripTargets";
+  describeEmailTargets,
+  hasEmailTargets,
+  paymentMethodOptions,
+  withPaymentMethods,
+  withTripValues,
+  type EmailOverrideTargets,
+} from "../lib/email-override-targets";
 import { EmailOverrideCreateModal } from "../components/email/EmailOverrideCreateModal";
 import {
   fetchEmailTemplates,
@@ -157,7 +158,8 @@ const EmailTemplateForm: React.FC = () => {
   });
   // Trip-specific overrides (Pro Email Automation). `targets` is only sent
   // for override rows; `previewTrip` feeds preview / test with a real trip.
-  const [targets, setTargets] = useState<TripTargets>({});
+  const [targets, setTargets] = useState<EmailOverrideTargets>({});
+  const methodOptions = useMemo(() => paymentMethodOptions(), []);
   const [previewTrip, setPreviewTrip] = useState<number | null>(null);
   const [overrideModalOpen, setOverrideModalOpen] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
@@ -349,7 +351,7 @@ const EmailTemplateForm: React.FC = () => {
     });
     setTargets(
       t.overrides && t.targets && typeof t.targets === "object"
-        ? (t.targets as TripTargets)
+        ? (t.targets as EmailOverrideTargets)
         : {},
     );
   }, [templateData]);
@@ -533,12 +535,17 @@ const EmailTemplateForm: React.FC = () => {
       showToast(__("Subject line is required"), "error");
       return;
     }
-    if (isOverride && !hasTargets(targets)) {
+    if (isOverride && !hasEmailTargets(targets)) {
       showToast(
-        __(
-          "An override needs at least one trip, category or trip type — or delete it to use the global template.",
-          "yatra",
-        ),
+        methodOptions
+          ? __(
+              "An override needs at least one trip, category, trip type or payment method — or delete it to use the global template.",
+              "yatra",
+            )
+          : __(
+              "An override needs at least one trip, category or trip type — or delete it to use the global template.",
+              "yatra",
+            ),
         "error",
       );
       return;
@@ -859,19 +866,41 @@ const EmailTemplateForm: React.FC = () => {
               <div className="p-4 space-y-3">
                 <MultiSelect
                   value={encodeTargets(targets)}
-                  onChange={(vals) => setTargets(decodeTargets(vals))}
+                  onChange={(vals) =>
+                    setTargets((prev) => withTripValues(prev, vals))
+                  }
                   options={tripTargetOptions}
                   placeholder={__(
                     "Search trips, categories, trip types…",
                     "yatra",
                   )}
                 />
-                {!hasTargets(targets) && (
+                {methodOptions && (
+                  <div data-testid="override-payment-methods">
+                    <div className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      {__("Only for bookings paid with", "yatra")}
+                    </div>
+                    <MultiSelect
+                      value={targets.payment_methods ?? []}
+                      onChange={(vals) =>
+                        setTargets((prev) => withPaymentMethods(prev, vals))
+                      }
+                      options={methodOptions}
+                      placeholder={__("Any payment method", "yatra")}
+                    />
+                  </div>
+                )}
+                {!hasEmailTargets(targets) && (
                   <p className="text-xs text-red-600">
-                    {__(
-                      "Pick at least one trip, category or trip type.",
-                      "yatra",
-                    )}
+                    {methodOptions
+                      ? __(
+                          "Pick at least one trip, category, trip type or payment method.",
+                          "yatra",
+                        )
+                      : __(
+                          "Pick at least one trip, category or trip type.",
+                          "yatra",
+                        )}
                   </p>
                 )}
                 <ul className="text-xs text-gray-500 dark:text-gray-400 list-disc pl-5 space-y-0.5">
@@ -887,6 +916,14 @@ const EmailTemplateForm: React.FC = () => {
                       "yatra",
                     )}
                   </li>
+                  {methodOptions && (
+                    <li>
+                      {__(
+                        "With payment methods picked, it is used only for bookings paid that way (and only on the trips above, if any). It then wins over overrides without payment methods. “Charged automatically to a saved card” matches scheduled payments Yatra will charge by itself; a gateway matches the booking's or the scheduled payment's gateway. “Charged automatically” only matches scheduled payment emails. A payment reminder for a balance charged automatically, sent from one of these, doesn't get Yatra's “Pay your balance now” button.",
+                        "yatra",
+                      )}
+                    </li>
+                  )}
                   <li>
                     {__(
                       "Trips that match no override keep the global template. Switching this override off does the same for its trips.",
@@ -929,7 +966,7 @@ const EmailTemplateForm: React.FC = () => {
                           {o.name}
                         </a>
                         <span className="text-xs text-purple-700 dark:text-purple-300">
-                          {describeTargets(o.targets, tripTargetOptions)}
+                          {describeEmailTargets(o.targets, tripTargetOptions)}
                         </span>
                         {!o.is_active && (
                           <span className="text-xs text-amber-700 dark:text-amber-300">
@@ -1510,6 +1547,18 @@ const EmailTemplateForm: React.FC = () => {
                           ? overrideOf
                           : String((templateData as any)?.template_key || "");
                         const hit = tripResolution.resolved[parentKey];
+                        // This check can't know how a booking is paid, so it
+                        // can't say whether a payment-method override applies.
+                        if (isOverride && (targets.payment_methods?.length ?? 0) > 0) {
+                          return (
+                            <span className="text-gray-700 dark:text-gray-300">
+                              {__(
+                                "it depends on how the booking is paid, which this check can't tell. Bookings paid with the payment methods above get this override when the trip matches too.",
+                                "yatra",
+                              )}
+                            </span>
+                          );
+                        }
                         if (isOverride) {
                           if (hit?.id === Number(id)) {
                             return (

@@ -41,6 +41,8 @@ class RecurringRule
     public ?string $to_latitude = null;
     public ?string $to_longitude = null;
     public ?array $exceptions = null;
+    /** @var array|null Dates the operator closed on this rule ('Y-m-d' strings or ['start','end'] periods). */
+    public ?array $excluded_dates = null;
     public string $exception_type = 'exclude';
     public string $capacity_type = 'fixed';
     public ?int $capacity_value = null;
@@ -141,7 +143,19 @@ class RecurringRule
                 $rule->exceptions = [];
             }
         }
-        
+
+        // Dates the operator excluded in the rule editor (holidays, closures).
+        // Without this, dates generated through this model (the public
+        // /trips/{id}/available-dates endpoint) still offered excluded dates
+        // that the storefront calendar and the booking guard both refuse.
+        if (isset($data['excluded_dates'])) {
+            $excluded = $data['excluded_dates'];
+            if (is_string($excluded)) {
+                $excluded = $excluded !== '' ? json_decode($excluded, true) : [];
+            }
+            $rule->excluded_dates = is_array($excluded) ? $excluded : [];
+        }
+
         return $rule;
     }
 
@@ -195,8 +209,65 @@ class RecurringRule
                 return false;
             }
         }
-        
+
+        if (!empty($this->excluded_dates) && self::isDateInExclusions($date, $this->excluded_dates)) {
+            return false;
+        }
+
         return true;
+    }
+
+    /**
+     * Is $date covered by an excluded_dates list?
+     *
+     * An entry is either a single 'Y-m-d' string or an inclusive period
+     * ['start' => 'Y-m-d', 'end' => 'Y-m-d'] (optionally with an admin 'note';
+     * a single date with a note is stored as a one-day period). Dates are ISO,
+     * so plain string comparison is chronological. A reversed period is
+     * tolerated rather than ignored.
+     *
+     * This is the one implementation; {@see \Yatra\Services\RecurringAvailabilityService::isDateExcluded()}
+     * delegates here so the storefront and the API can never disagree.
+     *
+     * @param string $date     Date being checked, 'Y-m-d'.
+     * @param mixed  $excluded Stored exclusions (a list; anything else = none).
+     */
+    public static function isDateInExclusions(string $date, $excluded): bool
+    {
+        if (!is_array($excluded)) {
+            return false;
+        }
+
+        foreach ($excluded as $entry) {
+            if (is_string($entry)) {
+                if ($entry === $date) {
+                    return true;
+                }
+
+                continue;
+            }
+
+            if (!is_array($entry)) {
+                continue;
+            }
+
+            $start = isset($entry['start']) ? (string) $entry['start'] : '';
+            $end = isset($entry['end']) ? (string) $entry['end'] : '';
+
+            if ($start === '' || $end === '') {
+                continue;
+            }
+
+            if ($start > $end) {
+                [$start, $end] = [$end, $start];
+            }
+
+            if ($date >= $start && $date <= $end) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
 

@@ -54,7 +54,11 @@ import {
   reorderEmailTemplateOverrides,
   resolveEmailTemplatesForTrip,
 } from "../../api/email-automation-api";
-import { describeTargets, useTripTargets } from "../../hooks/useTripTargets";
+import { useTripTargets } from "../../hooks/useTripTargets";
+import {
+  describeEmailTargets,
+  paymentMethodOptions,
+} from "../../lib/email-override-targets";
 import { ArrowDown, ArrowUp, Compass, Globe } from "lucide-react";
 
 const EMAIL_TEMPLATE_VISIBLE_COLUMNS_DEFAULT: Record<string, boolean> = {
@@ -798,7 +802,7 @@ export const EmailTemplatesList: React.FC<EmailTemplatesListProps> = ({
             visible: true,
             render: (template: UnifiedEmailTemplate) => (
               <span className="text-sm text-purple-700 dark:text-purple-300">
-                {describeTargets(template.targets, tripTargetOptions) || "—"}
+                {describeEmailTargets(template.targets, tripTargetOptions) || "—"}
               </span>
             ),
           },
@@ -1171,10 +1175,15 @@ export const EmailTemplatesList: React.FC<EmailTemplatesListProps> = ({
               </div>
               <span className="text-xs text-gray-400">
                 {asTrip
-                  ? __(
-                      "Highlighted rows are exactly what this trip's customers receive.",
-                      "yatra",
-                    )
+                  ? paymentMethodOptions()
+                    ? __(
+                        "Highlighted rows are what this trip's customers receive. An override limited to payment methods isn't shown here; it replaces these for bookings paid that way.",
+                        "yatra",
+                      )
+                    : __(
+                        "Highlighted rows are exactly what this trip's customers receive.",
+                        "yatra",
+                      )
                   : __(
                       "Pick a trip to highlight exactly what that trip's customers receive.",
                       "yatra",

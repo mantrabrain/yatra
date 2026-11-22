@@ -8,14 +8,15 @@ import { Label } from "../ui/label";
 import { SearchableSelect } from "../ui/searchable-select";
 import { MultiSelect } from "../ui/multi-select";
 import { useToast } from "../ui/toast";
+import { encodeTargets, useTripTargets } from "../../hooks/useTripTargets";
 import {
-  decodeTargets,
-  describeTargets,
-  encodeTargets,
-  hasTargets,
-  useTripTargets,
-  type TripTargets,
-} from "../../hooks/useTripTargets";
+  describeEmailTargets,
+  hasEmailTargets,
+  paymentMethodOptions,
+  withPaymentMethods,
+  withTripValues,
+  type EmailOverrideTargets,
+} from "../../lib/email-override-targets";
 import { createEmailTemplateOverride } from "../../api/email-automation-api";
 import type { UnifiedEmailTemplate } from "../../lib/email-templates-catalog";
 
@@ -40,11 +41,12 @@ export const EmailOverrideCreateModal: React.FC<
   const { showToast } = useToast();
   const queryClient = useQueryClient();
   const [parentId, setParentId] = useState<string>("");
-  const [targets, setTargets] = useState<TripTargets>({});
+  const [targets, setTargets] = useState<EmailOverrideTargets>({});
   const [name, setName] = useState("");
   const [nameTouched, setNameTouched] = useState(false);
   const [copy, setCopy] = useState(true);
   const { options } = useTripTargets(isOpen);
+  const methodOptions = useMemo(() => paymentMethodOptions(), []);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -62,7 +64,7 @@ export const EmailOverrideCreateModal: React.FC<
 
   const suggestedName = useMemo(() => {
     if (!selectedParent) return "";
-    const where = describeTargets(targets, options);
+    const where = describeEmailTargets(targets, options);
     return where ? `${selectedParent.name} — ${where}` : "";
   }, [selectedParent, targets, options]);
 
@@ -106,7 +108,7 @@ export const EmailOverrideCreateModal: React.FC<
   });
 
   const canSubmit =
-    !!selectedParent && hasTargets(targets) && !createMutation.isPending;
+    !!selectedParent && hasEmailTargets(targets) && !createMutation.isPending;
 
   return (
     <Modal
@@ -167,18 +169,46 @@ export const EmailOverrideCreateModal: React.FC<
           </Label>
           <MultiSelect
             value={encodeTargets(targets)}
-            onChange={(vals) => setTargets(decodeTargets(vals))}
+            onChange={(vals) => setTargets((prev) => withTripValues(prev, vals))}
             options={options}
             placeholder={__("Search trips, categories, trip types…", "yatra")}
             className="mt-1"
           />
           <p className="text-xs text-gray-500 mt-1">
-            {__(
-              "Trips, whole categories (sub-categories included) or a trip type. You can change this later.",
-              "yatra",
-            )}
+            {methodOptions
+              ? __(
+                  "Trips, whole categories (sub-categories included) or a trip type. Leave empty to use it for every trip paid with the payment methods below. You can change this later.",
+                  "yatra",
+                )
+              : __(
+                  "Trips, whole categories (sub-categories included) or a trip type. You can change this later.",
+                  "yatra",
+                )}
           </p>
         </div>
+
+        {methodOptions && (
+          <div data-testid="override-payment-methods">
+            <Label className="text-sm font-medium">
+              {__("Only for bookings paid with", "yatra")}
+            </Label>
+            <MultiSelect
+              value={targets.payment_methods ?? []}
+              onChange={(vals) =>
+                setTargets((prev) => withPaymentMethods(prev, vals))
+              }
+              options={methodOptions}
+              placeholder={__("Any payment method", "yatra")}
+              className="mt-1"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              {__(
+                "Optional. For example, a payment reminder that only tells card customers they'll be charged automatically, or one with your bank details for bank-transfer bookings.",
+                "yatra",
+              )}
+            </p>
+          </div>
+        )}
 
         <div>
           <Label className="text-sm font-medium">{__("Name", "yatra")}</Label>

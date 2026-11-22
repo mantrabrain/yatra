@@ -716,7 +716,12 @@ export type UnifiedEmailTemplate = {
   overrides?: string;
   /** True when this global template may have trip-specific overrides. */
   overridable?: boolean;
-  targets?: { trips?: number[]; categories?: number[]; trip_types?: string[] };
+  targets?: {
+    trips?: number[];
+    categories?: number[];
+    trip_types?: string[];
+    payment_methods?: string[];
+  };
   priority?: number;
   effective_event_key?: string;
 };

@@ -523,38 +523,70 @@ class PayPalGateway extends AbstractPaymentGateway
 
     public function verifyPayment(string $transactionId): array
     {
+        return $this->verifyOrder($transactionId, 0);
+    }
+
+    /**
+     * verifyPayment() for a known booking: an order created for another
+     * booking is refused before it is captured.
+     */
+    public function verifyPaymentForBooking(string $transactionId, int $bookingId): array
+    {
+        return $this->verifyOrder($transactionId, max(1, $bookingId));
+    }
+
+    /**
+     * Look up a PayPal order, capture it if it is approved, and report what
+     * was actually paid: the booking it was created for (`custom_id`, set by
+     * this site when it created the order), the captured amount and currency.
+     *
+     * With $expectedBookingId, an order created for another booking is refused
+     * BEFORE it is captured. Any order of this PayPal app could otherwise be
+     * replayed against any booking — for example a cheap booking's payment used
+     * to settle an expensive one.
+     */
+    private function verifyOrder(string $orderId, int $expectedBookingId): array
+    {
         $accessToken = $this->getAccessToken();
         if (!$accessToken) {
             return ['success' => false, 'error' => 'Authentication failed'];
         }
 
+        if ($orderId === '' || !preg_match('/^[A-Za-z0-9-]+$/', $orderId)) {
+            return ['success' => false, 'error' => 'Invalid order id'];
+        }
+
         // First try to get order details
-        $orderResponse = $this->makeRequest($this->getBaseUrl() . "/v2/checkout/orders/{$transactionId}", [
+        $orderResponse = $this->makeRequest($this->getBaseUrl() . "/v2/checkout/orders/{$orderId}", [
             'method' => 'GET',
             'headers' => [
                 'Authorization' => 'Bearer ' . $accessToken,
             ],
         ]);
 
-        // If already completed, return success
-        if (($orderResponse['body']['status'] ?? '') === 'COMPLETED') {
-            $vaultId = null;
-            $paymentSource = $orderResponse['body']['payment_source']['paypal'] ?? [];
-            if (!empty($paymentSource['attributes']['vault']['id'])) {
-                $vaultId = $paymentSource['attributes']['vault']['id'];
-            }
+        $order = is_array($orderResponse['body'] ?? null) ? $orderResponse['body'] : [];
+        $orderBookingId = (int) ($order['purchase_units'][0]['custom_id'] ?? 0);
 
-            return [
-                'success' => true,
-                'status' => 'COMPLETED',
-                'capture_id' => $orderResponse['body']['purchase_units'][0]['payments']['captures'][0]['id'] ?? null,
-                'vault_id' => $vaultId,
-            ];
+        if ($expectedBookingId > 0 && $orderBookingId !== $expectedBookingId) {
+            $this->log('PayPal order does not belong to this booking — ignored', [
+                'order_id' => $orderId,
+                'expected_booking_id' => $expectedBookingId,
+                'order_booking_id' => $orderBookingId,
+            ]);
+
+            return ['success' => false, 'status' => 'BOOKING_MISMATCH', 'error' => 'Order does not belong to this booking'];
+        }
+
+        $status = (string) ($order['status'] ?? '');
+
+        // If already completed, return success
+        if ($status === 'COMPLETED') {
+            return $this->orderResult($order, $order, $orderBookingId, true);
         }
 
         // If approved, capture the order
-        if (($orderResponse['body']['status'] ?? '') === 'APPROVED') {
-            $response = $this->makeRequest($this->getBaseUrl() . "/v2/checkout/orders/{$transactionId}/capture", [
+        if ($status === 'APPROVED') {
+            $response = $this->makeRequest($this->getBaseUrl() . "/v2/checkout/orders/{$orderId}/capture", [
                 'method' => 'POST',
                 'headers' => [
                     'Authorization' => 'Bearer ' . $accessToken,
@@ -562,27 +594,46 @@ class PayPalGateway extends AbstractPaymentGateway
                 ],
             ]);
 
-            $status = $response['body']['status'] ?? '';
-            
-            // Check for vault ID
-            $vaultId = null;
-            $paymentSource = $response['body']['payment_source']['paypal'] ?? [];
-            if (!empty($paymentSource['attributes']['vault']['id'])) {
-                $vaultId = $paymentSource['attributes']['vault']['id'];
-            }
-            
-            return [
-                'success' => $status === 'COMPLETED',
-                'status' => $status,
-                'capture_id' => $response['body']['purchase_units'][0]['payments']['captures'][0]['id'] ?? null,
-                'vault_id' => $vaultId,
-            ];
+            $captured = is_array($response['body'] ?? null) ? $response['body'] : [];
+
+            return $this->orderResult($captured, $order, $orderBookingId, ($captured['status'] ?? '') === 'COMPLETED');
         }
 
         return [
             'success' => false,
-            'status' => $orderResponse['body']['status'] ?? 'UNKNOWN',
+            'status' => $status !== '' ? $status : 'UNKNOWN',
         ];
+    }
+
+    /**
+     * The verify result for a (captured) order: what was paid, in what
+     * currency, for which booking. The amount comes from the capture itself.
+     */
+    private function orderResult(array $body, array $order, int $orderBookingId, bool $success): array
+    {
+        $capture = $body['purchase_units'][0]['payments']['captures'][0] ?? [];
+
+        $vaultId = null;
+        $paymentSource = $body['payment_source']['paypal'] ?? [];
+        if (!empty($paymentSource['attributes']['vault']['id'])) {
+            $vaultId = $paymentSource['attributes']['vault']['id'];
+        }
+
+        $result = [
+            'success' => $success,
+            'status' => (string) ($body['status'] ?? ''),
+            'capture_id' => $capture['id'] ?? null,
+            'vault_id' => $vaultId,
+            'booking_id' => $orderBookingId,
+        ];
+
+        $amount = $capture['amount'] ?? ($order['purchase_units'][0]['amount'] ?? null);
+        if (is_array($amount) && isset($amount['value'])) {
+            $result['amount'] = (float) $amount['value'];
+            $result['currency'] = strtoupper((string) ($amount['currency_code'] ?? ''));
+        }
+
+        return $result;
     }
 
     public function processRefund(string $transactionId, float $amount): array
@@ -757,13 +808,25 @@ class PayPalGateway extends AbstractPaymentGateway
             return ['success' => false, 'error' => 'IPN not verified'];
         }
         
+        // VERIFIED only proves PayPal sent this message — not that the money
+        // went to this site. Anyone can pay their own PayPal account and point
+        // that payment's IPN here with another booking's id in `custom`.
+        if (!$this->ipnPaidToThisAccount($ipnData)) {
+            $this->log('IPN ignored: payment was not made to the configured PayPal account', [
+                'receiver_email' => $ipnData['receiver_email'] ?? '',
+                'business' => $ipnData['business'] ?? '',
+                'txn_id' => $ipnData['txn_id'] ?? '',
+            ]);
+            return ['success' => false, 'error' => 'IPN receiver mismatch'];
+        }
+
         // Process the payment
         $paymentStatus = $ipnData['payment_status'] ?? '';
         $customData = json_decode($ipnData['custom'] ?? '{}', true);
         $bookingId = $customData['booking_id'] ?? 0;
         $transactionId = $ipnData['txn_id'] ?? '';
         $amount = (float) ($ipnData['mc_gross'] ?? 0);
-        $currency = $ipnData['mc_currency'] ?? 'USD';
+        $currency = strtoupper((string) ($ipnData['mc_currency'] ?? ''));
         
         if ($paymentStatus === 'Completed' && $bookingId > 0) {
             // Record the payment + confirm the booking. completePayment is
@@ -790,6 +853,31 @@ class PayPalGateway extends AbstractPaymentGateway
         return ['success' => true, 'status' => $paymentStatus];
     }
     
+    /**
+     * Was this IPN's payment made to the PayPal account configured here?
+     *
+     * PayPal names the receiving account in `receiver_email` (its primary
+     * email), `business` (the value the checkout form sent, possibly a
+     * secondary email) and `receiver_id` (the merchant ID). The configured
+     * "PayPal email" may be any of these, so any one matching is enough.
+     */
+    private function ipnPaidToThisAccount(array $ipnData): bool
+    {
+        $configured = strtolower(trim((string) ($this->config['email'] ?? '')));
+        if ($configured === '') {
+            return false;
+        }
+
+        foreach (['receiver_email', 'business', 'receiver_id'] as $field) {
+            $value = strtolower(trim((string) ($ipnData[$field] ?? '')));
+            if ($value !== '' && hash_equals($configured, $value)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Check if this gateway should handle the return request
      */
@@ -824,10 +912,15 @@ class PayPalGateway extends AbstractPaymentGateway
             $token = sanitize_text_field($_GET['token'] ?? '');
             
             if (!empty($token)) {
-                $result = $this->verifyPayment($token);
+                // The token comes from the URL: only accept an order this site
+                // created for THIS booking, and credit what was really captured.
+                $result = $this->verifyOrder($token, $bookingId);
                 
-                if ($result['success'] && $result['status'] === 'COMPLETED') {
-                    $this->completePayment($booking, $bookingRepository, $result['capture_id'] ?? $token);
+                if ($result['success'] && $result['status'] === 'COMPLETED' && isset($result['amount'])) {
+                    $this->completePayment($booking, $bookingRepository, (string) ($result['capture_id'] ?? $token), [
+                        'amount' => (float) $result['amount'],
+                        'currency' => (string) ($result['currency'] ?? ''),
+                    ]);
                 }
             }
         } else {
@@ -869,9 +962,25 @@ class PayPalGateway extends AbstractPaymentGateway
             }
         }
 
-        $amountDue = (float) ($booking->amount_due ?? ($booking->total_amount - $booking->amount_paid));
-        $amount = (float) ($paymentData['amount'] ?? $amountDue);
-        $currency = $paymentData['currency'] ?? ($booking->currency ?? 'USD');
+        // Credit only what PayPal reports was paid, in the booking's currency.
+        // (Defaulting to the amount due marked a deposit as full payment, and a
+        // payment in another currency was counted as if it were this one.)
+        $amount = isset($paymentData['amount']) ? (float) $paymentData['amount'] : 0.0;
+        $currency = strtoupper(trim((string) ($paymentData['currency'] ?? '')));
+        $bookingCurrency = strtoupper(trim((string) ($booking->currency ?? '')));
+        if ($bookingCurrency === '') {
+            $bookingCurrency = strtoupper(trim((string) \Yatra\Services\SettingsService::getCurrency()));
+        }
+        if ($amount <= 0 || $currency === '' || ($bookingCurrency !== '' && $currency !== $bookingCurrency)) {
+            $this->log('PayPal payment not applied: missing amount or wrong currency', [
+                'booking_id' => $bookingId,
+                'transaction_id' => $transactionId,
+                'amount' => $amount,
+                'currency' => $currency,
+                'booking_currency' => $bookingCurrency,
+            ]);
+            return;
+        }
         $previousBookingStatus = (string) ($booking->status ?? 'pending');
 
         // Accumulate paid amount so deposit/partial flows don't get force-marked fully paid.

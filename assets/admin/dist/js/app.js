@@ -56354,7 +56354,7 @@ const Payments = () => {
     enabled: can("yatra_view_bookings"),
     staleTime: 0
   });
-  const paymentMethodOptions = Array.isArray(paymentMethodsRaw) ? paymentMethodsRaw : [];
+  const paymentMethodOptions2 = Array.isArray(paymentMethodsRaw) ? paymentMethodsRaw : [];
   const deleteMutation = useMutation({
     mutationFn: async (id) => {
       await apiService.deletePayment(id);
@@ -56978,7 +56978,7 @@ const Payments = () => {
           className: "w-full lg:w-48 max-w-xs",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Methods", "yatra") }),
-            paymentMethodOptions.map((option) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: option.value, children: option.label }, option.value))
+            paymentMethodOptions2.map((option) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: option.value, children: option.label }, option.value))
           ]
         }
       ) })
@@ -72747,6 +72747,47 @@ const describeTargets = (t, options2) => {
   });
   return names.join(", ");
 };
+const paymentMethodOptions = () => {
+  var _a;
+  const raw = (_a = window.yatraAdmin) == null ? void 0 : _a.emailTemplatePaymentMethods;
+  if (!Array.isArray(raw)) return null;
+  const options2 = raw.filter((o) => o && typeof o.value === "string" && o.value !== "").map((o) => ({
+    value: String(o.value),
+    label: o.hint ? `${String(o.label || o.value)} (${String(o.hint)})` : String(o.label || o.value)
+  }));
+  return options2.length ? options2 : null;
+};
+const hasEmailTargets = (t) => {
+  var _a;
+  return hasTargets(t) || (((_a = t == null ? void 0 : t.payment_methods) == null ? void 0 : _a.length) ?? 0) > 0;
+};
+const withTripValues = (prev, values) => {
+  var _a;
+  const next = decodeTargets(values);
+  if ((_a = prev.payment_methods) == null ? void 0 : _a.length) next.payment_methods = prev.payment_methods;
+  return next;
+};
+const withPaymentMethods = (prev, values) => {
+  const next = { ...prev };
+  const methods = values.map(String).filter((v) => v !== "");
+  if (methods.length) next.payment_methods = methods;
+  else delete next.payment_methods;
+  return next;
+};
+const describeEmailTargets = (t, tripOptions) => {
+  var _a;
+  const trips = describeTargets(t, tripOptions);
+  const methods = (t == null ? void 0 : t.payment_methods) ?? [];
+  if (!methods.length) return trips;
+  const raw = (_a = window.yatraAdmin) == null ? void 0 : _a.emailTemplatePaymentMethods;
+  const known = Array.isArray(raw) ? raw : [];
+  const names = methods.map((m) => {
+    var _a2;
+    return ((_a2 = known.find((o) => String(o == null ? void 0 : o.value) === m)) == null ? void 0 : _a2.label) || m;
+  }).join(", ");
+  const paid = sprintf(__("payment: %s", "yatra"), names);
+  return trips ? `${trips} · ${paid}` : paid;
+};
 const EmailOverrideCreateModal = ({ isOpen, onClose, globals, parent }) => {
   const { showToast } = useToast();
   const queryClient2 = useQueryClient();
@@ -72756,6 +72797,7 @@ const EmailOverrideCreateModal = ({ isOpen, onClose, globals, parent }) => {
   const [nameTouched, setNameTouched] = reactExports.useState(false);
   const [copy2, setCopy] = reactExports.useState(true);
   const { options: options2 } = useTripTargets(isOpen);
+  const methodOptions = reactExports.useMemo(() => paymentMethodOptions(), []);
   reactExports.useEffect(() => {
     var _a;
     if (!isOpen) return;
@@ -72771,7 +72813,7 @@ const EmailOverrideCreateModal = ({ isOpen, onClose, globals, parent }) => {
   );
   const suggestedName = reactExports.useMemo(() => {
     if (!selectedParent) return "";
-    const where = describeTargets(targets, options2);
+    const where = describeEmailTargets(targets, options2);
     return where ? `${selectedParent.name} — ${where}` : "";
   }, [selectedParent, targets, options2]);
   const createMutation = useMutation({
@@ -72813,7 +72855,7 @@ const EmailOverrideCreateModal = ({ isOpen, onClose, globals, parent }) => {
       );
     }
   });
-  const canSubmit = !!selectedParent && hasTargets(targets) && !createMutation.isPending;
+  const canSubmit = !!selectedParent && hasEmailTargets(targets) && !createMutation.isPending;
   return /* @__PURE__ */ jsxRuntimeExports.jsx(
     Modal,
     {
@@ -72861,14 +72903,34 @@ const EmailOverrideCreateModal = ({ isOpen, onClose, globals, parent }) => {
             MultiSelect,
             {
               value: encodeTargets(targets),
-              onChange: (vals) => setTargets(decodeTargets(vals)),
+              onChange: (vals) => setTargets((prev) => withTripValues(prev, vals)),
               options: options2,
               placeholder: __("Search trips, categories, trip types…", "yatra"),
               className: "mt-1"
             }
           ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 mt-1", children: __(
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 mt-1", children: methodOptions ? __(
+            "Trips, whole categories (sub-categories included) or a trip type. Leave empty to use it for every trip paid with the payment methods below. You can change this later.",
+            "yatra"
+          ) : __(
             "Trips, whole categories (sub-categories included) or a trip type. You can change this later.",
+            "yatra"
+          ) })
+        ] }),
+        methodOptions && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { "data-testid": "override-payment-methods", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { className: "text-sm font-medium", children: __("Only for bookings paid with", "yatra") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            MultiSelect,
+            {
+              value: targets.payment_methods ?? [],
+              onChange: (vals) => setTargets((prev) => withPaymentMethods(prev, vals)),
+              options: methodOptions,
+              placeholder: __("Any payment method", "yatra"),
+              className: "mt-1"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 mt-1", children: __(
+            "Optional. For example, a payment reminder that only tells card customers they'll be charged automatically, or one with your bank details for bank-transfer bookings.",
             "yatra"
           ) })
         ] }),
@@ -73514,7 +73576,7 @@ const EmailTemplatesList = ({
         key: "applies_to",
         label: __("Applies to", "yatra"),
         visible: true,
-        render: (template) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-purple-700 dark:text-purple-300", children: describeTargets(template.targets, tripTargetOptions) || "—" })
+        render: (template) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-purple-700 dark:text-purple-300", children: describeEmailTargets(template.targets, tripTargetOptions) || "—" })
       }
     ] : [],
     ...overridesSupported && section === "global" ? [
@@ -73822,7 +73884,10 @@ const EmailTemplatesList = ({
             searchPlaceholder: __("Search trips…", "yatra")
           }
         ) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-400", children: asTrip ? __(
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-400", children: asTrip ? paymentMethodOptions() ? __(
+          "Highlighted rows are what this trip's customers receive. An override limited to payment methods isn't shown here; it replaces these for bookings paid that way.",
+          "yatra"
+        ) : __(
           "Highlighted rows are exactly what this trip's customers receive.",
           "yatra"
         ) : __(
@@ -74971,6 +75036,7 @@ const EmailTemplateForm = () => {
     is_active: true
   });
   const [targets, setTargets] = reactExports.useState({});
+  const methodOptions = reactExports.useMemo(() => paymentMethodOptions(), []);
   const [previewTrip, setPreviewTrip] = reactExports.useState(null);
   const [overrideModalOpen, setOverrideModalOpen] = reactExports.useState(false);
   const [showPreview, setShowPreview] = reactExports.useState(false);
@@ -75259,9 +75325,12 @@ const EmailTemplateForm = () => {
       showToast(__("Subject line is required"), "error");
       return;
     }
-    if (isOverride && !hasTargets(targets)) {
+    if (isOverride && !hasEmailTargets(targets)) {
       showToast(
-        __(
+        methodOptions ? __(
+          "An override needs at least one trip, category, trip type or payment method — or delete it to use the global template.",
+          "yatra"
+        ) : __(
           "An override needs at least one trip, category or trip type — or delete it to use the global template.",
           "yatra"
         ),
@@ -75500,7 +75569,7 @@ const EmailTemplateForm = () => {
                   MultiSelect,
                   {
                     value: encodeTargets(targets),
-                    onChange: (vals) => setTargets(decodeTargets(vals)),
+                    onChange: (vals) => setTargets((prev) => withTripValues(prev, vals)),
                     options: tripTargetOptions,
                     placeholder: __(
                       "Search trips, categories, trip types…",
@@ -75508,7 +75577,22 @@ const EmailTemplateForm = () => {
                     )
                   }
                 ),
-                !hasTargets(targets) && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-red-600", children: __(
+                methodOptions && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { "data-testid": "override-payment-methods", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs font-medium text-gray-700 dark:text-gray-300 mb-1", children: __("Only for bookings paid with", "yatra") }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    MultiSelect,
+                    {
+                      value: targets.payment_methods ?? [],
+                      onChange: (vals) => setTargets((prev) => withPaymentMethods(prev, vals)),
+                      options: methodOptions,
+                      placeholder: __("Any payment method", "yatra")
+                    }
+                  )
+                ] }),
+                !hasEmailTargets(targets) && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-red-600", children: methodOptions ? __(
+                  "Pick at least one trip, category, trip type or payment method.",
+                  "yatra"
+                ) : __(
                   "Pick at least one trip, category or trip type.",
                   "yatra"
                 ) }),
@@ -75519,6 +75603,10 @@ const EmailTemplateForm = () => {
                   ) }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: __(
                     "When several overrides match one trip, the most specific wins — trip › category › trip type — then the priority order in the Override templates list.",
+                    "yatra"
+                  ) }),
+                  methodOptions && /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: __(
+                    "With payment methods picked, it is used only for bookings paid that way (and only on the trips above, if any). It then wins over overrides without payment methods. “Charged automatically to a saved card” matches scheduled payments Yatra will charge by itself; a gateway matches the booking's or the scheduled payment's gateway. “Charged automatically” only matches scheduled payment emails. A payment reminder for a balance charged automatically, sent from one of these, doesn't get Yatra's “Pay your balance now” button.",
                     "yatra"
                   ) }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: __(
@@ -75560,7 +75648,7 @@ const EmailTemplateForm = () => {
                           children: o.name
                         }
                       ),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-purple-700 dark:text-purple-300", children: describeTargets(o.targets, tripTargetOptions) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-purple-700 dark:text-purple-300", children: describeEmailTargets(o.targets, tripTargetOptions) }),
                       !o.is_active && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-amber-700 dark:text-amber-300", children: __("(off)", "yatra") })
                     ]
                   },
@@ -75997,8 +76085,15 @@ const EmailTemplateForm = () => {
                   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-500", children: __("This trip's customers get:", "yatra") }),
                   " ",
                   (() => {
+                    var _a2;
                     const parentKey = isOverride ? overrideOf : String((templateData == null ? void 0 : templateData.template_key) || "");
                     const hit = tripResolution.resolved[parentKey];
+                    if (isOverride && (((_a2 = targets.payment_methods) == null ? void 0 : _a2.length) ?? 0) > 0) {
+                      return /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-700 dark:text-gray-300", children: __(
+                        "it depends on how the booking is paid, which this check can't tell. Bookings paid with the payment methods above get this override when the trip matches too.",
+                        "yatra"
+                      ) });
+                    }
                     if (isOverride) {
                       if ((hit == null ? void 0 : hit.id) === Number(id)) {
                         return /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "px-1.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300", children: [

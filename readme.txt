@@ -4,7 +4,7 @@ Tags: tour-booking, travel-booking, tour-operator, travel, travel-agency
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 3.1.2
+Stable tag: 3.1.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -281,6 +281,16 @@ Pricing starts at **$99/yr** (Starter, sale) and goes up to **$599/yr** (Scale 1
 9. Run offers without spreadsheets — coupon codes with usage limits, expiry dates and live status
 
 == Changelog ==
+
+= 3.1.3 — 22 November 2026 =
+* New - Email override templates can be limited to bookings paid with a chosen payment method, or to balances charged automatically to a saved card (needs Yatra Pro 3.1.3 or later). Without Yatra Pro 3.1.3 nothing changes.
+* Security - PayPal (Simple mode) payment notifications are now accepted only when the payment was made to the PayPal account configured in Yatra and in the booking's currency. Before, a genuine PayPal payment to any other account could be used to mark a booking as paid. Thanks to kta1kri for the responsible disclosure.
+* Security - A PayPal (Advanced mode) order is now applied only to the booking it was created for, and only for the amount actually captured. Before, an order paid for one booking could be reused to mark another booking as paid.
+* Security - The public payment confirmation and payment return endpoints now credit only a payment the gateway reports as completed, for its real amount and currency, and refuse a transaction that belongs to another booking or was already recorded. Before, a single cheap payment could mark other bookings as fully paid.
+* Fix - A PayPal (Advanced mode) deposit was recorded as full payment when the customer returned from PayPal before the webhook arrived.
+* Developers - A payment gateway's verifyPayment() result is now credited only when it reports a paid amount (`amount` above 0, and a `status` such as completed or succeeded when it sends one); a booking_id or currency it reports must match the booking. Third-party gateways that returned no amount were credited the amount due and are now refused.
+* Fix - The trip available-dates API (`/trips/{id}/available-dates`) listed dates excluded on a recurring rule, though the booking calendar hid them and they couldn't be booked.
+* Fix - The same API listed a sold-out date with all its seats free when the date came from a recurring rule.
 
 = 3.1.2 — 15 November 2026 =
 * Fix - The {{payment_type_label}} email tag printed the stored type ("installment", "final", "manual") instead of a readable name. It now shows "Installment 2 of 4", "Final payment" or "Balance payment".

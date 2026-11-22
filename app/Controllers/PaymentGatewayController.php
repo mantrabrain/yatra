@@ -598,7 +598,23 @@ class PaymentGatewayController extends BaseController
             return new WP_Error('transaction_mismatch', __('Transaction does not belong to this booking.', 'yatra'), ['status' => 409]);
         }
 
-        $result = $gateway->verifyPayment($transactionId);
+        // A gateway that can check the booking before taking the money (PayPal
+        // captures an approved order while verifying) is asked to.
+        $result = method_exists($gateway, 'verifyPaymentForBooking')
+            ? $gateway->verifyPaymentForBooking($transactionId, $bookingId)
+            : $gateway->verifyPayment($transactionId);
+
+        // A verified transaction must also be a completed payment, THIS
+        // booking's, in its currency.
+        if (!empty($result['success'])) {
+            $refusal = $this->paymentRefusal($result, $booking, $gatewayId, $transactionId);
+            if ($refusal === 'not_paid') {
+                return new WP_Error('payment_not_completed', __('The payment provider has not reported this payment as completed.', 'yatra'), ['status' => 409]);
+            }
+            if ($refusal !== null) {
+                return new WP_Error('transaction_mismatch', __('Transaction does not belong to this booking.', 'yatra'), ['status' => 409]);
+            }
+        }
 
         if ($result['success']) {
             // Get customer and payment method from result
@@ -615,11 +631,12 @@ class PaymentGatewayController extends BaseController
             $this->handle_successful_payment(
                 $bookingId,
                 $gatewayId,
-                $transactionId,
-                $result['amount'] ?? null,
-                $result['currency'] ?? null,
+                self::canonicalTransactionId($result, $transactionId),
+                isset($result['amount']) ? (float) $result['amount'] : null,
+                isset($result['currency']) ? (string) $result['currency'] : null,
                 ($saveCard || $passForSchedule) ? $customerId : null,
-                ($saveCard || $passForSchedule) ? $paymentMethodId : null
+                ($saveCard || $passForSchedule) ? $paymentMethodId : null,
+                self::transactionIds($result, $transactionId)
             );
         }
 
@@ -679,11 +696,26 @@ class PaymentGatewayController extends BaseController
             ?? $request->get_param('transaction_id') 
             ?? '';
 
-        if ($status === 'success' && !empty($transactionId)) {
-            $result = $gateway->verifyPayment($transactionId);
+        $booking = $bookingId > 0 ? $this->bookingRepository->find($bookingId) : null;
 
-            if ($result['success']) {
-                $this->handle_successful_payment($bookingId, $gatewayId, $transactionId);
+        if ($booking && $status === 'success' && !empty($transactionId)) {
+            $result = method_exists($gateway, 'verifyPaymentForBooking')
+                ? $gateway->verifyPaymentForBooking((string) $transactionId, $bookingId)
+                : $gateway->verifyPayment((string) $transactionId);
+
+            // booking_id is a URL parameter: the transaction must be this
+            // booking's, and only what was actually paid is credited.
+            if (!empty($result['success']) && $this->paymentRefusal($result, $booking, (string) $gatewayId, (string) $transactionId) === null) {
+                $this->handle_successful_payment(
+                    $bookingId,
+                    $gatewayId,
+                    self::canonicalTransactionId($result, (string) $transactionId),
+                    isset($result['amount']) ? (float) $result['amount'] : null,
+                    isset($result['currency']) ? (string) $result['currency'] : null,
+                    null,
+                    null,
+                    self::transactionIds($result, (string) $transactionId)
+                );
                 wp_redirect(home_url('/booking-success/?booking_id=' . $bookingId));
                 exit;
             }
@@ -691,6 +723,98 @@ class PaymentGatewayController extends BaseController
 
         wp_redirect(home_url('/booking-failed/'));
         exit;
+    }
+
+    /**
+     * Does a verified gateway transaction belong to this booking?
+     *
+     * The public confirm/callback endpoints take the booking id from the
+     * request, so a genuine payment made for one booking could otherwise be
+     * replayed to settle another. A gateway that reports which booking the
+     * transaction was created for (`booking_id`) must name this one, and a
+     * reported currency must be the booking's.
+     *
+     * @return string|null null when the payment may be applied; 'not_paid' when
+     *                     the gateway reports no completed, paid amount;
+     *                     'mismatch' when it is another booking's or currency's.
+     */
+    private function paymentRefusal(array $result, object $booking, string $gatewayId, string $transactionId): ?string
+    {
+        $bookingId = (int) ($booking->id ?? 0);
+
+        // `success` alone isn't enough: some gateways set it when the lookup
+        // worked, whatever the payment's state. A reported status must be a
+        // paid one.
+        $status = strtolower(trim((string) ($result['status'] ?? '')));
+        if ($status !== '' && !in_array($status, ['completed', 'succeeded', 'captured', 'confirmed', 'paid', 'success', 'settled'], true)) {
+            $this->log_payment_rejected($bookingId, $gatewayId, $transactionId, 'payment status is ' . $status);
+            return 'not_paid';
+        }
+
+        // Only what the gateway says was paid can be credited.
+        if (!isset($result['amount']) || !is_numeric($result['amount']) || (float) $result['amount'] <= 0) {
+            $this->log_payment_rejected($bookingId, $gatewayId, $transactionId, 'gateway reported no paid amount');
+            return 'not_paid';
+        }
+
+        if (isset($result['booking_id']) && (int) $result['booking_id'] !== $bookingId) {
+            $this->log_payment_rejected($bookingId, $gatewayId, $transactionId, 'booking mismatch (transaction is for booking ' . (int) $result['booking_id'] . ')');
+            return 'mismatch';
+        }
+
+        $paidCurrency = strtoupper(trim((string) ($result['currency'] ?? '')));
+        $bookingCurrency = strtoupper(trim((string) ($booking->currency ?? '')));
+        if ($paidCurrency !== '' && $bookingCurrency !== '' && $paidCurrency !== $bookingCurrency) {
+            $this->log_payment_rejected($bookingId, $gatewayId, $transactionId, 'currency ' . $paidCurrency . ' does not match booking currency ' . $bookingCurrency);
+            return 'mismatch';
+        }
+
+        return null;
+    }
+
+    /**
+     * The id a payment is recorded under, so every path records the same one
+     * and recognises it: the PayPal capture, the Stripe PaymentIntent, the
+     * T-Bank order — whichever id the request happened to carry.
+     */
+    private static function canonicalTransactionId(array $result, string $transactionId): string
+    {
+        foreach (['capture_id', 'payment_intent_id', 'order_id'] as $key) {
+            if (!empty($result[$key]) && is_scalar($result[$key])) {
+                return (string) $result[$key];
+            }
+        }
+
+        return $transactionId;
+    }
+
+    /** Every id the gateway reported for this payment. */
+    private static function transactionIds(array $result, string $transactionId): array
+    {
+        $ids = [$transactionId];
+        foreach (['capture_id', 'payment_intent_id', 'charge_id', 'order_id', 'payment_id'] as $key) {
+            if (!empty($result[$key]) && is_scalar($result[$key])) {
+                $ids[] = (string) $result[$key];
+            }
+        }
+
+        return array_values(array_unique($ids));
+    }
+
+    private function log_payment_rejected(int $bookingId, string $gatewayId, string $transactionId, string $reason): void
+    {
+        \Yatra\Utils\Logger::warning('Payment not applied to booking', [
+            'booking_id' => $bookingId,
+            'gateway' => $gatewayId,
+            'transaction_id' => $transactionId,
+            'reason' => $reason,
+        ]);
+
+        /**
+         * Fires when a verified payment is refused for a booking (wrong booking or currency).
+         * Useful for fraud monitoring.
+         */
+        do_action('yatra_payment_rejected', $bookingId, $gatewayId, $transactionId, $reason);
     }
 
     /**
@@ -762,7 +886,8 @@ class PaymentGatewayController extends BaseController
         ?float $amount = null, 
         ?string $currency = null,
         ?string $customerId = null,
-        ?string $paymentMethodId = null
+        ?string $paymentMethodId = null,
+        array $alsoKnownAs = []
     ): void {
         if ($bookingId <= 0) {
             return;
@@ -775,15 +900,32 @@ class PaymentGatewayController extends BaseController
             return;
         }
 
-        $paid_amount = $amount ?? (float) $booking->amount_due;
+        // Never credit the amount due on trust: only an amount the gateway
+        // reported as paid.
+        if ($amount === null || $amount <= 0) {
+            return;
+        }
+        $paid_amount = $amount;
         $payment_currency = $currency ?? $booking->currency;
 
-        // Idempotency guard: skip if we have already recorded this gateway transaction for this booking.
-        // Prevents double-applied payments when both confirm_payment and the gateway's own return-handler
-        // (or a webhook) fire for the same charge.
-        if ($transactionId !== '') {
-            $existing = $this->paymentRepository->findByTransactionId($transactionId);
-            if ($existing && (int) ($existing->booking_id ?? 0) === $bookingId) {
+        // A booking already paid in full can still receive a genuine payment
+        // (an old checkout tab or link paid after the operator settled it by
+        // hand). It is bound to this booking and recorded once below, so it is
+        // kept, as before, for the operator to see and refund; only flagged.
+        if ((string) ($booking->payment_status ?? '') === 'paid') {
+            \Yatra\Utils\Logger::warning('Payment received for a booking already paid in full', [
+                'booking_id' => $bookingId,
+                'gateway' => $gateway,
+                'transaction_id' => $transactionId,
+                'amount' => $amount,
+            ]);
+        }
+
+        // Idempotency guard: skip if this payment is already recorded — under any of its ids
+        // (an order and its capture, a PaymentIntent and its charge) and on any booking (for this
+        // booking: a duplicate confirm/return/webhook; for another one: a replayed payment).
+        foreach (array_unique(array_filter(array_merge([$transactionId], $alsoKnownAs), 'strlen')) as $knownId) {
+            if ($this->paymentRepository->findByTransactionId((string) $knownId)) {
                 return;
             }
         }

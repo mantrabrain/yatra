@@ -410,9 +410,27 @@ class DepartureService
         
         // Combine and format
         $availableDates = [];
-        
+
+        // Dates whose departure is already at capacity. The loop below only
+        // lists departures that still have room, so without remembering these
+        // the recurring rule re-added a sold-out date with its full seat count
+        // (e.g. "available_capacity: 9" for a departure with 9 of 9 booked).
+        // Only untimed departures count: on a day tour one full time slot must
+        // not hide the date while the rule's other slots still have room.
+        $soldOutDates = [];
+
         // Add manual departures
         foreach ($manualDepartures as $departure) {
+            if (
+                ($departure->time === null || $departure->time === '' || $departure->time === '00:00:00')
+                && (
+                    $departure->status === 'full'
+                    || ($departure->max_capacity > 0 && $departure->booked_count >= $departure->max_capacity)
+                )
+            ) {
+                $soldOutDates[$departure->date] = true;
+            }
+
             if ($departure->isAvailable()) {
                 $availableDates[$departure->date] = [
                     'id' => $departure->id,
@@ -432,7 +450,7 @@ class DepartureService
         
         // Add recurring rule dates (only if no manual departure exists)
         foreach ($recurringDates as $dateInfo) {
-            if (!isset($availableDates[$dateInfo['date']])) {
+            if (!isset($availableDates[$dateInfo['date']]) && !isset($soldOutDates[$dateInfo['date']])) {
                 $availableDates[$dateInfo['date']] = [
                     'id' => null,
                     'date' => $dateInfo['date'],

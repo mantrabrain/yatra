@@ -31,6 +31,8 @@ export type EmailTemplateTargets = {
   trips?: number[];
   categories?: number[];
   trip_types?: string[];
+  /** Gateway ids, or "auto_charge" (Pro builds that support it). */
+  payment_methods?: string[];
 };
 
 /**
