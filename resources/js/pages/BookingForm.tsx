@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
+import { formatYatraMoney } from "../lib/currency-display";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft,
@@ -129,6 +130,9 @@ const BookingForm: React.FC = () => {
   // Get global currency settings
   const globalCurrency = (window as any)?.yatraAdmin?.currency || "USD";
   const currencySymbol = getCurrencySymbol(globalCurrency);
+  // Amounts in the price breakdown, with the store's separators ("€1,150.00",
+  // not "€1150.00").
+  const bookingMoney = (n: number) => formatYatraMoney(Number(n) || 0, globalCurrency);
 
   const [formData, setFormData] = useState<BookingFormData>({
     customer_name: "",
@@ -422,7 +426,7 @@ const BookingForm: React.FC = () => {
           ),
           tax_amount: String((booking as any).tax_amount || "0"),
           total_amount: String(booking.total_amount || ""),
-          currency: booking.currency || "USD",
+          currency: globalCurrency,
           payment_status: booking.payment_status || "pending",
           booking_status: booking.booking_status || "pending",
           cancellation_reason: (booking as any).cancellation_reason || "",
@@ -467,7 +471,7 @@ const BookingForm: React.FC = () => {
         ),
         tax_amount: String((bookingData as any).tax_amount || "0"),
         total_amount: String(bookingData.total_amount || ""),
-        currency: bookingData.currency || "USD",
+        currency: globalCurrency,
         payment_status: bookingData.payment_status || "pending",
         booking_status: bookingData.booking_status || "pending",
         cancellation_reason: bookingData.cancellation_reason || "",
@@ -510,7 +514,7 @@ const BookingForm: React.FC = () => {
 
       setIsDataLoaded(true);
     }
-  }, [bookingData, isEditMode]);
+  }, [bookingData, isEditMode, globalCurrency]);
 
   // Auto-calculate pricing when trip or travelers change
   useEffect(() => {
@@ -522,7 +526,15 @@ const BookingForm: React.FC = () => {
         (trip: any) => String(trip.id) === formData.trip_id,
       );
       if (selectedTrip) {
-        const subtotal = selectedTrip.price * parseInt(formData.travelers);
+        // The trips list has no `price` field: the per-person price is the
+        // sale price when set, else the regular price (it used to read
+        // `trip.price` and show "Subtotal NaN").
+        const sale = Number(selectedTrip.discounted_price ?? selectedTrip.sale_price);
+        const regular = Number(selectedTrip.original_price ?? selectedTrip.price);
+        const unitPrice =
+          Number.isFinite(sale) && sale > 0 ? sale : Number.isFinite(regular) && regular > 0 ? regular : 0;
+        const travelers = parseInt(formData.travelers, 10);
+        const subtotal = unitPrice * (Number.isFinite(travelers) && travelers > 0 ? travelers : 1);
 
         // Calculate tax
         const taxCalculation = taxService.calculateBookingTax(
@@ -802,6 +814,9 @@ const BookingForm: React.FC = () => {
         departure_time: data.departure_time || "",
         travelers_count: travelersData.length,
         total_amount: parseFloat(data.total_amount),
+        // Every amount is in the store currency. Without this, bookings made
+        // here got the database default "USD" whatever the store currency.
+        currency: globalCurrency,
         payment_status: data.payment_status,
         status: data.booking_status,
         // Only meaningful on a cancellation; reaches the customer's email
@@ -1459,8 +1474,7 @@ const BookingForm: React.FC = () => {
                                 {__("Subtotal", "yatra")}
                               </span>
                               <span className="font-medium text-gray-900 dark:text-white">
-                                {currencySymbol}
-                                {parseFloat(formData.subtotal).toFixed(2)}
+                                {bookingMoney(parseFloat(formData.subtotal))}
                               </span>
                             </div>
                             {/* Itinerary Costs */}
@@ -1471,12 +1485,7 @@ const BookingForm: React.FC = () => {
                                   {__("Itinerary Costs", "yatra")}
                                 </span>
                                 <span className="font-medium text-gray-900 dark:text-white">
-                                  {getCurrencySymbol(
-                                    formData.currency || globalCurrency,
-                                  )}
-                                  {(
-                                    bookingData as any
-                                  ).itinerary_costs_total.toFixed(2)}
+                                  {bookingMoney((bookingData as any).itinerary_costs_total)}
                                 </span>
                               </div>
                             )}
@@ -1486,8 +1495,7 @@ const BookingForm: React.FC = () => {
                                   {__("Tax", "yatra")}
                                 </span>
                                 <span className="font-medium text-gray-900 dark:text-white">
-                                  {currencySymbol}
-                                  {parseFloat(formData.tax_amount).toFixed(2)}
+                                  {bookingMoney(parseFloat(formData.tax_amount))}
                                 </span>
                               </div>
                             )}
@@ -1496,10 +1504,7 @@ const BookingForm: React.FC = () => {
                                 {__("Total", "yatra")}
                               </span>
                               <span className="text-gray-900 dark:text-white">
-                                {getCurrencySymbol(
-                                  formData.currency || globalCurrency,
-                                )}
-                                {formData.total_amount}
+                                {bookingMoney(parseFloat(formData.total_amount) || 0)}
                               </span>
                             </div>
                           </>
@@ -1520,15 +1525,12 @@ const BookingForm: React.FC = () => {
                         htmlFor="total_amount"
                         className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
                       >
-                        {__("Total Amount", "yatra")} (
-                        {formData.currency || globalCurrency}){" "}
+                        {__("Total Amount", "yatra")} ({globalCurrency}){" "}
                         <span className="text-red-500">*</span>
                       </label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                          {getCurrencySymbol(
-                            formData.currency || globalCurrency,
-                          )}
+                          {currencySymbol}
                         </span>
                         <Input
                           id="total_amount"

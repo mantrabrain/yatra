@@ -21,6 +21,7 @@ import {
   Receipt,
   Globe,
   Plug,
+  KeyRound,
   Shield,
   Info,
   ChevronDown,
@@ -47,6 +48,7 @@ import {
   BarChart3,
   Palette,
   Percent,
+  Type,
 } from "lucide-react";
 import { __, sprintf } from "../lib/i18n";
 import { prepareWordPressMediaFrameOpen } from "../lib/wp-media-open";
@@ -71,6 +73,9 @@ import {
 } from "../api/usage-tracking-api";
 import { Button } from "../components/ui/button";
 import { ProFeature, ProBadge } from "../components/ProFeature";
+import { isModuleActive } from "../lib/plugin-utils";
+import ApiAccessSection from "../components/settings/ApiAccessSection";
+import { useWordPressMedia } from "../hooks/useWordPressMedia";
 import { PremiumUpgradeDialog } from "../components/modules/PremiumUpgradeDialog";
 import { Input } from "../components/ui/input";
 import { Select } from "../components/ui/select";
@@ -305,7 +310,11 @@ const GoogleCalendarIntegrationSection: React.FC<{
     const allSettings = {
       google_calendar_client_id: clientId,
       google_calendar_client_secret: clientSecret,
-      google_calendar_enabled: true, // Enable by default when settings are provided
+      // Enabled once credentials are entered. An untouched section with no
+      // credentials keeps what is stored (saving it used to flip "" to on).
+      ...(String(clientId || "").trim() !== "" && String(clientSecret || "").trim() !== ""
+        ? { google_calendar_enabled: true }
+        : {}),
       // Persist the target calendar through the MAIN page Save too (the option
       // name matches what the sync path reads), so the user's natural action —
       // clicking the page's Save button — keeps the chosen calendar.
@@ -788,6 +797,7 @@ const GoogleCalendarIntegrationSection: React.FC<{
 };
 
 type SettingsSection =
+  | "api"
   | "general"
   | "design"
   | "booking"
@@ -798,6 +808,7 @@ type SettingsSection =
   | "search"
   | "customer"
   | "review"
+  | "labels"
   | "tax"
   | "currency"
   | "integration"
@@ -900,6 +911,16 @@ interface SettingsData {
   allow_guest_checkout: boolean;
   require_guest_email_verification: boolean;
   booking_expiry_hours: number;
+  booking_fee_type: string; // 3.3: none | fixed | percent
+  booking_fee_amount: number;
+  booking_fee_label: string;
+  travel_insurance_enabled: boolean;
+  travel_insurance_title: string;
+  travel_insurance_description: string;
+  travel_insurance_price_type: string;
+  travel_insurance_amount: number | string;
+  travel_insurance_terms_url: string;
+  travel_insurance_require_choice: boolean;
   booking_reminder_days: number;
   allow_waitlist: boolean;
   waitlist_auto_confirm: boolean;
@@ -915,6 +936,25 @@ interface SettingsData {
   deposit_required: boolean;
   deposit_percentage: number;
   auto_confirm_pay_later: boolean;
+  customer_requests_enabled: boolean;
+  customer_request_cutoff_days: number;
+  label_overrides: { from: string; to: string }[];
+  weather_enabled: boolean;
+  recently_viewed_enabled: boolean;
+  weather_api_key: string;
+  weather_units: string;
+  social_proof_popup: boolean;
+  social_proof_popup_names: boolean;
+  social_proof_days: number | string;
+  social_proof_booked_badge: boolean;
+  social_proof_badge_min: number | string;
+  enquiry_custom_fields: {
+    id: string;
+    label: string;
+    type: string;
+    required: boolean;
+    options: string[];
+  }[];
   enable_scheduled_payments: boolean;
   scheduled_payment_type: string;
   scheduled_payment_days: number;
@@ -1091,6 +1131,7 @@ interface SettingsData {
   mailchimp_sync_on_booking?: boolean;
   mailchimp_sync_on_payment?: boolean;
   mailchimp_double_optin?: boolean;
+  mailchimp_subscribe_without_optin?: boolean;
   mailchimp_add_tags?: boolean;
   mailchimp_default_tags?: string[];
   mailchimp_field_mapping?: Record<string, string>;
@@ -1642,9 +1683,11 @@ const Settings: React.FC = () => {
       "trip",
       "customer",
       "review",
+      "labels",
       "tax",
       "currency",
       "integration",
+      "api",
       "permalink",
       "seo",
       "advanced",
@@ -1674,9 +1717,11 @@ const Settings: React.FC = () => {
           "trip",
           "customer",
           "review",
+          "labels",
           "tax",
           "currency",
           "integration",
+          "api",
           "permalink",
           "seo",
           "advanced",
@@ -1829,6 +1874,16 @@ const Settings: React.FC = () => {
       allow_guest_checkout: true,
       require_guest_email_verification: false,
       booking_expiry_hours: 24,
+      booking_fee_type: "none",
+      booking_fee_amount: 0,
+      booking_fee_label: "",
+      travel_insurance_enabled: false,
+      travel_insurance_title: "",
+      travel_insurance_description: "",
+      travel_insurance_price_type: "per_person",
+      travel_insurance_amount: 0,
+      travel_insurance_terms_url: "",
+      travel_insurance_require_choice: false,
       booking_reminder_days: 3,
       allow_waitlist: true,
       waitlist_auto_confirm: false,
@@ -1843,6 +1898,19 @@ const Settings: React.FC = () => {
       deposit_required: true,
       deposit_percentage: 20,
       auto_confirm_pay_later: true,
+      customer_requests_enabled: true,
+      customer_request_cutoff_days: 0,
+      label_overrides: [],
+      enquiry_custom_fields: [],
+      weather_enabled: false,
+      recently_viewed_enabled: false,
+      weather_api_key: "",
+      weather_units: "metric",
+      social_proof_popup: false,
+      social_proof_popup_names: false,
+      social_proof_days: 30,
+      social_proof_booked_badge: false,
+      social_proof_badge_min: 3,
       enable_scheduled_payments: false,
       scheduled_payment_type: "single",
       scheduled_payment_days: 15,
@@ -2774,6 +2842,12 @@ const Settings: React.FC = () => {
     gatewayOrderInitialized.current = true;
   }, [gatewayDefinitions, settings]);
 
+  // Company logo picker (used at the top of Yatra's emails).
+  const { openMediaLibrary: openLogoLibrary } = useWordPressMedia({
+    title: __("Choose your logo", "yatra"),
+    buttonText: __("Use this logo", "yatra"),
+  });
+
   // Single stable onChange handler that reads field name from input's name or id attribute
   const handleFieldChange = React.useCallback(
     (
@@ -3200,6 +3274,11 @@ const Settings: React.FC = () => {
       label: __("Review", "yatra"),
       icon: Star,
     },
+    {
+      id: "labels" as SettingsSection,
+      label: __("Labels", "yatra"),
+      icon: Type,
+    },
     { id: "tax" as SettingsSection, label: __("Tax", "yatra"), icon: Receipt },
     {
       id: "currency" as SettingsSection,
@@ -3210,6 +3289,11 @@ const Settings: React.FC = () => {
       id: "integration" as SettingsSection,
       label: __("Integration", "yatra"),
       icon: Plug,
+    },
+    {
+      id: "api" as SettingsSection,
+      label: __("API Access", "yatra"),
+      icon: KeyRound,
     },
     {
       id: "permalink" as SettingsSection,
@@ -3270,6 +3354,51 @@ const Settings: React.FC = () => {
                     onChange={handleFieldChange}
                     placeholder={__("Enter company name", "yatra")}
                   />
+                </FormField>
+
+                <FormField
+                  id="company_logo"
+                  label={__("Company Logo", "yatra")}
+                  description={__(
+                    "Shown at the top of Yatra's customer emails when \"Logo in emails\" is on (Yatra → Email → Delivery). Without one, your site's logo is used.",
+                    "yatra",
+                  )}
+                >
+                  <div className="flex items-center gap-3" data-testid="company-logo-field">
+                    {formData.company_logo ? (
+                      <img
+                        src={formData.company_logo}
+                        alt=""
+                        className="h-12 max-w-[160px] object-contain rounded border border-gray-200 dark:border-gray-700 bg-white p-1"
+                      />
+                    ) : null}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        openLogoLibrary((att: any) => {
+                          const a = Array.isArray(att) ? att[0] : att;
+                          const url = a?.sizes?.medium?.url || a?.url || "";
+                          if (url) {
+                            setFormData((prev) => (prev ? { ...prev, company_logo: url } : prev));
+                          }
+                        })
+                      }
+                    >
+                      {formData.company_logo ? __("Change logo", "yatra") : __("Choose logo", "yatra")}
+                    </Button>
+                    {formData.company_logo ? (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setFormData((prev) => (prev ? { ...prev, company_logo: "" } : prev))}
+                      >
+                        {__("Remove", "yatra")}
+                      </Button>
+                    ) : null}
+                  </div>
                 </FormField>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -3553,6 +3682,88 @@ const Settings: React.FC = () => {
                   </Select>
                 </FormField>
               </div>
+            </div>
+
+            <div data-testid="settings-recently-viewed">
+              <SectionDivider title={__("Recently Viewed Trips", "yatra")} />
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  id="recently_viewed_enabled"
+                  name="recently_viewed_enabled"
+                  checked={!!formData.recently_viewed_enabled}
+                  onChange={handleFieldChange}
+                  className="mt-1 w-4 h-4 rounded border-gray-300"
+                />
+                <span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">
+                    {__("Show the visitor's recently viewed trips under each trip page", "yatra")}
+                  </span>
+                  <span className="block text-xs text-gray-500 dark:text-gray-400">
+                    {__(
+                      "Kept in the visitor's own browser (local storage), never sent to your server. Also available anywhere with [yatra_recently_viewed]. Mention it in your cookie policy if your law requires it.",
+                      "yatra",
+                    )}
+                  </span>
+                </span>
+              </label>
+            </div>
+
+            <div data-testid="settings-weather">
+              <SectionDivider title={__("Weather Forecast", "yatra")} />
+              <label className="flex items-start gap-3 mb-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  id="weather_enabled"
+                  name="weather_enabled"
+                  checked={!!formData.weather_enabled}
+                  onChange={handleFieldChange}
+                  className="mt-1 w-4 h-4 rounded border-gray-300"
+                />
+                <span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">
+                    {__("Show a 7-day forecast on trip pages", "yatra")}
+                  </span>
+                  <span className="block text-xs text-gray-500 dark:text-gray-400">
+                    {__(
+                      "For the trip's starting point (its start location on the map). Data from Open-Meteo; only the trip's coordinates are sent, never anything about your visitors.",
+                      "yatra",
+                    )}
+                  </span>
+                </span>
+              </label>
+              {formData.weather_enabled && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    id="weather_api_key"
+                    label={__("Open-Meteo API key", "yatra")}
+                    description={__(
+                      "Open-Meteo's free service is for non-commercial use. For a business website, get an API key from open-meteo.com and enter it here.",
+                      "yatra",
+                    )}
+                  >
+                    <Input
+                      id="weather_api_key"
+                      name="weather_api_key"
+                      type="password"
+                      autoComplete="off"
+                      value={formData.weather_api_key || ""}
+                      onChange={handleFieldChange as any}
+                    />
+                  </FormField>
+                  <FormField id="weather_units" label={__("Temperature", "yatra")}>
+                    <Select
+                      id="weather_units"
+                      name="weather_units"
+                      value={formData.weather_units || "metric"}
+                      onChange={handleFieldChange}
+                    >
+                      <option value="metric">{__("Celsius (°C)", "yatra")}</option>
+                      <option value="imperial">{__("Fahrenheit (°F)", "yatra")}</option>
+                    </Select>
+                  </FormField>
+                </div>
+              )}
             </div>
           </div>
         );
@@ -4163,12 +4374,179 @@ const Settings: React.FC = () => {
                   </Label>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                     {__(
-                      'Automatically confirm bookings when "Book Now, Pay Later" is selected. If disabled, bookings will remain pending until payment is received.',
+                      'Automatically confirm bookings when "Book Now, Pay Later" is selected. If disabled, bookings will remain pending until payment is received. Pay Later bookings are never cancelled automatically for being unpaid.',
                       "yatra",
                     )}
                   </p>
                 </div>
               </div>
+            </div>
+
+            <div>
+              <SectionDivider title={__("Booking Fee", "yatra")} />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
+                <FormField
+                  id="booking_fee_type"
+                  label={__("Booking fee", "yatra")}
+                  description={__(
+                    "Added to every new booking as its own line. Coupons, tax and deposits include it.",
+                    "yatra",
+                  )}
+                >
+                  <select
+                    id="booking_fee_type"
+                    name="booking_fee_type"
+                    value={formData.booking_fee_type || "none"}
+                    onChange={handleFieldChange as any}
+                    className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                  >
+                    <option value="none">{__("No booking fee", "yatra")}</option>
+                    <option value="fixed">{__("Fixed amount per booking", "yatra")}</option>
+                    <option value="percent">{__("Percentage of the trip price", "yatra")}</option>
+                  </select>
+                </FormField>
+                {formData.booking_fee_type && formData.booking_fee_type !== "none" && (
+                  <>
+                    <FormField
+                      id="booking_fee_amount"
+                      label={
+                        formData.booking_fee_type === "percent"
+                          ? __("Fee (%)", "yatra")
+                          : __("Fee amount", "yatra")
+                      }
+                    >
+                      <Input
+                        id="booking_fee_amount"
+                        name="booking_fee_amount"
+                        type="number"
+                        min={0}
+                        max={formData.booking_fee_type === "percent" ? 100 : undefined}
+                        step="0.01"
+                        value={String(formData.booking_fee_amount ?? 0)}
+                        onChange={handleFieldChange as any}
+                      />
+                    </FormField>
+                    <FormField id="booking_fee_label" label={__("Label", "yatra")}>
+                      <Input
+                        id="booking_fee_label"
+                        name="booking_fee_label"
+                        maxLength={60}
+                        placeholder={__("Booking fee", "yatra")}
+                        value={formData.booking_fee_label || ""}
+                        onChange={handleFieldChange as any}
+                      />
+                    </FormField>
+                  </>
+                )}
+              </div>
+            </div>
+
+            <div data-testid="settings-travel-insurance">
+              <SectionDivider title={__("Travel Insurance", "yatra")} />
+              <label className="flex items-start gap-3 mb-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  id="travel_insurance_enabled"
+                  name="travel_insurance_enabled"
+                  checked={!!formData.travel_insurance_enabled}
+                  onChange={handleFieldChange}
+                  className="mt-1 w-4 h-4 rounded border-gray-300"
+                />
+                <span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">
+                    {__("Offer travel insurance at checkout", "yatra")}
+                  </span>
+                  <span className="block text-xs text-gray-500 dark:text-gray-400">
+                    {__(
+                      "Customers choose yes or no. When they add it, it is its own line in the booking and part of the total. A trip can turn it off under Availability & Booking.",
+                      "yatra",
+                    )}
+                  </span>
+                </span>
+              </label>
+              {formData.travel_insurance_enabled && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
+                  <FormField id="travel_insurance_title" label={__("Name", "yatra")}>
+                    <Input
+                      id="travel_insurance_title"
+                      name="travel_insurance_title"
+                      maxLength={80}
+                      placeholder={__("Travel insurance", "yatra")}
+                      value={formData.travel_insurance_title || ""}
+                      onChange={handleFieldChange as any}
+                    />
+                  </FormField>
+                  <FormField id="travel_insurance_price_type" label={__("Price", "yatra")}>
+                    <select
+                      id="travel_insurance_price_type"
+                      name="travel_insurance_price_type"
+                      value={formData.travel_insurance_price_type || "per_person"}
+                      onChange={handleFieldChange as any}
+                      className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                    >
+                      <option value="per_person">{__("Per traveller", "yatra")}</option>
+                      <option value="percent">{__("Percentage of the trip price", "yatra")}</option>
+                      <option value="fixed">{__("Per booking", "yatra")}</option>
+                    </select>
+                  </FormField>
+                  <FormField
+                    id="travel_insurance_amount"
+                    label={
+                      formData.travel_insurance_price_type === "percent"
+                        ? __("Percentage (%)", "yatra")
+                        : __("Amount", "yatra")
+                    }
+                  >
+                    <Input
+                      id="travel_insurance_amount"
+                      name="travel_insurance_amount"
+                      type="number"
+                      min={0}
+                      max={formData.travel_insurance_price_type === "percent" ? 100 : undefined}
+                      step="0.01"
+                      value={String(formData.travel_insurance_amount ?? 0)}
+                      onChange={handleFieldChange as any}
+                    />
+                  </FormField>
+                  <div className="md:col-span-3">
+                    <FormField id="travel_insurance_description" label={__("Description", "yatra")}>
+                      <textarea
+                        id="travel_insurance_description"
+                        name="travel_insurance_description"
+                        rows={2}
+                        maxLength={500}
+                        placeholder={__("Medical, cancellation and baggage cover from our insurance partner.", "yatra")}
+                        value={formData.travel_insurance_description || ""}
+                        onChange={handleFieldChange as any}
+                        className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                      />
+                    </FormField>
+                  </div>
+                  <div className="md:col-span-2">
+                    <FormField id="travel_insurance_terms_url" label={__("Link to the policy (optional)", "yatra")}>
+                      <Input
+                        id="travel_insurance_terms_url"
+                        name="travel_insurance_terms_url"
+                        type="url"
+                        placeholder="https://"
+                        value={formData.travel_insurance_terms_url || ""}
+                        onChange={handleFieldChange as any}
+                      />
+                    </FormField>
+                  </div>
+                  <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 md:mt-7">
+                    <input
+                      type="checkbox"
+                      id="travel_insurance_require_choice"
+                      name="travel_insurance_require_choice"
+                      checked={!!formData.travel_insurance_require_choice}
+                      onChange={handleFieldChange}
+                      className="w-4 h-4 rounded border-gray-300"
+                    />
+                    {__("Customers must say yes or no", "yatra")}
+                  </label>
+                </div>
+              )}
             </div>
 
             <div>
@@ -4647,6 +5025,108 @@ const Settings: React.FC = () => {
                                               `- ${field.description}`}
                                           </Label>
                                         </div>
+                                      );
+                                    }
+
+                                    // Bank accounts repeater (Bank Transfer, 3.3)
+                                    if (field.type === "bank_accounts") {
+                                      const accounts: Array<Record<string, string>> =
+                                        Array.isArray(config[field.id])
+                                          ? config[field.id]
+                                          : [];
+                                      const setAccounts = (
+                                        next: Array<Record<string, string>>,
+                                      ) =>
+                                        handleGatewayConfigChange(
+                                          gatewayId,
+                                          field.id,
+                                          next,
+                                        );
+                                      const cols: Array<[string, string]> = [
+                                        ["label", __("Label (e.g. Euro account)", "yatra")],
+                                        ["currency", __("Currency (e.g. EUR)", "yatra")],
+                                        ["bank_name", __("Bank Name", "yatra")],
+                                        ["account_name", __("Account Name", "yatra")],
+                                        ["account_number", __("Account Number / IBAN", "yatra")],
+                                        ["routing_code", __("Routing/SWIFT Code", "yatra")],
+                                      ];
+                                      return (
+                                        <FormField
+                                          key={field.id}
+                                          id={`${gatewayId}_${field.id}`}
+                                          label={field.label}
+                                          description={field.description}
+                                        >
+                                          <div className="space-y-3">
+                                            {accounts.map((acc, index) => (
+                                              <div
+                                                key={index}
+                                                className="p-3 border border-gray-200 dark:border-gray-700 rounded-lg grid grid-cols-1 md:grid-cols-2 gap-2"
+                                                data-testid="bank-account-row"
+                                              >
+                                                {cols.map(([key, label]) => (
+                                                  <Input
+                                                    key={key}
+                                                    aria-label={label}
+                                                    placeholder={label}
+                                                    value={acc[key] || ""}
+                                                    maxLength={key === "currency" ? 3 : 120}
+                                                    onChange={(e) => {
+                                                      const next = accounts.map((a, i) =>
+                                                        i === index
+                                                          ? {
+                                                              ...a,
+                                                              [key]:
+                                                                key === "currency"
+                                                                  ? e.target.value.toUpperCase()
+                                                                  : e.target.value,
+                                                            }
+                                                          : a,
+                                                      );
+                                                      setAccounts(next);
+                                                    }}
+                                                  />
+                                                ))}
+                                                <div className="md:col-span-2 flex justify-end">
+                                                  <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() =>
+                                                      setAccounts(
+                                                        accounts.filter((_, i) => i !== index),
+                                                      )
+                                                    }
+                                                  >
+                                                    {__("Remove account", "yatra")}
+                                                  </Button>
+                                                </div>
+                                              </div>
+                                            ))}
+                                            {accounts.length < 10 && (
+                                              <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() =>
+                                                  setAccounts([
+                                                    ...accounts,
+                                                    {
+                                                      label: "",
+                                                      currency: "",
+                                                      bank_name: "",
+                                                      account_name: "",
+                                                      account_number: "",
+                                                      routing_code: "",
+                                                    },
+                                                  ])
+                                                }
+                                              >
+                                                {__("Add another bank account", "yatra")}
+                                              </Button>
+                                            )}
+                                          </div>
+                                        </FormField>
                                       );
                                     }
 
@@ -5229,7 +5709,7 @@ const Settings: React.FC = () => {
                       value: "online",
                       label: __("Auto-confirm online payments only", "yatra"),
                       sub: __(
-                        "When an online payment (Stripe, PayPal, Razorpay…) pays the balance in full, the booking is confirmed. Deposits/partial payments and offline methods stay Pending.",
+                        "When an online payment (Stripe, PayPal, Razorpay…) pays the balance in full, the booking is confirmed. Deposits/partial payments and offline methods stay Pending; Pay Later follows its own “Auto-confirm Pay Later bookings” setting.",
                         "yatra",
                       ),
                     },
@@ -5588,6 +6068,56 @@ const Settings: React.FC = () => {
               settings here.
             */}
 
+            <SectionDivider title={__("Changes & Cancellations", "yatra")} />
+
+            <div className="space-y-4 mb-6">
+              <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                <input
+                  type="checkbox"
+                  id="customer_requests_enabled"
+                  checked={formData.customer_requests_enabled !== false}
+                  name="customer_requests_enabled"
+                  onChange={handleFieldChange}
+                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <div className="flex-1">
+                  <Label
+                    htmlFor="customer_requests_enabled"
+                    className="font-medium cursor-pointer"
+                  >
+                    {__("Let customers request a change or cancellation", "yatra")}
+                  </Label>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    {__(
+                      "Adds a request form to the booking in the customer's account. You get an email and the request shows on the booking; nothing is cancelled or refunded until you do it.",
+                      "yatra",
+                    )}
+                  </p>
+                </div>
+              </div>
+
+              {formData.customer_requests_enabled !== false && (
+                <FormField
+                  id="customer_request_cutoff_days"
+                  label={__("Accept requests until (days before travel)", "yatra")}
+                  description={__(
+                    "After this, customers are asked to contact you instead. 0 = until the travel date.",
+                    "yatra",
+                  )}
+                >
+                  <Input
+                    id="customer_request_cutoff_days"
+                    type="number"
+                    value={formData.customer_request_cutoff_days}
+                    name="customer_request_cutoff_days"
+                    onChange={handleFieldChange}
+                    min="0"
+                    className="max-w-xs"
+                  />
+                </FormField>
+              )}
+            </div>
+
             <SectionDivider title={__("Booking Expiry & Reminders", "yatra")} />
 
             <div className="space-y-4">
@@ -5627,6 +6157,210 @@ const Settings: React.FC = () => {
                 />
               </FormField>
             </div>
+
+            {(() => {
+              type EnquiryField = SettingsData["enquiry_custom_fields"][number];
+              const rows: EnquiryField[] = Array.isArray(formData.enquiry_custom_fields)
+                ? formData.enquiry_custom_fields
+                : [];
+              const setRows = (next: EnquiryField[]) =>
+                setFormData((prev) => (prev ? { ...prev, enquiry_custom_fields: next } : prev));
+              const update = (i: number, patch: Partial<EnquiryField>) =>
+                setRows(rows.map((r, j) => (j === i ? { ...r, ...patch } : r)));
+              const selectClass =
+                "flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white";
+              return (
+                <div data-testid="settings-enquiry-fields">
+                  <SectionDivider title={__("Enquiry Form", "yatra")} />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                    {__(
+                      "Ask your own questions on the trip enquiry form, after the travellers field. Answers are added to the enquiry message, so you see them on the Enquiries screen and in the enquiry email.",
+                      "yatra",
+                    )}
+                  </p>
+                  <div className="space-y-3">
+                    {rows.length === 0 && (
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {__("No extra questions yet.", "yatra")}
+                      </p>
+                    )}
+                    {rows.map((row, i) => (
+                      <div
+                        key={row.id || i}
+                        className="rounded-md border border-gray-200 dark:border-gray-700 p-3 space-y-2"
+                        data-testid={`enquiry-field-${i}`}
+                      >
+                        <div className="grid grid-cols-1 md:grid-cols-[1fr_180px_auto_auto] items-center gap-2">
+                          <Input
+                            value={row.label}
+                            maxLength={80}
+                            placeholder={__("Question, e.g. Preferred hotel category", "yatra")}
+                            aria-label={__("Question", "yatra")}
+                            onChange={(e) => update(i, { label: e.target.value })}
+                            data-testid={`enquiry-field-label-${i}`}
+                          />
+                          <select
+                            value={row.type || "text"}
+                            aria-label={__("Answer type", "yatra")}
+                            onChange={(e) => update(i, { type: e.target.value })}
+                            className={selectClass}
+                            data-testid={`enquiry-field-type-${i}`}
+                          >
+                            <option value="text">{__("Short answer", "yatra")}</option>
+                            <option value="textarea">{__("Paragraph", "yatra")}</option>
+                            <option value="select">{__("Dropdown", "yatra")}</option>
+                            <option value="checkbox">{__("Checkbox", "yatra")}</option>
+                          </select>
+                          <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                            <input
+                              type="checkbox"
+                              checked={!!row.required}
+                              onChange={(e) => update(i, { required: e.target.checked })}
+                              className="rounded border-gray-300"
+                              data-testid={`enquiry-field-required-${i}`}
+                            />
+                            {__("Required", "yatra")}
+                          </label>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            aria-label={__("Remove", "yatra")}
+                            onClick={() => setRows(rows.filter((_, j) => j !== i))}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                        {row.type === "select" && (
+                          <textarea
+                            rows={3}
+                            value={(row.options || []).join("\n")}
+                            placeholder={__("One choice per line", "yatra")}
+                            aria-label={__("Choices", "yatra")}
+                            onChange={(e) => update(i, { options: e.target.value.split("\n") })}
+                            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                            data-testid={`enquiry-field-options-${i}`}
+                          />
+                        )}
+                      </div>
+                    ))}
+                    {rows.length < 10 && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          setRows([
+                            ...rows,
+                            {
+                              id: "q" + Date.now().toString(36),
+                              label: "",
+                              type: "text",
+                              required: false,
+                              options: [],
+                            },
+                          ])
+                        }
+                        className="flex items-center gap-1"
+                        data-testid="enquiry-field-add"
+                      >
+                        <Plus className="w-4 h-4" />
+                        {__("Add a question", "yatra")}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {isModuleActive("social_proof") && (
+              <div data-testid="settings-social-proof">
+                <SectionDivider title={__("Countdown & Social Proof", "yatra")} />
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                  {__(
+                    "Built only from real bookings. The countdown is set per trip in the trip editor (Availability & Booking).",
+                    "yatra",
+                  )}
+                </p>
+                <div className="space-y-3">
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      id="social_proof_popup"
+                      name="social_proof_popup"
+                      checked={!!formData.social_proof_popup}
+                      onChange={handleFieldChange}
+                      className="mt-1 w-4 h-4 rounded border-gray-300"
+                    />
+                    <span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">
+                        {__("Recent-booking popup on trip pages", "yatra")}
+                      </span>
+                      <span className="block text-xs text-gray-500 dark:text-gray-400">
+                        {__(
+                          "\"Someone from Germany booked Everest Base Camp Trek · 3 hours ago\". Confirmed bookings only; no surname, email or other details are shown.",
+                          "yatra",
+                        )}
+                      </span>
+                    </span>
+                  </label>
+                  {formData.social_proof_popup && (
+                    <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 ml-7">
+                      <input
+                        type="checkbox"
+                        id="social_proof_popup_names"
+                        name="social_proof_popup_names"
+                        checked={!!formData.social_proof_popup_names}
+                        onChange={handleFieldChange}
+                        className="w-4 h-4 rounded border-gray-300"
+                      />
+                      {__("Show the traveller's first name (make sure your privacy policy allows it)", "yatra")}
+                    </label>
+                  )}
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      id="social_proof_booked_badge"
+                      name="social_proof_booked_badge"
+                      checked={!!formData.social_proof_booked_badge}
+                      onChange={handleFieldChange}
+                      className="mt-1 w-4 h-4 rounded border-gray-300"
+                    />
+                    <span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">
+                        {__("\"Booked N times\" badge on trip pages", "yatra")}
+                      </span>
+                    </span>
+                  </label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField id="social_proof_days" label={__("Look back (days)", "yatra")}>
+                      <Input
+                        id="social_proof_days"
+                        name="social_proof_days"
+                        type="number"
+                        min={1}
+                        max={365}
+                        value={String(formData.social_proof_days ?? 30)}
+                        onChange={handleFieldChange as any}
+                      />
+                    </FormField>
+                    <FormField
+                      id="social_proof_badge_min"
+                      label={__("Show the badge from (bookings)", "yatra")}
+                    >
+                      <Input
+                        id="social_proof_badge_min"
+                        name="social_proof_badge_min"
+                        type="number"
+                        min={1}
+                        value={String(formData.social_proof_badge_min ?? 3)}
+                        onChange={handleFieldChange as any}
+                      />
+                    </FormField>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         );
 
@@ -5939,6 +6673,118 @@ const Settings: React.FC = () => {
             </div>
           </div>
         );
+
+      case "labels": {
+        // Yatra's own texts (exact source strings) customers see most.
+        const suggestions = [
+          "Book Now",
+          "Check Availability",
+          "Enquire",
+          "Traveler",
+          "Travelers",
+          "Select travelers",
+          "per person",
+          "Itinerary",
+          "Overview",
+          "Trip Details",
+          "Departure",
+          "Group Departure",
+          "Complete Booking",
+          "Pay Now",
+          "Reviews",
+          "FAQ",
+          "Location",
+        ];
+        const rows: { from: string; to: string }[] = Array.isArray(
+          (formData as any).label_overrides,
+        )
+          ? (formData as any).label_overrides
+          : [];
+        const setRows = (next: { from: string; to: string }[]) =>
+          setFormData((prev: any) => ({ ...prev, label_overrides: next }));
+        const unused = suggestions.filter(
+          (s) => !rows.some((r) => r.from === s),
+        );
+        return (
+          <div className="space-y-6" data-testid="settings-labels">
+            <div className="rounded-md border border-gray-200 bg-gray-50 p-3 text-xs text-gray-600 dark:border-gray-700 dark:bg-gray-800/50 dark:text-gray-400">
+              {__(
+                "Rename texts your customers see — for example \"Book Now\" → \"Reserve\" or \"Travelers\" → \"Guests\". Enter Yatra's text exactly as it appears in English (it works on translated sites too). Applies to the website, emails and the booking pages; admin screens keep the original wording.",
+                "yatra",
+              )}
+            </div>
+
+            <div className="space-y-2">
+              {rows.length === 0 && (
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {__("No labels renamed yet.", "yatra")}
+                </p>
+              )}
+              {rows.map((row, i) => (
+                <div key={i} className="grid grid-cols-[1fr_auto_1fr_auto] items-center gap-2">
+                  <Input
+                    value={row.from}
+                    placeholder={__("Yatra's text, e.g. Book Now", "yatra")}
+                    onChange={(e) =>
+                      setRows(rows.map((r, j) => (j === i ? { ...r, from: e.target.value } : r)))
+                    }
+                    data-testid={`label-from-${i}`}
+                  />
+                  <span className="text-gray-400" aria-hidden="true">→</span>
+                  <Input
+                    value={row.to}
+                    placeholder={__("What customers see", "yatra")}
+                    onChange={(e) =>
+                      setRows(rows.map((r, j) => (j === i ? { ...r, to: e.target.value } : r)))
+                    }
+                    data-testid={`label-to-${i}`}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    aria-label={__("Remove", "yatra")}
+                    onClick={() => setRows(rows.filter((_, j) => j !== i))}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setRows([...rows, { from: "", to: "" }])}
+                className="flex items-center gap-1"
+                data-testid="label-add"
+              >
+                <Plus className="w-4 h-4" />
+                {__("Add a label", "yatra")}
+              </Button>
+            </div>
+
+            {unused.length > 0 && (
+              <div>
+                <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
+                  {__("Common texts — click to rename:", "yatra")}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {unused.map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => setRows([...rows, { from: s, to: "" }])}
+                      className="rounded-full border border-gray-300 dark:border-gray-600 px-3 py-1 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      }
 
       case "review":
         return (
@@ -6403,7 +7249,27 @@ const Settings: React.FC = () => {
                 </FormField>
               </div>
             </div>
+
+            {(window as any).yatraAdmin?.currencySwitcherEnabled && (
+              <DisplayCurrenciesCard
+                rows={Array.isArray((formData as any).display_currencies) ? (formData as any).display_currencies : []}
+                autoRates={!!(formData as any).display_currency_auto_rates}
+                baseCurrency={String(formData.currency || "USD")}
+                onChange={(rows, autoRates) =>
+                  setFormData((prev: any) => ({ ...prev, display_currencies: rows, display_currency_auto_rates: autoRates }))
+                }
+              />
+            )}
           </div>
+        );
+
+      case "api":
+        return (
+          <ApiAccessSection
+            onSettingSaved={(key, value) =>
+              setFormData((prev) => (prev ? ({ ...prev, [key]: value } as SettingsData) : prev))
+            }
+          />
         );
 
       case "integration":
@@ -6614,7 +7480,7 @@ const Settings: React.FC = () => {
                         </Label>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                           {__(
-                            "Automatically add customers to Mailchimp when they make a booking",
+                            "Add customers to Mailchimp when they book (customers who ticked the newsletter box, unless you allow everyone below)",
                             "yatra",
                           )}
                         </p>
@@ -6640,6 +7506,31 @@ const Settings: React.FC = () => {
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                           {__(
                             "Require email confirmation before adding to list (recommended for GDPR)",
+                            "yatra",
+                          )}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                      <input
+                        type="checkbox"
+                        id="mailchimp_subscribe_without_optin"
+                        checked={formData.mailchimp_subscribe_without_optin ?? false}
+                        name="mailchimp_subscribe_without_optin"
+                        onChange={handleFieldChange}
+                        className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <div className="flex-1">
+                        <Label
+                          htmlFor="mailchimp_subscribe_without_optin"
+                          className="font-medium cursor-pointer"
+                        >
+                          {__("Also add customers who didn't tick the newsletter box", "yatra")}
+                        </Label>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                          {__(
+                            "Off: only customers who tick \"Subscribe to our newsletter\" at checkout are added. Turn on only if you have another lawful basis to email every customer.",
                             "yatra",
                           )}
                         </p>
@@ -9450,6 +10341,85 @@ const Settings: React.FC = () => {
           "https://wpyatra.com/pricing"
         }
       />
+    </div>
+  );
+};
+
+/**
+ * Currency switcher (Yatra Pro): the other currencies visitors can see
+ * prices in, with the rate from the store currency. Bookings and payments
+ * stay in the store currency.
+ */
+const DisplayCurrenciesCard: React.FC<{
+  rows: { code: string; rate: number }[];
+  autoRates: boolean;
+  baseCurrency: string;
+  onChange: (rows: { code: string; rate: number }[], autoRates: boolean) => void;
+}> = ({ rows, autoRates, baseCurrency, onChange }) => {
+  const update = (i: number, patch: Partial<{ code: string; rate: number }>) =>
+    onChange(
+      rows.map((r, n) => (n === i ? { ...r, ...patch } : r)),
+      autoRates,
+    );
+  return (
+    <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-4 space-y-3" data-testid="display-currencies">
+      <div>
+        <h4 className="text-sm font-semibold text-gray-900 dark:text-white">{__("Currency switcher", "yatra")}</h4>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          {sprintf(
+            __(
+              "Visitors can view trip prices in these currencies. Bookings and payments stay in %s; checkout says so. Rate = how much of the currency 1 %s is.",
+              "yatra",
+            ),
+            baseCurrency,
+            baseCurrency,
+          )}
+        </p>
+      </div>
+      {rows.map((r, i) => (
+        <div key={i} className="flex gap-2 items-center">
+          <Input
+            className="w-24"
+            placeholder="EUR"
+            maxLength={3}
+            value={r.code}
+            onChange={(e) => update(i, { code: e.target.value.toUpperCase() })}
+            aria-label={__("Currency code", "yatra")}
+          />
+          <span className="text-xs text-gray-500">{sprintf(__("1 %s =", "yatra"), baseCurrency)}</span>
+          <Input
+            className="w-32"
+            type="number"
+            step="0.000001"
+            min="0"
+            value={String(r.rate ?? "")}
+            onChange={(e) => update(i, { rate: Number(e.target.value) })}
+            aria-label={__("Rate", "yatra")}
+          />
+          <span className="text-xs text-gray-500">{r.code || ""}</span>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onChange(rows.filter((_, n) => n !== i), autoRates)}
+          >
+            {__("Remove", "yatra")}
+          </Button>
+        </div>
+      ))}
+      <div className="flex flex-wrap gap-3 items-center">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => onChange([...rows, { code: "", rate: 1 }], autoRates)}
+          disabled={rows.length >= 20}
+        >
+          {__("Add currency", "yatra")}
+        </Button>
+        <label className="inline-flex items-center gap-2 text-sm">
+          <input type="checkbox" checked={autoRates} onChange={(e) => onChange(rows, e.target.checked)} />
+          {__("Update rates daily (open.er-api.com — sends only the store currency code)", "yatra")}
+        </label>
+      </div>
     </div>
   );
 };

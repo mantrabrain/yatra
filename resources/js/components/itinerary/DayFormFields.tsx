@@ -17,6 +17,7 @@ interface DayFormFieldsProps {
     day: string;
     day_title: string;
     day_description: string;
+    day_altitude?: string;
   };
   errors: Record<string, string>;
   tripsData: any[];
@@ -229,6 +230,33 @@ export const DayFormFields: React.FC<DayFormFieldsProps> = ({
               {errors.day_description}
             </p>
           )}
+        </div>
+
+        <div>
+          <label
+            htmlFor="day_altitude"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+          >
+            {__("Highest altitude (metres, optional)", "yatra")}
+          </label>
+          <HelpText
+            text={__(
+              "The highest point reached this day. When two or more days have one, the trip page shows an altitude chart.",
+              "yatra",
+            )}
+            className="mb-2"
+          />
+          <Input
+            id="day_altitude"
+            type="number"
+            min={-500}
+            max={9000}
+            step={1}
+            value={formData.day_altitude || ""}
+            onChange={(e) => onFieldChange("day_altitude", e.target.value)}
+            placeholder={__("e.g., 4130", "yatra")}
+            className="max-w-[200px]"
+          />
         </div>
       </CardContent>
     </Card>

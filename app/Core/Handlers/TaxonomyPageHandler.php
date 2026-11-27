@@ -33,6 +33,18 @@ class TaxonomyPageHandler extends BasePageHandler
             return false;
         }
 
+        /**
+         * The term shown on its own page (name, description, …), e.g. in the
+         * visitor's language.
+         *
+         * @param object $taxonomy_data Classification row.
+         * @param string $taxonomy_type destination | activity | category.
+         */
+        $filtered = apply_filters('yatra_taxonomy_page_term', $taxonomy_data, $taxonomy_type);
+        if (is_object($filtered)) {
+            $taxonomy_data = $filtered;
+        }
+
         $tripRepository = new TripRepository();
         $filter_key = $this->getFilterKey($taxonomy_type);
 

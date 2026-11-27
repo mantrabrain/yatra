@@ -71,6 +71,15 @@ const formatRequestUrl = (rawUrl: string): string => {
   }
 };
 
+/**
+ * Tells Yatra a REST call comes from an admin screen, so WPML / Polylang
+ * never hand the editor a translation (the Referer can be missing).
+ */
+const adminContextHeader = (): Record<string, string> =>
+  typeof window !== "undefined" && window.location.pathname.indexOf("/wp-admin/") !== -1
+    ? { "X-Yatra-Context": "admin" }
+    : {};
+
 class ApiError extends Error {
   response: {
     status: number;
@@ -179,6 +188,7 @@ class ApiClient {
     // Build headers
     const headers: HeadersInit = {
       "X-WP-Nonce": this.resolveNonce(),
+      ...adminContextHeader(),
       ...options.headers,
     };
 
@@ -305,6 +315,7 @@ class ApiClient {
       typeof FormData !== "undefined" && options.body instanceof FormData;
     const headers: HeadersInit = {
       "X-WP-Nonce": this.resolveNonce(),
+      ...adminContextHeader(),
       ...options.headers,
     };
     if (!isFormDataBody) {
@@ -460,6 +471,7 @@ class WpApiClient {
       method: "GET",
       headers: {
         "X-WP-Nonce": this.nonce,
+        ...adminContextHeader(),
       },
       credentials: "include",
     });
@@ -772,6 +784,15 @@ export const apiService = {
   getCronJobs: () => apiClient.get(API_ENDPOINTS.TOOLS_CRON_JOBS),
   runCronJob: (hook: string) =>
     apiClient.post(API_ENDPOINTS.TOOLS_CRON_RUN(hook)),
+  // Import from WP Travel Engine
+  detectWteData: () => apiClient.get(API_ENDPOINTS.TOOLS_WTE_DETECT),
+  scanWteData: () => apiClient.post(API_ENDPOINTS.TOOLS_WTE_SCAN),
+  importWteTerms: () => apiClient.post(API_ENDPOINTS.TOOLS_WTE_TERMS),
+  importWteTrips: (data: {
+    offset: number;
+    limit: number;
+    update_existing: boolean;
+  }) => apiClient.post(API_ENDPOINTS.TOOLS_WTE_TRIPS, data),
   clearCache: () => apiClient.delete(API_ENDPOINTS.TOOLS_CLEAR_CACHE),
   getCacheView: () => apiClient.get(API_ENDPOINTS.TOOLS_CACHE_VIEW),
   clearCacheItem: (key: string, type: string) =>

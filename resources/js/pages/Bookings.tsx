@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useMemo } from "react";
+import { CsvExportButton } from "../components/common/CsvExportButton";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Plus,
@@ -26,7 +27,7 @@ import {
   BulkActionToolbar,
   Table as SharedTable,
 } from "../components/shared";
-import { __ } from "../lib/i18n";
+import { __, sprintf } from "../lib/i18n";
 import { downloadAdminBookingInvoice } from "../lib/invoice-download";
 import {
   buildYatraSinglePublicUrls,
@@ -50,6 +51,8 @@ interface Booking {
   booking_number: string;
   customer_name: string;
   customer_email: string;
+  /** Pro Travel Agencies: the agency that made the booking, if any. */
+  agency_name?: string;
   trip_title: string;
   trip_id: number;
   trip_slug?: string;
@@ -661,6 +664,15 @@ const Bookings: React.FC = () => {
           <span className="text-xs text-muted-foreground">
             {booking.customer_email}
           </span>
+          {booking.agency_name ? (
+            <span className="text-xs text-blue-700 dark:text-blue-300">
+              {sprintf(
+                /* translators: %s: travel agency name. */
+                __("via %s"),
+                booking.agency_name,
+              )}
+            </span>
+          ) : null}
         </div>
       ),
     },
@@ -990,6 +1002,18 @@ const Bookings: React.FC = () => {
         description={__("Manage customer bookings and reservations")}
         actions={
           <div className="flex items-center gap-2">
+            <CsvExportButton
+              endpoint="/bookings/export"
+              capability="yatra_export_bookings"
+              testId="export-bookings"
+              params={{
+                ...(searchTerm ? { search: searchTerm } : {}),
+                ...(statusFilter !== "all" ? { status: statusFilter } : {}),
+                ...(paymentFilter !== "all" ? { payment_status: paymentFilter } : {}),
+                orderby: sortBy,
+                order: sortOrder,
+              }}
+            />
             <Button
               onClick={handleCreateBooking}
               className="flex items-center gap-2"

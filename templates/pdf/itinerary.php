@@ -316,8 +316,13 @@ $brandHeaderColor = (string) ($pdfBranding['header_color'] ?? '#1e40af');
                 </td>
                 <td style="width: 40%;">
                     <div class="brand" style="background: #374151; text-align: right;">
+                        <?php if (!empty($is_brochure)): ?>
+                        <p style="font-size: 10px; margin-bottom: 2px;"><?php esc_html_e('Prepared for', 'yatra'); ?></p>
+                        <p style="font-size: 14px; font-weight: 700;"><?php echo htmlspecialchars($customerName !== '' ? $customerName : (string) ($trip_title ?? ''), ENT_QUOTES, 'UTF-8'); ?></p>
+                        <?php else: ?>
                         <p style="font-size: 10px; margin-bottom: 2px;"><?php esc_html_e('Booking Reference', 'yatra'); ?></p>
                         <p style="font-size: 14px; font-weight: 700;"><?php echo htmlspecialchars($bookingRef ?: __('N/A', 'yatra'), ENT_QUOTES, 'UTF-8'); ?></p>
+                        <?php endif; ?>
                     </div>
                 </td>
             </tr>
@@ -518,6 +523,18 @@ $brandHeaderColor = (string) ($pdfBranding['header_color'] ?? '#1e40af');
                         <div class="timeline-title">
                             <?php echo htmlspecialchars($dayTitle !== '' ? $dayTitle : sprintf(__('Day %d', 'yatra'), $dayNumber), ENT_QUOTES, 'UTF-8'); ?>
                         </div>
+                        <?php
+                        $dayAltitude = class_exists('\\Yatra\\Repositories\\ItineraryRepository')
+                            ? \Yatra\Repositories\ItineraryRepository::dayAltitude(is_object($day) || is_array($day) ? $day : [])
+                            : null;
+                        if ($dayAltitude !== null): ?>
+                            <div class="timeline-desc" style="color:#6b7280;">
+                                <?php
+                                /* translators: 1: altitude in metres, 2: altitude in feet */
+                                echo esc_html(sprintf(__('Highest altitude: %1$s m (%2$s ft)', 'yatra'), number_format_i18n($dayAltitude), number_format_i18n((int) round($dayAltitude * 3.28084))));
+                                ?>
+                            </div>
+                        <?php endif; ?>
                         <?php if ($dayDescription !== ''): ?>
                             <div class="timeline-desc"><?php echo wp_kses_post(wpautop($dayDescription)); ?></div>
                         <?php endif; ?>

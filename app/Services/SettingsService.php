@@ -81,6 +81,31 @@ class SettingsService
         // gracefully by skipping the cancellation paragraph or
         // falling back to the per-trip cancellation_policy.
         'booking_expiry_hours' => 24,
+        // Booking fee (3.3): none | fixed | percent.
+        'booking_fee_type' => 'none',
+        'booking_fee_amount' => 0,
+        'booking_fee_label' => '',
+        // Email branding (3.3).
+        'email_show_logo' => false,
+        'email_brand_color' => '',
+        'enquiry_custom_fields' => [],
+        'embed_enabled' => false,
+        'recently_viewed_enabled' => false,
+        'weather_enabled' => false,
+        'weather_api_key' => '',
+        'weather_units' => 'metric',
+        'social_proof_popup' => false,
+        'social_proof_popup_names' => false,
+        'social_proof_days' => 30,
+        'social_proof_booked_badge' => false,
+        'social_proof_badge_min' => 3,
+        'travel_insurance_enabled' => false,
+        'travel_insurance_title' => '',
+        'travel_insurance_description' => '',
+        'travel_insurance_price_type' => 'per_person',
+        'travel_insurance_amount' => 0,
+        'travel_insurance_terms_url' => '',
+        'travel_insurance_require_choice' => false,
         'booking_reminder_days' => 3,
         // Storefront booking horizon in months. 12 is the value that was
         // hard-coded before it became configurable, so a site that never
@@ -111,6 +136,15 @@ class SettingsService
         'partial_payment' => false,
         'partial_payment_percentage' => 30,
         'auto_confirm_pay_later' => true,
+        // Customers can ask to change or cancel a booking from their account
+        // (a request the operator handles; nothing changes automatically).
+        'customer_requests_enabled' => true,
+        'customer_request_cutoff_days' => 0,
+        // Settings → Labels: [{from, to}] — Yatra's text and what customers see.
+        'label_overrides' => [],
+        // Currency switcher (Yatra Pro): [{code, rate}] — 1 store currency = rate × code.
+        'display_currencies' => [],
+        'display_currency_auto_rates' => false,
         'payment_gateways' => ['pay_later'],
         'payment_methods' => [],
         'gateway_configs' => [],

@@ -197,7 +197,22 @@ if (!defined('ABSPATH')) {
 
             <?php if (!is_user_logged_in()): ?>
                 <div class="yatra-review-login-notice">
-                    <p><?php echo esc_html__('Please', 'yatra'); ?> <a href="<?php echo esc_url(wp_login_url(get_permalink())); ?>"><?php echo esc_html__('log in', 'yatra'); ?></a> <?php echo esc_html__('to write a review.', 'yatra'); ?></p>
+                    <?php
+                    // Back to this trip after logging in (get_permalink() is the
+                    // virtual page here and pointed at a 404 without /trip/).
+                    $yatra_review_return = function_exists('yatra_get_trip_permalink') ? yatra_get_trip_permalink($trip) : '';
+                    $yatra_review_login = wp_login_url($yatra_review_return !== '' ? $yatra_review_return : home_url('/'));
+                    ?>
+                    <p><?php
+                    echo wp_kses(
+                        sprintf(
+                            /* translators: %s: URL of the login page. */
+                            __('Please <a href="%s">log in</a> to write a review.', 'yatra'),
+                            esc_url($yatra_review_login)
+                        ),
+                        ['a' => ['href' => []]]
+                    );
+                    ?></p>
                 </div>
             <?php elseif (!$can_review && $require_booking): ?>
                 <div class="yatra-review-booking-notice">

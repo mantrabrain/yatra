@@ -42,6 +42,7 @@ import {
   Sparkles,
   MessageCircle,
   Network,
+  Briefcase,
 } from "lucide-react";
 
 export const ICON_MAP: Record<string, LucideIcon> = {
@@ -77,6 +78,7 @@ export const ICON_MAP: Record<string, LucideIcon> = {
   Sparkles,
   MessageCircle,
   Network,
+  Briefcase,
   Tools: Wrench,
 };
 

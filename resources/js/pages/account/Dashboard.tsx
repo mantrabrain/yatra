@@ -307,11 +307,12 @@ const Dashboard: React.FC<DashboardProps> = ({
                               {getStatusLabel(booking.booking_status)}
                             </span>
                           </div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2">
+                          {booking.destination && (
+<p className="text-sm text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2">
                             <MapPin className="w-4 h-4" />
-                            {booking.destination ||
-                              __("Multiple destinations", "yatra")}
+                            {booking.destination}
                           </p>
+)}
                           <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
                             <span className="flex items-center gap-1">
                               <Calendar className="w-3.5 h-3.5" />
@@ -560,7 +561,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 dark:text-white">
                       {__("Payment pending:", "yatra")}{" "}
-                      {currency(payment.amount)}
+                      {currency(payment.amount, payment.currency)}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
                       {formatDate(payment.date)}

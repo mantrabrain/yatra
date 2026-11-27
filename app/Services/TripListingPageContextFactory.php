@@ -102,6 +102,9 @@ final class TripListingPageContextFactory
         $out['type'] = (string) $taxonomyContext['type'];
         $out['slug'] = isset($entity->slug) ? (string) $entity->slug : '';
         $out['name'] = isset($entity->name) ? (string) $entity->name : '';
+        if (function_exists('yatra_translate_term_name')) {
+            $out['name'] = yatra_translate_term_name($out['name']);
+        }
 
         return $out;
     }

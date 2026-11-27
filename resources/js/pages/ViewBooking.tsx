@@ -15,6 +15,7 @@ import {
   DollarSign,
   CreditCard,
   FileText,
+  MapPin,
   AlertCircle,
   FileSignature,
   CheckCircle,
@@ -37,6 +38,16 @@ import {
 } from "../components/ui/card";
 import { ConditionalRender } from "../components/ui/conditional-render";
 import { ResendEmailMenu } from "../components/bookings/ResendEmailMenu";
+import { TravelAgencyPanel } from "../components/bookings/TravelAgencyPanel";
+import { isModuleActive } from "../lib/plugin-utils";
+import {
+  AdjustPriceButton,
+  BookingActivityCard,
+  CustomerRequestsCard,
+  RecordPaymentButton,
+  PaymentLinkButton,
+  RefundPaymentButton,
+} from "../components/bookings/BookingWorkspace";
 import { downloadAdminBookingInvoice } from "../lib/invoice-download";
 import { Skeleton } from "../components/ui/skeleton";
 import { formatYatraMoney } from "../lib/currency-display";
@@ -163,6 +174,13 @@ const ViewBooking: React.FC = () => {
           payment_schedule: (data as any).payment_schedule || null,
           discount_amount: data.discount_amount || 0,
           discount_code: data.discount_code || null,
+          // Discounts / surcharges added on this screen after booking.
+          price_adjustments: Array.isArray((data as any).price_adjustments)
+            ? (data as any).price_adjustments
+            : [],
+          customer_requests: Array.isArray((data as any).customer_requests)
+            ? (data as any).customer_requests
+            : [],
           currency: data.currency || "USD",
           // Tax fields
           subtotal: data.subtotal,
@@ -181,13 +199,19 @@ const ViewBooking: React.FC = () => {
           // End tax fields
           payment_status: data.payment_status,
           booking_status: data.status,
-          payment_method: data.payment_gateway,
+          payment_method: data.payment_gateway_label || data.payment_gateway,
           payment_date: data.payment_date,
           notes: data.special_requests,
+          pickup_point: (data as any).pickup_point || null,
+          accommodation: (data as any).accommodation || null,
+          travel_insurance: (data as any).travel_insurance || null,
           internal_notes: data.internal_notes,
           emergency_contact: data.emergency_contact,
           contact_data: data.contact_data,
           payments: data.payments || [],
+          net_received: data.net_received,
+          total_received: (data as any).total_received,
+          total_refunded: (data as any).total_refunded,
           created_at: data.created_at,
           updated_at: data.updated_at,
           confirmed_at: data.confirmed_at,
@@ -248,8 +272,10 @@ const ViewBooking: React.FC = () => {
       .sort((a, b) => a.order - b.order);
   }, [formConfig]);
 
-  // Fetch consent status for this booking (only if Pro is active)
+  // Fetch consent status for this booking (only if Pro is active and the
+  // Trip Consent module is on — its route doesn't exist otherwise).
   const isPro = !!(window as any).yatraAdmin?.isPro;
+  const tripConsentOn = !!(window as any).yatraAdmin?.tripConsentEnabled;
   const { data: consentStatus } = useQuery({
     queryKey: ["booking-consent-status", bookingId],
     queryFn: async () => {
@@ -259,7 +285,7 @@ const ViewBooking: React.FC = () => {
       );
       return response?.data || null;
     },
-    enabled: !!bookingId && isPro,
+    enabled: !!bookingId && isPro && tripConsentOn,
   });
 
   const formatDate = (dateString: string) => {
@@ -540,6 +566,27 @@ const ViewBooking: React.FC = () => {
               </Button>
             </ConditionalRender>
             <ConditionalRender capability="yatra_edit_bookings">
+              <RecordPaymentButton
+                bookingId={Number(booking.id)}
+                amountDue={Number(booking.amount_due) || 0}
+                currency={booking.currency}
+              />
+            </ConditionalRender>
+            <ConditionalRender capability="yatra_edit_bookings">
+              <PaymentLinkButton
+                bookingId={Number(booking.id)}
+                amountDue={Number(booking.amount_due) || 0}
+                currency={booking.currency}
+              />
+            </ConditionalRender>
+            <ConditionalRender capability="yatra_edit_bookings">
+              <AdjustPriceButton
+                bookingId={Number(booking.id)}
+                total={Number(booking.total_amount) || 0}
+                currency={booking.currency}
+              />
+            </ConditionalRender>
+            <ConditionalRender capability="yatra_edit_bookings">
               <ResendEmailMenu
                 bookingId={Number(booking.id)}
                 status={booking.booking_status}
@@ -584,9 +631,16 @@ const ViewBooking: React.FC = () => {
                   <CardTitle className="text-base">
                     {__("Booking Overview", "yatra")}
                   </CardTitle>
-                  <div className="flex items-center gap-2">
-                    {getBookingStatusBadge(booking.booking_status)}
-                    {getPaymentStatusBadge(booking.payment_status)}
+                  {/* Labelled: both statuses can read "Pending". */}
+                  <div className="flex items-center gap-3">
+                    <span className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+                      {__("Booking", "yatra")}
+                      {getBookingStatusBadge(booking.booking_status)}
+                    </span>
+                    <span className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+                      {__("Payment", "yatra")}
+                      {getPaymentStatusBadge(booking.payment_status)}
+                    </span>
                   </div>
                 </div>
               </CardHeader>
@@ -650,9 +704,20 @@ const ViewBooking: React.FC = () => {
                   </h4>
                   {(() => {
                     // ── Raw figures ──────────────────────────────────────────
+                    // Discounts / surcharges added after booking change the
+                    // stored total, not the price the trip was booked at.
+                    const adjustmentsNet = (
+                      Array.isArray((booking as any).price_adjustments)
+                        ? (booking as any).price_adjustments
+                        : []
+                    ).reduce(
+                      (sum: number, a: any) =>
+                        sum + (a?.type === "discount" ? -1 : 1) * (Number(a?.amount) || 0),
+                      0,
+                    );
                     const dbSubtotal =
                       parseFloat((booking as any).subtotal) ||
-                      booking.total_amount ||
+                      (booking.total_amount || 0) - adjustmentsNet ||
                       0;
                     const discountAmount = booking.discount_amount || 0;
                     const itineraryCostsTotal =
@@ -906,6 +971,27 @@ const ViewBooking: React.FC = () => {
                           </>
                         )}
 
+                        {/* Price adjustments made after booking (already in the Net Amount) */}
+                        {Array.isArray((booking as any).price_adjustments) &&
+                          (booking as any).price_adjustments.map(
+                            (adj: any, i: number) => (
+                              <Row
+                                key={`adj-${i}`}
+                                label={
+                                  (adj.type === "discount"
+                                    ? __("Price adjustment: discount", "yatra")
+                                    : __("Price adjustment: surcharge", "yatra")) +
+                                  (adj.reason ? ` (${adj.reason})` : "")
+                                }
+                                value={`${adj.type === "discount" ? "-" : "+"}${formatPrice(
+                                  Number(adj.amount) || 0,
+                                  booking.currency,
+                                )}`}
+                                green={adj.type === "discount"}
+                              />
+                            ),
+                          )}
+
                         {/* Net Amount */}
                         <div className="flex justify-between text-base font-bold border-t-2 border-gray-800 dark:border-gray-300 pt-2 mt-1">
                           <span className="text-gray-900 dark:text-white">
@@ -935,10 +1021,28 @@ const ViewBooking: React.FC = () => {
                           </div>
                         )}
 
+                        {/* Received / refunded, when money went back */}
+                        {Number((booking as any).total_refunded) > 0 && (
+                          <>
+                            <Row
+                              label={__("Received", "yatra")}
+                              value={formatPrice(Number((booking as any).total_received) || 0, booking.currency)}
+                            />
+                            <Row
+                              label={__("Refunded", "yatra")}
+                              value={`-${formatPrice(Number((booking as any).total_refunded) || 0, booking.currency)}`}
+                            />
+                          </>
+                        )}
+
                         {/* Amount Paid */}
                         {amountPaid > 0 && (
                           <Row
-                            label={__("Amount Paid", "yatra")}
+                            label={
+                              Number((booking as any).total_refunded) > 0
+                                ? __("Amount Paid (after refunds)", "yatra")
+                                : __("Amount Paid", "yatra")
+                            }
                             value={formatPrice(amountPaid, booking.currency)}
                             green
                           />
@@ -1068,9 +1172,21 @@ const ViewBooking: React.FC = () => {
                         >
                           <div className="min-w-0">
                             <div className="font-medium text-gray-900 dark:text-white">
-                              {formatPrice(
-                                Number(payment.amount || 0),
-                                payment.currency || booking.currency,
+                              {payment.payment_type === "refund" || Number(payment.amount) < 0 ? (
+                                <span className="whitespace-nowrap text-red-600 dark:text-red-400">
+                                  {__("Refund", "yatra")}{" "}
+                                  -{formatPrice(
+                                    Math.abs(Number(payment.amount || 0)),
+                                    payment.currency || booking.currency,
+                                  )}
+                                </span>
+                              ) : (
+                                <span className="whitespace-nowrap">
+                                  {formatPrice(
+                                    Number(payment.amount || 0),
+                                    payment.currency || booking.currency,
+                                  )}
+                                </span>
                               )}
                               <span className="ml-2 font-normal text-gray-500 dark:text-gray-400">
                                 {payment.payment_method_label ||
@@ -1090,11 +1206,28 @@ const ViewBooking: React.FC = () => {
                                 : ""}
                             </div>
                           </div>
-                          <span
-                            className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium whitespace-nowrap ${statusClass}`}
-                          >
-                            {statusLabel[status] || status}
-                          </span>
+                          <div className="flex flex-col items-end gap-1">
+                            <span
+                              className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium whitespace-nowrap ${statusClass}`}
+                            >
+                              {statusLabel[status] || status}
+                            </span>
+                            {status === "completed" &&
+                              Number(payment.amount) > 0 &&
+                              payment.payment_type !== "refund" && (
+                                <RefundPaymentButton
+                                  bookingId={Number(booking.id)}
+                                  paymentId={Number(payment.id)}
+                                  maxAmount={Math.min(
+                                    Number(payment.amount) || 0,
+                                    Number(booking.net_received ?? booking.amount_paid) || 0,
+                                  )}
+                                  currency={payment.currency || booking.currency}
+                                  gatewayRefundAvailable={Boolean(payment.gateway_refund_available)}
+                                  gatewayLabel={payment.payment_method_label || payment.gateway}
+                                />
+                              )}
+                          </div>
                         </div>
                       );
                     })}
@@ -1415,6 +1548,60 @@ const ViewBooking: React.FC = () => {
                 </Card>
               )}
 
+            {/* Pickup point chosen at checkout */}
+            {(booking as any).pickup_point?.name && (
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <MapPin className="w-4 h-4" />
+                    {__("Pickup point", "yatra")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    {(booking as any).pickup_point.name}
+                    {(booking as any).pickup_point.time
+                      ? ` — ${(booking as any).pickup_point.time}`
+                      : ""}
+                  </p>
+                  {(booking as any).pickup_point.details && (
+                    <p className="mt-1 text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
+                      {(booking as any).pickup_point.details}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Accommodation option + travel insurance answer (3.3) */}
+            {((booking as any).accommodation?.name || (booking as any).travel_insurance) && (
+              <Card data-testid="booking-checkout-choices">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">
+                    {__("Stay & insurance", "yatra")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-1 text-sm">
+                  {(booking as any).accommodation?.name && (
+                    <p className="text-gray-900 dark:text-white">
+                      <span className="text-gray-500 dark:text-gray-400">{__("Accommodation", "yatra")}: </span>
+                      {(booking as any).accommodation.name}
+                    </p>
+                  )}
+                  {(booking as any).travel_insurance && (
+                    <p className="text-gray-900 dark:text-white">
+                      <span className="text-gray-500 dark:text-gray-400">
+                        {((booking as any).travel_insurance.title || __("Travel insurance", "yatra")) + ": "}
+                      </span>
+                      {(booking as any).travel_insurance.accepted
+                        ? __("Added", "yatra")
+                        : __("Declined by the customer", "yatra")}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
             {/* Notes */}
             {booking.notes && (
               <Card>
@@ -1467,7 +1654,15 @@ const ViewBooking: React.FC = () => {
                             <span
                               className={`inline-flex items-center px-3 py-1 rounded-md text-sm font-medium ${statusClass}`}
                             >
-                              {status}
+                              {status === "synced"
+                                ? __("Synced", "yatra")
+                                : status === "failed"
+                                  ? __("Failed", "yatra")
+                                  : status === "pending"
+                                    ? __("Pending", "yatra")
+                                    : status === "not_synced"
+                                      ? __("Not synced", "yatra")
+                                      : status}
                             </span>
                           </div>
 
@@ -1517,6 +1712,14 @@ const ViewBooking: React.FC = () => {
                 </Card>
               )}
 
+            {/* Travel agency (Pro module) */}
+            {isModuleActive("travel_agency") && booking?.id ? (
+              <TravelAgencyPanel
+                bookingId={Number(booking.id)}
+                canEdit={can("yatra_edit_bookings")}
+              />
+            ) : null}
+
             {/* Payment Information */}
             <Card>
               <CardHeader className="pb-2">
@@ -1546,7 +1749,7 @@ const ViewBooking: React.FC = () => {
                 )}
                 <div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
-                    {__("Trip Price per Person", "yatra")}
+                    {__("Average Trip Price per Person", "yatra")}
                     {((v) => v === true || parseInt(String(v), 10) === 1)(
                       (booking as any).tax_inclusive,
                     ) && (
@@ -1586,9 +1789,20 @@ const ViewBooking: React.FC = () => {
                         : 0;
 
                       const baseTripCost = subtotal - servicesTotal;
-                      return formatPrice(
-                        baseTripCost / travelers,
-                        booking.currency,
+                      const adjusted =
+                        Array.isArray((booking as any).price_adjustments) &&
+                        (booking as any).price_adjustments.length > 0;
+                      return (
+                        <>
+                          {formatPrice(baseTripCost / travelers, booking.currency)}
+                          {/* The total below includes discounts/surcharges added
+                              later; say this figure is from before them. */}
+                          {adjusted && (
+                            <span className="block text-xs text-gray-500 dark:text-gray-400">
+                              {__("Before price adjustments", "yatra")}
+                            </span>
+                          )}
+                        </>
                       );
                     })()}
                   </div>
@@ -1665,6 +1879,13 @@ const ViewBooking: React.FC = () => {
                 </CardContent>
               </Card>
             )}
+
+            <CustomerRequestsCard
+              bookingId={Number(booking.id)}
+              requests={(booking as any).customer_requests || []}
+            />
+
+            <BookingActivityCard bookingId={Number(booking.id)} />
 
             {/* Consent Status Card - Only show if Pro is active and there are consent forms */}
             {isPro && consentStatus && consentStatus.total_required > 0 && (

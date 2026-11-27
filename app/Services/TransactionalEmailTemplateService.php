@@ -10,6 +10,9 @@ namespace Yatra\Services;
  */
 class TransactionalEmailTemplateService
 {
+    /** True while an email is being sent in the customer's booking language. */
+    private static bool $languageSwitched = false;
+
     public const TYPE_BOOKING_CONFIRMATION = 'booking_confirmation';
 
     public const TYPE_PAYMENT_CONFIRMATION = 'payment_confirmation';
@@ -551,6 +554,43 @@ class TransactionalEmailTemplateService
      */
     public static function sendIfEnabled(string $type, string $to, array $variables = []): bool
     {
+        /**
+         * Who receives this email. Return a different address, or a list to
+         * send the same email to each address separately (e.g. a travel
+         * agency's bookings: tour emails to the guest, payment emails to the
+         * agency). An empty value sends nothing.
+         *
+         * @param string $to        Recipient chosen by Yatra.
+         * @param string $type      Email type (TYPE_* constant value).
+         * @param array  $variables The email's merge tags (booking_id when about a booking).
+         * @since 3.2.0
+         */
+        $recipients = apply_filters('yatra_transactional_email_recipients', $to, $type, $variables);
+        if (is_array($recipients)) {
+            $sent = false;
+            $seen = [];
+            foreach ($recipients as $recipient) {
+                $recipient = sanitize_email((string) $recipient);
+                if ($recipient === '' || isset($seen[strtolower($recipient)])) {
+                    continue;
+                }
+                $seen[strtolower($recipient)] = true;
+                if (self::sendToOne($type, $recipient, $variables)) {
+                    $sent = true;
+                }
+            }
+
+            return $sent;
+        }
+
+        return self::sendToOne($type, (string) $recipients, $variables);
+    }
+
+    /**
+     * @param array<string, string|int|float> $variables
+     */
+    private static function sendToOne(string $type, string $to, array $variables): bool
+    {
         $to = sanitize_email($to);
         if ($to === '' || !is_email($to)) {
             return false;
@@ -598,6 +638,60 @@ class TransactionalEmailTemplateService
             }
         }
 
+        // A customer email goes out in the language the customer booked in
+        // (WPML / Polylang), whatever language the admin screen or cron run
+        // sending it is in. Emails to the operator keep the site language.
+        if (!self::$languageSwitched && strpos($type, 'admin') !== false && class_exists(\Yatra\Multilingual\Multilingual::class)
+            && \Yatra\Multilingual\Multilingual::isTranslating()) {
+            // An operator email triggered by a German visitor's checkout.
+            self::$languageSwitched = true;
+            \Yatra\Multilingual\Multilingual::switchTo(\Yatra\Multilingual\Multilingual::defaultLanguage());
+            try {
+                return self::sendIfEnabled($type, $to, $variables);
+            } finally {
+                \Yatra\Multilingual\Multilingual::restore();
+                self::$languageSwitched = false;
+            }
+        }
+        if (!self::$languageSwitched && strpos($type, 'admin') === false && class_exists(\Yatra\Multilingual\Multilingual::class)) {
+            $bookingLang = \Yatra\Multilingual\Multilingual::bookingLanguage((int) ($variables['booking_id'] ?? 0));
+            if ($bookingLang === '') {
+                // No language stored (older booking, or checkout before it is
+                // saved): the visitor's, never the admin screen's language filter.
+                $bookingLang = \Yatra\Multilingual\Multilingual::visitorLanguage();
+            }
+            if ($bookingLang !== '' && (
+                $bookingLang !== \Yatra\Multilingual\Multilingual::currentLanguage()
+                || \Yatra\Multilingual\Multilingual::localeOf($bookingLang) !== determine_locale()
+            )) {
+                self::$languageSwitched = true;
+                \Yatra\Multilingual\Multilingual::switchTo($bookingLang);
+                try {
+                    return self::sendIfEnabled($type, $to, $variables);
+                } finally {
+                    \Yatra\Multilingual\Multilingual::restore();
+                    self::$languageSwitched = false;
+                }
+            }
+        }
+        if (class_exists(\Yatra\Multilingual\Multilingual::class) && \Yatra\Multilingual\Multilingual::isTranslating()
+            && !empty($variables['trip_name']) && (int) ($variables['trip_id'] ?? 0) > 0) {
+            $original = (string) $variables['trip_name'];
+            $translated = \Yatra\Multilingual\Multilingual::translate(
+                $original,
+                \Yatra\Multilingual\TripStrings::hint((int) $variables['trip_id'], 'title')
+            );
+            $variables['trip_name'] = $translated;
+            // Ready-made blocks (booking details tables etc.) carry the title too.
+            if ($translated !== $original) {
+                foreach ($variables as $k => $v) {
+                    if (is_string($v) && $k !== 'trip_name' && strpos($v, $original) !== false) {
+                        $variables[$k] = str_replace([$original, esc_html($original)], [$translated, esc_html($translated)], $v);
+                    }
+                }
+            }
+        }
+
         $variables = self::mergeDefaultVariables($variables);
         $variables = self::normalizeVariablesForType($type, $variables);
 
@@ -614,6 +708,19 @@ class TransactionalEmailTemplateService
         try {
             $handled = apply_filters('yatra_send_transactional_email', null, $type, $to, $variables);
             if ($handled !== null) {
+                /**
+                 * A transactional email Yatra Pro (or an extension) sent in
+                 * core's place. Fired so the booking history records it like
+                 * any other email; `yatra_transactional_email_sent` is not
+                 * fired here because Pro logs its own sends.
+                 *
+                 * @param string               $type
+                 * @param string               $to
+                 * @param bool                 $sent
+                 * @param array<string, mixed> $variables
+                 */
+                do_action('yatra_transactional_email_handled', $type, $to, (bool) $handled, $variables);
+
                 return (bool) $handled;
             }
 
@@ -671,7 +778,46 @@ class TransactionalEmailTemplateService
         $subjectTpl = SettingsService::getString($subjectKey, '');
         $bodyTpl = SettingsService::getString($bodyKey, '');
 
+        // A customised template in the customer's language (WPML / Polylang
+        // string translation). Empty templates use the built-in wording,
+        // which follows the locale already.
+        if (class_exists(\Yatra\Multilingual\Multilingual::class) && \Yatra\Multilingual\Multilingual::isTranslating()) {
+            $subjectTpl = \Yatra\Multilingual\Multilingual::translate($subjectTpl, self::translationHint($subjectKey));
+            $bodyTpl = \Yatra\Multilingual\Multilingual::translate($bodyTpl, self::translationHint($bodyKey));
+        }
+
         return self::renderWithStringTemplates($type, $subjectTpl, $bodyTpl, $variables);
+    }
+
+    private static function translationHint(string $settingKey): string
+    {
+        return 'Email ' . $settingKey;
+    }
+
+    /**
+     * Customised customer email subjects and bodies, for the multilingual
+     * plugin's string translation screen. Emails to the operator stay in the
+     * site language and are left out.
+     *
+     * @return array<int, array{0:string, 1:string, 2:bool}> [text, hint, multiline]
+     */
+    public static function customerTemplateTextsForTranslation(): array
+    {
+        $out = [];
+        foreach (self::typeToSettingsKeys() as $type => $keys) {
+            if (strpos((string) $type, 'admin') !== false) {
+                continue;
+            }
+            foreach (['subject' => false, 'body' => true] as $part => $multiline) {
+                $key = isset($keys[$part]) && is_string($keys[$part]) ? $keys[$part] : '';
+                $value = $key !== '' ? SettingsService::getString($key, '') : '';
+                if (trim($value) !== '') {
+                    $out[] = [$value, self::translationHint($key), $multiline];
+                }
+            }
+        }
+
+        return $out;
     }
 
     /**
@@ -1109,6 +1255,23 @@ class TransactionalEmailTemplateService
         }
     }
 
+    /** The trip's code for {{trip_code}} ('' when none). @since 3.3.0 */
+    private static function tripCodeOf(int $tripId): string
+    {
+        if ($tripId <= 0 || !class_exists(\Yatra\Repositories\TripRepository::class)) {
+            return '';
+        }
+        $row = (new \Yatra\Repositories\TripRepository())->find($tripId);
+        if (!$row) {
+            return '';
+        }
+        try {
+            return \Yatra\Models\Trip::fromStdClass($row)->getTripCode();
+        } catch (\Throwable $e) {
+            return '';
+        }
+    }
+
     /**
      * Build variables from a booking row (admin / cron).
      *
@@ -1143,6 +1306,7 @@ class TransactionalEmailTemplateService
             // for {{trip_id}}; "0" when the booking has no trip.
             'trip_id' => (string) (int) ($booking->trip_id ?? 0),
             'trip_name' => (string) ($booking->trip_title ?? ''),
+            'trip_code' => self::tripCodeOf((int) ($booking->trip_id ?? 0)),
             'trip_url' => !empty($booking->trip_slug)
                 ? home_url('/' . SettingsService::getTripBase() . '/' . rawurlencode((string) $booking->trip_slug) . '/')
                 : home_url('/'),
@@ -1162,11 +1326,14 @@ class TransactionalEmailTemplateService
             'total_amount' => yatra_format_price((float) ($booking->total_amount ?? 0), null, false),
             'balance_due' => yatra_format_price((float) ($booking->amount_due ?? 0), null, false),
             'amount_due' => yatra_format_price((float) ($booking->amount_due ?? 0), null, false),
+            // The plain number, for "is anything still due?" decisions.
+            'amount_due_value' => (string) round((float) ($booking->amount_due ?? 0), 2),
             'amount_paid' => yatra_format_price((float) ($booking->amount_paid ?? 0), null, false),
             'amount_paid_formatted' => yatra_format_price((float) ($booking->amount_paid ?? 0), null, false),
             'currency' => $currency,
-            'booking_status' => (string) ($booking->status ?? ''),
-            'payment_status' => (string) ($booking->payment_status ?? ''),
+            // Readable labels ("Confirmed", "Partially paid"), not stored keys.
+            'booking_status' => BookingActivityService::statusLabel((string) ($booking->status ?? '')),
+            'payment_status' => BookingActivityService::statusLabel((string) ($booking->payment_status ?? '')),
             'admin_url' => admin_url('admin.php?page=yatra'),
         ];
 

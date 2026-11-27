@@ -70,6 +70,36 @@ if (!defined('ABSPATH')) {
                 </div>
             </div>
 
+            <?php
+            $yatra_enquiry_custom_fields = class_exists('\\Yatra\\Services\\EnquiryCustomFields') ? \Yatra\Services\EnquiryCustomFields::fields() : [];
+            foreach ($yatra_enquiry_custom_fields as $yatra_ecf) :
+                $yatra_ecf_name = \Yatra\Services\EnquiryCustomFields::INPUT_PREFIX . $yatra_ecf['id'];
+                $yatra_ecf_dom = 'enquiry-cf-' . $yatra_ecf['id'];
+                ?>
+                <div class="yatra-enquiry-field yatra-enquiry-field--custom" data-type="<?php echo esc_attr($yatra_ecf['type']); ?>">
+                    <?php if ($yatra_ecf['type'] === 'checkbox') : ?>
+                        <label class="yatra-enquiry-label yatra-enquiry-checkbox" for="<?php echo esc_attr($yatra_ecf_dom); ?>" style="display:flex;gap:8px;align-items:flex-start;font-weight:normal;">
+                            <input type="checkbox" id="<?php echo esc_attr($yatra_ecf_dom); ?>" name="<?php echo esc_attr($yatra_ecf_name); ?>" value="1"<?php echo $yatra_ecf['required'] ? ' required' : ''; ?> style="margin-top:3px;">
+                            <span><?php echo esc_html($yatra_ecf['label']); ?><?php if ($yatra_ecf['required']) : ?> <span class="yatra-enquiry-required">*</span><?php endif; ?></span>
+                        </label>
+                    <?php else : ?>
+                        <label for="<?php echo esc_attr($yatra_ecf_dom); ?>" class="yatra-enquiry-label"><?php echo esc_html($yatra_ecf['label']); ?><?php if ($yatra_ecf['required']) : ?> <span class="yatra-enquiry-required">*</span><?php endif; ?></label>
+                        <?php if ($yatra_ecf['type'] === 'textarea') : ?>
+                            <textarea id="<?php echo esc_attr($yatra_ecf_dom); ?>" name="<?php echo esc_attr($yatra_ecf_name); ?>" class="yatra-enquiry-textarea" rows="2" maxlength="2000"<?php echo $yatra_ecf['required'] ? ' required' : ''; ?>></textarea>
+                        <?php elseif ($yatra_ecf['type'] === 'select') : ?>
+                            <select id="<?php echo esc_attr($yatra_ecf_dom); ?>" name="<?php echo esc_attr($yatra_ecf_name); ?>" class="yatra-enquiry-input"<?php echo $yatra_ecf['required'] ? ' required' : ''; ?>>
+                                <option value=""><?php esc_html_e('Select an option', 'yatra'); ?></option>
+                                <?php foreach ($yatra_ecf['options'] as $yatra_ecf_opt) : ?>
+                                    <option value="<?php echo esc_attr($yatra_ecf_opt); ?>"><?php echo esc_html($yatra_ecf_opt); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        <?php else : ?>
+                            <input type="text" id="<?php echo esc_attr($yatra_ecf_dom); ?>" name="<?php echo esc_attr($yatra_ecf_name); ?>" class="yatra-enquiry-input" maxlength="500"<?php echo $yatra_ecf['required'] ? ' required' : ''; ?>>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+
             <div class="yatra-enquiry-field">
                 <label for="enquiry-message" class="yatra-enquiry-label"><?php esc_html_e('Message', 'yatra'); ?> <span class="yatra-enquiry-required">*</span></label>
                 <textarea id="enquiry-message" name="message" class="yatra-enquiry-textarea" rows="3" placeholder="<?php esc_attr_e('Tell us about your travel plans, special requirements, or any questions you have...', 'yatra'); ?>" required></textarea>

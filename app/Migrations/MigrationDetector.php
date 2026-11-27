@@ -277,12 +277,25 @@ class MigrationDetector
 
     private function countOldProGoogleCalendar(): int
     {
-        $token = get_option('yatra_google_calendar_refresh_token', '');
-        if (is_string($token) && $token !== '') {
-            return 1;
-        }
+        // Keys only Yatra Pro 2.x wrote.
         $enabled = get_option('yatra_enable_google_calendar', '');
         if ($enabled !== '' && $enabled !== null) {
+            return 1;
+        }
+        $expiresIn = get_option('yatra_google_calendar_expires_in', '');
+        if ($expiresIn !== '' && $expiresIn !== null && $expiresIn !== false) {
+            return 1;
+        }
+
+        // Yatra Pro 3.x stores its refresh token under the SAME name, so a
+        // token alone is legacy only when 3.x hasn't set the connection up
+        // (it always writes the expiry and the calendar choice). Before, every
+        // 3.x site that connected Google Calendar was told it had Yatra 2.x
+        // data to migrate.
+        $token = get_option('yatra_google_calendar_refresh_token', '');
+        if (is_string($token) && $token !== ''
+            && get_option('yatra_google_calendar_token_expires_at', '') === ''
+            && get_option('yatra_google_calendar_calendar_id', '') === '') {
             return 1;
         }
 

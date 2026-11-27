@@ -664,6 +664,59 @@ class Trip
     }
 
     /**
+     * The trip's own reference code (e.g. "ABC-12"), or ''. Stored as
+     * custom_fields['trip_code']. @since 3.3.0
+     */
+    public function getTripCode(): string
+    {
+        $code = is_array($this->custom_fields) ? trim((string) ($this->custom_fields['trip_code'] ?? '')) : '';
+        if ($code === '' && is_string($this->trip_code)) {
+            $code = trim($this->trip_code);
+        }
+
+        return sanitize_text_field($code);
+    }
+
+    /**
+     * The trip's custom booking link (book on another site / system), or ''.
+     * Stored as custom_fields['external_booking_url']; Yatra 2.x "External"
+     * trips are migrated into it. Enquiry-only mode wins when both are set.
+     *
+     * @since 3.3.0
+     */
+    public function getExternalBookingUrl(): string
+    {
+        if ($this->isBookingDisabled()) {
+            return '';
+        }
+        $url = is_array($this->custom_fields) ? trim((string) ($this->custom_fields['external_booking_url'] ?? '')) : '';
+        // A plain link (no DNS lookup, which wp_http_validate_url() would do on
+        // every page view and which fails for hosts this server can't resolve).
+        if ($url === '' || !preg_match('#^https?://#i', $url) || filter_var($url, FILTER_VALIDATE_URL) === false
+            || (string) wp_parse_url($url, PHP_URL_HOST) === '') {
+            return '';
+        }
+
+        return (string) apply_filters('yatra_trip_external_booking_url', esc_url_raw($url), $this);
+    }
+
+    /** Button text for the custom booking link ("Book Now" by default). @since 3.3.0 */
+    public function getExternalBookingLabel(): string
+    {
+        $label = is_array($this->custom_fields) ? trim(sanitize_text_field((string) ($this->custom_fields['external_booking_button_text'] ?? ''))) : '';
+
+        return $label !== '' ? $label : __('Book Now', 'yatra');
+    }
+
+    /** Open the custom booking link in a new tab (default yes). @since 3.3.0 */
+    public function opensExternalBookingInNewTab(): bool
+    {
+        $v = is_array($this->custom_fields) ? ($this->custom_fields['external_booking_new_tab'] ?? true) : true;
+
+        return !($v === false || $v === 0 || $v === '0' || $v === 'false');
+    }
+
+    /**
      * Returns true when the trip is set to enquiry-only (booking calendar disabled).
      * Stored as custom_fields['disable_booking'] = true. Requires Pro to be active.
      */
@@ -719,7 +772,23 @@ class Trip
      */
     public function getTitle(): string
     {
-        return !empty($this->title) ? $this->title : __('Untitled Trip', 'yatra');
+        return !empty($this->title)
+            ? self::inVisitorLanguage((string) $this->title, (int) ($this->id ?? 0), 'title')
+            : __('Untitled Trip', 'yatra');
+    }
+
+    /**
+     * A trip text in the visitor's language when WPML / Polylang is active
+     * and a translation exists (trip cards, listings, blocks); otherwise the
+     * text as stored.
+     */
+    private static function inVisitorLanguage(string $value, int $tripId, string $field): string
+    {
+        if ($tripId <= 0 || !class_exists('\\Yatra\\Multilingual\\Multilingual') || !\Yatra\Multilingual\Multilingual::isTranslating()) {
+            return $value;
+        }
+
+        return \Yatra\Multilingual\Multilingual::translate($value, \Yatra\Multilingual\TripStrings::hint($tripId, $field));
     }
 
     /**
@@ -727,7 +796,9 @@ class Trip
      */
     public function getShortDescription(): ?string
     {
-        return !empty($this->short_description) ? $this->short_description : null;
+        return !empty($this->short_description)
+            ? self::inVisitorLanguage((string) $this->short_description, (int) ($this->id ?? 0), 'short_description')
+            : null;
     }
 
     /**
@@ -839,7 +910,33 @@ class Trip
     public function getDestinations(): array
     {
         // This will be populated by the repository when loading trip data
-        return $this->destinations ?? [];
+        return self::termsInVisitorLanguage($this->destinations ?? []);
+    }
+
+    /**
+     * Term names in the visitor's language (WPML / Polylang); copies, so the
+     * loaded trip keeps its original data.
+     *
+     * @param mixed $terms
+     * @return mixed
+     */
+    private static function termsInVisitorLanguage($terms)
+    {
+        if (!is_array($terms) || $terms === [] || !class_exists('\\Yatra\\Multilingual\\Multilingual') || !\Yatra\Multilingual\Multilingual::isTranslating()) {
+            return $terms;
+        }
+        foreach ($terms as $i => $term) {
+            if (is_object($term) && isset($term->name) && is_string($term->name)) {
+                $term = clone $term;
+                $term->name = \Yatra\Multilingual\Multilingual::translateTerm($term->name);
+                $terms[$i] = $term;
+            } elseif (is_array($term) && isset($term['name']) && is_string($term['name'])) {
+                $term['name'] = \Yatra\Multilingual\Multilingual::translateTerm($term['name']);
+                $terms[$i] = $term;
+            }
+        }
+
+        return $terms;
     }
 
     /**
@@ -850,11 +947,11 @@ class Trip
         // Handle both property names for backward compatibility
         // AppServiceProvider uses 'categories', TripRepository uses 'trip_category'
         if (!empty($this->categories)) {
-            return $this->categories;
+            return self::termsInVisitorLanguage($this->categories);
         }
         
         if (!empty($this->trip_category)) {
-            return $this->trip_category;
+            return self::termsInVisitorLanguage($this->trip_category);
         }
         
         return [];
@@ -1156,7 +1253,7 @@ class Trip
     public function getActivities(): array
     {
         // This will be populated by the repository when loading trip data
-        return $this->activities ?? [];
+        return self::termsInVisitorLanguage($this->activities ?? []);
     }
 
     /**
@@ -1483,7 +1580,7 @@ class Trip
      */
     public function getDescription(): string
     {
-        return $this->description ?? '';
+        return self::inVisitorLanguage((string) ($this->description ?? ''), (int) ($this->id ?? 0), 'description');
     }
 
     /**

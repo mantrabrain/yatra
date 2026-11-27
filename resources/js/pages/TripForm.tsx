@@ -64,6 +64,7 @@ import {
   Eye,
   X,
   Trash2,
+  ExternalLink,
   Users,
   Box,
   BarChart3,
@@ -111,6 +112,7 @@ import { MultiSelect } from "../components/ui/multi-select";
 import { TestimonialsSelector } from "../components/trip-form/TestimonialsSelector";
 import { LocationPicker } from "../components/trip-form/LocationPicker";
 import { ProFeature, ProBadge } from "../components/ProFeature";
+import { isModuleActive } from "../lib/plugin-utils";
 import { getErrorContext } from "../lib/errors";
 import {
   buildYatraSinglePublicUrls,
@@ -413,6 +415,22 @@ interface TripFormData {
   visa_requirements: string;
   vaccination_requirements: string;
   disable_booking: boolean; // Pro: enquiry-only mode (stored in custom_fields)
+  private_trip_enabled: boolean; // Pro Private Trips (custom_fields)
+  private_trip_fee: string;
+  private_trip_fee_per: string; // "booking" | "person"
+  pickup_points: Array<{ id: string; name: string; time: string; details: string }>; // custom_fields (3.3)
+  pickup_required: boolean;
+  accommodation_options: Array<{ id: string; name: string; description: string; price: string; price_per: string }>; // custom_fields (3.3)
+  travel_insurance_disabled: boolean; // custom_fields (3.3)
+  group_price_tiers: Array<{ min: string; max: string; price: string }>; // custom_fields (3.3)
+  countdown_mode: string; // custom_fields (3.3, Pro Countdown & Social Proof): off | date | next_departure
+  countdown_ends_at: string;
+  countdown_label: string;
+  guide_ids: number[]; // custom_fields (3.3, Pro Guides & Resources)
+  external_booking_url: string; // custom_fields (3.3): book on another site
+  external_booking_button_text: string;
+  external_booking_new_tab: boolean;
+  trip_code: string; // custom_fields (3.3)
 
   // Fallback Settings (for trips without availability dates/rules)
   has_default_time_slots: boolean; // For day tours: enable multiple time slots
@@ -770,6 +788,22 @@ const TripForm: React.FC = () => {
       vaccination_requirements:
         "No mandatory vaccinations. Recommended: Hepatitis A, Typhoid, and routine vaccinations.",
       disable_booking: false,
+      private_trip_enabled: false,
+      private_trip_fee: "",
+      private_trip_fee_per: "booking",
+      pickup_points: [],
+      pickup_required: false,
+      accommodation_options: [],
+      travel_insurance_disabled: false,
+      group_price_tiers: [],
+      countdown_mode: "off",
+      countdown_ends_at: "",
+      countdown_label: "",
+      guide_ids: [],
+      external_booking_url: "",
+      external_booking_button_text: "",
+      external_booking_new_tab: true,
+      trip_code: "",
       has_default_time_slots: false,
       default_time_slots: [],
       departure_time: "",
@@ -1023,6 +1057,22 @@ const TripForm: React.FC = () => {
       vaccination_requirements:
         "Recommended: Hepatitis A, Typhoid, Japanese Encephalitis, and routine vaccinations. Consult with travel health clinic.",
       disable_booking: false,
+      private_trip_enabled: false,
+      private_trip_fee: "",
+      private_trip_fee_per: "booking",
+      pickup_points: [],
+      pickup_required: false,
+      accommodation_options: [],
+      travel_insurance_disabled: false,
+      group_price_tiers: [],
+      countdown_mode: "off",
+      countdown_ends_at: "",
+      countdown_label: "",
+      guide_ids: [],
+      external_booking_url: "",
+      external_booking_button_text: "",
+      external_booking_new_tab: true,
+      trip_code: "",
       has_default_time_slots: false,
       default_time_slots: [],
       departure_time: "",
@@ -1287,6 +1337,22 @@ const TripForm: React.FC = () => {
       vaccination_requirements:
         "No mandatory vaccinations. Routine vaccinations recommended.",
       disable_booking: false,
+      private_trip_enabled: false,
+      private_trip_fee: "",
+      private_trip_fee_per: "booking",
+      pickup_points: [],
+      pickup_required: false,
+      accommodation_options: [],
+      travel_insurance_disabled: false,
+      group_price_tiers: [],
+      countdown_mode: "off",
+      countdown_ends_at: "",
+      countdown_label: "",
+      guide_ids: [],
+      external_booking_url: "",
+      external_booking_button_text: "",
+      external_booking_new_tab: true,
+      trip_code: "",
       has_default_time_slots: false,
       default_time_slots: [],
       departure_time: "",
@@ -1516,6 +1582,22 @@ const TripForm: React.FC = () => {
     visa_requirements: "Schengen visa",
     vaccination_requirements: "COVID-19 vaccination",
     disable_booking: false,
+    private_trip_enabled: false,
+    private_trip_fee: "",
+    private_trip_fee_per: "booking",
+    pickup_points: [],
+    pickup_required: false,
+    accommodation_options: [],
+    travel_insurance_disabled: false,
+    group_price_tiers: [],
+    countdown_mode: "off",
+    countdown_ends_at: "",
+    countdown_label: "",
+    guide_ids: [],
+    external_booking_url: "",
+    external_booking_button_text: "",
+    external_booking_new_tab: true,
+    trip_code: "",
     has_default_time_slots: false,
     default_time_slots: [],
     departure_time: "09:00",
@@ -1676,6 +1758,22 @@ const TripForm: React.FC = () => {
   }, []);
 
   const isEditMode = action === "edit" && tripId !== null;
+
+  // Guides to pick for the trip page (Pro Guides & Resources, 3.3).
+  const guidesModuleOn = isModuleActive("guides_resources");
+  const { data: guideOptions } = useQuery({
+    queryKey: ["resources", "guide"],
+    queryFn: async () => {
+      try {
+        const res: any = await apiClient.get("/resources", { params: { type: "guide", active: 1 } });
+        const items = res?.data?.data || res?.data || res || [];
+        return Array.isArray(items) ? (items as Array<{ id: number; name: string }>) : [];
+      } catch {
+        return [];
+      }
+    },
+    enabled: guidesModuleOn,
+  });
 
   // Fetch traveler categories - LAZY LOAD: only when pricing section is visited
   const { data: travelerCategoriesData, isLoading: isLoadingCategories } =
@@ -2275,6 +2373,75 @@ const TripForm: React.FC = () => {
       visa_requirements: tripData.visa_requirements || "",
       vaccination_requirements: tripData.vaccination_requirements || "",
       disable_booking: Boolean(tripData.custom_fields?.disable_booking),
+      private_trip_enabled:
+        tripData.custom_fields?.private_trip_enabled === true ||
+        tripData.custom_fields?.private_trip_enabled === 1 ||
+        tripData.custom_fields?.private_trip_enabled === "1",
+      private_trip_fee:
+        tripData.custom_fields?.private_trip_fee !== undefined &&
+        tripData.custom_fields?.private_trip_fee !== null
+          ? String(tripData.custom_fields.private_trip_fee)
+          : "",
+      private_trip_fee_per:
+        tripData.custom_fields?.private_trip_fee_per === "person"
+          ? "person"
+          : "booking",
+      pickup_points: Array.isArray(tripData.custom_fields?.pickup_points)
+        ? tripData.custom_fields.pickup_points
+            .filter((p: any) => p && typeof p.name === "string")
+            .map((p: any, i: number) => ({
+              id: String(p.id || `p${i + 1}`),
+              name: String(p.name || ""),
+              time: String(p.time || ""),
+              details: String(p.details || ""),
+            }))
+        : [],
+      pickup_required:
+        tripData.custom_fields?.pickup_required === true ||
+        tripData.custom_fields?.pickup_required === 1 ||
+        tripData.custom_fields?.pickup_required === "1",
+      accommodation_options: Array.isArray(tripData.custom_fields?.accommodation_options)
+        ? tripData.custom_fields.accommodation_options
+            .filter((a: any) => a && typeof a.name === "string")
+            .map((a: any, i: number) => ({
+              id: String(a.id || `a${i + 1}`),
+              name: String(a.name || ""),
+              description: String(a.description || ""),
+              price: a.price === undefined || a.price === null ? "" : String(a.price),
+              price_per: a.price_per === "booking" ? "booking" : "person",
+            }))
+        : [],
+      countdown_mode: ["date", "next_departure"].includes(String(tripData.custom_fields?.countdown_mode))
+        ? String(tripData.custom_fields?.countdown_mode)
+        : "off",
+      countdown_ends_at: String(tripData.custom_fields?.countdown_ends_at || ""),
+      countdown_label: String(tripData.custom_fields?.countdown_label || ""),
+      guide_ids: Array.isArray(tripData.custom_fields?.guide_ids)
+        ? tripData.custom_fields.guide_ids.map((x: any) => parseInt(String(x), 10)).filter((x: number) => x > 0)
+        : [],
+      group_price_tiers: Array.isArray(tripData.custom_fields?.group_price_tiers)
+        ? tripData.custom_fields.group_price_tiers
+            .filter((t: any) => t && t.price !== undefined)
+            .map((t: any) => ({
+              min: t.min === undefined || t.min === null ? "" : String(t.min),
+              max: t.max === undefined || t.max === null ? "" : String(t.max),
+              price: String(t.price),
+            }))
+        : [],
+      travel_insurance_disabled:
+        tripData.custom_fields?.travel_insurance_disabled === true ||
+        tripData.custom_fields?.travel_insurance_disabled === 1 ||
+        tripData.custom_fields?.travel_insurance_disabled === "1",
+      trip_code: String(tripData.custom_fields?.trip_code || ""),
+      external_booking_url: String(tripData.custom_fields?.external_booking_url || ""),
+      external_booking_button_text: String(
+        tripData.custom_fields?.external_booking_button_text || "",
+      ),
+      external_booking_new_tab: !(
+        tripData.custom_fields?.external_booking_new_tab === false ||
+        tripData.custom_fields?.external_booking_new_tab === 0 ||
+        tripData.custom_fields?.external_booking_new_tab === "0"
+      ),
       // tinyint(1) columns can serialize from PHP/wpdb as the string "0"/"1".
       // JS treats "0" as truthy, so a plain `value || false` would leave the
       // checkbox stuck on after the user un-checked + saved. Coerce explicitly.
@@ -3411,7 +3578,73 @@ const TripForm: React.FC = () => {
         min_travelers: data.min_travelers ? parseInt(data.min_travelers) : null,
         booking_deadline_hours: data.booking_deadline_hours || null,
         cancellation_policy: data.cancellation_policy || "",
-        custom_fields: { disable_booking: data.disable_booking },
+        custom_fields: {
+          disable_booking: data.disable_booking,
+          private_trip_enabled: data.private_trip_enabled,
+          private_trip_fee:
+            data.private_trip_fee !== "" &&
+            !isNaN(parseFloat(data.private_trip_fee))
+              ? Math.max(0, parseFloat(data.private_trip_fee))
+              : 0,
+          private_trip_fee_per:
+            data.private_trip_fee_per === "person" ? "person" : "booking",
+          pickup_points: (data.pickup_points || [])
+            .filter((p) => p.name.trim() !== "")
+            .map((p) => ({
+              id: p.id,
+              name: p.name.trim(),
+              time: /^([01]?\d|2[0-3]):[0-5]\d$/.test(p.time) ? p.time : "",
+              details: p.details.trim(),
+            })),
+          pickup_required: Boolean(data.pickup_required),
+          accommodation_options: (data.accommodation_options || [])
+            .filter((a) => a.name.trim() !== "")
+            .map((a) => ({
+              id: a.id,
+              name: a.name.trim(),
+              description: a.description.trim(),
+              price:
+                a.price !== "" && !isNaN(parseFloat(a.price))
+                  ? Math.max(0, parseFloat(a.price))
+                  : 0,
+              price_per: a.price_per === "booking" ? "booking" : "person",
+            })),
+          travel_insurance_disabled: Boolean(data.travel_insurance_disabled),
+          countdown_mode: ["date", "next_departure"].includes(data.countdown_mode)
+            ? data.countdown_mode
+            : "off",
+          countdown_ends_at: /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(data.countdown_ends_at || "")
+            ? data.countdown_ends_at
+            : "",
+          countdown_label: (data.countdown_label || "").trim().slice(0, 60),
+          guide_ids: (data.guide_ids || []).filter((x) => Number.isInteger(x) && x > 0).slice(0, 12),
+          group_price_tiers:
+            data.pricing_type === "regular"
+              ? (data.group_price_tiers || [])
+                  .filter((t) => t.price !== "" && parseFloat(t.price) > 0)
+                  .map((t) => ({
+                    min: Math.max(1, parseInt(t.min, 10) || 1),
+                    max: t.max === "" || isNaN(parseInt(t.max, 10)) ? null : parseInt(t.max, 10),
+                    price: Math.round(parseFloat(t.price) * 100) / 100,
+                  }))
+              : (data.group_price_tiers || []).length
+                ? (data.group_price_tiers || []).map((t) => ({
+                    min: parseInt(t.min, 10) || 1,
+                    max: t.max === "" ? null : parseInt(t.max, 10) || null,
+                    price: parseFloat(t.price) || 0,
+                  }))
+                : [],
+          external_booking_url: /^https?:\/\//i.test(
+            (data.external_booking_url || "").trim(),
+          )
+            ? (data.external_booking_url || "").trim()
+            : "",
+          external_booking_button_text: (
+            data.external_booking_button_text || ""
+          ).trim(),
+          external_booking_new_tab: data.external_booking_new_tab !== false,
+          trip_code: (data.trip_code || "").trim().slice(0, 40),
+        },
         age_min: data.age_min ? parseInt(data.age_min) : null,
         age_max: data.age_max ? parseInt(data.age_max) : null,
         physical_requirements: data.physical_requirements.trim(),
@@ -4194,6 +4427,30 @@ const TripForm: React.FC = () => {
                     {__("Show URL Preview", "yatra")}
                   </button>
                 )}
+              </div>
+
+              {/* Trip code (3.3) */}
+              <div className="mb-4">
+                <label
+                  htmlFor="trip_code"
+                  className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
+                >
+                  {__("Trip code (optional)", "yatra")}
+                </label>
+                <Input
+                  id="trip_code"
+                  value={formData.trip_code}
+                  maxLength={40}
+                  onChange={(e) => handleFieldChange("trip_code", e.target.value)}
+                  placeholder={__("e.g., ABC-12", "yatra")}
+                  className="max-w-xs font-mono text-sm"
+                />
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  {__(
+                    "Your own reference for this trip. Shown in the trip's quick facts and available in emails as {{trip_code}}.",
+                    "yatra",
+                  )}
+                </p>
               </div>
 
               {/* Short Description */}
@@ -6211,6 +6468,322 @@ const TripForm: React.FC = () => {
                 </ProFeature>
               </div>
 
+              {/* SECTION 3c: Private trips (Pro, Private Trips module) */}
+              <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-5 bg-gray-50 dark:bg-gray-800/30">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <Users className="w-4 h-4 text-blue-500" />
+                  {__("Private Trips", "yatra")}
+                  <ProBadge isProActive={isPro} />
+                </h3>
+                <ProFeature
+                  description={__(
+                    "let a group book a departure for themselves",
+                    "yatra",
+                  )}
+                  moduleName={__("Private Trips", "yatra")}
+                  pricingUrl="https://wpyatra.com/pricing?module=private-trips"
+                  isProActive={isPro}
+                  isModuleEnabled={isModuleActive("private_trips")}
+                >
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-3">
+                      <div className="flex items-center h-5 mt-0.5">
+                        <input
+                          id="private_trip_enabled"
+                          type="checkbox"
+                          checked={formData.private_trip_enabled}
+                          onChange={(e) =>
+                            handleFieldChange(
+                              "private_trip_enabled",
+                              e.target.checked,
+                            )
+                          }
+                          className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 cursor-pointer"
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="private_trip_enabled"
+                          className="block text-sm font-medium text-gray-900 dark:text-white cursor-pointer"
+                        >
+                          {__("Allow private bookings", "yatra")}
+                        </label>
+                        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                          {__(
+                            "At checkout the customer can make the trip private: nobody else can then book that departure. Only a departure with no bookings yet can be made private.",
+                            "yatra",
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                    {formData.private_trip_enabled && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label
+                            htmlFor="private_trip_fee"
+                            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                          >
+                            {sprintf(
+                              /* translators: %s: currency symbol */
+                              __("Private trip fee (%s)", "yatra"),
+                              getCurrencySymbol(
+                                (window as any).yatraAdmin?.currency || "USD",
+                              ) || "",
+                            )}
+                          </label>
+                          <Input
+                            id="private_trip_fee"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={formData.private_trip_fee}
+                            onChange={(e) =>
+                              handleFieldChange(
+                                "private_trip_fee",
+                                e.target.value,
+                              )
+                            }
+                            placeholder="0"
+                          />
+                          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                            {__(
+                              "Added to the trip price when the customer makes it private. 0 = no extra charge.",
+                              "yatra",
+                            )}
+                          </p>
+                        </div>
+                        <div>
+                          <label
+                            htmlFor="private_trip_fee_per"
+                            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                          >
+                            {__("Charge the fee", "yatra")}
+                          </label>
+                          <select
+                            id="private_trip_fee_per"
+                            value={formData.private_trip_fee_per}
+                            onChange={(e) =>
+                              handleFieldChange(
+                                "private_trip_fee_per",
+                                e.target.value,
+                              )
+                            }
+                            className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                          >
+                            <option value="booking">
+                              {__("Once per booking", "yatra")}
+                            </option>
+                            <option value="person">
+                              {__("Per traveller", "yatra")}
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </ProFeature>
+              </div>
+
+              {/* SECTION 3c2: Countdown (Pro, Countdown & Social Proof module, 3.3) */}
+              <div
+                className="border border-gray-200 dark:border-gray-700 rounded-lg p-5 bg-gray-50 dark:bg-gray-800/30"
+                data-testid="trip-countdown"
+              >
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-blue-500" />
+                  {__("Countdown", "yatra")}
+                  <ProBadge isProActive={isPro} />
+                </h3>
+                <ProFeature
+                  description={__("show a countdown on the trip page", "yatra")}
+                  moduleName={__("Countdown & Social Proof", "yatra")}
+                  pricingUrl="https://wpyatra.com/pricing?module=social-proof"
+                  isProActive={isPro}
+                  isModuleEnabled={isModuleActive("social_proof")}
+                >
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5" htmlFor="countdown_mode">
+                        {__("Count down to", "yatra")}
+                      </label>
+                      <select
+                        id="countdown_mode"
+                        value={formData.countdown_mode}
+                        onChange={(e) => handleFieldChange("countdown_mode", e.target.value)}
+                        className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                      >
+                        <option value="off">{__("No countdown", "yatra")}</option>
+                        <option value="date">{__("A date and time (e.g. an offer's end)", "yatra")}</option>
+                        <option value="next_departure">{__("The next departure", "yatra")}</option>
+                      </select>
+                    </div>
+                    {formData.countdown_mode === "date" && (
+                      <div>
+                        <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5" htmlFor="countdown_ends_at">
+                          {__("Ends at (site time)", "yatra")}
+                        </label>
+                        <Input
+                          id="countdown_ends_at"
+                          type="datetime-local"
+                          value={formData.countdown_ends_at}
+                          onChange={(e) => handleFieldChange("countdown_ends_at", e.target.value)}
+                        />
+                      </div>
+                    )}
+                    {formData.countdown_mode !== "off" && (
+                      <div>
+                        <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1.5" htmlFor="countdown_label">
+                          {__("Text", "yatra")}
+                        </label>
+                        <Input
+                          id="countdown_label"
+                          maxLength={60}
+                          value={formData.countdown_label}
+                          placeholder={
+                            formData.countdown_mode === "date"
+                              ? __("Offer ends in", "yatra")
+                              : __("Next departure in", "yatra")
+                          }
+                          onChange={(e) => handleFieldChange("countdown_label", e.target.value)}
+                        />
+                      </div>
+                    )}
+                  </div>
+                  {formData.countdown_mode === "date" && (
+                    <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                      {__(
+                        "The countdown only shows the time left; it doesn't change the price. End the offer yourself (or with a Dynamic Pricing rule) at the same time. It disappears when the time is up.",
+                        "yatra",
+                      )}
+                    </p>
+                  )}
+                  {formData.countdown_mode === "next_departure" && (
+                    <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                      {__("For trips with set departure dates; sold-out departures are skipped.", "yatra")}
+                    </p>
+                  )}
+                </ProFeature>
+              </div>
+
+              {guidesModuleOn && (
+                <div
+                  className="border border-gray-200 dark:border-gray-700 rounded-lg p-5 bg-gray-50 dark:bg-gray-800/30"
+                  data-testid="trip-guides"
+                >
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1 flex items-center gap-2">
+                    <Users className="w-4 h-4 text-blue-500" />
+                    {__("Guides on the trip page", "yatra")}
+                  </h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                    {__("Shown as \"Meet your guides\". Add guides under Guides & Resources.", "yatra")}
+                  </p>
+                  {(guideOptions || []).length === 0 ? (
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{__("No guides yet.", "yatra")}</p>
+                  ) : (
+                    <div className="flex flex-wrap gap-3">
+                      {(guideOptions || []).map((g) => (
+                        <label key={g.id} className="flex items-center gap-2 text-sm text-gray-800 dark:text-gray-200">
+                          <input
+                            type="checkbox"
+                            checked={formData.guide_ids.includes(g.id)}
+                            onChange={(e) =>
+                              handleFieldChange(
+                                "guide_ids",
+                                e.target.checked
+                                  ? [...formData.guide_ids, g.id]
+                                  : formData.guide_ids.filter((x) => x !== g.id),
+                              )
+                            }
+                          />
+                          {g.name}
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* SECTION 3d: Custom booking link (3.3) */}
+              <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-5 bg-gray-50 dark:bg-gray-800/30">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1 flex items-center gap-2">
+                  <ExternalLink className="w-4 h-4 text-blue-500" />
+                  {__("Custom Booking Link", "yatra")}
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                  {__(
+                    "Is this trip booked on another website (a partner, an OTA, your own system)? Add the link and the trip page shows a button to it instead of Yatra's calendar and checkout. Leave empty to take bookings here.",
+                    "yatra",
+                  )}
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="md:col-span-2">
+                    <label
+                      htmlFor="external_booking_url"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                    >
+                      {__("Booking link", "yatra")}
+                    </label>
+                    <Input
+                      id="external_booking_url"
+                      type="url"
+                      value={formData.external_booking_url}
+                      onChange={(e) =>
+                        handleFieldChange("external_booking_url", e.target.value)
+                      }
+                      placeholder="https://"
+                    />
+                    {formData.external_booking_url.trim() !== "" &&
+                      !/^https?:\/\//i.test(formData.external_booking_url.trim()) && (
+                        <p className="mt-1 text-xs text-red-600">
+                          {__(
+                            "Enter a full address starting with https:// or http://",
+                            "yatra",
+                          )}
+                        </p>
+                      )}
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="external_booking_button_text"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                    >
+                      {__("Button text", "yatra")}
+                    </label>
+                    <Input
+                      id="external_booking_button_text"
+                      value={formData.external_booking_button_text}
+                      onChange={(e) =>
+                        handleFieldChange(
+                          "external_booking_button_text",
+                          e.target.value,
+                        )
+                      }
+                      placeholder={__("Book Now", "yatra")}
+                    />
+                  </div>
+                  <div className="flex items-center gap-2 pt-6">
+                    <input
+                      type="checkbox"
+                      id="external_booking_new_tab"
+                      checked={formData.external_booking_new_tab}
+                      onChange={(e) =>
+                        handleFieldChange(
+                          "external_booking_new_tab",
+                          e.target.checked,
+                        )
+                      }
+                      className="w-4 h-4 rounded border-gray-300 text-blue-600"
+                    />
+                    <label
+                      htmlFor="external_booking_new_tab"
+                      className="text-sm text-gray-900 dark:text-white"
+                    >
+                      {__("Open in a new tab", "yatra")}
+                    </label>
+                  </div>
+                </div>
+              </div>
+
               {/* SECTION 4: Accommodation */}
               <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-5 bg-gray-50 dark:bg-gray-800/30">
                 <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
@@ -6403,6 +6976,245 @@ const TripForm: React.FC = () => {
                       </div>
                     </>
                   )}
+                </div>
+              </div>
+              {/* SECTION 5b: Pickup points the customer chooses from (3.3) */}
+              <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-5 bg-gray-50 dark:bg-gray-800/30">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1 flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-blue-500" />
+                  {__("Pickup Points", "yatra")}
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                  {__(
+                    "Places the customer can choose to be picked up from at checkout. The choice is shown on the booking, the confirmation page, the departure manifest and in emails ({{pickup_point}}).",
+                    "yatra",
+                  )}
+                </p>
+                <div className="space-y-3">
+                  {formData.pickup_points.map((point, index) => (
+                    <div
+                      key={point.id}
+                      className="grid grid-cols-1 md:grid-cols-12 gap-2 items-start"
+                    >
+                      <div className="md:col-span-4">
+                        <Input
+                          aria-label={__("Pickup point name", "yatra")}
+                          value={point.name}
+                          onChange={(e) => {
+                            const next = [...formData.pickup_points];
+                            next[index] = { ...point, name: e.target.value };
+                            handleFieldChange("pickup_points", next);
+                          }}
+                          placeholder={__("e.g., Hotel Yak & Yeti, Durbar Marg", "yatra")}
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <Input
+                          aria-label={__("Pickup time", "yatra")}
+                          type="time"
+                          value={point.time}
+                          onChange={(e) => {
+                            const next = [...formData.pickup_points];
+                            next[index] = { ...point, time: e.target.value };
+                            handleFieldChange("pickup_points", next);
+                          }}
+                        />
+                      </div>
+                      <div className="md:col-span-5">
+                        <Input
+                          aria-label={__("Directions or notes", "yatra")}
+                          value={point.details}
+                          onChange={(e) => {
+                            const next = [...formData.pickup_points];
+                            next[index] = { ...point, details: e.target.value };
+                            handleFieldChange("pickup_points", next);
+                          }}
+                          placeholder={__("Directions or notes (optional)", "yatra")}
+                        />
+                      </div>
+                      <div className="md:col-span-1">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          aria-label={__("Remove pickup point", "yatra")}
+                          onClick={() =>
+                            handleFieldChange(
+                              "pickup_points",
+                              formData.pickup_points.filter((_, i) => i !== index),
+                            )
+                          }
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      handleFieldChange("pickup_points", [
+                        ...formData.pickup_points,
+                        {
+                          id: `p${Date.now().toString(36)}${Math.floor(Math.random() * 1000)}`,
+                          name: "",
+                          time: "",
+                          details: "",
+                        },
+                      ])
+                    }
+                  >
+                    <Plus className="w-4 h-4 mr-1" />
+                    {__("Add pickup point", "yatra")}
+                  </Button>
+                  {formData.pickup_points.length > 0 && (
+                    <div className="flex items-center gap-2 pt-1">
+                      <input
+                        type="checkbox"
+                        id="pickup_required"
+                        checked={formData.pickup_required}
+                        onChange={(e) =>
+                          handleFieldChange("pickup_required", e.target.checked)
+                        }
+                        className="w-4 h-4 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"
+                      />
+                      <label
+                        htmlFor="pickup_required"
+                        className="text-sm text-gray-900 dark:text-white"
+                      >
+                        {__("Customers must choose a pickup point", "yatra")}
+                      </label>
+                    </div>
+                  )}
+                </div>
+              </div>
+              {/* SECTION 5c: Accommodation options + travel insurance (3.3) */}
+              <div
+                className="border border-gray-200 dark:border-gray-700 rounded-lg p-5 bg-gray-50 dark:bg-gray-800/30"
+                data-testid="trip-accommodation-options"
+              >
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
+                  {__("Accommodation Options", "yatra")}
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                  {__(
+                    "Hotel categories or room types the customer chooses from at checkout, with the extra price over the trip price. The first option is preselected, so list your standard option first (price 0 if it is included).",
+                    "yatra",
+                  )}
+                </p>
+                <div className="space-y-3">
+                  {formData.accommodation_options.map((option, index) => (
+                    <div key={option.id} className="grid grid-cols-1 md:grid-cols-12 gap-2 items-start">
+                      <div className="md:col-span-3">
+                        <Input
+                          aria-label={__("Accommodation name", "yatra")}
+                          value={option.name}
+                          onChange={(e) => {
+                            const next = [...formData.accommodation_options];
+                            next[index] = { ...option, name: e.target.value };
+                            handleFieldChange("accommodation_options", next);
+                          }}
+                          placeholder={__("e.g., Deluxe hotel, single room", "yatra")}
+                        />
+                      </div>
+                      <div className="md:col-span-4">
+                        <Input
+                          aria-label={__("Accommodation description", "yatra")}
+                          value={option.description}
+                          onChange={(e) => {
+                            const next = [...formData.accommodation_options];
+                            next[index] = { ...option, description: e.target.value };
+                            handleFieldChange("accommodation_options", next);
+                          }}
+                          placeholder={__("Short description (optional)", "yatra")}
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <Input
+                          aria-label={__("Extra price", "yatra")}
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={option.price}
+                          onChange={(e) => {
+                            const next = [...formData.accommodation_options];
+                            next[index] = { ...option, price: e.target.value };
+                            handleFieldChange("accommodation_options", next);
+                          }}
+                          placeholder="0"
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <select
+                          aria-label={__("Price per", "yatra")}
+                          value={option.price_per}
+                          onChange={(e) => {
+                            const next = [...formData.accommodation_options];
+                            next[index] = { ...option, price_per: e.target.value };
+                            handleFieldChange("accommodation_options", next);
+                          }}
+                          className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                        >
+                          <option value="person">{__("per person", "yatra")}</option>
+                          <option value="booking">{__("per booking", "yatra")}</option>
+                        </select>
+                      </div>
+                      <div className="md:col-span-1">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          aria-label={__("Remove accommodation option", "yatra")}
+                          onClick={() =>
+                            handleFieldChange(
+                              "accommodation_options",
+                              formData.accommodation_options.filter((_, i) => i !== index),
+                            )
+                          }
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                  {formData.accommodation_options.length < 20 && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        handleFieldChange("accommodation_options", [
+                          ...formData.accommodation_options,
+                          {
+                            id: `a${Date.now().toString(36)}${Math.floor(Math.random() * 1000)}`,
+                            name: "",
+                            description: "",
+                            price: "",
+                            price_per: "person",
+                          },
+                        ])
+                      }
+                    >
+                      <Plus className="w-4 h-4 mr-1" />
+                      {__("Add accommodation option", "yatra")}
+                    </Button>
+                  )}
+                  <div className="flex items-center gap-2 pt-3 border-t border-gray-200 dark:border-gray-700">
+                    <input
+                      type="checkbox"
+                      id="travel_insurance_disabled"
+                      checked={formData.travel_insurance_disabled}
+                      onChange={(e) =>
+                        handleFieldChange("travel_insurance_disabled", e.target.checked)
+                      }
+                      className="w-4 h-4 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"
+                    />
+                    <label htmlFor="travel_insurance_disabled" className="text-sm text-gray-900 dark:text-white">
+                      {__("Don't offer travel insurance on this trip", "yatra")}
+                    </label>
+                  </div>
                 </div>
               </div>
             </div>
@@ -7426,6 +8238,109 @@ const TripForm: React.FC = () => {
                         <p className="mt-1 text-xs text-red-600">
                           {errors.discounted_price}
                         </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Group-size price tiers (3.3) */}
+                  <div
+                    className="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
+                    data-testid="trip-group-price-tiers"
+                  >
+                    <div className="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                      {__("Price by group size", "yatra")} ({__("Optional", "yatra")})
+                    </div>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                      {__(
+                        "A different price per person for bigger groups, e.g. 1 person 1500, 2–3 people 1300, 4 or more 1100. It replaces the price above (and departure prices) when the group size matches. Leave \"To\" empty for \"and more\".",
+                        "yatra",
+                      )}
+                    </p>
+                    <div className="space-y-2">
+                      {formData.group_price_tiers.map((tier, index) => (
+                        <div key={index} className="grid grid-cols-12 gap-2 items-center">
+                          <div className="col-span-3">
+                            <Input
+                              aria-label={__("From (people)", "yatra")}
+                              type="number"
+                              min="1"
+                              value={tier.min}
+                              placeholder={__("From", "yatra")}
+                              onChange={(e) => {
+                                const next = [...formData.group_price_tiers];
+                                next[index] = { ...tier, min: e.target.value };
+                                handleFieldChange("group_price_tiers", next);
+                              }}
+                            />
+                          </div>
+                          <div className="col-span-3">
+                            <Input
+                              aria-label={__("To (people)", "yatra")}
+                              type="number"
+                              min="1"
+                              value={tier.max}
+                              placeholder={__("To (empty = and more)", "yatra")}
+                              onChange={(e) => {
+                                const next = [...formData.group_price_tiers];
+                                next[index] = { ...tier, max: e.target.value };
+                                handleFieldChange("group_price_tiers", next);
+                              }}
+                            />
+                          </div>
+                          <div className="col-span-5 relative">
+                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
+                              {getCurrencySymbol(globalCurrency)}
+                            </span>
+                            <Input
+                              aria-label={__("Price per person", "yatra")}
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              value={tier.price}
+                              placeholder="0.00"
+                              className="pl-7"
+                              onChange={(e) => {
+                                const next = [...formData.group_price_tiers];
+                                next[index] = { ...tier, price: e.target.value };
+                                handleFieldChange("group_price_tiers", next);
+                              }}
+                            />
+                          </div>
+                          <div className="col-span-1">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              aria-label={__("Remove price tier", "yatra")}
+                              onClick={() =>
+                                handleFieldChange(
+                                  "group_price_tiers",
+                                  formData.group_price_tiers.filter((_, i) => i !== index),
+                                )
+                              }
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                      {formData.group_price_tiers.length < 10 && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const last = formData.group_price_tiers[formData.group_price_tiers.length - 1];
+                            const nextMin = last && last.max !== "" ? String((parseInt(last.max, 10) || 0) + 1) : "";
+                            handleFieldChange("group_price_tiers", [
+                              ...formData.group_price_tiers,
+                              { min: nextMin, max: "", price: "" },
+                            ]);
+                          }}
+                        >
+                          <Plus className="w-4 h-4 mr-1" />
+                          {__("Add group price", "yatra")}
+                        </Button>
                       )}
                     </div>
                   </div>

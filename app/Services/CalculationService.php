@@ -116,6 +116,18 @@ class CalculationService
         $discounted_price = $this->resolveDiscountedPrice($trip, $availability);
         $unit_price       = $discounted_price > 0 ? $discounted_price : $original_price;
 
+        /**
+         * The per-unit price before dynamic pricing (e.g. a group-size price
+         * tier). Runs before the pre-dynamic-pricing snapshot, so discount
+         * stacking treats it as the base price, not as a dynamic adjustment.
+         *
+         * @since 3.3.0
+         * @param float $unit_price
+         * @param int   $trip_id
+         * @param array $params Calculation parameters.
+         */
+        $unit_price = (float) apply_filters('yatra_calculation_base_unit_price', $unit_price, $trip_id, $params);
+
         // Snapshot the pre-DP per-unit price so the pricing-summary template
         // can render the dynamic-pricing impact as its own line item rather
         // than silently absorbing it into the Gross Total. Without this, an

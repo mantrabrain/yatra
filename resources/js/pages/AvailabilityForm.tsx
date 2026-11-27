@@ -74,6 +74,7 @@ interface AvailabilityFormData {
   is_blocked: boolean; // Blocked for maintenance/holidays
   block_reason: string; // Reason for blocking
   alert_threshold: string; // Alert when seats drop below this
+  cutoff_hours: string; // Bookings close this many hours before departure
   from_location: string;
   to_location: string;
   from_latitude: string;
@@ -119,6 +120,7 @@ const AvailabilityForm: React.FC = () => {
     is_blocked: false,
     block_reason: "",
     alert_threshold: "5",
+    cutoff_hours: "24",
     from_location: "",
     to_location: "",
     from_latitude: "",
@@ -285,6 +287,11 @@ const AvailabilityForm: React.FC = () => {
           false,
         block_reason: availabilityData.block_reason || "",
         alert_threshold: availabilityData.alert_threshold?.toString() || "5",
+        cutoff_hours:
+          availabilityData.cutoff_hours !== undefined &&
+          availabilityData.cutoff_hours !== null
+            ? String(availabilityData.cutoff_hours)
+            : "24",
         from_location:
           availabilityData.from_location || tripData?.starting_location || "",
         to_location:
@@ -564,7 +571,9 @@ const AvailabilityForm: React.FC = () => {
         to_latitude: data.to_latitude?.trim() || null,
         to_longitude: data.to_longitude?.trim() || null,
         special_notes: null,
-        cutoff_hours: 24,
+        // Was always 24, so a saved date lost any other cutoff.
+        // The table requires at least 1 hour.
+        cutoff_hours: Math.max(1, parseInt(data.cutoff_hours, 10) || 24),
         alert_threshold: data.alert_threshold
           ? parseInt(data.alert_threshold)
           : null,
@@ -643,7 +652,7 @@ const AvailabilityForm: React.FC = () => {
   if (!tripId) {
     return (
       <Alert variant="error">
-        <AlertCircle className="w-4 h-4" />
+        {/* The alert draws its own icon. */}
         <div>
           <p className="font-medium">{__("Trip ID Required", "yatra")}</p>
           <p className="text-sm">
@@ -1611,6 +1620,29 @@ const AvailabilityForm: React.FC = () => {
                   <HelpText
                     text={__(
                       "Alert when available seats drop below this number",
+                      "yatra",
+                    )}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    {__("Booking Cutoff (hours before)", "yatra")}
+                  </label>
+                  <Input
+                    type="number"
+                    min="1"
+                    step="1"
+                    value={formData.cutoff_hours}
+                    onChange={(e) =>
+                      handleFieldChange("cutoff_hours", e.target.value)
+                    }
+                    placeholder="24"
+                    data-testid="availability-cutoff-hours"
+                  />
+                  <HelpText
+                    text={__(
+                      "Bookings for this date close this many hours before departure, and the date is no longer offered. For 20 days, enter 480.",
                       "yatra",
                     )}
                     className="mt-1"

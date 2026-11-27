@@ -81,6 +81,7 @@ const ItineraryForm: React.FC = () => {
     day: "",
     day_title: "",
     day_description: "",
+    day_altitude: "",
     item_type_id: "",
     item_id: "",
     title: "",
@@ -341,6 +342,10 @@ const ItineraryForm: React.FC = () => {
         day: entryData.day?.toString() || dayParam || prev.day,
         day_title: entryData.day_title || prev.day_title,
         day_description: entryData.day_description || prev.day_description,
+        day_altitude:
+          entryData.day_altitude !== undefined && entryData.day_altitude !== null
+            ? String(entryData.day_altitude)
+            : prev.day_altitude,
         gallery: entryData.gallery || prev.gallery,
         video_url: entryData.video_url || prev.video_url,
         status: entryData.status || prev.status,
@@ -967,6 +972,7 @@ const ItineraryForm: React.FC = () => {
                       day: formData.day,
                       day_title: formData.day_title || "",
                       day_description: formData.day_description || "",
+                      day_altitude: formData.day_altitude || "",
                     }}
                     errors={errors}
                     tripsData={tripsData}

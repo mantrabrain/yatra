@@ -9,6 +9,7 @@ export interface ItineraryFormData {
   day: string;
   day_title?: string;
   day_description?: string;
+  day_altitude?: string; // metres (3.3)
   item_type_id: string;
   item_id: string;
   title: string;

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "yatra/trip-faq",
+  "title": "Trip FAQ",
+  "category": "yatra",
+  "icon": "editor-help",
+  "description": "Frequently asked questions of a trip.",
+  "keywords": [
+    "faq",
+    "questions",
+    "yatra"
+  ],
+  "textdomain": "yatra",
+  "attributes": {
+    "tripId": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "supports": {
+    "html": false,
+    "inserter": true,
+    "align": [
+      "wide",
+      "full"
+    ]
+  },
+  "editorScript": "yatra-trip-faq-block-editor"
+}

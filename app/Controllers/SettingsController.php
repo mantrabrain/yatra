@@ -88,7 +88,41 @@ class SettingsController extends BaseController
         // they're harmless orphans — the save endpoint no longer
         // accepts them, and the email template skips the cancellation
         // paragraph when the global setting is absent.
+        // Change / cancellation requests from the customer account. A request
+        // is recorded and emailed to the operator; it changes nothing by
+        // itself, so the operator's own policy and refunds still apply.
+        'customer_requests_enabled' => true,
+        'customer_request_cutoff_days' => 0,
+        // Settings → Labels (rename customer-facing texts).
+        'label_overrides' => [],
+        'display_currencies' => [],
+        'display_currency_auto_rates' => false,
         'booking_expiry_hours' => 24,
+        // Booking fee (3.3): none | fixed | percent.
+        'booking_fee_type' => 'none',
+        'booking_fee_amount' => 0,
+        'booking_fee_label' => '',
+        // Email branding (3.3).
+        'email_show_logo' => false,
+        'email_brand_color' => '',
+        'enquiry_custom_fields' => [],
+        'embed_enabled' => false,
+        'recently_viewed_enabled' => false,
+        'weather_enabled' => false,
+        'weather_api_key' => '',
+        'weather_units' => 'metric',
+        'social_proof_popup' => false,
+        'social_proof_popup_names' => false,
+        'social_proof_days' => 30,
+        'social_proof_booked_badge' => false,
+        'social_proof_badge_min' => 3,
+        'travel_insurance_enabled' => false,
+        'travel_insurance_title' => '',
+        'travel_insurance_description' => '',
+        'travel_insurance_price_type' => 'per_person',
+        'travel_insurance_amount' => 0,
+        'travel_insurance_terms_url' => '',
+        'travel_insurance_require_choice' => false,
         'booking_reminder_days' => 3,
         'availability_horizon_months' => 12,
         'allow_waitlist' => true,
@@ -704,12 +738,21 @@ class SettingsController extends BaseController
                 // Save to WordPress options table with yatra_ prefix
                 $option_name = 'yatra_' . $key;
                 
-                // Serialize arrays for storage
-                if (is_array($sanitized_value)) {
+                // Serialize arrays for storage — except the gateway configs,
+                // which WPML / Polylang translate (wpml-config.xml): they need
+                // the array itself, and choke on a pre-serialised string.
+                // Every reader accepts both forms.
+                if (is_array($sanitized_value) && $key !== 'gateway_configs') {
                     $sanitized_value = maybe_serialize($sanitized_value);
                 }
                 
-                $result = update_option($option_name, $sanitized_value);
+                // update_option() can't store false in an option that doesn't
+                // exist yet (it compares false with "missing" and does
+                // nothing), so unticking a default-on setting that had never
+                // been saved silently stayed on. Create the option instead.
+                $result = get_option($option_name, null) === null
+                    ? add_option($option_name, $sanitized_value)
+                    : update_option($option_name, $sanitized_value);
                 
                 if ($result !== false) {
                     $updated[] = $key;
@@ -845,6 +888,12 @@ class SettingsController extends BaseController
         }
     }
 
+    /** Cut text to $max characters without splitting a multi-byte character. */
+    private static function mbCut(string $text, int $max): string
+    {
+        return function_exists('mb_substr') ? (string) mb_substr($text, 0, $max) : substr($text, 0, $max);
+    }
+
     /**
      * Sanitize and validate setting value
      * Pro plugins can handle sanitization of their own settings via filter
@@ -854,6 +903,58 @@ class SettingsController extends BaseController
      */
     private function sanitize_setting(string $key, $value)
     {
+        // Booking fee (3.3) — before the type-based handling below, which
+        // would round a decimal amount to an integer (its default is 0).
+        if ($key === 'booking_fee_type') {
+            $v = is_string($value) ? strtolower(trim($value)) : '';
+            return in_array($v, ['none', 'fixed', 'percent'], true) ? $v : 'none';
+        }
+        if ($key === 'booking_fee_amount') {
+            return is_numeric($value) ? max(0.0, round((float) $value, 2)) : 0.0;
+        }
+        if ($key === 'booking_fee_label') {
+            return is_string($value) ? self::mbCut(sanitize_text_field($value), 60) : '';
+        }
+        // Weather forecast (3.3).
+        if ($key === 'weather_units') {
+            return $value === 'imperial' ? 'imperial' : 'metric';
+        }
+        if ($key === 'weather_api_key') {
+            return is_string($value) ? substr(preg_replace('/[^A-Za-z0-9_\-]/', '', $value), 0, 100) : '';
+        }
+        // Social proof (3.3, Pro module): look-back window and badge threshold.
+        if ($key === 'social_proof_days') {
+            return is_numeric($value) ? max(1, min(365, (int) $value)) : 30;
+        }
+        if ($key === 'social_proof_badge_min') {
+            return is_numeric($value) ? max(1, min(1000, (int) $value)) : 3;
+        }
+        // Travel insurance (3.3).
+        if ($key === 'travel_insurance_price_type') {
+            $v = is_string($value) ? strtolower(trim($value)) : '';
+            return in_array($v, ['per_person', 'percent', 'fixed'], true) ? $v : 'per_person';
+        }
+        if ($key === 'travel_insurance_amount') {
+            return is_numeric($value) ? max(0.0, round((float) $value, 2)) : 0.0;
+        }
+        if ($key === 'travel_insurance_title') {
+            return is_string($value) ? self::mbCut(sanitize_text_field($value), 80) : '';
+        }
+        if ($key === 'travel_insurance_description') {
+            return is_string($value) ? self::mbCut(sanitize_textarea_field($value), 500) : '';
+        }
+        if ($key === 'travel_insurance_terms_url') {
+            $v = is_string($value) ? esc_url_raw(trim($value), ['http', 'https']) : '';
+            return $v;
+        }
+        if ($key === 'enquiry_custom_fields') {
+            return \Yatra\Services\EnquiryCustomFields::sanitizeList($value);
+        }
+        if ($key === 'email_brand_color') {
+            $v = is_string($value) ? strtolower(trim($value)) : '';
+            return preg_match('/^#[0-9a-f]{6}$/', $v) ? $v : '';
+        }
+
         $default = $this->default_settings[$key] ?? null;
         $default_type = gettype($default);
         
@@ -872,6 +973,59 @@ class SettingsController extends BaseController
         // shape at all was stored.
         if ($key === 'booking_form_config') {
             return is_array($value) ? $this->sanitize_booking_form_config($value) : [];
+        }
+
+        // List of {from, to}; the generic array branch would keep any shape.
+        if ($key === 'label_overrides') {
+            return \Yatra\Services\LabelOverrideService::sanitizeRows($value);
+        }
+
+        // List of {code, rate}: other currencies prices can be shown in.
+        if ($key === 'display_currencies') {
+            return self::sanitizeDisplayCurrencies($value);
+        }
+
+        // Gateway settings: every gateway's fields are kept (Pro gateways add
+        // their own), text-sanitised as before, except the multi-line fields
+        // (a cheque postal address, instructions), which keep their line
+        // breaks. Bank transfer's extra accounts are capped and normalised.
+        if ($key === 'gateway_configs' && is_array($value)) {
+            $out = $this->sanitize_array($value);
+            foreach ($value as $gw => $cfg) {
+                if (!is_array($cfg)) {
+                    continue;
+                }
+                $gwKey = is_string($gw) ? sanitize_key($gw) : $gw;
+                foreach (['address', 'instructions', 'description'] as $multiline) {
+                    if (isset($cfg[$multiline]) && is_string($cfg[$multiline])) {
+                        $out[$gwKey][$multiline] = sanitize_textarea_field($cfg[$multiline]);
+                    }
+                }
+                if ($gwKey === 'bank_transfer') {
+                    if (isset($out[$gwKey]['account_currency']) && is_string($out[$gwKey]['account_currency'])) {
+                        $out[$gwKey]['account_currency'] = strtoupper(substr($out[$gwKey]['account_currency'], 0, 3));
+                    }
+                    if (isset($out[$gwKey]['extra_accounts'])) {
+                        $accounts = [];
+                        foreach (array_slice(array_values((array) $out[$gwKey]['extra_accounts']), 0, 10) as $acc) {
+                            if (!is_array($acc)) {
+                                continue;
+                            }
+                            $clean = [];
+                            foreach (['label', 'bank_name', 'account_name', 'account_number', 'routing_code'] as $f) {
+                                $clean[$f] = isset($acc[$f]) && is_scalar($acc[$f]) ? (string) $acc[$f] : '';
+                            }
+                            $clean['currency'] = isset($acc['currency']) && is_scalar($acc['currency']) ? strtoupper(substr((string) $acc['currency'], 0, 3)) : '';
+                            if ($clean['bank_name'] !== '' || $clean['account_number'] !== '') {
+                                $accounts[] = $clean;
+                            }
+                        }
+                        $out[$gwKey]['extra_accounts'] = $accounts;
+                    }
+                }
+            }
+
+            return $out;
         }
 
         // Handle null values - use default
@@ -1204,6 +1358,24 @@ class SettingsController extends BaseController
                 $row['account_number'] = isset($config['account_number']) ? sanitize_text_field((string) $config['account_number']) : '';
                 $row['routing_code'] = isset($config['routing_code']) ? sanitize_text_field((string) $config['routing_code']) : '';
                 $row['instructions'] = isset($config['instructions']) ? sanitize_textarea_field((string) $config['instructions']) : '';
+                // 3.3: per-currency accounts.
+                $row['account_currency'] = isset($config['account_currency']) ? strtoupper(substr(sanitize_text_field((string) $config['account_currency']), 0, 3)) : '';
+                $row['extra_accounts'] = [];
+                if (isset($config['extra_accounts']) && is_array($config['extra_accounts'])) {
+                    foreach (array_slice(array_values($config['extra_accounts']), 0, 10) as $acc) {
+                        if (!is_array($acc)) {
+                            continue;
+                        }
+                        $clean = [];
+                        foreach (['label', 'bank_name', 'account_name', 'account_number', 'routing_code'] as $k) {
+                            $clean[$k] = isset($acc[$k]) ? sanitize_text_field((string) $acc[$k]) : '';
+                        }
+                        $clean['currency'] = isset($acc['currency']) ? strtoupper(substr(sanitize_text_field((string) $acc['currency']), 0, 3)) : '';
+                        if ($clean['bank_name'] !== '' || $clean['account_number'] !== '') {
+                            $row['extra_accounts'][] = $clean;
+                        }
+                    }
+                }
             }
 
             /**
@@ -1638,5 +1810,32 @@ class SettingsController extends BaseController
 
         return $slug !== '' ? $slug : 'account';
     }
-}
 
+    /**
+     * @param mixed $value
+     * @return array<int, array{code: string, rate: float}>
+     */
+    public static function sanitizeDisplayCurrencies($value): array
+    {
+        $base = strtoupper((string) \Yatra\Services\SettingsService::getCurrency());
+        $out = [];
+        $seen = [];
+        foreach (is_array($value) ? $value : [] as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $code = strtoupper(preg_replace('/[^A-Za-z]/', '', (string) ($row['code'] ?? '')));
+            $rate = round((float) ($row['rate'] ?? 0), 6);
+            if (strlen($code) !== 3 || $code === $base || isset($seen[$code]) || $rate <= 0 || $rate > 1000000) {
+                continue;
+            }
+            $seen[$code] = true;
+            $out[] = ['code' => $code, 'rate' => $rate];
+            if (count($out) >= 20) {
+                break;
+            }
+        }
+
+        return $out;
+    }
+}

@@ -30,6 +30,20 @@ if (!defined('ABSPATH')) {
         </div>
     </div>
 
+    <?php $yatra_trip_code = method_exists($trip, 'getTripCode') ? $trip->getTripCode() : ''; ?>
+    <?php if ($yatra_trip_code !== '') : ?>
+    <!-- Trip code (3.3) -->
+    <div class="yatra-quick-fact yatra-quick-fact--trip-code">
+        <div class="yatra-quick-fact-icon">
+            <?php echo yatra_svg_icon('bookmark', 'yatra-icon-lg'); ?>
+        </div>
+        <div class="yatra-quick-fact-content">
+            <div class="yatra-quick-fact-label"><?php echo esc_html__('Trip code', 'yatra'); ?></div>
+            <div class="yatra-quick-fact-value"><?php echo esc_html($yatra_trip_code); ?></div>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <!-- Difficulty (use resolved name from classifications, not raw difficulty_level ID) -->
     <?php
     $difficulty = $trip->getDifficulty();

@@ -59,6 +59,7 @@ declare global {
       whatsappEnabled?: boolean;
       channelManagerEnabled?: boolean;
       webhooksEnabled?: boolean;
+      travelAgencyEnabled?: boolean;
       scheduledPaymentsEnabled?: boolean;
       currency?: string;
       date_format?: string;

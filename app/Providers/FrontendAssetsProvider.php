@@ -18,6 +18,14 @@ use Yatra\Utils\Logger;
  */
 class FrontendAssetsProvider
 {
+    /** The provider the plugin booted, for shortcodes/blocks that load the bundle on render. */
+    private static ?self $instance = null;
+
+    /** Whether the shared bundle has been enqueued in this request. */
+    private bool $commonEnqueued = false;
+
+    private bool $tripDetailEnqueued = false;
+
     /**
      * Register the provider
      *
@@ -25,9 +33,114 @@ class FrontendAssetsProvider
      */
     public function register(): void
     {
+        self::$instance = $this;
         add_action('init', [self::class, 'registerCoreFrontendStylesheets'], 5);
         // Hook into WordPress to enqueue assets
         add_action('wp_enqueue_scripts', [$this, 'enqueueAssets']);
+    }
+
+    /**
+     * Load Yatra's shared front-end CSS/JS from a shortcode, block or widget
+     * rendered on a page that isn't otherwise a Yatra page (a trip grid on
+     * the home page, a search box in a sidebar). Idempotent. Called during
+     * rendering, so the files are printed in the footer.
+     */
+    public static function ensureCommonAssets(): void
+    {
+        if (self::$instance !== null && !is_admin()) {
+            self::$instance->enqueueCommonAssets();
+        }
+    }
+
+    /**
+     * Load the single-trip page files (booking card, date picker, sidebar JS and
+     * the yatraTripData for the global $trip) from a trip section block or
+     * widget rendered outside the trip page. Set the global $trip first. The
+     * trip page itself already loads them. Idempotent.
+     *
+     * @since 3.1.4
+     */
+    public static function ensureTripDetailAssets(bool $forThisTrip = false): void
+    {
+        if (self::$instance === null || is_admin()) {
+            return;
+        }
+        // The booking card's scripts read yatraTripData; when another trip's
+        // block printed it first, print it again for this trip (the later
+        // assignment wins in the page).
+        if ($forThisTrip) {
+            self::$instance->tripDetailEnqueued = false;
+        }
+        self::$instance->enqueueCommonAssets();
+        if (yatra_is_single_trip()) {
+            return;
+        }
+
+        // single-trip.php prints flatpickr itself; elsewhere use the shared handle
+        // ([yatra_search] uses the same one, so it is never loaded twice).
+        wp_enqueue_style('yatra-flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css', [], YATRA_VERSION);
+        wp_enqueue_script('yatra-flatpickr', 'https://cdn.jsdelivr.net/npm/flatpickr', [], YATRA_VERSION, true);
+
+        self::$instance->enqueueTripDetailAssets();
+    }
+
+    /**
+     * Should Yatra's front-end files load in <head> on this request? Same
+     * answer (and filter) as the main bundle, for components that enqueue
+     * their own files (e.g. the search bar).
+     */
+    public static function shouldLoadOnThisRequest(): bool
+    {
+        if (is_admin() || self::$instance === null) {
+            return false;
+        }
+
+        /** This filter is documented in FrontendAssetsProvider::enqueueAssets(). */
+        return (bool) apply_filters('yatra_load_frontend_assets', self::$instance->requestShowsYatraContent());
+    }
+
+    /**
+     * Does this request show Yatra content? Yatra's own pages (trip, listing,
+     * taxonomy, booking, confirmation, account …) and any post whose content
+     * holds a Yatra shortcode or block — including Elementor page data.
+     * Content Yatra can't see in advance (widgets, header/footer builders)
+     * loads the files itself when it renders (see ensureCommonAssets()).
+     */
+    private function requestShowsYatraContent(): bool
+    {
+        if (yatra_is_account_page() || yatra_is_trip_listing() || yatra_is_single_trip()
+            || yatra_is_activity_listing() || yatra_is_destination_listing()
+            || yatra_is_booking_page() || yatra_is_taxonomy_page()) {
+            return true;
+        }
+
+        foreach (['yatra_trip', 'yatra_trip_id', 'yatra_booking_confirmation', 'yatra_remaining_checkout', 'yatra_verify_email',
+                     'yatra_account_page', 'yatra_destination_slug', 'yatra_activity_slug', 'yatra_category_slug',
+                     'yatra_page', 'yatra_booking_trip_slug'] as $var) {
+            if ((string) get_query_var($var) !== '') {
+                return true;
+            }
+        }
+
+        foreach (['yatra_booking', 'yatra_trip_list', 'yatra_taxonomy_data'] as $global) {
+            if (!empty($GLOBALS[$global])) {
+                return true;
+            }
+        }
+
+        $post = get_queried_object();
+        if ($post instanceof \WP_Post) {
+            $content = (string) $post->post_content;
+            if (strpos($content, '[yatra_') !== false || strpos($content, '<!-- wp:yatra/') !== false) {
+                return true;
+            }
+            $elementor = get_post_meta($post->ID, '_elementor_data', true);
+            if (is_string($elementor) && (strpos($elementor, 'yatra_') !== false || strpos($elementor, 'yatra-') !== false)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -126,7 +239,21 @@ class FrontendAssetsProvider
             return;
         }
 
-        // Always enqueue common frontend assets
+        /**
+         * Whether to load Yatra's front-end CSS/JS on this request.
+         *
+         * Yatra used to load its whole bundle (~850 KB) on every page of the
+         * site. It now loads only where Yatra content is shown; shortcodes and
+         * blocks elsewhere load it when they render. Return true to restore the
+         * old load-everywhere behaviour (e.g. for a theme that styles Yatra
+         * markup it prints by itself).
+         *
+         * @param bool $load True on Yatra pages and posts that contain Yatra content.
+         */
+        if (!self::shouldLoadOnThisRequest()) {
+            return;
+        }
+
         $this->enqueueCommonAssets();
 
         // Enqueue page-specific assets
@@ -140,6 +267,11 @@ class FrontendAssetsProvider
      */
     private function enqueueCommonAssets(): void
     {
+        if ($this->commonEnqueued) {
+            return;
+        }
+        $this->commonEnqueued = true;
+
         // Enqueue common CSS
         $this->enqueueCommonCss();
 
@@ -418,6 +550,11 @@ class FrontendAssetsProvider
      */
     private function enqueueTripDetailAssets(): void
     {
+        if ($this->tripDetailEnqueued) {
+            return;
+        }
+        $this->tripDetailEnqueued = true;
+
         // Enqueue booking assets for trip detail pages (booking forms)
         $bookingJs = YATRA_PLUGIN_PATH . 'assets/js/booking.js';
         if (file_exists($bookingJs)) {
@@ -917,7 +1054,24 @@ class FrontendAssetsProvider
 
         wp_script_add_data('yatra-account-page', 'type', 'module');
 
+        // Can a balance be paid online at all? Offline methods (Pay Later,
+        // Bank Transfer) can't settle one, so without an online method the
+        // "Pay Remaining Balance" button would lead to a dead end.
+        $canPayOnline = false;
+        try {
+            foreach (\Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance()->getEnabledGateways() as $gw) {
+                if (method_exists($gw, 'isOffline') && !$gw->isOffline()) {
+                    $canPayOnline = true;
+                    break;
+                }
+            }
+        } catch (\Throwable $e) {
+            $canPayOnline = true; // Unknown: keep the old behaviour.
+        }
+
         wp_localize_script('yatra-account-page', 'yatraAccountPage', [
+            // As a string: wp_localize_script() turns false into "".
+            'canPayOnline' => apply_filters('yatra_account_can_pay_balance_online', $canPayOnline) ? 'yes' : 'no',
             'apiUrl' => rest_url('yatra/v1'),
             'nonce' => wp_create_nonce('wp_rest'),
             'userId' => get_current_user_id(),

@@ -266,7 +266,23 @@ export const formatPriceForBooking = (price: number, currency?: string) => {
   );
 };
 
-export const currency = (value: number, currencyCode?: string) => {
+/**
+ * The one currency a list of bookings/payments is in, so a total over them
+ * shows that currency (an EUR booking on a USD site used to total as "$").
+ * Mixed currencies, or none stored: undefined (the site currency).
+ */
+export const commonCurrency = (
+  items: Array<{ currency?: string | null } | null | undefined>,
+): string | undefined => {
+  const codes = new Set(
+    items
+      .map((i) => String(i?.currency || "").trim().toUpperCase())
+      .filter((c) => c !== ""),
+  );
+  return codes.size === 1 ? Array.from(codes)[0] : undefined;
+};
+
+export const currency = (value: number, currencyCode?: string | null) => {
   const cfg = readPriceConfig();
   const code = (currencyCode || cfg.globalCurrency || "USD") as string;
   return formatYatraMoney(Number(value) || 0, code, { zeroAsUnknown: false });

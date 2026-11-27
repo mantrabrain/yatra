@@ -59,6 +59,8 @@ export type EmailDeliverySectionProps = {
     | "from_email"
     | "from_name"
     | "email_always_bcc"
+    | "email_show_logo"
+    | "email_brand_color"
     | "smtp_enabled"
     | "smtp_host"
     | "smtp_port"
@@ -113,6 +115,59 @@ export const EmailDeliverySection: React.FC<EmailDeliverySectionProps> = ({
             onChange={onFieldChange}
             placeholder={__("archive@example.com", "yatra")}
           />
+        </Field>
+
+        <Field
+          id="email_brand_color"
+          label={__("Email brand colour", "yatra")}
+          description={__(
+            "Colour of the header band and buttons in customer emails. Leave empty for Yatra's teal.",
+            "yatra",
+          )}
+        >
+          <div className="flex items-center gap-2">
+            <input
+              type="color"
+              aria-label={__("Pick a colour", "yatra")}
+              value={/^#[0-9a-f]{6}$/i.test(values.email_brand_color || "") ? (values.email_brand_color as string) : "#0d9488"}
+              onChange={(e) =>
+                onFieldChange({
+                  target: { name: "email_brand_color", id: "email_brand_color", value: e.target.value, type: "text" },
+                } as any)
+              }
+              className="h-9 w-12 rounded border border-gray-300 dark:border-gray-600 bg-white"
+            />
+            <Input
+              id="email_brand_color"
+              name="email_brand_color"
+              value={values.email_brand_color ?? ""}
+              onChange={onFieldChange}
+              placeholder="#0d9488"
+              maxLength={7}
+              className="max-w-[140px] font-mono"
+            />
+          </div>
+        </Field>
+
+        <Field
+          id="email_show_logo"
+          label={__("Logo in emails", "yatra")}
+          description={__(
+            "Show your company logo (Settings → General → Company Logo, or your site logo if none is set) at the top of customer emails.",
+            "yatra",
+          )}
+        >
+          <label className="inline-flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              id="email_show_logo"
+              name="email_show_logo"
+              checked={!!values.email_show_logo}
+              onChange={onFieldChange}
+              className="w-4 h-4 rounded border-gray-300"
+            />
+            {__("Show the logo", "yatra")}
+          </label>
         </Field>
 
         <Field

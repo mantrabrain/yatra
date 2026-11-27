@@ -52,6 +52,27 @@ class AppServiceProvider extends ServiceProvider
         // Initialize ItineraryCostService for free itinerary costs feature
         \Yatra\Services\ItineraryCostService::init();
 
+        // Booking fee (3.3): off unless set in Settings → Payment.
+        \Yatra\Services\BookingFeeService::init();
+
+        // Accommodation choice + travel insurance at checkout (3.3).
+        \Yatra\Services\CheckoutChoiceService::init();
+
+        // Per-person price by group size (3.3).
+        \Yatra\Services\GroupPriceTierService::init();
+
+        // 7-day weather forecast on trip pages (3.3, off by default).
+        \Yatra\Services\WeatherService::init();
+
+        // Recently viewed trips (3.3, browser storage only, off by default).
+        \Yatra\Services\RecentlyViewedService::init();
+
+        // Trips embedder for other websites (3.3, off by default).
+        \Yatra\Services\TripEmbedService::init();
+
+        // SliceWP affiliate commissions for bookings (3.3; acts only with SliceWP's "Yatra" integration on).
+        \Yatra\Integrations\SliceWP\SliceWPBridge::init();
+
         // Persist + expose selected additional services on bookings (free fallback).
         \Yatra\Services\AdditionalServicesBookingService::init();
 
@@ -60,6 +81,33 @@ class AppServiceProvider extends ServiceProvider
 
         // Initialize utility hooks (admin bar, etc.)
         \Yatra\Hooks\UtilsHooks::init();
+
+        // WPML / Polylang support (no-op without either).
+        \Yatra\Multilingual\MultilingualHooks::init();
+
+        // Booking activity log (status changes, emails, notes, price changes).
+        \Yatra\Services\BookingActivityService::init();
+
+        // Settings → Labels: rename customer-facing texts.
+        \Yatra\Services\LabelOverrideService::init();
+
+        // Payment links: open → balance checkout for the link's amount; a
+        // payment arriving on the booking marks the link paid.
+        add_action('template_redirect', [\Yatra\Services\PaymentLinkService::class, 'handleRequest'], 1);
+        add_action('yatra_payment_completed', static function (...$args): void {
+            $bookingId = 0;
+            $amount = 0.0;
+            if (isset($args[0]) && is_array($args[0])) {
+                $bookingId = (int) ($args[0]['booking_id'] ?? 0);
+                $amount = (float) ($args[0]['amount'] ?? 0);
+            } else {
+                $bookingId = (int) ($args[0] ?? 0);
+                $amount = (float) (is_array($args[3] ?? null) ? ($args[3]['amount'] ?? 0) : 0);
+            }
+            if ($bookingId > 0 && $amount > 0) {
+                \Yatra\Services\PaymentLinkService::onPaymentCompleted($bookingId, $amount);
+            }
+        }, 20, 4);
 
         // Initialize review and enquiry hooks
         \Yatra\Hooks\ReviewHooks::init();

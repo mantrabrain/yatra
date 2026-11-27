@@ -239,6 +239,10 @@ class DiscountAndDealsShortcode extends BaseShortcode
             'duration_days' => $trip->duration_days ?? 0,
             'duration_nights' => $trip->duration_nights ?? 0,
             'difficulty_level' => $trip->difficulty_level,
+            // The card's "Group size" read these; without them it showed the
+            // 1-20 fallback instead of the trip's own group size.
+            'min_travelers' => isset($trip->min_travelers) ? (int) $trip->min_travelers : null,
+            'max_travelers' => isset($trip->max_travelers) ? (int) $trip->max_travelers : null,
             'created_at' => $trip->created_at,
             'permalink' => $permalink
         ];

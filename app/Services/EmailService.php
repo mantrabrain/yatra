@@ -128,6 +128,9 @@ class EmailService
         add_filter('wp_mail_from', [self::class, 'customFromEmail']);
         add_filter('wp_mail_from_name', [self::class, 'customFromName']);
         
+        // Logo and brand colour (Settings → Email, 3.3).
+        $message = EmailBranding::apply($message);
+
         $result = wp_mail($to, $subject, $message, $headers, $attachments);
         
         // Remove filters after sending

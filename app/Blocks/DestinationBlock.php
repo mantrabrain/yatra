@@ -32,6 +32,7 @@ class DestinationBlock
      */
     public function renderCallback(array $attributes, string $content): string
     {
+        FrontendAssetsProvider::ensureCommonAssets();
         wp_enqueue_style('yatra-destination-shortcode', \YATRA_PLUGIN_URL . 'assets/css/shortcodes/destination-shortcode.css', [], YATRA_VERSION);
 
         return BlockDataService::renderDestinationBlock($attributes);

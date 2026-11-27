@@ -42,6 +42,7 @@ import {
   Network,
   Webhook,
   Users,
+  Briefcase,
   Puzzle,
   ArrowLeft,
   Gift,
@@ -455,6 +456,32 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           icon: UserCircle,
           cap: "yatra_view_customers",
         },
+        // Travel Agencies — Growth/Scale module. Same gate as WhatsApp:
+        // the Growth-or-Scale flag AND the module toggle on (useModules.ts
+        // updates `travelAgencyEnabled` and fires `yatra-modules-updated`).
+        ...((window as any).yatraAdmin?.isAiEligible &&
+        (window as any).yatraAdmin?.travelAgencyEnabled
+          ? [
+              {
+                subpage: "travel-agencies",
+                label: __("Travel Agencies", "yatra"),
+                icon: Briefcase,
+                isPremium: true,
+                cap: "yatra_view_bookings",
+              },
+            ]
+          : []),
+        ...((window as any).yatraAdmin?.guidesResourcesEnabled
+          ? [
+              {
+                subpage: "guides-resources",
+                label: __("Guides & Resources", "yatra"),
+                icon: Users,
+                isPremium: true,
+                cap: "yatra_view_trips",
+              },
+            ]
+          : []),
         {
           subpage: "travelers",
           label: __("Travelers", "yatra"),
@@ -1162,8 +1189,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     // Show specific text for trip form page
                     if (isTripFormPage) {
                       return currentAction === "create"
-                        ? "Create Trip"
-                        : "Edit Trip";
+                        ? __("Create Trip", "yatra")
+                        : __("Edit Trip", "yatra");
                     }
 
                     const activeItem = brandedMenuItems.find((item) =>
@@ -1175,7 +1202,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                       );
                       return activeSubItem?.label || activeItem.label;
                     }
-                    return activeItem?.label || __("Dashboard", "yatra");
+                    if (activeItem?.label) return activeItem.label;
+                    // Screens opened from the header buttons, not the menu.
+                    const headerPages: Record<string, string> = {
+                      tools: __("Tools", "yatra"),
+                      settings: __("Settings", "yatra"),
+                      modules: __("Modules", "yatra"),
+                      "ai-assistant": __("AI Assistant", "yatra"),
+                    };
+                    return headerPages[currentSubpage as string] || __("Dashboard", "yatra");
                   })()}
                 </h1>
 

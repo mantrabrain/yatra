@@ -177,6 +177,23 @@ class ItineraryPdfBuilder
             'transportation_details'   => $trip ? (string) ($trip->transportation_details ?? '') : '',
         ];
 
+        // A trip brochure (no booking): no reference, status or money; the
+        // visitor it was prepared for, and today as the issue date. @since 3.3.0
+        if (!empty($source['brochure'])) {
+            $templateData['booking_ref'] = '';
+            $templateData['booking_status'] = '';
+            $templateData['status_class'] = '';
+            $templateData['booking_date'] = date_i18n((string) get_option('date_format'));
+            $templateData['travel_date'] = '';
+            $templateData['return_date'] = '';
+            $templateData['total_amount'] = '';
+            $templateData['amount_paid'] = '';
+            $templateData['amount_due'] = '';
+            $templateData['traveler_count'] = 0;
+            $templateData['customer_email'] = '';
+            $templateData['is_brochure'] = true;
+        }
+
         // Locale-aware font is resolved inside PdfService — do NOT
         // pass a `default_font` override here, otherwise the Nepali /
         // Hindi / Arabic fonts loaded for non-Latin locales get

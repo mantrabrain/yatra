@@ -177,6 +177,12 @@ if (typeof window.yatraNumOr !== 'function') {
     if (params.partial) {
       q.set('partial', '1');
     }
+    // Yatra Pro's currency switcher: this request carries no cookies, so pass
+    // the visitor's display currency along for the prices in the cards.
+    const cs = window.yatraCurrencySwitcher;
+    if (cs && cs.convert === 'yes' && /^[A-Z]{3}$/.test(String(cs.current || ''))) {
+      q.set('currency', String(cs.current));
+    }
     const qs = q.toString();
     if (isPlain && baseUrl.includes('rest_route=')) {
       return `${baseUrl}/trips/${tripId}/availability-template&${qs}`;
@@ -223,6 +229,16 @@ if (typeof window.yatraNumOr !== 'function') {
       const decimals = Number.isFinite(Number(cfg.decimalPlaces)) ? Number(cfg.decimalPlaces) : 2;
       const thousandSep = (typeof cfg.thousandSeparator === 'string') ? cfg.thousandSeparator : ',';
       const decimalSep = (typeof cfg.decimalSeparator === 'string') ? cfg.decimalSeparator : '.';
+
+      // Prices shown in the visitor's currency (Yatra Pro currency switcher).
+      if (typeof window.yatraDisplayPrice === 'function') {
+        try {
+          const shown = window.yatraDisplayPrice(Number(amount) || 0);
+          if (typeof shown === 'string' && shown !== '') {
+            return shown;
+          }
+        } catch (e) { /* fall back to the store currency */ }
+      }
 
       const num = Number(amount) || 0;
 
@@ -329,7 +345,7 @@ if (typeof window.yatraNumOr !== 'function') {
     initializeGallery() {
       this.modal = document.getElementById('hero-gallery');
       if (!this.modal) {
-        console.warn('Hero gallery modal not found');
+        // Pages without a gallery (most block / listing pages): nothing to do.
         return;
       }
 
@@ -616,7 +632,6 @@ if (typeof window.yatraNumOr !== 'function') {
     setup() {
       this.modal = document.getElementById('itinerary-gallery');
       if (!this.modal) {
-        console.warn('Itinerary gallery modal not found');
         return;
       }
       this.attachEventListeners();
@@ -1468,7 +1483,6 @@ if (typeof window.yatraNumOr !== 'function') {
       this.participantsSelect = document.querySelector('.yatra-participants-select');
 
       if (!this.checkAvailabilityBtn) {
-        console.warn('Check Availability button not found');
       }
 
       this.attachEventListeners();
@@ -3596,6 +3610,19 @@ if (typeof window.yatraNumOr !== 'function') {
      * Proceed to booking - creates session and redirects
      */
     proceedToBooking(btn, originalText, sessionPayload) {
+      // An add-on can take over where the booking goes next (Yatra Pro's
+      // cart: "Add to cart" sends the same payload to the cart instead of
+      // starting checkout). Return true when handled.
+      if (typeof window.yatraProceedToBooking === 'function') {
+        try {
+          if (window.yatraProceedToBooking({ btn: btn, originalText: originalText, sessionPayload: sessionPayload }) === true) {
+            return;
+          }
+        } catch (e) {
+          window.YATRA_DEBUG && console.log('[Yatra] yatraProceedToBooking hook failed', e);
+        }
+      }
+
       // Track Book Now click as InitiateCheckout (Facebook Pixel)
       if (typeof fbq !== 'undefined' && window.yatraAdmin?.facebookPixel?.connectionStatus?.pixelConnected) {
         const tripData = this.getTripData();

@@ -1498,6 +1498,7 @@
 }
 
 .yatra-booking-pay-btn #pay-amount {
+    white-space: nowrap; /* "$ 2,300.00" stays on one line on phones */
     font-size: 18px;
     font-weight: 700;
     background: rgba(255, 255, 255, 0.2);

@@ -39,6 +39,21 @@ class LoginShortcode extends BaseShortcode
             return;
         }
 
+        self::enqueueLoginAssets();
+    }
+
+    /**
+     * Enqueue the login form CSS/JS. Public so the yatra/login block and the
+     * Elementor widget can load them as they render. Idempotent.
+     *
+     * @since 3.1.4
+     */
+    public static function enqueueLoginAssets(): void
+    {
+        if (wp_script_is('yatra-login-shortcode', 'enqueued')) {
+            return;
+        }
+
         // Enqueue CSS
         wp_enqueue_style(
             'yatra-login-shortcode',

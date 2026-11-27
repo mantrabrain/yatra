@@ -26,6 +26,8 @@ export interface Booking {
   total_amount: number;
   amount_paid?: number | null;
   amount_due?: number | null;
+  /** ISO code the booking was made in. */
+  currency?: string | null;
   payment_status: "paid" | "pending" | "partial" | "refunded";
   booking_status: "confirmed" | "pending" | "cancelled" | "completed";
   destination?: string;
@@ -40,6 +42,9 @@ export interface Payment {
   amount: number;
   status: "paid" | "pending" | "failed" | "refunded" | "completed";
   method: string;
+  /** Display name of the method ("Bank Transfer"). */
+  method_label?: string;
+  currency?: string | null;
   date: string;
   type: "deposit" | "balance" | "installment";
   booking_amount_due?: number | null;

@@ -30,7 +30,23 @@ class NotificationService
      */
     public static function sendPaymentCompletedNotification(array $paymentData): void
     {
-        self::notifyAdminPaymentReceived($paymentData);
+        $booking = (new BookingRepository())->find((int) ($paymentData['booking_id'] ?? 0));
+        $isPartial = $booking && (float) ($booking->amount_due ?? 0) > 0;
+        /**
+         * Send the standard admin "Payment received" email for this payment?
+         * Yatra Pro's Email Automation answers false for a part payment when the
+         * operator has their own admin template on "Partial Payment Received",
+         * which it sends instead. A manual "Resend" is not affected.
+         *
+         * @param bool        $send        Default true.
+         * @param object|null $booking     The booking (after this payment).
+         * @param array       $paymentData The payment.
+         * @param bool        $isPartial   A balance is still due.
+         * @since 3.2.0
+         */
+        if (apply_filters('yatra_send_admin_payment_received_email', true, $booking ?: null, $paymentData, $isPartial)) {
+            self::notifyAdminPaymentReceived($paymentData);
+        }
         self::notifyCustomerPaymentReceived($paymentData);
     }
 

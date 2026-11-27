@@ -164,6 +164,14 @@ export const useToggleModule = () => {
         window.yatraAdmin.webhooksEnabled = enabledModules.some(
           (m) => m.slug === "webhooks",
         );
+        // Travel Agencies — Growth/Scale sidebar menu, same instant-toggle pattern.
+        window.yatraAdmin.travelAgencyEnabled = enabledModules.some(
+          (m) => m.slug === "travel_agency" || m.slug === "travel-agency",
+        );
+        // Guides & Resources (3.3) — sidebar menu while the module is on.
+        (window.yatraAdmin as any).guidesResourcesEnabled = enabledModules.some(
+          (m) => m.slug === "guides_resources",
+        );
         // Scheduled Payments — decides whether Payments is a plain menu item
         // or a parent with All Payments / Scheduled beneath it. Same
         // instant-toggle pattern, so the submenu appears and disappears as the
@@ -317,6 +325,14 @@ export const useBulkToggleModules = () => {
         // Webhooks — Agency-only sidebar menu, same instant-toggle pattern.
         window.yatraAdmin.webhooksEnabled = enabledModules.some(
           (m) => m.slug === "webhooks",
+        );
+        // Travel Agencies — Growth/Scale sidebar menu, same instant-toggle pattern.
+        window.yatraAdmin.travelAgencyEnabled = enabledModules.some(
+          (m) => m.slug === "travel_agency" || m.slug === "travel-agency",
+        );
+        // Guides & Resources (3.3) — sidebar menu while the module is on.
+        (window.yatraAdmin as any).guidesResourcesEnabled = enabledModules.some(
+          (m) => m.slug === "guides_resources",
         );
         // Scheduled Payments — decides whether Payments is a plain menu item
         // or a parent with All Payments / Scheduled beneath it. Same

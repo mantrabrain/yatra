@@ -1,0 +1,52 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "yatra/login",
+  "title": "Customer Login",
+  "category": "yatra",
+  "icon": "lock",
+  "description": "Customer login and registration form.",
+  "keywords": [
+    "login",
+    "account",
+    "register",
+    "sign in",
+    "yatra"
+  ],
+  "textdomain": "yatra",
+  "attributes": {
+    "title": {
+      "type": "string",
+      "default": ""
+    },
+    "subtitle": {
+      "type": "string",
+      "default": ""
+    },
+    "show_register": {
+      "type": "boolean",
+      "default": true
+    },
+    "show_forgot_password": {
+      "type": "boolean",
+      "default": true
+    },
+    "remember_me": {
+      "type": "boolean",
+      "default": true
+    },
+    "redirect_url": {
+      "type": "string",
+      "default": ""
+    }
+  },
+  "supports": {
+    "html": false,
+    "inserter": true,
+    "align": [
+      "wide",
+      "full"
+    ]
+  },
+  "editorScript": "yatra-login-block-editor"
+}

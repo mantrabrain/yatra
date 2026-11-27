@@ -1201,6 +1201,97 @@ class DiscountService extends BaseService
     }
 
     /**
+     * The per-customer rules of a coupon ("uses per customer", "first-time
+     * customers only"), checked once the customer's email is known.
+     *
+     * @param string $code  Coupon code applied.
+     * @param string $email The booking's contact email.
+     * @return string|null Why the coupon can't be used, or null.
+     */
+    public function customerRestriction(string $code, string $email): ?string
+    {
+        $code = trim($code);
+        $email = strtolower(trim($email));
+        if ($code === '' || $email === '') {
+            return null;
+        }
+        $discount = $this->repository->findByCode($code);
+        if (!$discount) {
+            return null;
+        }
+        $perCustomer = (int) ($discount->usage_limit_per_customer ?? 0);
+        $firstTimeOnly = !empty($discount->first_time_customer_only);
+        if ($perCustomer <= 0 && !$firstTimeOnly) {
+            return null;
+        }
+
+        global $wpdb;
+        $table = \Yatra\Database\Tables\BookingsTable::getTableName();
+        // The visitor's own checkout being retried is not an earlier booking.
+        $own = (isset($_SESSION) && is_array($_SESSION)) ? (int) ($_SESSION['yatra_coupon_checkout_booking'] ?? 0) : 0;
+        $since = gmdate('Y-m-d H:i:s', current_time('timestamp') - 30 * MINUTE_IN_SECONDS);
+        $exclude = $own > 0
+            ? $wpdb->prepare(' AND NOT (id = %d AND COALESCE(amount_paid, 0) <= 0 AND created_at >= %s)', $own, $since)
+            : '';
+
+        if ($perCustomer > 0) {
+            $used = (int) $wpdb->get_var($wpdb->prepare(
+                "SELECT COUNT(*) FROM `{$table}` WHERE LOWER(contact_email) = %s AND discount_code = %s AND status NOT IN ('cancelled', 'failed', 'refunded')" . $exclude,
+                $email,
+                (string) $discount->code
+            ));
+            if ($used >= $perCustomer) {
+                return __('You have already used this coupon as many times as it allows.', 'yatra');
+            }
+        }
+        if ($firstTimeOnly) {
+            $earlier = (int) $wpdb->get_var($wpdb->prepare(
+                "SELECT COUNT(*) FROM `{$table}` WHERE LOWER(contact_email) = %s AND status NOT IN ('cancelled', 'failed')" . $exclude,
+                $email
+            ));
+            if ($earlier > 0) {
+                return __('This coupon is for first-time customers only.', 'yatra');
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Bookings that have used this coupon so far.
+     *
+     * The visitor's own checkout that is still being paid for (same trip, created
+     * by this session within the last 30 minutes, nothing paid yet) is left out:
+     * re-pricing it for a card retry must not lose the discount it was booked with.
+     *
+     * @param \stdClass $discount Discount row.
+     * @param int       $trip_id  Trip being priced.
+     * @return int
+     */
+    private function usageCount(\stdClass $discount, int $trip_id): int
+    {
+        $code  = (string) ($discount->code ?? '');
+        $count = max((int) ($discount->usage_count ?? 0), $code !== '' ? $this->repository->countUsage($code) : 0);
+
+        $own = (isset($_SESSION) && is_array($_SESSION)) ? (int) ($_SESSION['yatra_coupon_checkout_booking'] ?? 0) : 0;
+        if ($own > 0 && $count > 0 && $code !== '') {
+            global $wpdb;
+            $table = \Yatra\Database\Tables\BookingsTable::getTableName();
+            $mine  = (int) $wpdb->get_var($wpdb->prepare(
+                "SELECT COUNT(*) FROM `{$table}` WHERE id = %d AND trip_id = %d AND discount_code = %s
+                 AND status NOT IN ('cancelled', 'failed') AND COALESCE(amount_paid, 0) <= 0 AND created_at >= %s",
+                $own,
+                $trip_id,
+                $code,
+                gmdate('Y-m-d H:i:s', current_time('timestamp') - 30 * MINUTE_IN_SECONDS)
+            ));
+            $count -= $mine;
+        }
+
+        return max(0, $count);
+    }
+
+    /**
      * Validate coupon for booking
      * 
      * @param \stdClass $discount Discount object
@@ -1222,8 +1313,10 @@ class DiscountService extends BaseService
             return ['valid' => false, 'message' => __('This coupon has expired.', 'yatra')];
         }
         
-        // Check usage limit
-        if ($discount->usage_limit > 0 && $discount->usage_count >= $discount->usage_limit) {
+        // Check usage limit. The stored usage_count column is never incremented,
+        // so on its own it let a single-use coupon be used without limit; the
+        // bookings that carry the code are the real count.
+        if ((int) $discount->usage_limit > 0 && $this->usageCount($discount, $trip_id) >= (int) $discount->usage_limit) {
             return ['valid' => false, 'message' => __('This coupon has reached its usage limit.', 'yatra')];
         }
         

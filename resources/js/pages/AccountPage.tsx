@@ -28,6 +28,7 @@ import {
   isUpcomingBooking,
   phoneToTelHref,
   currency as formatAccountCurrency,
+  commonCurrency,
 } from "./account/utils";
 import Dashboard from "./account/Dashboard";
 import Bookings from "./account/Bookings";
@@ -437,21 +438,28 @@ const AccountPage: React.FC = () => {
   // formatDate / site currency from ./account/utils
 
   const stats = useMemo(() => {
-    const outstanding = payments
-      .filter((p: Payment) => p.status === "pending")
-      .reduce((sum: number, payment: Payment) => sum + payment.amount, 0);
+    // From the bookings themselves (they include bookings linked by email,
+    // which have no customer record and no payment rows yet).
+    const isLive = (b: Booking) =>
+      !["cancelled", "refunded", "failed"].includes(String((b as any).booking_status || (b as any).status || ""));
+    const outstanding = bookings
+      .filter(isLive)
+      .reduce((sum: number, b: Booking) => sum + (Number(b.amount_due) || 0), 0);
     const upcoming = bookings.filter((b: Booking) =>
       isUpcomingBooking(b),
     ).length;
 
     // Calculate from real data
-    const totalSpent = displayProfile?.total_spent ?? 0;
+    const totalSpent = bookings.reduce(
+      (sum: number, b: Booking) => sum + (Number(b.amount_paid) || 0),
+      0,
+    );
     const totalBookings = bookings.length;
 
     return [
       {
         label: __("Total Bookings", "yatra"),
-        value: displayProfile?.total_bookings ?? totalBookings,
+        value: totalBookings,
         icon: Package,
         badge: displayProfile?.loyalty_tier || "",
       },
@@ -462,16 +470,16 @@ const AccountPage: React.FC = () => {
       },
       {
         label: __("Outstanding Balance", "yatra"),
-        value: formatAccountCurrency(outstanding),
+        value: formatAccountCurrency(outstanding, commonCurrency(bookings as any[])),
         icon: DollarSign,
       },
       {
         label: __("Total Spent", "yatra"),
-        value: formatAccountCurrency(totalSpent),
+        value: formatAccountCurrency(totalSpent, commonCurrency(bookings as any[])),
         icon: ShieldCheck,
       },
     ];
-  }, [bookings, payments, displayProfile]);
+  }, [bookings, displayProfile]);
 
   // getBadge moved to ./account/utils
 
@@ -512,6 +520,7 @@ const AccountPage: React.FC = () => {
         return (
           <Payments
             payments={payments}
+            bookings={bookings}
             onSectionChange={(section: string) =>
               handleSectionChange(section as Section)
             }
@@ -611,6 +620,8 @@ const AccountPage: React.FC = () => {
               </div>
             </nav>
 
+            {/* Only when there is a phone or email to reach: it looked clickable but did nothing. */}
+            {(accountShell.companyPhone || accountShell.companyEmail) && (
             <div
               className="rounded-xl p-6 text-white space-y-2 shadow-xl"
               style={{
@@ -641,6 +652,7 @@ const AccountPage: React.FC = () => {
                 </a>
               ) : null}
             </div>
+            )}
           </aside>
 
           <section className="flex-1 min-w-0 space-y-6" style={{ minWidth: 0 }}>

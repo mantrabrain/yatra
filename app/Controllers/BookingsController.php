@@ -161,6 +161,74 @@ class BookingsController extends BaseController
         // This keeps BookingsController focused on booking operations only
 
         // =====================
+        // BOOKING WORKSPACE (3.2)
+        // =====================
+
+        // Timeline: creation, payments/refunds (from the ledger) and the activity log.
+        register_rest_route($this->namespace, '/bookings/(?P<id>\d+)/activity', [
+            'methods' => 'GET',
+            'callback' => [$this, 'getBookingActivity'],
+            'permission_callback' => [$this, 'checkCanView'],
+        ]);
+
+        // Internal note (staff only, never sent to the customer).
+        register_rest_route($this->namespace, '/bookings/(?P<id>\d+)/notes', [
+            'methods' => 'POST',
+            'callback' => [$this, 'addBookingNote'],
+            'permission_callback' => [$this, 'checkCanEdit'],
+        ]);
+
+        // Mark a customer's change/cancellation request as handled.
+        register_rest_route($this->namespace, '/bookings/(?P<id>\d+)/requests/(?P<request_id>[a-f0-9-]{36})/resolve', [
+            'methods' => 'POST',
+            'callback' => [$this, 'resolveCustomerRequest'],
+            'permission_callback' => [$this, 'checkCanEdit'],
+        ]);
+
+        // Discount or surcharge with a reason.
+        register_rest_route($this->namespace, '/bookings/(?P<id>\d+)/adjustments', [
+            'methods' => 'POST',
+            'callback' => [$this, 'adjustBookingPrice'],
+            'permission_callback' => [$this, 'checkCanEdit'],
+        ]);
+
+        // Payment links: ask the customer to pay part of the balance.
+        register_rest_route($this->namespace, '/bookings/(?P<id>\d+)/payment-links', [
+            [
+                'methods' => 'GET',
+                'callback' => [$this, 'listPaymentLinks'],
+                'permission_callback' => [$this, 'checkCanEdit'],
+            ],
+            [
+                'methods' => 'POST',
+                'callback' => [$this, 'createPaymentLink'],
+                'permission_callback' => [$this, 'checkCanEdit'],
+            ],
+        ]);
+        register_rest_route($this->namespace, '/bookings/(?P<id>\d+)/payment-links/(?P<link>[a-z0-9]{8})', [
+            'methods' => 'DELETE',
+            'callback' => [$this, 'cancelPaymentLink'],
+            'permission_callback' => [$this, 'checkCanEdit'],
+        ]);
+
+        // CSV exports: the bookings list (with its filters) and a departure manifest.
+        register_rest_route($this->namespace, '/bookings/export', [
+            'methods' => 'GET',
+            'callback' => [$this, 'exportBookings'],
+            'permission_callback' => [$this, 'checkCanExport'],
+        ]);
+        register_rest_route($this->namespace, '/bookings/manifest', [
+            'methods' => 'GET',
+            'callback' => [$this, 'exportManifest'],
+            'permission_callback' => [$this, 'checkCanExport'],
+            'args' => [
+                'trip_id' => ['required' => false, 'sanitize_callback' => 'absint'],
+                'date' => ['required' => false, 'sanitize_callback' => 'sanitize_text_field'],
+                'departure_id' => ['required' => false, 'sanitize_callback' => 'absint'],
+            ],
+        ]);
+
+        // =====================
         // TRAVELERS ROUTES
         // =====================
 
@@ -222,6 +290,89 @@ class BookingsController extends BaseController
         return current_user_can('yatra_delete_bookings');
     }
 
+    public function checkCanExport(): bool
+    {
+        return current_user_can('yatra_export_bookings');
+    }
+
+    /** GET /bookings/{id}/activity */
+    public function getBookingActivity(WP_REST_Request $request): WP_REST_Response
+    {
+        $id = (int) $request->get_param('id');
+        if (!$this->bookingService->getBooking($id)) {
+            return new WP_REST_Response(['success' => false, 'message' => __('Booking not found.', 'yatra')], 404);
+        }
+
+        return new WP_REST_Response(['success' => true, 'data' => (new \Yatra\Services\BookingActivityService())->timeline($id)]);
+    }
+
+    /** POST /bookings/{id}/notes {note} */
+    public function addBookingNote(WP_REST_Request $request): WP_REST_Response
+    {
+        $result = (new \Yatra\Services\BookingActivityService())->addNote(
+            (int) $request->get_param('id'),
+            (string) $request->get_param('note')
+        );
+
+        return new WP_REST_Response($result, $result['success'] ? 201 : 400);
+    }
+
+    /** POST /bookings/{id}/requests/{request_id}/resolve */
+    public function resolveCustomerRequest(WP_REST_Request $request): WP_REST_Response
+    {
+        $result = (new \Yatra\Services\CustomerRequestService())->resolve(
+            (int) $request->get_param('id'),
+            (string) $request->get_param('request_id')
+        );
+
+        return new WP_REST_Response($result, $result['success'] ? 200 : 400);
+    }
+
+    /** POST /bookings/{id}/adjustments {kind: discount|surcharge, amount, reason} */
+    public function adjustBookingPrice(WP_REST_Request $request): WP_REST_Response
+    {
+        $result = (new \Yatra\Services\BookingActivityService())->adjustPrice(
+            (int) $request->get_param('id'),
+            (string) $request->get_param('kind'),
+            (float) $request->get_param('amount'),
+            (string) $request->get_param('reason')
+        );
+
+        return new WP_REST_Response($result, $result['success'] ? 200 : 400);
+    }
+
+    /** GET /bookings/export — CSV of the bookings list with the same filters. */
+    public function exportBookings(WP_REST_Request $request): WP_REST_Response
+    {
+        $filters = [];
+        foreach (['status', 'payment_status', 'search', 'date_from', 'date_to', 'created_from', 'created_to', 'orderby', 'order'] as $key) {
+            $value = $request->get_param($key);
+            if (is_string($value) && $value !== '') {
+                $filters[$key] = sanitize_text_field($value);
+            }
+        }
+        if ((int) $request->get_param('trip_id') > 0) {
+            $filters['trip_id'] = (int) $request->get_param('trip_id');
+        }
+
+        return new WP_REST_Response(['success' => true, 'data' => (new \Yatra\Services\BookingExportService())->bookingsCsv($filters)]);
+    }
+
+    /** GET /bookings/manifest?trip_id=&date= — everyone travelling on one departure. */
+    public function exportManifest(WP_REST_Request $request): WP_REST_Response
+    {
+        $departureId = (int) $request->get_param('departure_id');
+        $date = (string) $request->get_param('date');
+        if ($departureId <= 0 && (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) || (int) $request->get_param('trip_id') <= 0)) {
+            return new WP_REST_Response(['success' => false, 'message' => __('Invalid date.', 'yatra')], 400);
+        }
+
+        return new WP_REST_Response([
+            'success' => true,
+            'data' => (new \Yatra\Services\BookingExportService())->manifestCsv((int) $request->get_param('trip_id'), $date, $departureId),
+        ]);
+    }
+
     public function checkCanChangeStatus(): bool
     {
         // Separate from edit — Front Desk has this without the
@@ -260,6 +411,9 @@ class BookingsController extends BaseController
             'search' => $request->get_param('search') ?: '',
             'date_from' => $request->get_param('date_from') ?: '',
             'date_to' => $request->get_param('date_to') ?: '',
+            // Booked-on window (date_from/date_to filter the travel date).
+            'created_from' => $request->get_param('created_from') ?: '',
+            'created_to' => $request->get_param('created_to') ?: '',
             // Column sorting from the table headers — whitelisted in the repository.
             'orderby' => $request->get_param('orderby') ?: '',
             'order' => $request->get_param('order') ?: '',
@@ -346,8 +500,14 @@ class BookingsController extends BaseController
                 return $this->error_response($result['message'] ?? 'Failed to create booking', 400);
             }
 
-            Logger::info("Booking created successfully", ['booking_id' => $result['data']['id'] ?? null]);
-            return $this->success_response($result['data'], 201);
+            // createBooking() returns booking_id/reference, not 'data': reading
+            // $result['data'] raised a PHP warning on every admin booking (and
+            // could corrupt the JSON where warnings are displayed).
+            $bookingId = (int) ($result['booking_id'] ?? ($result['data']['id'] ?? 0));
+            Logger::info("Booking created successfully", ['booking_id' => $bookingId]);
+            $created = $bookingId > 0 ? $this->bookingService->getBooking($bookingId) : null;
+
+            return $this->success_response($created ?? $result, 201);
             
         } catch (\Exception $e) {
             Logger::error("Failed to create booking", ['data' => $data ?? [], 'error' => $e->getMessage()]);
@@ -369,8 +529,19 @@ class BookingsController extends BaseController
             $data = BookingValidator::sanitize($data);
             
             Logger::apiRequest("/bookings/{$id}", 'PUT', $data);
-            
+
+            $bookingRepository = new \Yatra\Repositories\BookingRepository();
+            $before = $bookingRepository->find($id);
+
             $result = $this->bookingService->updateBooking($id, $data);
+
+            // What the edit changed, for the booking's history.
+            if (!empty($result['success']) && $before) {
+                $after = $bookingRepository->find($id);
+                if ($after) {
+                    (new \Yatra\Services\BookingActivityService())->recordEdit($id, $before, $after);
+                }
+            }
 
             if (!$result['success']) {
                 Logger::warning("Booking update failed", ['booking_id' => $id, 'data' => $data, 'result' => $result]);
@@ -488,7 +659,30 @@ class BookingsController extends BaseController
     {
         $bookingId = (int) $request->get_param('id');
         $data = $request->get_json_params();
+        $data = is_array($data) ? $data : [];
         $data['booking_id'] = $bookingId;
+
+        // A recorded payment can't be more than what is still owed (a typo of
+        // 99999 marked a $1,080 booking paid with $100k received). To take
+        // more, raise the price first (Adjust price).
+        $booking = (new \Yatra\Repositories\BookingRepository())->find($bookingId);
+        $amount = round((float) ($data['amount'] ?? 0), 2);
+        $status = (string) ($data['status'] ?? 'completed');
+        if ($booking && $amount > 0 && in_array($status, ['completed', 'paid'], true) && empty($data['allow_overpayment'])) {
+            $due = round(max(0.0, (float) ($booking->amount_due ?? ((float) $booking->total_amount - (float) $booking->amount_paid))), 2);
+            if ($amount > $due + 0.009) {
+                return new WP_REST_Response([
+                    'success' => false,
+                    'message' => $due > 0
+                        ? sprintf(
+                            /* translators: %s: balance still due, formatted. */
+                            __('That is more than the balance due (%s). Record at most the balance, or use Adjust price first if the customer owes more.', 'yatra'),
+                            yatra_format_price($due, (string) ($booking->currency ?: \Yatra\Services\SettingsService::getCurrency()), false)
+                        )
+                        : __('This booking is already fully paid. Use Adjust price first if the customer owes more.', 'yatra'),
+                ], 400);
+            }
+        }
 
         $result = $this->paymentService->createPayment($data);
 
@@ -930,5 +1124,75 @@ class BookingsController extends BaseController
 
         $builder->pdfService()->outputPdfDownload($pdfBinary, $filename);
         exit;
+    }
+
+    public function listPaymentLinks(WP_REST_Request $request): WP_REST_Response
+    {
+        $booking = (new \Yatra\Repositories\BookingRepository())->find((int) $request->get_param('id'));
+        if (!$booking) {
+            return new WP_REST_Response(['success' => false, 'message' => __('Booking not found.', 'yatra')], 404);
+        }
+
+        return new WP_REST_Response([
+            'success' => true,
+            'data' => \Yatra\Services\PaymentLinkService::forBooking($booking),
+            'can_pay_online' => \Yatra\Services\PaymentLinkService::canPayOnline(),
+        ], 200);
+    }
+
+    public function createPaymentLink(WP_REST_Request $request): WP_REST_Response
+    {
+        $body = (array) $request->get_json_params();
+        $result = \Yatra\Services\PaymentLinkService::create(
+            (int) $request->get_param('id'),
+            (float) ($body['amount'] ?? 0),
+            (string) ($body['note'] ?? ''),
+            !empty($body['send_email'])
+        );
+        if (empty($result['success'])) {
+            return new WP_REST_Response($result, 400);
+        }
+        // In the booking's history (as a note by the operator who made it).
+        try {
+            $booking = (new \Yatra\Repositories\BookingRepository())->find((int) $request->get_param('id'));
+            (new \Yatra\Services\BookingActivityService())->addNote((int) $request->get_param('id'), sprintf(
+                /* translators: %s: amount. */
+                __('Payment link created for %s.', 'yatra'),
+                yatra_format_price((float) ($result['link']['amount'] ?? 0), (string) ($booking->currency ?? ''), false)
+            ) . (!empty($body['send_email']) ? ' ' . __('Emailed to the customer.', 'yatra') : ''));
+        } catch (\Throwable $e) {
+            // History is informational.
+        }
+
+        return new WP_REST_Response($result, 201);
+    }
+
+    public function cancelPaymentLink(WP_REST_Request $request): WP_REST_Response
+    {
+        $bookingId = (int) $request->get_param('id');
+        $linkId = (string) $request->get_param('link');
+        $amount = null;
+        $booking = (new \Yatra\Repositories\BookingRepository())->find($bookingId);
+        if ($booking) {
+            foreach (\Yatra\Services\PaymentLinkService::forBooking($booking) as $link) {
+                if ($link['id'] === $linkId) {
+                    $amount = (float) $link['amount'];
+                }
+            }
+        }
+        $ok = \Yatra\Services\PaymentLinkService::cancel($bookingId, $linkId);
+        if ($ok && $amount !== null) {
+            try {
+                (new \Yatra\Services\BookingActivityService())->addNote($bookingId, sprintf(
+                    /* translators: %s: amount. */
+                    __('Payment link for %s cancelled.', 'yatra'),
+                    yatra_format_price($amount, (string) ($booking->currency ?? ''), false)
+                ));
+            } catch (\Throwable $e) {
+                // History is informational.
+            }
+        }
+
+        return new WP_REST_Response(['success' => $ok, 'message' => $ok ? __('Payment link cancelled.', 'yatra') : __('This link is no longer open.', 'yatra')], $ok ? 200 : 400);
     }
 }

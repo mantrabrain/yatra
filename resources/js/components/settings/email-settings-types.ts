@@ -3,6 +3,9 @@ import type { ChangeEventHandler } from "react";
 /** Core email fields stored via Settings API (`/settings`). */
 export type EmailSettingsValues = {
   email_always_bcc?: string;
+  // Email branding (3.3).
+  email_show_logo?: boolean;
+  email_brand_color?: string;
   // Payment-mode flags, read to decide whether part-payment specific
   // templates are relevant to this site.
   partial_payment?: boolean;

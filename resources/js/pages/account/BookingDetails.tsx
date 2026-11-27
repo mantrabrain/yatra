@@ -22,6 +22,8 @@ import {
   getYatraAccountPageGlobals,
 } from "./utils";
 import TaxDisplay from "../../components/booking/TaxDisplay";
+import BookingRequestPanel from "./BookingRequestPanel";
+import TravellerDetailsEditor from "./TravellerDetailsEditor";
 
 const getCountryName = (code: string): string => {
   if (!code || typeof code !== "string") {
@@ -299,10 +301,11 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                  {__("Booking Number", "yatra")}
+                  {__("Booking Reference", "yatra")}
                 </div>
                 <div className="text-lg font-semibold text-gray-900 dark:text-white">
-                  {booking.booking_number || `#${booking.id}`}
+                  {/* The reference the emails use, not the internal id. */}
+                  {booking.booking_number || (booking as any).reference || `#${booking.id}`}
                 </div>
               </div>
               <div>
@@ -340,6 +343,46 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({
                   {formatTravelDateRange(booking.travel_date, booking.end_date)}
                 </div>
               </div>
+              {(booking as any).pickup_point?.name && (
+                <div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                    {__("Pickup point", "yatra")}
+                  </div>
+                  <div className="text-sm text-gray-900 dark:text-white">
+                    {(booking as any).pickup_point.name}
+                    {(booking as any).pickup_point.time
+                      ? ` — ${(booking as any).pickup_point.time}`
+                      : ""}
+                  </div>
+                  {(booking as any).pickup_point.details && (
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      {(booking as any).pickup_point.details}
+                    </div>
+                  )}
+                </div>
+              )}
+              {(booking as any).accommodation?.name && (
+                <div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                    {__("Accommodation", "yatra")}
+                  </div>
+                  <div className="text-sm text-gray-900 dark:text-white">
+                    {(booking as any).accommodation.name}
+                  </div>
+                </div>
+              )}
+              {(booking as any).travel_insurance && (
+                <div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                    {(booking as any).travel_insurance.title || __("Travel insurance", "yatra")}
+                  </div>
+                  <div className="text-sm text-gray-900 dark:text-white">
+                    {(booking as any).travel_insurance.accepted
+                      ? __("Added", "yatra")
+                      : __("Declined", "yatra")}
+                  </div>
+                </div>
+              )}
               <div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
                   <Users className="w-3 h-3" />
@@ -717,6 +760,19 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({
             })()}
           </div>
 
+          {/* Complete / correct traveller details (absent on older servers) */}
+          {Array.isArray((booking as any).traveler_form_fields) &&
+            Array.isArray(booking.travelers_data) && (
+              <TravellerDetailsEditor
+                bookingId={Number((booking as any).id)}
+                travelers={booking.travelers_data as any[]}
+                fields={(booking as any).traveler_form_fields}
+                missing={(booking as any).travelers_missing || []}
+                canEdit={Boolean((booking as any).can_edit_travelers)}
+                travelersCount={Number((booking as any).travelers_count) || 0}
+              />
+            )}
+
           {/* Travelers Information */}
           {booking.travelers_data && booking.travelers_data.length > 0 && (
             <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
@@ -821,6 +877,16 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({
                             fieldValue.length === 2
                           ) {
                             displayValue = getCountryName(fieldValue);
+                          }
+                          // A choice field shows its label ("Male"), not the stored value ("male").
+                          const formField = Array.isArray((booking as any).traveler_form_fields)
+                            ? (booking as any).traveler_form_fields.find((f: any) => f.id === fieldId)
+                            : null;
+                          const option = formField?.options?.find(
+                            (o: any) => String(o.value) === String(fieldValue),
+                          );
+                          if (option?.label) {
+                            displayValue = option.label;
                           }
                           return (
                             <div key={fieldId}>
@@ -1100,6 +1166,17 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({
               </div>
             )}
           </div>
+
+          {/* Change / cancellation requests (absent on older servers) */}
+          {typeof (booking as any).can_request_change === "boolean" && (
+            <BookingRequestPanel
+              bookingId={Number((booking as any).id)}
+              requests={(booking as any).customer_requests || []}
+              canRequest={Boolean((booking as any).can_request_change)}
+              unavailableReason={String((booking as any).request_unavailable_reason || "")}
+              enabled={(booking as any).customer_requests_enabled !== false}
+            />
+          )}
 
           {/* Timeline */}
           <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">

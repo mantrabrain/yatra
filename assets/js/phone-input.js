@@ -79,6 +79,12 @@
     var isoInput = field.querySelector(".yatra-phone-iso");
     var flagBase = field.getAttribute("data-flag-base") || "";
     if (!button || !numberInput || !isoInput) return;
+    // A number already filled in (saved profile, form re-shown) keeps its
+    // country; only a blank or freshly typed national number follows the
+    // Country select.
+    if (String(numberInput.value || "").trim() !== "") {
+      field.dataset.yatraPhonePicked = "1";
+    }
 
     var dropdown = null;
     var listEl = null;
@@ -145,6 +151,7 @@
           "</span>";
         li.querySelector(".yatra-phone-option-name").textContent = c.name;
         li.addEventListener("click", function () {
+          field.dataset.yatraPhonePicked = "1";
           setCountry(c.iso);
           close();
           numberInput.focus();
@@ -224,7 +231,11 @@
       var v = numberInput.value;
       if (v.charAt(0) === "+") {
         var d = detectCountry(v);
-        if (d) setCountry(d.iso);
+        if (d) {
+          // A typed "+44…" says which country the number is from.
+          field.dataset.yatraPhonePicked = "1";
+          setCountry(d.iso);
+        }
       }
     });
 
@@ -233,10 +244,17 @@
       if (v.charAt(0) !== "+") return;
       var d = detectCountry(v);
       if (d) {
+        field.dataset.yatraPhonePicked = "1";
         setCountry(d.iso);
         numberInput.value = d.national;
       }
     }
+    // Lets a country picked elsewhere on the form set the dial code.
+    field.yatraSetCountry = setCountry;
+    field.yatraIsEmpty = function () {
+      return String(numberInput.value || "").trim() === "";
+    };
+
     numberInput.addEventListener("blur", splitIfInternational);
     numberInput.addEventListener("paste", function () {
       setTimeout(splitIfInternational, 0);
@@ -248,6 +266,20 @@
       .querySelectorAll("[data-yatra-phone]")
       .forEach(initField);
   }
+
+  // Picking a country (e.g. "Country" in the contact details) sets the dial
+  // code of the phone fields in the same form, as long as the customer hasn't
+  // chosen a dial code themselves (from the list, or by typing "+44…"). A
+  // national number typed before the country still follows the country.
+  document.addEventListener("change", function (e) {
+    var sel = e.target;
+    if (!sel || sel.tagName !== "SELECT" || !/country$/i.test(sel.name || "") || !sel.value) return;
+    var scope = sel.closest("form") || document;
+    scope.querySelectorAll("[data-yatra-phone]").forEach(function (f) {
+      if (f.dataset.yatraPhonePicked === "1" || !f.yatraSetCountry) return;
+      f.yatraSetCountry(sel.value);
+    });
+  });
 
   // Close on outside click / Escape.
   document.addEventListener("click", function (e) {

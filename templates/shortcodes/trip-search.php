@@ -47,6 +47,9 @@ if ($active_filters['destination'] !== '') {
     foreach ($destinations as $d) {
         if ((string) ($d->slug ?? '') === $active_filters['destination']) {
             $dest_label = (string) ($d->name ?? $active_filters['destination']);
+            if (function_exists('yatra_translate_term_name')) {
+                $dest_label = yatra_translate_term_name($dest_label);
+            }
             break;
         }
     }
@@ -61,6 +64,9 @@ if ($active_filters['activity'] !== '') {
     foreach ($activities as $a) {
         if ((string) ($a->slug ?? '') === $active_filters['activity']) {
             $act_label = (string) ($a->name ?? $active_filters['activity']);
+            if (function_exists('yatra_translate_term_name')) {
+                $act_label = yatra_translate_term_name($act_label);
+            }
             break;
         }
     }
@@ -85,12 +91,15 @@ if ($active_filters['budget'] !== '') {
 
 $dur_display_label = __('Duration', 'yatra');
 if ($active_filters['duration'] !== '' && preg_match('/^(\d+)-(\d+)$/', $active_filters['duration'], $dmDur)) {
-    $dur_display_label = sprintf(
-        /* translators: 1: min days, 2: max days */
-        __('%1$d – %2$d days', 'yatra'),
-        (int) $dmDur[1],
-        (int) $dmDur[2]
-    );
+    $dur_display_label = (int) $dmDur[1] === (int) $dmDur[2]
+        /* translators: %d: number of days. */
+        ? sprintf(_n('%d Day', '%d Days', (int) $dmDur[1], 'yatra'), (int) $dmDur[1])
+        : sprintf(
+            /* translators: 1: min days, 2: max days */
+            __('%1$d – %2$d days', 'yatra'),
+            (int) $dmDur[1],
+            (int) $dmDur[2]
+        );
 }
 
 // Per-field visibility is owned entirely by the SearchShortcode: for each field
@@ -174,6 +183,9 @@ $yatra_search_rendered = false;
                                 <?php foreach ($destinations as $dest) : ?>
                                     <?php
                                     $dname = (string) ($dest->name ?? '');
+                                    if (function_exists('yatra_translate_term_name')) {
+                                        $dname = yatra_translate_term_name($dname);
+                                    }
                                     $dslug = (string) ($dest->slug ?? '');
                                     ?>
                                     <div class="yatra-dropdown-option<?php echo ($active_filters['destination'] === $dslug) ? ' selected' : ''; ?>" data-value="<?php echo esc_attr($dslug); ?>" data-search-text="<?php echo esc_attr($dname . ' ' . $dslug); ?>">
@@ -248,6 +260,9 @@ $yatra_search_rendered = false;
                                 <?php foreach ($activities as $act) : ?>
                                     <?php
                                     $aname = (string) ($act->name ?? '');
+                                    if (function_exists('yatra_translate_term_name')) {
+                                        $aname = yatra_translate_term_name($aname);
+                                    }
                                     $aslug = (string) ($act->slug ?? '');
                                     ?>
                                     <div class="yatra-dropdown-option<?php echo ($active_filters['activity'] === $aslug) ? ' selected' : ''; ?>" data-value="<?php echo esc_attr($aslug); ?>" data-search-text="<?php echo esc_attr($aname . ' ' . $aslug); ?>">

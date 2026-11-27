@@ -1,9 +1,9 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-DLxDKlIL.js","../../../dist/js/react-vendor-W-_yntDU.js","../css/react-vendor.css","../../../dist/js/index-BepRZmXV.js","../css/index.css","../../../dist/js/BuildItineraryModal-YugDA9cT.js","../../../dist/js/ProFeature-eW2EIwqA.js","../../../dist/js/Settings-5xW46lQt.js","../../../dist/js/Team-DyYUid5I.js","../../../dist/js/Reports-DJFFzVlx.js","../../../dist/js/DiscountForm-DEhimB0H.js","../../../dist/js/ApplicableTripSelector-D2QW_HaZ.js","../../../dist/js/Itinerary-CF5aaNMY.js","../../../dist/js/RecurringRuleForm-DGAFIGuV.js","./Whatsapp.js","../../../dist/js/module-skeleton-C9FJOcwf.js","../../../dist/js/ChannelManager-Fb0ex6IR.js","../../../dist/js/Webhooks-CwK81HRm.js","../../../dist/js/ScheduledPayments-DdSUOyEb.js","../../../dist/js/TripConsentForm-BAKrDitH.js","../../../dist/js/BookingForm-WRfLP_5t.js","../../../dist/js/ViewBooking-D0EgePSD.js","../../../dist/js/AvailabilityForm-p5NPshvM.js","../../../dist/js/DynamicPricing-PAm1uvCr.js","../../../dist/js/RuleTypeSelectionModal-DSWZlmcG.js","../../../dist/js/toggle-DcgGKLMp.js","../../../dist/js/DynamicPricingRuleForm-BNVsNOcm.js","../../../dist/js/AiAssistant-DONS3P3T.js","../../../dist/js/AbandonedRecovery-a5eULyr-.js","../../../dist/js/WhiteLabel-BzFhb8A5.js"])))=>i.map(i=>d[i]);
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["../../../dist/js/TripForm-C-a3J5A9.js","../../../dist/js/react-vendor-B8PqgpgO.js","../css/react-vendor.css","../../../dist/js/index-_dIN_405.js","../css/index.css","../../../dist/js/BuildItineraryModal-CyDwNxlk.js","../../../dist/js/ProFeature-BFaiH-dq.js","../../../dist/js/Settings-BWgByeyf.js","../../../dist/js/Team-B6pKe6iB.js","../../../dist/js/Reports-d4B5rrDw.js","../../../dist/js/DiscountForm-DpP7G12z.js","../../../dist/js/ApplicableTripSelector-BkIbjolj.js","../../../dist/js/Itinerary-BvJkY4oM.js","../../../dist/js/RecurringRuleForm-BnxXoSMZ.js","./Whatsapp.js","../../../dist/js/module-skeleton-BUfnfMLm.js","../../../dist/js/ChannelManager-B6mfK3Vn.js","../../../dist/js/Webhooks-ipRnYIaP.js","../../../dist/js/TravelAgencies-D2llVuvh.js","../../../dist/js/GuidesResources-CaWOGsCi.js","../../../dist/js/ScheduledPayments-DH_Bdv_C.js","../../../dist/js/TripConsentForm-CzReTXGd.js","../../../dist/js/BookingForm-CmqBWZis.js","../../../dist/js/ViewBooking-WCU20PD1.js","../../../dist/js/AvailabilityForm-BNi8_Do5.js","../../../dist/js/DynamicPricing-BObeBao8.js","../../../dist/js/RuleTypeSelectionModal-CfKT6tL0.js","../../../dist/js/toggle-dqBoVrZd.js","../../../dist/js/DynamicPricingRuleForm-DC20vKS8.js","../../../dist/js/AiAssistant-B2LdNa4s.js","../../../dist/js/AbandonedRecovery-B1EcHvJO.js","../../../dist/js/WhiteLabel-DKz0zXt3.js"])))=>i.map(i=>d[i]);
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key2, value) => key2 in obj ? __defProp(obj, key2, { enumerable: true, configurable: true, writable: true, value }) : obj[key2] = value;
 var __publicField = (obj, key2, value) => __defNormalProp(obj, typeof key2 !== "symbol" ? key2 + "" : key2, value);
-import { r as reactExports, j as jsxRuntimeExports, W as Wrench, N as Network, M as MessageCircle, S as Sparkles, R as RotateCcw, P as Puzzle, a as MessageSquare, b as Plane, B as BadgePercent, c as Route, F as FileSignature, K as Key, d as Mail, C as Crown, A as Activity, L as List, T as TrendingUp, e as Tag, f as FolderTree, U as Users, g as CircleUser, h as Package, i as CreditCard, k as FileText, l as Settings$1, m as BarChart3, n as Star, o as CalendarDays, p as CalendarClock, q as Calendar$1, s as MapPin, t as LayoutDashboard, u as useQueryClient, v as useMutation, w as useQuery, Z as Zap, x as Webhook, y as ChevronDown, z as ChevronRight, D as ArrowLeft, G as Gift, E as Cloud, H as Sun, I as Moon, J as User, O as RefreshCw, Q as Inbox, V as AlertTriangle, X as ExternalLink, Y as isObjectLike_1, _ as _baseGetTag, $ as isArray_1, a0 as _MapCache, a1 as getDefaultExportFromCjs, a2 as _Symbol, a3 as isObject$5, a4 as isFunction, a5 as reactIsExports, a6 as React, a7 as _Stack, a8 as _baseIsEqual, a9 as isObject_1, aa as keys_1, ab as isLength_1, ac as _isIndex, ad as isArguments_1, ae as _Set, af as _setToArray, ag as _SetCache, ah as _cacheHas, ai as _arrayPush, aj as isArrayLike_1, ak as _baseUnary, al as _getNative, am as eq_1, an as _root, ao as isEqual, ap as Animate, aq as _overArg, ar as _arraySome, as as Clock, at as DollarSign, au as ArrowRight, av as Shield, aw as CheckCircle, ax as Plus, ay as X, az as reactDomExports, aA as AlertCircle, aB as Loader2, aC as Check, aD as Wand2, aE as ChevronLeft, aF as CheckCircle2, aG as HelpCircle, aH as Info, aI as Copy, aJ as MoreVertical, aK as Columns, aL as PenSquare, aM as ArrowUp, aN as ArrowDown, aO as Archive, aP as Trash2, aQ as Search, aR as ArrowUpDown, aS as Eye, aT as Upload, aU as Image, aV as ReactQuill, aW as Pen, aX as Save, aY as Download, aZ as CircleDollarSign, a_ as Undo2, a$ as Phone, b0 as PauseCircle, b1 as ShieldX, b2 as ShieldOff, b3 as Globe, b4 as Award, b5 as Database, b6 as Folder, b7 as Mountain, b8 as UserCheck, b9 as Server, ba as XCircle, bb as Video, bc as Lock, bd as GripVertical, be as ChevronUp, bf as Play, bg as ClipboardCopy, bh as StickyNote, bi as Ban, bj as Bell, bk as Heart, bl as Scissors, bm as Send, bn as Filter, bo as ArrowUpRight, bp as ClipboardCheck, bq as PenTool, br as Camera, bs as BarChart$1, bt as Megaphone, bu as Compass, bv as GitBranch, bw as Pause, bx as Settings2, by as Code, bz as Bug, bA as EyeOff, bB as QueryClient, bC as client, bD as QueryClientProvider } from "../../../dist/js/react-vendor-W-_yntDU.js";
-import { a as apiClient, A as API_ENDPOINTS, b as apiService, _ as __, u as useToast, s as sprintf, n as normalizeCurrencyPosition, t as toDateValue, f as formatYatraMoney, r as readYatraCurrencyPositionFromWindow, c as brandName, d as formatDateForInput, I as Input, e as formatDate$1, g as getWeekStartsOn, h as getWeekdayLabels, i as todayYmd, S as SearchableSelect, j as getCurrencySymbol, k as formatDateTime, l as getCountryName, m as ajaxService, T as ToastProvider, E as ErrorBoundary } from "../../../dist/js/index-BepRZmXV.js";
+import { r as reactExports, j as jsxRuntimeExports, W as Wrench, B as Briefcase, N as Network, M as MessageCircle, S as Sparkles, R as RotateCcw, P as Puzzle, a as MessageSquare, b as Plane, c as BadgePercent, d as Route, F as FileSignature, K as Key, e as Mail, C as Crown, A as Activity, L as List, T as TrendingUp, f as Tag, g as FolderTree, U as Users, h as CircleUser, i as Package, k as CreditCard, l as FileText, m as Settings$1, n as BarChart3, o as Star, p as CalendarDays, q as CalendarClock, s as Calendar$1, t as MapPin, u as LayoutDashboard, v as useQueryClient, w as useMutation, x as useQuery, Z as Zap, y as Webhook, z as ChevronDown, D as ChevronRight, E as ArrowLeft, G as Gift, H as Cloud, I as Sun, J as Moon, O as User, Q as RefreshCw, V as Inbox, X as AlertTriangle, Y as ExternalLink, _ as isObjectLike_1, $ as _baseGetTag, a0 as isArray_1, a1 as _MapCache, a2 as getDefaultExportFromCjs, a3 as _Symbol, a4 as isObject$5, a5 as isFunction, a6 as reactIsExports, a7 as React, a8 as _Stack, a9 as _baseIsEqual, aa as isObject_1, ab as keys_1, ac as isLength_1, ad as _isIndex, ae as isArguments_1, af as _Set, ag as _setToArray, ah as _SetCache, ai as _cacheHas, aj as _arrayPush, ak as isArrayLike_1, al as _baseUnary, am as _getNative, an as eq_1, ao as _root, ap as isEqual, aq as Animate, ar as _overArg, as as _arraySome, at as Clock, au as DollarSign, av as ArrowRight, aw as Shield, ax as CheckCircle, ay as Plus, az as X, aA as reactDomExports, aB as AlertCircle, aC as Loader2, aD as Check, aE as Wand2, aF as ChevronLeft, aG as CheckCircle2, aH as HelpCircle, aI as Info, aJ as Copy, aK as MoreVertical, aL as Columns, aM as PenSquare, aN as ArrowUp, aO as ArrowDown, aP as Archive, aQ as Trash2, aR as Search, aS as ArrowUpDown, aT as Eye, aU as Upload, aV as Image, aW as ReactQuill, aX as Pen, aY as Save, aZ as Download, a_ as CircleDollarSign, a$ as Undo2, b0 as Phone, b1 as PauseCircle, b2 as ShieldX, b3 as ShieldOff, b4 as Globe, b5 as Award, b6 as Shuffle, b7 as Play, b8 as XCircle, b9 as Pencil, ba as Database, bb as Folder, bc as Mountain, bd as UserCheck, be as Server, bf as Video, bg as Lock, bh as GripVertical, bi as ChevronUp, bj as ClipboardCopy, bk as StickyNote, bl as Ban, bm as Bell, bn as Heart, bo as Scissors, bp as Send, bq as Filter, br as ArrowUpRight, bs as ClipboardCheck, bt as PenTool, bu as Camera, bv as BarChart$1, bw as Megaphone, bx as Compass, by as GitBranch, bz as Pause, bA as Settings2, bB as Code, bC as Bug, bD as EyeOff, bE as QueryClient, bF as client, bG as QueryClientProvider } from "../../../dist/js/react-vendor-B8PqgpgO.js";
+import { a as apiClient, A as API_ENDPOINTS, b as apiService, _ as __, u as useToast, s as sprintf, n as normalizeCurrencyPosition, t as toDateValue, f as formatYatraMoney, r as readYatraCurrencyPositionFromWindow, c as brandName, d as formatDateForInput, I as Input, e as formatDate$1, g as getWeekStartsOn, h as getWeekdayLabels, i as todayYmd, S as SearchableSelect, j as getCurrencySymbol, k as formatDateTime, l as _n, m as getCountryName, o as ajaxService, T as ToastProvider, E as ErrorBoundary } from "../../../dist/js/index-_dIN_405.js";
 const scriptRel = "modulepreload";
 const assetsURL = function(dep, importerUrl) {
   return new URL(dep, importerUrl).href;
@@ -431,6 +431,16 @@ const DEFAULT_MENU_ITEMS = [
   },
   { slug: "bookings", label: "Bookings", iconName: "Calendar" },
   { slug: "customers", label: "Customers", iconName: "UserCircle" },
+  {
+    slug: "travel-agencies",
+    label: "Travel Agencies",
+    iconName: "Briefcase"
+  },
+  {
+    slug: "guides-resources",
+    label: "Guides & Resources",
+    iconName: "Users"
+  },
   { slug: "travelers", label: "Travelers", iconName: "Plane" },
   { slug: "enquiries", label: "Enquiries", iconName: "MessageSquare" },
   { slug: "reviews", label: "Reviews", iconName: "Star" },
@@ -514,6 +524,7 @@ const ICON_MAP = {
   Sparkles,
   MessageCircle,
   Network,
+  Briefcase,
   Tools: Wrench
 };
 const accessibility = {
@@ -4150,7 +4161,7 @@ const Layout = ({ children }) => {
     // pre_load_script_translations filter then delivers the locale
     // data to wp.i18n on every admin page load.
     () => {
-      var _a2, _b2, _c2, _d2, _e2, _f2, _g2, _h2, _i2, _j2, _k2, _l2, _m;
+      var _a2, _b2, _c2, _d2, _e2, _f2, _g2, _h2, _i2, _j2, _k2, _l2, _m, _n2, _o, _p;
       return [
         {
           subpage: "dashboard",
@@ -4291,6 +4302,27 @@ const Layout = ({ children }) => {
           icon: CircleUser,
           cap: "yatra_view_customers"
         },
+        // Travel Agencies — Growth/Scale module. Same gate as WhatsApp:
+        // the Growth-or-Scale flag AND the module toggle on (useModules.ts
+        // updates `travelAgencyEnabled` and fires `yatra-modules-updated`).
+        ...((_b2 = window.yatraAdmin) == null ? void 0 : _b2.isAiEligible) && ((_c2 = window.yatraAdmin) == null ? void 0 : _c2.travelAgencyEnabled) ? [
+          {
+            subpage: "travel-agencies",
+            label: __("Travel Agencies", "yatra"),
+            icon: Briefcase,
+            isPremium: true,
+            cap: "yatra_view_bookings"
+          }
+        ] : [],
+        ...((_d2 = window.yatraAdmin) == null ? void 0 : _d2.guidesResourcesEnabled) ? [
+          {
+            subpage: "guides-resources",
+            label: __("Guides & Resources", "yatra"),
+            icon: Users,
+            isPremium: true,
+            cap: "yatra_view_trips"
+          }
+        ] : [],
         {
           subpage: "travelers",
           label: __("Travelers", "yatra"),
@@ -4363,7 +4395,7 @@ const Layout = ({ children }) => {
         // `isAgency` and `whiteLabelEnabled`; useModules.ts updates the
         // latter on toggle and fires `yatra-modules-updated` which bumps
         // navRefreshKey → this memo recomputes → menu appears.
-        ...((_b2 = window.yatraAdmin) == null ? void 0 : _b2.isAgency) && ((_c2 = window.yatraAdmin) == null ? void 0 : _c2.whiteLabelEnabled) ? [
+        ...((_e2 = window.yatraAdmin) == null ? void 0 : _e2.isAgency) && ((_f2 = window.yatraAdmin) == null ? void 0 : _f2.whiteLabelEnabled) ? [
           {
             subpage: "white-label",
             label: __("White Label", "yatra"),
@@ -4380,7 +4412,7 @@ const Layout = ({ children }) => {
         // window.yatraAdmin.aiAssistantEnabled and fires
         // `yatra-modules-updated`, which bumps navRefreshKey so this
         // memo recomputes immediately without a page reload.
-        ...((_d2 = window.yatraAdmin) == null ? void 0 : _d2.isAiEligible) && ((_e2 = window.yatraAdmin) == null ? void 0 : _e2.aiAssistantEnabled) ? [
+        ...((_g2 = window.yatraAdmin) == null ? void 0 : _g2.isAiEligible) && ((_h2 = window.yatraAdmin) == null ? void 0 : _h2.aiAssistantEnabled) ? [
           {
             subpage: "ai-assistant",
             label: __("AI Assistant", "yatra"),
@@ -4395,7 +4427,7 @@ const Layout = ({ children }) => {
         // useModules.ts updates `whatsappEnabled` on toggle + fires
         // `yatra-modules-updated` so this menu appears instantly without
         // a page reload.
-        ...((_f2 = window.yatraAdmin) == null ? void 0 : _f2.isAiEligible) && ((_g2 = window.yatraAdmin) == null ? void 0 : _g2.whatsappEnabled) ? [
+        ...((_i2 = window.yatraAdmin) == null ? void 0 : _i2.isAiEligible) && ((_j2 = window.yatraAdmin) == null ? void 0 : _j2.whatsappEnabled) ? [
           {
             subpage: "whatsapp",
             label: __("WhatsApp", "yatra"),
@@ -4409,7 +4441,7 @@ const Layout = ({ children }) => {
         // toggle on. useModules.ts updates `channelManagerEnabled` on
         // toggle + fires `yatra-modules-updated` so this menu appears
         // instantly without a page reload.
-        ...((_h2 = window.yatraAdmin) == null ? void 0 : _h2.isAgency) && ((_i2 = window.yatraAdmin) == null ? void 0 : _i2.channelManagerEnabled) ? [
+        ...((_k2 = window.yatraAdmin) == null ? void 0 : _k2.isAgency) && ((_l2 = window.yatraAdmin) == null ? void 0 : _l2.channelManagerEnabled) ? [
           {
             subpage: "channel-manager",
             label: __("Channel Manager", "yatra"),
@@ -4420,7 +4452,7 @@ const Layout = ({ children }) => {
         ] : [],
         // Webhooks — Agency-tier outbound integration hub. Same gate
         // as Channel Manager / White Label: Agency license + module on.
-        ...((_j2 = window.yatraAdmin) == null ? void 0 : _j2.isAgency) && ((_k2 = window.yatraAdmin) == null ? void 0 : _k2.webhooksEnabled) ? [
+        ...((_m = window.yatraAdmin) == null ? void 0 : _m.isAgency) && ((_n2 = window.yatraAdmin) == null ? void 0 : _n2.webhooksEnabled) ? [
           {
             subpage: "webhooks",
             label: __("Webhooks", "yatra"),
@@ -4433,7 +4465,7 @@ const Layout = ({ children }) => {
         // access + audit log. Gate matches Webhooks: Agency license +
         // module on. The page itself is also cap-gated server-side; the
         // sidebar entry is just UX.
-        ...((_l2 = window.yatraAdmin) == null ? void 0 : _l2.isAgency) && ((_m = window.yatraAdmin) == null ? void 0 : _m.teamEnabled) ? [
+        ...((_o = window.yatraAdmin) == null ? void 0 : _o.isAgency) && ((_p = window.yatraAdmin) == null ? void 0 : _p.teamEnabled) ? [
           {
             subpage: "team",
             label: __("Team & Access", "yatra"),
@@ -4809,7 +4841,7 @@ const Layout = ({ children }) => {
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 flex-wrap min-w-0", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-2xl font-semibold text-gray-900 dark:text-white", children: (() => {
                     if (isTripFormPage) {
-                      return currentAction === "create" ? "Create Trip" : "Edit Trip";
+                      return currentAction === "create" ? __("Create Trip", "yatra") : __("Edit Trip", "yatra");
                     }
                     const activeItem = brandedMenuItems.find(
                       (item) => isActive(item.subpage)
@@ -4820,7 +4852,14 @@ const Layout = ({ children }) => {
                       );
                       return (activeSubItem == null ? void 0 : activeSubItem.label) || activeItem.label;
                     }
-                    return (activeItem == null ? void 0 : activeItem.label) || __("Dashboard", "yatra");
+                    if (activeItem == null ? void 0 : activeItem.label) return activeItem.label;
+                    const headerPages = {
+                      tools: __("Tools", "yatra"),
+                      settings: __("Settings", "yatra"),
+                      modules: __("Modules", "yatra"),
+                      "ai-assistant": __("AI Assistant", "yatra")
+                    };
+                    return headerPages[currentSubpage] || __("Dashboard", "yatra");
                   })() }),
                   !isProPluginActive() && /* @__PURE__ */ jsxRuntimeExports.jsx(
                     Tooltip$1,
@@ -14413,11 +14452,11 @@ function _arrayLikeToArray$b(arr, len) {
 function _iterableToArrayLimit$6(arr, i) {
   if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return;
   var _arr = [];
-  var _n = true;
+  var _n2 = true;
   var _d = false;
   var _e = void 0;
   try {
-    for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+    for (var _i = arr[Symbol.iterator](), _s; !(_n2 = (_s = _i.next()).done); _n2 = true) {
       _arr.push(_s.value);
       if (i && _arr.length === i) break;
     }
@@ -14426,7 +14465,7 @@ function _iterableToArrayLimit$6(arr, i) {
     _e = err;
   } finally {
     try {
-      if (!_n && _i["return"] != null) _i["return"]();
+      if (!_n2 && _i["return"] != null) _i["return"]();
     } finally {
       if (_d) throw _e;
     }
@@ -26484,7 +26523,7 @@ const SkeletonStatCard = () => /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { chi
 ] }) }) });
 const WELCOME_DISMISSED_KEY = "yatra:dashboard:welcome-dismissed:v1";
 const Dashboard = () => {
-  var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n;
+  var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n2;
   const isWpAdmin = !!((_a = window.yatraAdmin) == null ? void 0 : _a.isWpAdmin);
   const { can } = usePermissions();
   const [range3, setRange] = reactExports.useState("all_time");
@@ -26929,7 +26968,7 @@ const Dashboard = () => {
         StatCard,
         {
           title: __("Cancellation Rate", "yatra"),
-          value: `${Number(((_n = reportData == null ? void 0 : reportData.booking_stats) == null ? void 0 : _n.cancellationRate) || 0).toFixed(1)}%`,
+          value: `${Number(((_n2 = reportData == null ? void 0 : reportData.booking_stats) == null ? void 0 : _n2.cancellationRate) || 0).toFixed(1)}%`,
           icon: CheckCircle,
           color: "red",
           tooltip: __(
@@ -37306,6 +37345,49 @@ const DifficultyLevelForm = () => {
     ] }) }) })
   ] });
 };
+const CsvExportButton = ({ endpoint, params, label, capability, testId }) => {
+  const { showToast } = useToast();
+  const [busy, setBusy] = reactExports.useState(false);
+  const run = async () => {
+    var _a, _b;
+    setBusy(true);
+    try {
+      const res = await apiClient.get(endpoint, { params });
+      const data = (res == null ? void 0 : res.data) ?? res;
+      if (!data || typeof data.csv !== "string") {
+        throw new Error((res == null ? void 0 : res.message) || __("Export failed.", "yatra"));
+      }
+      const blob = new Blob([data.csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a2 = document.createElement("a");
+      a2.href = url;
+      a2.download = data.filename || "yatra-export.csv";
+      document.body.appendChild(a2);
+      a2.click();
+      a2.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1e3);
+      if (data.truncated) {
+        showToast(
+          sprintf(
+            __("Exported the first %d rows. Narrow the filters to export the rest.", "yatra"),
+            Number(data.rows) || 0
+          ),
+          "warning"
+        );
+      } else {
+        showToast(sprintf(__("Exported %d rows.", "yatra"), Number(data.rows) || 0), "success");
+      }
+    } catch (e) {
+      showToast(((_b = (_a = e == null ? void 0 : e.response) == null ? void 0 : _a.data) == null ? void 0 : _b.message) || (e == null ? void 0 : e.message) || __("Export failed.", "yatra"), "error");
+    } finally {
+      setBusy(false);
+    }
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { variant: "outline", onClick: run, disabled: busy, className: "flex items-center gap-2", "data-testid": testId, children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Download, { className: "w-4 h-4" }),
+    busy ? __("Exporting…", "yatra") : label || __("Export CSV", "yatra")
+  ] }) });
+};
 function getAdminRestConfig() {
   var _a, _b;
   const w = window;
@@ -37878,7 +37960,12 @@ const Bookings = () => {
       visible: visibleColumns.customer,
       render: (booking) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium", children: booking.customer_name || __2("Guest") }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground", children: booking.customer_email })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted-foreground", children: booking.customer_email }),
+        booking.agency_name ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-blue-700 dark:text-blue-300", children: sprintf(
+          /* translators: %s: travel agency name. */
+          __2("via %s"),
+          booking.agency_name
+        ) }) : null
       ] })
     },
     {
@@ -38156,17 +38243,34 @@ const Bookings = () => {
       {
         title: __2("Bookings"),
         description: __2("Manage customer bookings and reservations"),
-        actions: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          Button,
-          {
-            onClick: handleCreateBooking,
-            className: "flex items-center gap-2",
-            children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4" }),
-              __2("Create Booking")
-            ]
-          }
-        ) })
+        actions: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            CsvExportButton,
+            {
+              endpoint: "/bookings/export",
+              capability: "yatra_export_bookings",
+              testId: "export-bookings",
+              params: {
+                ...searchTerm ? { search: searchTerm } : {},
+                ...statusFilter !== "all" ? { status: statusFilter } : {},
+                ...paymentFilter !== "all" ? { payment_status: paymentFilter } : {},
+                orderby: sortBy2,
+                order: sortOrder
+              }
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            Button,
+            {
+              onClick: handleCreateBooking,
+              className: "flex items-center gap-2",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4" }),
+                __2("Create Booking")
+              ]
+            }
+          )
+        ] })
       }
     ),
     statsData && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-4 gap-3", children: [
@@ -38837,18 +38941,27 @@ const Customers = () => {
       {
         title: __2("Customers"),
         description: __2("Manage your customer database"),
-        actionCapability: "yatra_edit_customers",
-        actions: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          Button,
-          {
-            onClick: handleCreateCustomer,
-            className: "flex items-center gap-2",
-            children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4" }),
-              __2("Add New Customer")
-            ]
-          }
-        )
+        actions: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            CsvExportButton,
+            {
+              endpoint: "/customers/export",
+              capability: "yatra_export_customers",
+              testId: "export-customers"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_customers", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            Button,
+            {
+              onClick: handleCreateCustomer,
+              className: "flex items-center gap-2",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4" }),
+                __2("Add New Customer")
+              ]
+            }
+          ) })
+        ] })
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
@@ -45684,6 +45797,402 @@ const ViewReview = () => {
     ] }) })
   ] });
 };
+const taxonomyLabel = (taxonomy) => {
+  switch (taxonomy) {
+    case "destination":
+      return __("Destinations", "yatra");
+    case "activities":
+      return __("Activities", "yatra");
+    case "trip_types":
+      return __("Trip types → Categories", "yatra");
+    case "difficulty":
+      return __("Difficulty levels", "yatra");
+    case "trip-packages-categories":
+      return __("Traveller categories", "yatra");
+    default:
+      return taxonomy;
+  }
+};
+const actionBadge = (action) => {
+  switch (action) {
+    case "created":
+      return /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "success", children: __("Created", "yatra") });
+    case "updated":
+      return /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "info", children: __("Updated", "yatra") });
+    case "skipped":
+      return /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "default", children: __("Skipped", "yatra") });
+    default:
+      return /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "error", children: __("Failed", "yatra") });
+  }
+};
+const WteImport = () => {
+  const { showToast } = useToast();
+  const brand = brandName();
+  const [detect, setDetect] = reactExports.useState(null);
+  const [loading, setLoading] = reactExports.useState(true);
+  const [scan, setScan] = reactExports.useState(null);
+  const [isScanning, setIsScanning] = reactExports.useState(false);
+  const [isImporting, setIsImporting] = reactExports.useState(false);
+  const [updateExisting, setUpdateExisting] = reactExports.useState(false);
+  const [progress, setProgress] = reactExports.useState({ done: 0, total: 0 });
+  const [results, setResults] = reactExports.useState([]);
+  const [termErrors, setTermErrors] = reactExports.useState([]);
+  const [totals, setTotals] = reactExports.useState(null);
+  const [stage, setStage] = reactExports.useState("");
+  const cancelRef = reactExports.useRef(false);
+  const loadDetect = async () => {
+    setLoading(true);
+    try {
+      const data = await apiService.detectWteData();
+      setDetect(data);
+    } catch (error) {
+      showToast(
+        (error == null ? void 0 : error.message) || __("Could not check for WP Travel Engine data.", "yatra"),
+        "error"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+  reactExports.useEffect(() => {
+    loadDetect();
+    return () => {
+      cancelRef.current = true;
+    };
+  }, []);
+  const runScan = async () => {
+    setIsScanning(true);
+    try {
+      const data = await apiService.scanWteData();
+      setScan(data);
+    } catch (error) {
+      showToast((error == null ? void 0 : error.message) || __("Scan failed.", "yatra"), "error");
+    } finally {
+      setIsScanning(false);
+    }
+  };
+  const runImport = async (startOffset = 0) => {
+    if (!detect) return;
+    cancelRef.current = false;
+    setIsImporting(true);
+    if (startOffset === 0) {
+      setResults([]);
+      setTotals(null);
+    }
+    setProgress({ done: startOffset, total: detect.trips });
+    try {
+      setStage("terms");
+      const termResult = await apiService.importWteTerms();
+      const errs = [];
+      Object.values(((termResult == null ? void 0 : termResult.data) ?? termResult) || {}).forEach((t) => {
+        if (t && Array.isArray(t.errors)) errs.push(...t.errors.map(String));
+      });
+      setTermErrors(errs);
+      setStage("trips");
+      let offset = startOffset;
+      while (true) {
+        if (cancelRef.current) break;
+        const batch = await apiService.importWteTrips({
+          offset,
+          limit: detect.batch_size || 10,
+          update_existing: updateExisting
+        });
+        setResults((prev) => [...prev, ...batch.results]);
+        setTotals(batch.totals);
+        setProgress({ done: batch.next_offset, total: batch.total });
+        if (batch.done || batch.next_offset <= offset) break;
+        offset = batch.next_offset;
+      }
+      if (!cancelRef.current) {
+        setStage("done");
+        showToast(__("WP Travel Engine import finished.", "yatra"), "success");
+      }
+      loadDetect();
+    } catch (error) {
+      setStage("");
+      showToast(
+        (error == null ? void 0 : error.message) || __("Import stopped. You can resume where it left off.", "yatra"),
+        "error"
+      );
+      loadDetect();
+    } finally {
+      setIsImporting(false);
+    }
+  };
+  const percent2 = progress.total > 0 ? Math.min(100, Math.round(progress.done / progress.total * 100)) : 0;
+  const canResume = !isImporting && stage !== "done" && !!(detect == null ? void 0 : detect.last_run) && detect.last_run.done === false && (detect.last_run.offset || 0) > 0;
+  if (loading && !detect) {
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "p-8", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 text-gray-600 dark:text-gray-400", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "w-5 h-5 animate-spin" }),
+      __("Looking for WP Travel Engine data...", "yatra")
+    ] }) });
+  }
+  if (!detect || !detect.has_data) {
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "p-8", "data-testid": "wte-import-empty", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-4", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Shuffle, { className: "w-6 h-6 text-gray-500 dark:text-gray-400" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-semibold text-gray-900 dark:text-white", children: __("Import from WP Travel Engine", "yatra") }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400", children: __(
+          "No WP Travel Engine trips were found on this site. Once WP Travel Engine data is present (the plugin does not need to be active), you can import it here.",
+          "yatra"
+        ) })
+      ] })
+    ] }) });
+  }
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-8", "data-testid": "wte-import", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "p-8", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-4 mb-6", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Shuffle, { className: "w-6 h-6 text-purple-600 dark:text-purple-400" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-semibold text-gray-900 dark:text-white", children: __("Import from WP Travel Engine", "yatra") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400", children: sprintf(
+            __(
+              "Copy your WP Travel Engine trips, itineraries, FAQs, prices and destinations into %s.",
+              "yatra"
+            ),
+            brand
+          ) })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Info, { className: "w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-blue-700 dark:text-blue-400", children: __(
+          "Your WP Travel Engine data is only read - nothing is changed or deleted, so you can keep WP Travel Engine until you are happy with the result. Running the import again never creates duplicates.",
+          "yatra"
+        ) })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 md:grid-cols-4 gap-4 mb-6", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 rounded-lg border border-gray-200 dark:border-gray-700", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-2xl font-bold text-gray-900 dark:text-white", children: detect.trips }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-500 dark:text-gray-400", children: __("Trips", "yatra") })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 rounded-lg border border-gray-200 dark:border-gray-700", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-2xl font-bold text-gray-900 dark:text-white", children: (detect.terms.destination || 0) + (detect.terms.activities || 0) + (detect.terms.trip_types || 0) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-500 dark:text-gray-400", children: __("Destinations, activities & trip types", "yatra") })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 rounded-lg border border-gray-200 dark:border-gray-700", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-2xl font-bold text-gray-900 dark:text-white", children: detect.imported_trips }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-500 dark:text-gray-400", children: __("Already imported", "yatra") })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 rounded-lg border border-gray-200 dark:border-gray-700", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-2xl font-bold text-gray-900 dark:text-white", children: detect.bookings }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-500 dark:text-gray-400", children: __("Bookings (not imported)", "yatra") })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Button,
+          {
+            onClick: runScan,
+            variant: "outline",
+            disabled: isScanning || isImporting,
+            className: "flex items-center gap-2",
+            "data-testid": "wte-scan",
+            children: [
+              isScanning ? /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "w-4 h-4 animate-spin" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "w-4 h-4" }),
+              isScanning ? __("Scanning...", "yatra") : __("Scan (dry run)", "yatra")
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Button,
+          {
+            onClick: () => runImport(0),
+            disabled: !scan || isImporting || isScanning,
+            className: "flex items-center gap-2",
+            "data-testid": "wte-import-start",
+            children: [
+              isImporting ? /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "w-4 h-4 animate-spin" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Play, { className: "w-4 h-4" }),
+              isImporting ? __("Importing...", "yatra") : __("Import", "yatra")
+            ]
+          }
+        ),
+        canResume && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Button,
+          {
+            onClick: () => runImport(detect.last_run.offset || 0),
+            variant: "outline",
+            className: "flex items-center gap-2",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "w-4 h-4" }),
+              sprintf(
+                __("Resume from trip %1$d of %2$d", "yatra"),
+                (detect.last_run.offset || 0) + 1,
+                detect.last_run.total || detect.trips
+              )
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "checkbox",
+              checked: updateExisting,
+              disabled: isImporting,
+              onChange: (e) => setUpdateExisting(e.target.checked),
+              className: "rounded border-gray-300 dark:border-gray-600"
+            }
+          ),
+          __("Update trips imported before", "yatra")
+        ] })
+      ] }),
+      !scan && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-3", children: __("Run a scan first to see what will be imported.", "yatra") }),
+      updateExisting && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-yellow-700 dark:text-yellow-400 mt-3 flex items-center gap-1", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(AlertTriangle, { className: "w-3 h-3" }),
+        __(
+          "Trips imported before will be overwritten with their WP Travel Engine data, including any edits you made since.",
+          "yatra"
+        )
+      ] }),
+      (isImporting || stage === "done" || results.length > 0) && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "div",
+        {
+          className: "mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg",
+          "data-testid": "wte-progress",
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-medium text-blue-700 dark:text-blue-400", children: stage === "terms" ? __("Importing destinations, activities and categories...", "yatra") : stage === "done" ? __("Import complete", "yatra") : __("Importing trips...", "yatra") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm text-blue-600 dark:text-blue-400", children: [
+                percent2,
+                "%"
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full bg-blue-200 dark:bg-blue-800 rounded-full h-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "div",
+              {
+                className: "bg-blue-600 dark:bg-blue-400 h-2 rounded-full transition-all duration-300",
+                style: { width: `${percent2}%` }
+              }
+            ) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-blue-600 dark:text-blue-400 mt-2", children: [
+              sprintf(
+                __("%1$d / %2$d trips processed", "yatra"),
+                progress.done,
+                progress.total
+              ),
+              totals && " · " + sprintf(
+                __("%1$d created, %2$d updated, %3$d skipped, %4$d failed", "yatra"),
+                totals.created,
+                totals.updated,
+                totals.skipped,
+                totals.failed
+              )
+            ] })
+          ]
+        }
+      )
+    ] }),
+    scan && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "p-8", "data-testid": "wte-scan-results", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-gray-900 dark:text-white mb-4", children: __("Scan results", "yatra") }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap gap-2 mb-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "success", children: sprintf(__("%d to create", "yatra"), scan.counts.create) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "info", children: sprintf(__("%d already imported", "yatra"), scan.counts.update) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "warning", children: sprintf(__("%d with notes", "yatra"), scan.counts.warnings) })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 mb-6", children: Object.entries(scan.terms).map(([taxonomy, row]) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "div",
+        {
+          className: "p-3 rounded-lg border border-gray-200 dark:border-gray-700",
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium text-gray-900 dark:text-white", children: taxonomyLabel(taxonomy) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: sprintf(
+              __("%1$d new, %2$d existing", "yatra"),
+              row.create,
+              row.matched + row.mapped
+            ) })
+          ]
+        },
+        taxonomy
+      )) }),
+      [...scan.notes, ...scan.not_imported].length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { className: "mb-6 space-y-1", children: [...scan.notes, ...scan.not_imported].map((note, i) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "li",
+        {
+          className: "text-sm text-gray-600 dark:text-gray-400 flex gap-2",
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(AlertCircle, { className: "w-4 h-4 flex-shrink-0 mt-0.5 text-gray-400" }),
+            note
+          ]
+        },
+        i
+      )) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full text-sm", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { className: "text-left text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "py-2 pr-4", children: __("Trip", "yatra") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "py-2 pr-4", children: __("Will", "yatra") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "py-2 pr-4", children: __("Days", "yatra") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "py-2 pr-4", children: __("FAQs", "yatra") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "py-2 pr-4", children: __("Pricing", "yatra") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "py-2", children: __("Notes", "yatra") })
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { children: scan.trips.map((trip) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "tr",
+          {
+            className: "border-b border-gray-100 dark:border-gray-700/50 align-top",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: "py-2 pr-4 text-gray-900 dark:text-white", children: [
+                trip.title,
+                trip.status !== "publish" && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "ml-2 text-xs text-gray-500", children: [
+                  "(",
+                  trip.status,
+                  ")"
+                ] })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "py-2 pr-4", children: trip.action === "create" ? /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "success", children: __("Create", "yatra") }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "info", children: updateExisting ? __("Update", "yatra") : __("Skip", "yatra") }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "py-2 pr-4", children: trip.itinerary_days }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "py-2 pr-4", children: trip.faqs }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "py-2 pr-4", children: trip.pricing === "traveler_based" ? __("Per traveller category", "yatra") : trip.price > 0 ? __("Regular", "yatra") : __("No price", "yatra") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "py-2 text-xs text-gray-500 dark:text-gray-400", children: trip.warnings.length > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { className: "list-disc pl-4 space-y-0.5", children: trip.warnings.map((w, i) => /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: w }, i)) }) : "-" })
+            ]
+          },
+          trip.wte_id
+        )) })
+      ] }) })
+    ] }),
+    termErrors.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "p-6 border-amber-200 dark:border-amber-800", "data-testid": "wte-term-errors", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-sm font-semibold text-amber-800 dark:text-amber-300 mb-2", children: __("Some destinations, activities or trip types could not be imported", "yatra") }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { className: "list-disc pl-5 text-sm text-gray-700 dark:text-gray-300 space-y-1", children: termErrors.map((e, i) => /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: e }, i)) })
+    ] }),
+    results.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "p-8", "data-testid": "wte-results", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-gray-900 dark:text-white mb-4", children: __("Import log", "yatra") }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { className: "divide-y divide-gray-100 dark:divide-gray-700/50", children: results.map((r2, i) => /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { className: "py-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center gap-3", children: [
+          r2.action === "failed" ? /* @__PURE__ */ jsxRuntimeExports.jsx(XCircle, { className: "w-4 h-4 text-red-500" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-4 h-4 text-green-500" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: r2.title }),
+          actionBadge(r2.action),
+          r2.edit_url && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "a",
+            {
+              href: r2.edit_url,
+              className: "text-sm text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1",
+              "data-testid": "wte-edit-link",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { className: "w-3 h-3" }),
+                __("Edit", "yatra")
+              ]
+            }
+          ),
+          r2.view_url && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "a",
+            {
+              href: r2.view_url,
+              target: "_blank",
+              rel: "noopener noreferrer",
+              className: "text-sm text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1",
+              "data-testid": "wte-view-link",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ExternalLink, { className: "w-3 h-3" }),
+                __("View", "yatra")
+              ]
+            }
+          )
+        ] }),
+        r2.error && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-red-600 dark:text-red-400 mt-1 ml-7", children: r2.error }),
+        r2.warnings.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { className: "mt-1 ml-7 list-disc pl-4 text-xs text-gray-500 dark:text-gray-400 space-y-0.5", children: r2.warnings.map((w, j) => /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: w }, j)) })
+      ] }, `${r2.wte_id}-${i}`)) })
+    ] })
+  ] });
+};
 const MIGRATION_NOTICE_KEY = "yatra_migration_notice_dismissed_at";
 const Tools = () => {
   var _a, _b, _c;
@@ -46610,8 +47119,21 @@ const Tools = () => {
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Migration" })
             ]
           }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "button",
+          {
+            onClick: () => setActiveTab("wte-import"),
+            "data-testid": "tools-tab-wte-import",
+            className: `flex-1 py-3 px-6 rounded-md font-medium text-sm flex items-center justify-center gap-3 transition-all duration-200 ${activeTab === "wte-import" ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 shadow-sm" : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50"}`,
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Upload, { className: "w-5 h-5" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "whitespace-nowrap", children: __("WP Travel Engine", "yatra") })
+            ]
+          }
         )
       ] }) }),
+      activeTab === "wte-import" && /* @__PURE__ */ jsxRuntimeExports.jsx(WteImport, {}),
       activeTab === "export-import" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-8", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-8", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "p-8", children: [
@@ -53178,6 +53700,7 @@ const useItineraryFormSave = ({
             day,
             day_title: dayTitle,
             day_description: ((_b = data.day_description) == null ? void 0 : _b.trim()) || null,
+            day_altitude: (data.day_altitude ?? "").toString().trim(),
             title: dayTitle || `Day ${day}`,
             // Backend requires title field
             item_type_id: null,
@@ -53322,6 +53845,7 @@ const useItineraryFormSave = ({
             day,
             day_title: dayTitle,
             day_description: ((_c = data.day_description) == null ? void 0 : _c.trim()) || null,
+            day_altitude: (data.day_altitude ?? "").toString().trim(),
             item_type_id: null,
             item_id: null,
             title: dayTitle || `Day ${day}`,
@@ -53352,6 +53876,7 @@ const useItineraryFormSave = ({
             trip_id: tripId,
             day,
             day_title: dayTitle,
+            day_altitude: (data.day_altitude ?? "").toString().trim(),
             item_type_id: parseInt(activityData.item_type_id),
             item_id: parseInt(activityData.item_id),
             title: activityData.title.trim(),
@@ -53756,6 +54281,40 @@ const DayFormFields = ({
           /* @__PURE__ */ jsxRuntimeExports.jsx(Info, { className: "w-4 h-4" }),
           errors.day_description
         ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "label",
+          {
+            htmlFor: "day_altitude",
+            className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5",
+            children: __("Highest altitude (metres, optional)", "yatra")
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          HelpText,
+          {
+            text: __(
+              "The highest point reached this day. When two or more days have one, the trip page shows an altitude chart.",
+              "yatra"
+            ),
+            className: "mb-2"
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Input,
+          {
+            id: "day_altitude",
+            type: "number",
+            min: -500,
+            max: 9e3,
+            step: 1,
+            value: formData.day_altitude || "",
+            onChange: (e) => onFieldChange("day_altitude", e.target.value),
+            placeholder: __("e.g., 4130", "yatra"),
+            className: "max-w-[200px]"
+          }
+        )
       ] })
     ] })
   ] });
@@ -54098,6 +54657,7 @@ const ItineraryForm = () => {
     day: "",
     day_title: "",
     day_description: "",
+    day_altitude: "",
     item_type_id: "",
     item_id: "",
     title: "",
@@ -54296,6 +54856,7 @@ const ItineraryForm = () => {
           day: ((_b2 = entryData.day) == null ? void 0 : _b2.toString()) || dayParam || prev.day,
           day_title: entryData.day_title || prev.day_title,
           day_description: entryData.day_description || prev.day_description,
+          day_altitude: entryData.day_altitude !== void 0 && entryData.day_altitude !== null ? String(entryData.day_altitude) : prev.day_altitude,
           gallery: entryData.gallery || prev.gallery,
           video_url: entryData.video_url || prev.video_url,
           status: entryData.status || prev.status
@@ -54761,7 +55322,8 @@ const ItineraryForm = () => {
                 trip_id: formData.trip_id,
                 day: formData.day,
                 day_title: formData.day_title || "",
-                day_description: formData.day_description || ""
+                day_description: formData.day_description || "",
+                day_altitude: formData.day_altitude || ""
               },
               errors,
               tripsData,
@@ -62395,7 +62957,7 @@ const Departures = () => {
     } catch {
     }
     return {
-      trip: false,
+      trip: true,
       date: true,
       time: true,
       capacity: true,
@@ -62920,43 +63482,42 @@ const Departures = () => {
         key: "travelers",
         label: __("Travelers", "yatra"),
         visible: visibleColumns.travelers,
-        render: (departure) => {
-          var _a2;
-          return /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            Button,
-            {
-              variant: "outline",
-              size: "sm",
-              onClick: () => openTravelerModal(departure),
-              disabled: !departure.travelers || departure.travelers.length === 0,
-              className: "px-3 py-1.5",
-              children: [
-                departure.travelers_count || ((_a2 = departure.travelers) == null ? void 0 : _a2.length) || 0,
-                " ",
-                __("Traveler(s)", "yatra")
-              ]
-            }
-          );
-        }
+        render: (departure) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button,
+          {
+            variant: "outline",
+            size: "sm",
+            onClick: () => openTravelerModal(departure),
+            disabled: !departure.travelers || departure.travelers.length === 0,
+            className: "px-3 py-1.5",
+            children: (() => {
+              var _a2;
+              const n = Number(departure.travelers_count || ((_a2 = departure.travelers) == null ? void 0 : _a2.length) || 0);
+              return sprintf(_n("%d traveler", "%d travelers", n), n);
+            })()
+          }
+        )
       },
       {
         key: "bookings",
         label: __("Bookings", "yatra"),
         visible: visibleColumns.bookings,
         render: (departure) => departure.booking_ids && departure.booking_ids.length > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap gap-1", children: [
-          departure.booking_ids.slice(0, 3).map((bookingId) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "a",
-            {
-              href: `?page=yatra&subpage=bookings&action=view&id=${bookingId}`,
-              className: "text-blue-600 hover:text-blue-800 hover:underline text-sm",
-              title: __("View booking", "yatra"),
-              children: [
-                "#",
-                bookingId
-              ]
-            },
-            bookingId
-          )),
+          departure.booking_ids.slice(0, 3).map((bookingId) => {
+            var _a2;
+            return /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "a",
+              {
+                href: `?page=yatra&subpage=bookings&action=view&id=${bookingId}`,
+                className: "text-blue-600 hover:text-blue-800 hover:underline text-sm",
+                title: __("View booking", "yatra"),
+                children: ((_a2 = (departure.travelers || []).find(
+                  (t) => Number(t == null ? void 0 : t.booking_id) === Number(bookingId) && (t == null ? void 0 : t.booking_reference)
+                )) == null ? void 0 : _a2.booking_reference) || `#${bookingId}`
+              },
+              bookingId
+            );
+          }),
           departure.booking_ids.length > 3 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-gray-500 text-sm", children: [
             "+",
             departure.booking_ids.length - 3
@@ -64030,6 +64591,20 @@ const ViewDeparture = () => {
           ] })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+          (departure.trip_id || trip.id) && (departure.date || departure.start_date) && /* @__PURE__ */ jsxRuntimeExports.jsx(
+            CsvExportButton,
+            {
+              endpoint: "/bookings/manifest",
+              capability: "yatra_export_bookings",
+              label: __("Download manifest", "yatra"),
+              testId: "export-manifest",
+              params: {
+                departure_id: departure.id,
+                trip_id: departure.trip_id || trip.id,
+                date: String(departure.date || departure.start_date).slice(0, 10)
+              }
+            }
+          ),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             Badge,
             {
@@ -66467,6 +67042,12 @@ const useToggleModule = () => {
         window.yatraAdmin.webhooksEnabled = enabledModules.some(
           (m) => m.slug === "webhooks"
         );
+        window.yatraAdmin.travelAgencyEnabled = enabledModules.some(
+          (m) => m.slug === "travel_agency" || m.slug === "travel-agency"
+        );
+        window.yatraAdmin.guidesResourcesEnabled = enabledModules.some(
+          (m) => m.slug === "guides_resources"
+        );
         window.yatraAdmin.scheduledPaymentsEnabled = enabledModules.some(
           (m) => m.slug === "scheduled_payments" || m.slug === "scheduled-payments"
         );
@@ -66577,6 +67158,12 @@ const useBulkToggleModules = () => {
         );
         window.yatraAdmin.webhooksEnabled = enabledModules.some(
           (m) => m.slug === "webhooks"
+        );
+        window.yatraAdmin.travelAgencyEnabled = enabledModules.some(
+          (m) => m.slug === "travel_agency" || m.slug === "travel-agency"
+        );
+        window.yatraAdmin.guidesResourcesEnabled = enabledModules.some(
+          (m) => m.slug === "guides_resources"
         );
         window.yatraAdmin.scheduledPaymentsEnabled = enabledModules.some(
           (m) => m.slug === "scheduled_payments" || m.slug === "scheduled-payments"
@@ -71264,6 +71851,8 @@ const EMAIL_KEYS = [
   "from_email",
   "from_name",
   "email_always_bcc",
+  "email_show_logo",
+  "email_brand_color",
   "email_template_booking",
   "email_template_confirmation",
   "email_template_cancellation",
@@ -71409,6 +71998,8 @@ const EMAIL_SETTINGS_DEFAULTS = {
   email_template_abandoned_booking_recovery_first: true,
   email_template_abandoned_booking_recovery_second: true,
   email_template_abandoned_booking_recovery_final: true,
+  email_show_logo: false,
+  email_brand_color: "",
   smtp_enabled: false,
   smtp_host: "smtp.gmail.com",
   smtp_port: 587,
@@ -71664,6 +72255,68 @@ const EmailDeliverySection = ({
               placeholder: __("archive@example.com", "yatra")
             }
           )
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Field,
+        {
+          id: "email_brand_color",
+          label: __("Email brand colour", "yatra"),
+          description: __(
+            "Colour of the header band and buttons in customer emails. Leave empty for Yatra's teal.",
+            "yatra"
+          ),
+          children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "input",
+              {
+                type: "color",
+                "aria-label": __("Pick a colour", "yatra"),
+                value: /^#[0-9a-f]{6}$/i.test(values.email_brand_color || "") ? values.email_brand_color : "#0d9488",
+                onChange: (e) => onFieldChange({
+                  target: { name: "email_brand_color", id: "email_brand_color", value: e.target.value, type: "text" }
+                }),
+                className: "h-9 w-12 rounded border border-gray-300 dark:border-gray-600 bg-white"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Input,
+              {
+                id: "email_brand_color",
+                name: "email_brand_color",
+                value: values.email_brand_color ?? "",
+                onChange: onFieldChange,
+                placeholder: "#0d9488",
+                maxLength: 7,
+                className: "max-w-[140px] font-mono"
+              }
+            )
+          ] })
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Field,
+        {
+          id: "email_show_logo",
+          label: __("Logo in emails", "yatra"),
+          description: __(
+            "Show your company logo (Settings → General → Company Logo, or your site logo if none is set) at the top of customer emails.",
+            "yatra"
+          ),
+          children: /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "inline-flex items-center gap-2 text-sm", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "input",
+              {
+                type: "checkbox",
+                id: "email_show_logo",
+                name: "email_show_logo",
+                checked: !!values.email_show_logo,
+                onChange: onFieldChange,
+                className: "w-4 h-4 rounded border-gray-300"
+              }
+            ),
+            __("Show the logo", "yatra")
+          ] })
         }
       ),
       /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -76429,13 +77082,15 @@ const EmailSequenceForm = () => {
   });
   const templates = Array.isArray(templatesData) ? templatesData : [];
   const allTriggerEvents = reactExports.useMemo(() => {
-    return events.map((e) => ({
+    return events.filter(
+      (e) => e.can_start_sequence !== false || e.key === formData.trigger_type
+    ).map((e) => ({
       key: e.key,
       name: e.name,
       description: e.description,
       category: e.category
     }));
-  }, [events]);
+  }, [events, formData.trigger_type]);
   const [openTriggerDropdown, setOpenTriggerDropdown] = reactExports.useState(false);
   const sequenceTemplates = reactExports.useMemo(() => {
     return templates.filter((t) => t.recipient_type !== "admin");
@@ -79560,28 +80215,30 @@ const License = () => {
     ] }) }) })
   ] });
 };
-const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-DLxDKlIL.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
-const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-5xW46lQt.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
-const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-DyYUid5I.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
-const Reports = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Reports-DJFFzVlx.js"), true ? __vite__mapDeps([9,1,2,3,4]) : void 0, import.meta.url));
-const DiscountForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DiscountForm-DEhimB0H.js"), true ? __vite__mapDeps([10,1,2,3,4,11]) : void 0, import.meta.url));
-const Itinerary = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Itinerary-CF5aaNMY.js"), true ? __vite__mapDeps([12,1,2,3,4,5]) : void 0, import.meta.url));
-const RecurringRuleForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/RecurringRuleForm-DGAFIGuV.js"), true ? __vite__mapDeps([13,1,2,3,4]) : void 0, import.meta.url));
+const TripForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripForm-C-a3J5A9.js"), true ? __vite__mapDeps([0,1,2,3,4,5,6]) : void 0, import.meta.url));
+const Settings = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Settings-BWgByeyf.js"), true ? __vite__mapDeps([7,1,2,3,4,6]) : void 0, import.meta.url));
+const Team = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Team-B6pKe6iB.js"), true ? __vite__mapDeps([8,1,2,3,4]) : void 0, import.meta.url));
+const Reports = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Reports-d4B5rrDw.js"), true ? __vite__mapDeps([9,1,2,3,4]) : void 0, import.meta.url));
+const DiscountForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DiscountForm-DpP7G12z.js"), true ? __vite__mapDeps([10,1,2,3,4,11]) : void 0, import.meta.url));
+const Itinerary = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Itinerary-BvJkY4oM.js"), true ? __vite__mapDeps([12,1,2,3,4,5]) : void 0, import.meta.url));
+const RecurringRuleForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/RecurringRuleForm-BnxXoSMZ.js"), true ? __vite__mapDeps([13,1,2,3,4]) : void 0, import.meta.url));
 const Whatsapp = reactExports.lazy(() => __vitePreload(() => import("./Whatsapp.js"), true ? __vite__mapDeps([14,1,2,3,4,15]) : void 0, import.meta.url));
-const ChannelManager = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ChannelManager-Fb0ex6IR.js"), true ? __vite__mapDeps([16,1,2,3,4,15]) : void 0, import.meta.url));
-const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Webhooks-CwK81HRm.js"), true ? __vite__mapDeps([17,1,2,3,4,15]) : void 0, import.meta.url));
-const ScheduledPayments = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ScheduledPayments-DdSUOyEb.js"), true ? __vite__mapDeps([18,1,2,3,4]) : void 0, import.meta.url));
-const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-BAKrDitH.js"), true ? __vite__mapDeps([19,1,2,3,4,11]) : void 0, import.meta.url));
-const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-WRfLP_5t.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
-const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-D0EgePSD.js"), true ? __vite__mapDeps([21,1,2,3,4]) : void 0, import.meta.url));
-const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-p5NPshvM.js"), true ? __vite__mapDeps([22,1,2,3,4]) : void 0, import.meta.url));
-const DynamicPricing = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DynamicPricing-PAm1uvCr.js"), true ? __vite__mapDeps([23,1,2,24,3,4,25]) : void 0, import.meta.url));
+const ChannelManager = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ChannelManager-B6mfK3Vn.js"), true ? __vite__mapDeps([16,1,2,3,4,15]) : void 0, import.meta.url));
+const Webhooks = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/Webhooks-ipRnYIaP.js"), true ? __vite__mapDeps([17,1,2,3,4,15]) : void 0, import.meta.url));
+const TravelAgencies = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TravelAgencies-D2llVuvh.js"), true ? __vite__mapDeps([18,1,2,3,4]) : void 0, import.meta.url));
+const GuidesResources = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/GuidesResources-CaWOGsCi.js"), true ? __vite__mapDeps([19,1,2,3,4]) : void 0, import.meta.url));
+const ScheduledPayments = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ScheduledPayments-DH_Bdv_C.js"), true ? __vite__mapDeps([20,1,2,3,4]) : void 0, import.meta.url));
+const TripConsentForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/TripConsentForm-CzReTXGd.js"), true ? __vite__mapDeps([21,1,2,3,4,11]) : void 0, import.meta.url));
+const BookingForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/BookingForm-CmqBWZis.js"), true ? __vite__mapDeps([22,1,2,3,4]) : void 0, import.meta.url));
+const ViewBooking = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/ViewBooking-WCU20PD1.js"), true ? __vite__mapDeps([23,1,2,3,4]) : void 0, import.meta.url));
+const AvailabilityForm = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AvailabilityForm-BNi8_Do5.js"), true ? __vite__mapDeps([24,1,2,3,4]) : void 0, import.meta.url));
+const DynamicPricing = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/DynamicPricing-BObeBao8.js"), true ? __vite__mapDeps([25,1,2,26,3,4,27]) : void 0, import.meta.url));
 const DynamicPricingRuleForm = reactExports.lazy(
-  () => __vitePreload(() => import("../../../dist/js/DynamicPricingRuleForm-BNVsNOcm.js"), true ? __vite__mapDeps([26,1,2,3,4,24]) : void 0, import.meta.url)
+  () => __vitePreload(() => import("../../../dist/js/DynamicPricingRuleForm-DC20vKS8.js"), true ? __vite__mapDeps([28,1,2,3,4,26]) : void 0, import.meta.url)
 );
-const AiAssistant = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AiAssistant-DONS3P3T.js"), true ? __vite__mapDeps([27,1,2,3,4,15]) : void 0, import.meta.url));
-const AbandonedRecovery = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AbandonedRecovery-a5eULyr-.js"), true ? __vite__mapDeps([28,1,2,3,4,25]) : void 0, import.meta.url));
-const WhiteLabel = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/WhiteLabel-BzFhb8A5.js"), true ? __vite__mapDeps([29,1,2,3,4,15]) : void 0, import.meta.url));
+const AiAssistant = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AiAssistant-B2LdNa4s.js"), true ? __vite__mapDeps([29,1,2,3,4,15]) : void 0, import.meta.url));
+const AbandonedRecovery = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/AbandonedRecovery-B1EcHvJO.js"), true ? __vite__mapDeps([30,1,2,3,4,27]) : void 0, import.meta.url));
+const WhiteLabel = reactExports.lazy(() => __vitePreload(() => import("../../../dist/js/WhiteLabel-DKz0zXt3.js"), true ? __vite__mapDeps([31,1,2,3,4,15]) : void 0, import.meta.url));
 const PageLoadingFallback = () => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-1/3" }),
@@ -79821,6 +80478,10 @@ const App = () => {
         return /* @__PURE__ */ jsxRuntimeExports.jsx(ChannelManager, {});
       case "webhooks":
         return /* @__PURE__ */ jsxRuntimeExports.jsx(Webhooks, {});
+      case "travel-agencies":
+        return /* @__PURE__ */ jsxRuntimeExports.jsx(TravelAgencies, {});
+      case "guides-resources":
+        return /* @__PURE__ */ jsxRuntimeExports.jsx(GuidesResources, {});
       case "team":
         return /* @__PURE__ */ jsxRuntimeExports.jsx(Team, {});
       case "dashboard":
@@ -79870,81 +80531,81 @@ if (rootElement) {
   }
 }
 export {
-  Switch as $,
+  Tooltip$1 as $,
   Alert as A,
   Button as B,
   Card as C,
   DatePicker as D,
-  CardFooter as E,
-  PremiumUpgradeDialog as F,
-  buildYatraAccountViewUrl as G,
+  useWordPressMedia as E,
+  ConditionalRender as F,
+  CardFooter as G,
   HelpText as H,
   IconPicker as I,
-  navigateMenu as J,
-  saveSettings as K,
+  PremiumUpgradeDialog as J,
+  buildYatraAccountViewUrl as K,
   LocationPicker as L,
   Modal as M,
-  buildYatraListingPublicUrl as N,
-  postInsertBookingShortcode as O,
+  navigateMenu as N,
+  saveSettings as O,
   PageHeader as P,
-  postFlushRewriteRules as Q,
+  buildYatraListingPublicUrl as Q,
   RichTextEditor as R,
   Select as S,
   TimePicker as T,
-  fetchBookingPageShortcodeStatus as U,
-  fetchPaymentGatewayDefinitions as V,
-  fetchWordPressPages as W,
-  Skeleton as X,
-  Table as Y,
-  Tooltip$1 as Z,
-  Pagination as _,
+  postInsertBookingShortcode as U,
+  postFlushRewriteRules as V,
+  fetchBookingPageShortcodeStatus as W,
+  fetchPaymentGatewayDefinitions as X,
+  fetchWordPressPages as Y,
+  Skeleton as Z,
+  Table as _,
   isAiModuleEnabled as a,
-  setUserCaps as a0,
-  canCap as a1,
-  BookingStatusChart as a2,
-  BookingsOverviewChart as a3,
-  isProPluginActive as a4,
-  isModuleActive as a5,
-  BulkActionToolbar as a6,
-  IconSelector as a7,
-  useNavigate as a8,
-  Table$1 as a9,
-  XAxis as aA,
-  YAxis as aB,
-  formatAxisMap as aC,
-  ResponsiveContainer as aD,
-  CartesianGrid as aE,
-  Tooltip as aF,
-  DEFAULT_MENU_ITEMS as aG,
-  useWordPressMedia as aH,
+  Pagination as a0,
+  Switch as a1,
+  setUserCaps as a2,
+  canCap as a3,
+  BookingStatusChart as a4,
+  BookingsOverviewChart as a5,
+  isProPluginActive as a6,
+  BulkActionToolbar as a7,
+  IconSelector as a8,
+  useNavigate as a9,
+  generateCategoricalChart as aA,
+  XAxis as aB,
+  YAxis as aC,
+  formatAxisMap as aD,
+  ResponsiveContainer as aE,
+  CartesianGrid as aF,
+  Tooltip as aG,
+  DEFAULT_MENU_ITEMS as aH,
   MenuIcon as aI,
   ICON_MAP as aJ,
-  TableHeader as aa,
-  TableRow as ab,
-  TableHead as ac,
-  TableBody as ad,
-  TableCell as ae,
-  SearchFilterToolbar as af,
-  Popover as ag,
-  PopoverTrigger as ah,
-  PopoverContent as ai,
-  downloadAdminBookingInvoice as aj,
-  clsx as ak,
-  Dot as al,
-  findAllByType as am,
-  ErrorBar as an,
-  Layer as ao,
-  filterProps as ap,
-  Curve as aq,
-  interpolateNumber$2 as ar,
-  isNil$1 as as,
-  hasClipDot as at,
-  LabelList as au,
-  getValueByDataKey as av,
-  uniqueId as aw,
-  Global as ax,
-  getCateCoordinateOfLine as ay,
-  generateCategoricalChart as az,
+  Table$1 as aa,
+  TableHeader as ab,
+  TableRow as ac,
+  TableHead as ad,
+  TableBody as ae,
+  TableCell as af,
+  SearchFilterToolbar as ag,
+  Popover as ah,
+  PopoverTrigger as ai,
+  PopoverContent as aj,
+  downloadAdminBookingInvoice as ak,
+  clsx as al,
+  Dot as am,
+  findAllByType as an,
+  ErrorBar as ao,
+  Layer as ap,
+  filterProps as aq,
+  Curve as ar,
+  interpolateNumber$2 as as,
+  isNil$1 as at,
+  hasClipDot as au,
+  LabelList as av,
+  getValueByDataKey as aw,
+  uniqueId as ax,
+  Global as ay,
+  getCateCoordinateOfLine as az,
   isAiReady as b,
   aiApi as c,
   CardContent as d,
@@ -79953,22 +80614,22 @@ export {
   CardTitle as g,
   CardDescription as h,
   isAiEligible as i,
-  getErrorContext as j,
-  ConfirmationDialog as k,
-  buildYatraSinglePublicUrls as l,
-  isWordPressPlainPermalink as m,
-  MultiSelect as n,
-  prepareWordPressMediaFrameOpen as o,
+  isModuleActive as j,
+  getErrorContext as k,
+  ConfirmationDialog as l,
+  buildYatraSinglePublicUrls as m,
+  isWordPressPlainPermalink as n,
+  MultiSelect as o,
   parseItineraryText as p,
-  fetchSettings as q,
-  unwrapApiPayload as r,
-  Label as s,
-  useTripTargets as t,
+  prepareWordPressMediaFrameOpen as q,
+  fetchSettings as r,
+  unwrapApiPayload as s,
+  Label as t,
   usePermissions as u,
-  describeTargets as v,
-  decodeTargets as w,
-  encodeTargets as x,
-  hasTargets as y,
-  ConditionalRender as z
+  useTripTargets as v,
+  describeTargets as w,
+  decodeTargets as x,
+  encodeTargets as y,
+  hasTargets as z
 };
 //# sourceMappingURL=app.js.map

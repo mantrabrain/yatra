@@ -87,6 +87,8 @@ $controllers = [
     // and are registered by Pro's WhiteLabelModule::boot() at rest_api_init.
     \Yatra\Controllers\ReportsController::class,
     \Yatra\Controllers\ToolsController::class,
+    \Yatra\Controllers\ApiKeysController::class, // Settings > API Access (3.3)
+    \Yatra\Controllers\WteImportController::class, // Tools > Import from WP Travel Engine
     \Yatra\Controllers\SampleDataController::class,
     \Yatra\Controllers\UsageTrackingController::class,
     \Yatra\Controllers\NoticeController::class,

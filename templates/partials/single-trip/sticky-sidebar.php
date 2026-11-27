@@ -96,6 +96,7 @@ if ($effective_min > 0) {
 }
 // Pro: check whether this trip has booking disabled (enquiry-only mode)
 $booking_disabled = method_exists($trip, 'isBookingDisabled') && $trip->isBookingDisabled();
+$external_booking_url = method_exists($trip, 'getExternalBookingUrl') ? $trip->getExternalBookingUrl() : '';
 
 // Pro feature: same filter contract as the desktop sidebar — the Pro module
 // decides whether to switch to a dropdown and supplies the option list.
@@ -116,6 +117,18 @@ $yatra_mobile_use_date_dropdown = (bool) apply_filters('yatra_use_date_dropdown'
                     onclick="window.YatraEnquiry?.open?.(); return false;">
                 <?php esc_html_e('Send Enquiry', 'yatra'); ?>
             </button>
+        </div>
+    </div>
+</div>
+<?php elseif ($external_booking_url !== ''): ?>
+<div class="yatra-mobile-sticky-sidebar yatra-external-booking-sticky" id="yatra-mobile-sticky-sidebar">
+    <div class="yatra-mobile-sticky-content">
+        <div class="yatra-mobile-row-1" style="justify-content:flex-end;align-items:center;">
+            <a class="yatra-mobile-book-btn" style="background:var(--yatra-primary,#3b82f6);text-decoration:none;"
+               href="<?php echo esc_url($external_booking_url); ?>"
+               <?php echo $trip->opensExternalBookingInNewTab() ? 'target="_blank" rel="noopener"' : ''; ?>>
+                <?php echo esc_html($trip->getExternalBookingLabel()); ?>
+            </a>
         </div>
     </div>
 </div>

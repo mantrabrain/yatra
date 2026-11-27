@@ -142,14 +142,21 @@ const EmailSequenceForm: React.FC = () => {
     : [];
 
   // Get all trigger events from Schema (passed via window.yatraAdmin.emailEvents)
+  // Only events that can start a sequence (Yatra Pro sends can_start_sequence);
+  // the sequence's current trigger stays listed so an old one isn't hidden.
   const allTriggerEvents = useMemo(() => {
-    return events.map((e: any) => ({
+    return events
+      .filter(
+        (e: any) =>
+          e.can_start_sequence !== false || e.key === formData.trigger_type,
+      )
+      .map((e: any) => ({
       key: e.key,
       name: e.name,
       description: e.description,
       category: e.category,
     }));
-  }, [events]);
+  }, [events, formData.trigger_type]);
 
   // State for trigger dropdown
   const [openTriggerDropdown, setOpenTriggerDropdown] = useState(false);

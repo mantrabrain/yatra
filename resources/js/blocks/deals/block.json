@@ -1,0 +1,54 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "yatra/deals",
+  "title": "Trip Deals",
+  "category": "yatra",
+  "icon": "tag",
+  "description": "Grid of discounted trips and special offers.",
+  "keywords": [
+    "deals",
+    "discount",
+    "offer",
+    "sale",
+    "yatra"
+  ],
+  "textdomain": "yatra",
+  "attributes": {
+    "per_page": {
+      "type": "number",
+      "default": 10
+    },
+    "columns": {
+      "type": "number",
+      "default": 3
+    },
+    "order": {
+      "type": "string",
+      "default": "asc",
+      "enum": [
+        "asc",
+        "desc"
+      ]
+    },
+    "card_layout": {
+      "type": "string",
+      "default": "inherit",
+      "enum": [
+        "inherit",
+        "standard",
+        "compact_mobile",
+        "compact_all"
+      ]
+    }
+  },
+  "supports": {
+    "html": false,
+    "inserter": true,
+    "align": [
+      "wide",
+      "full"
+    ]
+  },
+  "editorScript": "yatra-deals-block-editor"
+}

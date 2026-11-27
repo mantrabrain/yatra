@@ -418,6 +418,16 @@ function yatra_render_form_section($section_config, $prefix = '', $countries = [
 <?php endif; ?>
 
 <?php if (!$is_remaining_payment) : ?>
+    <?php
+    /**
+     * Before the contact details at checkout (e.g. Yatra Pro's travel agency
+     * box, where an agency enters its code and then the guest's details).
+     *
+     * @param array $session The booking session.
+     * @since 3.2.0
+     */
+    do_action('yatra_checkout_before_contact_details', function_exists('yatra_get_booking_session') ? (array) yatra_get_booking_session() : []);
+    ?>
     <!-- Contact Form Section -->
     <?php 
     $contact_config = $form_config['contact_form'] ?? [];
@@ -760,15 +770,41 @@ $display_gateways = [];
 if (class_exists('Yatra\PaymentGateways\PaymentGatewayRegistry')) {
     $registry = \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance();
     foreach ($registry->getForCheckout() as $gateway) {
-        if (!empty($gateway['id'])) {
-            $display_gateways[$gateway['id']] = $gateway;
+        if (empty($gateway['id'])) {
+            continue;
         }
+        // Paying a balance needs a method that actually takes money: Pay Later /
+        // Bank Transfer would be refused by the server (same filter it uses).
+        if ($is_remaining_payment) {
+            $gw = $registry->get((string) $gateway['id']);
+            $offline = $gw && method_exists($gw, 'isOffline') ? $gw->isOffline() : in_array($gateway['id'], ['pay_later', 'bank_transfer'], true);
+            // Same arguments as the server-side check, booking included.
+            if (!isset($yatra_remaining_booking)) {
+                $yatra_remaining_booking = (!empty($existing_booking_id) && class_exists('\\Yatra\\Repositories\\BookingRepository'))
+                    ? (new \Yatra\Repositories\BookingRepository())->find((int) $existing_booking_id)
+                    : null;
+                $yatra_remaining_booking = $yatra_remaining_booking ?: false;
+            }
+            if ($offline && !apply_filters('yatra_remaining_payment_allow_offline_gateway', false, (string) $gateway['id'], $yatra_remaining_booking ?: null)) {
+                continue;
+            }
+        }
+        $display_gateways[$gateway['id']] = $gateway;
     }
+    /**
+     * The payment methods offered at checkout (e.g. only those that can pay
+     * a multi-trip cart).
+     *
+     * @param array $display_gateways id => gateway data.
+     * @param array $session          The booking session.
+     * @since 3.2.0
+     */
+    $display_gateways = (array) apply_filters('yatra_checkout_display_gateways', $display_gateways, function_exists('yatra_get_booking_session') ? (array) yatra_get_booking_session() : []);
 }
 ?>
 <?php if (!empty($display_gateways)) : ?>
 <div class="yatra-booking-section">
-    <h2 class="yatra-section-title"><?php esc_html_e('Select Payment Gateway', 'yatra'); ?></h2>
+    <h2 class="yatra-section-title"><?php esc_html_e('Payment Method', 'yatra'); ?></h2>
     
     <div class="yatra-gateway-options">
         <?php 
@@ -778,7 +814,7 @@ if (class_exists('Yatra\PaymentGateways\PaymentGatewayRegistry')) {
         ?>
         <div class="yatra-gateway-option-wrapper">
             <label class="yatra-gateway-option">
-                <input type="radio" name="payment_gateway" value="<?php echo esc_attr($gateway_id); ?>" <?php checked($first); ?>>
+                <input type="radio" name="payment_gateway" value="<?php echo esc_attr($gateway_id); ?>"<?php echo (function_exists('yatra_is_deferred_payment_gateway') && yatra_is_deferred_payment_gateway((string) $gateway_id)) ? ' data-deferred="1"' : ''; ?> <?php checked($first); ?>>
                 <span class="yatra-gateway-icon-wrap">
                     <img src="<?php echo esc_url($icon ?? ''); ?>" alt="<?php echo esc_attr($gateway['title'] ?? ''); ?>" class="yatra-gateway-icon">
                 </span>
@@ -798,6 +834,48 @@ if (class_exists('Yatra\PaymentGateways\PaymentGatewayRegistry')) {
         ?>
     </div>
 </div>
+<?php elseif ($is_remaining_payment) : ?>
+<div class="yatra-booking-section">
+    <p class="yatra-form-error yatra-no-online-gateway" role="alert" data-testid="no-online-gateway">
+        <?php esc_html_e('Online payment is not available right now. Please contact us to pay this balance.', 'yatra'); ?>
+    </p>
+</div>
+<?php endif; ?>
+
+<?php
+$yatra_pickup_points = (!$is_remaining_payment && !empty($trip_id) && class_exists('\\Yatra\\Services\\PickupPointService'))
+    ? \Yatra\Services\PickupPointService::forTrip((int) $trip_id)
+    : [];
+if (!empty($yatra_pickup_points)) :
+    $yatra_pickup_required = \Yatra\Services\PickupPointService::isRequired((int) $trip_id);
+?>
+    <!-- Pickup point -->
+    <div class="yatra-booking-section yatra-pickup-section">
+        <h2 class="yatra-section-title"><?php esc_html_e('Pickup point', 'yatra'); ?></h2>
+        <p class="yatra-section-description">
+            <?php echo $yatra_pickup_required
+                ? esc_html__('Choose where we pick you up.', 'yatra')
+                : esc_html__('Choose where we pick you up (optional).', 'yatra'); ?>
+        </p>
+        <div class="yatra-form-group yatra-field-full">
+            <label for="yatra-pickup-point" class="screen-reader-text"><?php esc_html_e('Pickup point', 'yatra'); ?></label>
+            <select id="yatra-pickup-point" name="pickup_point" <?php echo $yatra_pickup_required ? 'required' : ''; ?>>
+                <option value=""><?php echo $yatra_pickup_required ? esc_html__('Select a pickup point', 'yatra') : esc_html__('No pickup needed', 'yatra'); ?></option>
+                <?php foreach ($yatra_pickup_points as $yatra_pickup) : ?>
+                    <option value="<?php echo esc_attr($yatra_pickup['id']); ?>"><?php echo esc_html(\Yatra\Services\PickupPointService::label($yatra_pickup)); ?></option>
+                <?php endforeach; ?>
+            </select>
+            <?php
+            $yatra_pickup_details = array_filter($yatra_pickup_points, static function ($p) { return $p['details'] !== ''; });
+            if (!empty($yatra_pickup_details)) : ?>
+                <ul class="yatra-pickup-details" style="margin:8px 0 0;padding-left:18px;font-size:0.9em;opacity:0.85;">
+                    <?php foreach ($yatra_pickup_details as $yatra_pickup) : ?>
+                        <li><strong><?php echo esc_html($yatra_pickup['name']); ?>:</strong> <?php echo esc_html($yatra_pickup['details']); ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
+        </div>
+    </div>
 <?php endif; ?>
 
 <?php if (!$is_remaining_payment) : ?>

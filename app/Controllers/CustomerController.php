@@ -126,6 +126,33 @@ class CustomerController extends BaseController
             ],
         ]);
 
+        // Ask to change or cancel one of my bookings.
+        register_rest_route($namespace, '/' . $base . '/my-bookings/(?P<id>\d+)/requests', [
+            [
+                'methods' => \WP_REST_Server::CREATABLE,
+                'callback' => [$this, 'createMyBookingRequest'],
+                'permission_callback' => [$this, 'checkCustomerPermission'],
+                'args' => [
+                    'id' => ['required' => true, 'type' => 'integer', 'sanitize_callback' => 'absint'],
+                    'type' => ['required' => true, 'type' => 'string', 'enum' => \Yatra\Services\CustomerRequestService::TYPES],
+                    'message' => ['required' => true, 'type' => 'string', 'sanitize_callback' => 'sanitize_textarea_field'],
+                ],
+            ],
+        ]);
+
+        // Complete or correct my travellers' details after booking.
+        register_rest_route($namespace, '/' . $base . '/my-bookings/(?P<id>\d+)/travelers', [
+            [
+                'methods' => \WP_REST_Server::EDITABLE,
+                'callback' => [$this, 'updateMyBookingTravelers'],
+                'permission_callback' => [$this, 'checkCustomerPermission'],
+                'args' => [
+                    'id' => ['required' => true, 'type' => 'integer', 'sanitize_callback' => 'absint'],
+                    'travelers' => ['required' => true, 'type' => 'array'],
+                ],
+            ],
+        ]);
+
         // Current customer's payments
         register_rest_route($namespace, '/' . $base . '/my-payments', [
             [
@@ -210,6 +237,17 @@ class CustomerController extends BaseController
         ]);
 
         // Customer statistics — view cap.
+        // CSV of every customer (3.2).
+        register_rest_route($namespace, '/' . $base . '/export', [
+            'methods' => \WP_REST_Server::READABLE,
+            'callback' => static function () {
+                return new \WP_REST_Response(['success' => true, 'data' => (new \Yatra\Services\BookingExportService())->customersCsv()]);
+            },
+            'permission_callback' => static function (): bool {
+                return current_user_can('yatra_export_customers');
+            },
+        ]);
+
         register_rest_route($namespace, '/' . $base . '/stats', [
             [
                 'methods' => \WP_REST_Server::READABLE,
@@ -534,8 +572,89 @@ class CustomerController extends BaseController
 
         return new WP_REST_Response([
             'success' => true,
-            'data' => $this->withPaymentSchedule($booking),
+            'data' => $this->withCustomerRequests($this->withPaymentSchedule($booking), $bookingId),
         ]);
+    }
+
+    /**
+     * The booking's change/cancel requests and whether a new one can be sent.
+     *
+     * @param mixed $booking
+     * @return mixed
+     */
+    private function withCustomerRequests($booking, int $bookingId)
+    {
+        $row = (new \Yatra\Repositories\BookingRepository())->find($bookingId);
+        if (!$row) {
+            return $booking;
+        }
+        $eligibility = \Yatra\Services\CustomerRequestService::eligibility($row);
+        $extra = [
+            'customer_requests' => array_map(
+                [\Yatra\Services\CustomerRequestService::class, 'forCustomer'],
+                \Yatra\Services\CustomerRequestService::requestsOf($row)
+            ),
+            'can_request_change' => $eligibility['allowed'],
+            // Completing traveller details from the account.
+            'traveler_form_fields' => \Yatra\Services\TravellerDetailsService::fields($row),
+            'travelers_missing' => \Yatra\Services\TravellerDetailsService::missing($row),
+            'can_edit_travelers' => \Yatra\Services\TravellerDetailsService::eligibility($row)['allowed'],
+            'customer_requests_enabled' => \Yatra\Services\SettingsService::isEnabled('customer_requests_enabled'),
+            'request_unavailable_reason' => $eligibility['allowed'] ? '' : $eligibility['reason'],
+        ];
+        if (is_array($booking)) {
+            return array_merge($booking, $extra);
+        }
+        if (is_object($booking)) {
+            foreach ($extra as $k => $v) {
+                $booking->$k = $v;
+            }
+        }
+
+        return $booking;
+    }
+
+    /**
+     * PUT /customers/my-bookings/{id}/travelers — complete traveller details.
+     */
+    public function updateMyBookingTravelers(WP_REST_Request $request): WP_REST_Response
+    {
+        $userId = get_current_user_id();
+        $bookingId = (int) $request->get_param('id');
+        if (!$this->customerService->getBookingDetailsForUser($userId, $bookingId)) {
+            return new WP_REST_Response(['success' => false, 'message' => __('Booking not found.', 'yatra')], 404);
+        }
+        $travelers = $request->get_param('travelers');
+        $result = (new \Yatra\Services\TravellerDetailsService())->update(
+            $bookingId,
+            is_array($travelers) ? $travelers : [],
+            $userId
+        );
+
+        return new WP_REST_Response($result, $result['success'] ? 200 : 400);
+    }
+
+    /**
+     * POST /customers/my-bookings/{id}/requests — ask to change or cancel.
+     */
+    public function createMyBookingRequest(WP_REST_Request $request): WP_REST_Response
+    {
+        $userId = get_current_user_id();
+        $bookingId = (int) $request->get_param('id');
+
+        // Only the customer's own booking (same check as the booking page).
+        if (!$this->customerService->getBookingDetailsForUser($userId, $bookingId)) {
+            return new WP_REST_Response(['success' => false, 'message' => __('Booking not found.', 'yatra')], 404);
+        }
+
+        $result = (new \Yatra\Services\CustomerRequestService())->submit(
+            $bookingId,
+            (string) $request->get_param('type'),
+            (string) $request->get_param('message'),
+            $userId
+        );
+
+        return new WP_REST_Response($result, $result['success'] ? 201 : 400);
     }
 
     /**

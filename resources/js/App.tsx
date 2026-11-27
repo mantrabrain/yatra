@@ -105,6 +105,8 @@ const RecurringRuleForm = lazy(() => import("./pages/RecurringRuleForm"));
 const Whatsapp = lazy(() => import("./pages/Whatsapp"));
 const ChannelManager = lazy(() => import("./pages/ChannelManager"));
 const Webhooks = lazy(() => import("./pages/Webhooks"));
+const TravelAgencies = lazy(() => import("./pages/TravelAgencies"));
+const GuidesResources = lazy(() => import("./pages/GuidesResources"));
 const ScheduledPayments = lazy(() => import("./pages/ScheduledPayments"));
 const TripConsentForm = lazy(() => import("./pages/TripConsentForm"));
 const BookingForm = lazy(() => import("./pages/BookingForm"));
@@ -419,6 +421,10 @@ const App: React.FC = () => {
         return <ChannelManager />;
       case "webhooks":
         return <Webhooks />;
+      case "travel-agencies":
+        return <TravelAgencies />;
+      case "guides-resources":
+        return <GuidesResources />;
       case "team":
         return <Team />;
       case "dashboard":

@@ -375,6 +375,15 @@ if (typeof window.yatraNumOr !== 'function') {
             if (serviceIds.length) {
                 payload.additional_services = serviceIds;
             }
+            // Accommodation option / travel insurance answer (3.3).
+            const accommodation = $('input[name="accommodation"]:checked').val();
+            if (accommodation) {
+                payload.accommodation = accommodation;
+            }
+            const insurance = $('input[name="travel_insurance"]:checked').val();
+            if (insurance) {
+                payload.travel_insurance = insurance;
+            }
             const pricingType = $('#yatra-summary-pricing').data('pricing-type');
             if (pricingType) {
                 payload.pricing_type = pricingType;
@@ -399,7 +408,9 @@ if (typeof window.yatraNumOr !== 'function') {
             const $payAmount = $('#pay-amount');
             const gateway = $('input[name="payment_gateway"]:checked').val() || 'pay_later';
             const offlineGateways = ['pay_later', 'bank_transfer'];
-            const isOffline = offlineGateways.includes(gateway);
+            // Deferred methods (e.g. Pro's "Pay by invoice") take no payment now either.
+            const isOffline = offlineGateways.includes(gateway)
+                || String($('input[name="payment_gateway"]:checked').attr('data-deferred') || '') === '1';
             const paymentMethod = $('input[name="payment_method"]:checked').val() || 'full';
             const summary = window.yatraBookingSummary || {};
             let due = parseFloat(summary.amountDue);
@@ -412,6 +423,13 @@ if (typeof window.yatraNumOr !== 'function') {
                 totalSafe = parseFloat($form.attr('data-payment-due')) || 0;
             }
             const flexDue = paymentMethod === 'deposit' || paymentMethod === 'partial';
+            // Other bookings paid with this checkout (Yatra Pro's cart): their
+            // amounts are fixed server-side and added to what the button shows.
+            const linkedAmount = parseFloat($form.attr('data-linked-amount')) || 0;
+            if (linkedAmount > 0) {
+                due += linkedAmount;
+                totalSafe += linkedAmount;
+            }
 
             if (isOffline) {
                 $buttonText.text(window.yatraBookingData?.i18n?.complete_booking || __('Complete Booking', 'yatra'));
@@ -587,7 +605,11 @@ if (typeof window.yatraNumOr !== 'function') {
                 // checked state, so an unchecked required box would wrongly pass.
                 // Test the checked state instead.
                 let invalid;
-                if (type === 'checkbox' || type === 'radio') {
+                if (type === 'radio' && $field.attr('name')) {
+                    // A radio group is answered when any radio of the group is checked.
+                    const groupName = String($field.attr('name')).replace(/["\\]/g, '\\$&');
+                    invalid = $form.find('input[type="radio"][name="' + groupName + '"]:checked').length === 0;
+                } else if (type === 'checkbox' || type === 'radio') {
                     invalid = !$field.is(':checked');
                 } else {
                     const value = $field.val();
@@ -597,12 +619,18 @@ if (typeof window.yatraNumOr !== 'function') {
                 if (invalid) {
                     isValid = false;
                     $field.addClass('error');
-                    const label = $field.closest('.yatra-form-group').find('label').text().replace('*', '').trim();
-                    errors.push(sprintf(
+                    let label = $field.closest('.yatra-form-group').find('label').text().replace('*', '').trim();
+                    if (!label) {
+                        label = $field.closest('.yatra-booking-section').find('.yatra-section-title').first().text().trim();
+                    }
+                    const requiredMessage = sprintf(
                         /* translators: %s: form field label. */
                         __('%s is required', 'yatra'),
                         label
-                    ));
+                    );
+                    if (errors.indexOf(requiredMessage) === -1) {
+                        errors.push(requiredMessage);
+                    }
                 }
             });
             
@@ -882,6 +910,11 @@ if (typeof window.yatraNumOr !== 'function') {
                 };
             }
             updateCheckoutButtonState();
+            // Other trips paid with this checkout: their amount due now depends
+            // on the payment method shown by default — fetch it once.
+            if ((parseFloat($form.attr('data-linked-amount')) || 0) > 0 && typeof schedulePricingSummaryRefresh === 'function') {
+                schedulePricingSummaryRefresh();
+            }
         }
 
         $(document).on('change', 'input[name="payment_method"]', function() {
@@ -1392,6 +1425,17 @@ if (typeof window.yatraNumOr !== 'function') {
             if (d.pricing_html) {
                 $('#yatra-summary-pricing').html(d.pricing_html);
             }
+            // A coupon applied here changes the other trips' prices too.
+            if (typeof d.linked_amount !== 'undefined' && $form.length) {
+                $form.attr('data-linked-amount', String(parseFloat(d.linked_amount) || 0));
+            }
+            if (Array.isArray(d.linked_items)) {
+                d.linked_items.forEach(function (item) {
+                    if (item && item.id) {
+                        $('[data-linked-item="' + String(item.id).replace(/[^A-Za-z0-9_-]/g, '') + '"] [data-linked-price]').text(String(item.total_formatted || ''));
+                    }
+                });
+            }
             window.yatraBookingSummary = {
                 totalAmount: typeof d.total_amount === 'number' ? d.total_amount : parseFloat(d.total_amount),
                 amountDue: typeof d.amount_due === 'number' ? d.amount_due : parseFloat(d.amount_due),
@@ -1595,6 +1639,34 @@ if (typeof window.yatraNumOr !== 'function') {
             updateServicesInSession();
         });
         
+        // Accommodation option / travel insurance answer (3.3): keep the
+        // session in step (so a reload keeps the choice) and re-price.
+        $(document).on('change', 'input[name="accommodation"], input[name="travel_insurance"]', function() {
+            const { base: restBase, isPlain } = getRestBase();
+            const siteBase = (window.yatraBookingData?.siteUrl || window.location.origin || '').replace(/\/$/, '');
+            let sessionUrl;
+            if (isPlain) {
+                sessionUrl = `${siteBase}/?rest_route=/yatra/v1/booking/session`;
+            } else if (restBase.includes('/yatra/v1')) {
+                sessionUrl = `${restBase}/booking/session`;
+            } else {
+                sessionUrl = `${restBase}/yatra/v1/booking/session`;
+            }
+            const payload = {};
+            payload[this.name] = this.value;
+            try {
+                const tok = new URLSearchParams(window.location.search).get('booking_token');
+                if (tok) payload.booking_token = tok;
+            } catch (e) { /* ignore */ }
+            schedulePricingSummaryRefresh();
+            fetch(sessionUrl, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': nonce },
+                body: JSON.stringify(payload)
+            }).catch(function() { /* the summary refresh already carries the choice */ });
+        });
+
         /**
          * Get selected additional services
          */

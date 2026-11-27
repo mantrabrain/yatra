@@ -29,6 +29,7 @@ class ActivityBlock
      */
     public function renderCallback(array $attributes, string $content): string
     {
+        FrontendAssetsProvider::ensureCommonAssets();
         FrontendAssetsProvider::registerCoreFrontendStylesheets();
         wp_enqueue_style('yatra-activity-shortcode');
 

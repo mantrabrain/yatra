@@ -1020,6 +1020,9 @@ class CustomerService
             'currency' => $booking->currency ?? null,
             'payment_status' => $booking->payment_status ?? null,
             'status' => $booking->status ?? null,
+            // The account's booking screen reads booking_status (the list
+            // payload has it); without it every booking showed "Pending".
+            'booking_status' => $booking->status ?? null,
             'payment_gateway' => $booking->payment_gateway ?? null,
             'contact_first_name' => $booking->contact_first_name ?? null,
             'contact_last_name' => $booking->contact_last_name ?? null,
@@ -1032,6 +1035,9 @@ class CustomerService
             'customer_email' => $booking->contact_email ?? null,
             'customer_phone' => $booking->contact_phone ?? null,
             'special_requests' => $booking->special_requests ?? null,
+            'pickup_point' => PickupPointService::forBooking($booking),
+            'accommodation' => CheckoutChoiceService::forBooking($booking)['accommodation'],
+            'travel_insurance' => CheckoutChoiceService::forBooking($booking)['travel_insurance'],
             'emergency_contact' => $emergencyContact,
             'contact_data' => $contactData,
             'travelers' => $travelersList,

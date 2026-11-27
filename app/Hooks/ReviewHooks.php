@@ -171,8 +171,7 @@ class ReviewHooks
             wp_send_json_error(['message' => __('Please specify at least one traveler.', 'yatra')]);
         }
 
-        $enquiryService = new EnquiryService();
-        $result = $enquiryService->createEnquiry([
+        $submission = [
             'trip_id' => $trip_id > 0 ? $trip_id : null,
             'name' => $name,
             'email' => $email,
@@ -180,7 +179,20 @@ class ReviewHooks
             'message' => $message,
             'adults' => $adults,
             'children' => $children,
-        ]);
+        ];
+        // The operator's own questions (3.3).
+        foreach ($_POST as $postKey => $postValue) {
+            if (is_string($postKey) && strpos($postKey, \Yatra\Services\EnquiryCustomFields::INPUT_PREFIX) === 0 && is_scalar($postValue)) {
+                $submission[$postKey] = wp_unslash((string) $postValue);
+            }
+        }
+        $submission = \Yatra\Services\EnquiryCustomFields::applyToSubmission($submission);
+        if (is_string($submission)) {
+            wp_send_json_error(['message' => $submission]);
+        }
+
+        $enquiryService = new EnquiryService();
+        $result = $enquiryService->createEnquiry($submission);
 
         if (!empty($result['success'])) {
             wp_send_json_success(['message' => $result['message'] ?? __('Your enquiry has been submitted successfully!', 'yatra')]);

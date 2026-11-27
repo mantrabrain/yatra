@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { Button } from "./ui/button";
-import { __ } from "@wordpress/i18n";
+import { __, sprintf } from "@wordpress/i18n";
 
 // Pro Feature Component Props
 interface ProFeatureProps {
@@ -79,9 +79,15 @@ export const ProFeature: React.FC<ProFeatureProps> = ({
               {__("Please activate", "yatra")} {moduleName}
             </h4>
             <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
-              {__("You have Yatra Pro installed. Enable the", "yatra")}{" "}
-              {moduleName} {__("module to access", "yatra")}{" "}
-              {description.toLowerCase()} {__("features.", "yatra")}
+              {/* `description` is a verb phrase ("offer deposit and partial
+                  payment options to your customers"); the old wording glued
+                  it into "…to access offer … features." */}
+              {sprintf(
+                /* translators: 1: module name, 2: what the module lets you do, e.g. "offer deposits to your customers". */
+                __("You have Yatra Pro installed. Turn on the %1$s module to %2$s.", "yatra"),
+                moduleName,
+                description,
+              )}
             </p>
             <Button
               type="button"
@@ -120,9 +126,10 @@ export const ProFeature: React.FC<ProFeatureProps> = ({
             {__("Upgrade to Pro for", "yatra")} {moduleName}
           </h4>
           <p className="text-sm text-purple-700 dark:text-purple-300 mt-1">
-            {__(
-              `Get Yatra Pro to access ${description} and unlock all premium features.`,
-              "yatra",
+            {sprintf(
+              /* translators: %s: what the module lets you do, e.g. "offer deposits to your customers". */
+              __("Get Yatra Pro to %s, and unlock all premium features.", "yatra"),
+              description,
             )}
           </p>
           <a

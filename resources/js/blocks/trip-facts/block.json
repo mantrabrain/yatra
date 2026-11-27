@@ -1,0 +1,36 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "yatra/trip-facts",
+  "title": "Trip Facts",
+  "category": "yatra",
+  "icon": "list-view",
+  "description": "Duration, difficulty, group size, rating and other key facts of a trip.",
+  "keywords": [
+    "facts",
+    "duration",
+    "difficulty",
+    "group size",
+    "yatra"
+  ],
+  "textdomain": "yatra",
+  "attributes": {
+    "tripId": {
+      "type": "number",
+      "default": 0
+    },
+    "showAttributes": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "supports": {
+    "html": false,
+    "inserter": true,
+    "align": [
+      "wide",
+      "full"
+    ]
+  },
+  "editorScript": "yatra-trip-facts-block-editor"
+}

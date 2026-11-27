@@ -17,6 +17,7 @@ import {
   currency,
   isUpcomingBooking,
   phoneToTelHref,
+  commonCurrency,
 } from "./utils";
 import { downloadVoucher } from "./utils/downloads";
 import type { Booking } from "./types";
@@ -211,7 +212,8 @@ const Bookings: React.FC<BookingsProps> = ({
     ).length,
     completed: displayBookings.filter((b) => b.booking_status === "completed")
       .length,
-    totalSpent: displayBookings.reduce((sum, b) => sum + b.total_amount, 0),
+    // What the customer actually paid (after refunds), not booking totals.
+    totalSpent: displayBookings.reduce((sum, b) => sum + (Number(b.amount_paid) || 0), 0),
   };
 
   return (
@@ -262,9 +264,9 @@ const Bookings: React.FC<BookingsProps> = ({
         </div>
       </div>
 
-      {/* Stats Grid - Clean Dashboard Style */}
-      <div className="flex flex-nowrap gap-6 overflow-x-auto">
-        <div className="flex-shrink-0 bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700 min-w-0 flex-1">
+      {/* Stats Grid - 2 per row on phones (one row of 4 clipped "Total Spent") */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 lg:p-6 border border-gray-100 dark:border-gray-700 min-w-0">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
@@ -279,7 +281,7 @@ const Bookings: React.FC<BookingsProps> = ({
             </div>
           </div>
         </div>
-        <div className="flex-shrink-0 bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700 min-w-0 flex-1">
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 lg:p-6 border border-gray-100 dark:border-gray-700 min-w-0">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
@@ -294,7 +296,7 @@ const Bookings: React.FC<BookingsProps> = ({
             </div>
           </div>
         </div>
-        <div className="flex-shrink-0 bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700 min-w-0 flex-1">
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 lg:p-6 border border-gray-100 dark:border-gray-700 min-w-0">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
@@ -309,7 +311,7 @@ const Bookings: React.FC<BookingsProps> = ({
             </div>
           </div>
         </div>
-        <div className="flex-shrink-0 bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700 min-w-0 flex-1">
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 lg:p-6 border border-gray-100 dark:border-gray-700 min-w-0">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
@@ -324,14 +326,14 @@ const Bookings: React.FC<BookingsProps> = ({
             </div>
           </div>
         </div>
-        <div className="flex-shrink-0 bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700 min-w-0 flex-1">
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 lg:p-6 border border-gray-100 dark:border-gray-700 min-w-0">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
                 {__("Total Spent", "yatra")}
               </p>
               <p className="text-xl font-bold text-gray-900 dark:text-white">
-                {currency(bookingStats.totalSpent)}
+                {currency(bookingStats.totalSpent, commonCurrency(displayBookings))}
               </p>
             </div>
             <div className="p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
@@ -367,7 +369,12 @@ const Bookings: React.FC<BookingsProps> = ({
             const totalPaid = paidNumeric;
             const amountDue = totalNumeric - totalPaid;
             const canPayRemaining =
-              amountDue > 0 && booking.payment_status !== "paid";
+              amountDue > 0 &&
+              booking.payment_status !== "paid" &&
+              !["cancelled", "refunded", "failed"].includes(String(booking.booking_status)) &&
+              !["", "0", "no", false].includes(
+                (window as any).yatraAccountPage?.canPayOnline,
+              ); // wp_localize_script turns false into "" 
 
             return (
               <div
@@ -392,20 +399,21 @@ const Bookings: React.FC<BookingsProps> = ({
                           <h3 className="text-base font-bold text-gray-900 dark:text-white mb-1">
                             {booking.trip_title}
                           </h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                          {booking.destination && (
+<p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
                             <MapPin className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                            {booking.destination ||
-                              __("Multiple destinations", "yatra")}
+                            {booking.destination}
                           </p>
+)}
                         </div>
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-2 items-start">
                       <span className={getBadge(booking.booking_status)}>
-                        {getStatusLabel(booking.booking_status)}
+                        {__("Booking:", "yatra")} {getStatusLabel(booking.booking_status)}
                       </span>
                       <span className={getBadge(booking.payment_status)}>
-                        {getStatusLabel(booking.payment_status)}
+                        {__("Payment:", "yatra")} {getStatusLabel(booking.payment_status)}
                       </span>
                     </div>
                   </div>
@@ -449,7 +457,7 @@ const Bookings: React.FC<BookingsProps> = ({
                         {__("Total Amount", "yatra")}
                       </p>
                       <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                        {currency(booking.total_amount)}
+                        {currency(booking.total_amount, booking.currency)}
                       </p>
                     </div>
                     <div>
@@ -457,10 +465,10 @@ const Bookings: React.FC<BookingsProps> = ({
                         {__("Paid / Due", "yatra")}
                       </p>
                       <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                        {currency(totalPaid ?? 0)}
+                        {currency(totalPaid ?? 0, booking.currency)}
                         {amountDue !== null && (
-                          <span className="text-xs font-normal text-gray-500 dark:text-gray-400 ml-1">
-                            {__("Due:", "yatra")} {currency(amountDue)}
+                          <span className="text-xs font-normal text-gray-500 dark:text-gray-400 ml-1 whitespace-nowrap">
+                            {__("Due:", "yatra")} {currency(amountDue, booking.currency)}
                           </span>
                         )}
                       </p>

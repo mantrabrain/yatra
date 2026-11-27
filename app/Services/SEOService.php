@@ -900,7 +900,12 @@ class SEOService
             // (e.g. user-submitted review text/author) can break out of this
             // <script> block — a </script> in a review would otherwise be XSS.
             // Google parses the \u-escaped JSON identically.
-            echo '<script type="application/ld+json">' . json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) . '</script>' . "\n";
+            // INVALID_UTF8_SUBSTITUTE: one bad byte in a trip text must not
+            // blank the whole block (json_encode() returns false otherwise).
+            $json = json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_INVALID_UTF8_SUBSTITUTE);
+            if (is_string($json) && $json !== '') {
+                echo '<script type="application/ld+json">' . $json . '</script>' . "\n";
+            }
         }
     }
 
@@ -1136,18 +1141,19 @@ class SEOService
             ? (int) $trip->getReviewCount()
             : 0;
 
-        // No approved reviews → keep the generic Article (unchanged behaviour).
-        // A Product is emitted ONLY when there's a real rating to nest, which is
-        // exactly what fixes the review markup — and it avoids emitting a bare
-        // Product (offers/review/rating all absent) that Google would flag as
-        // incomplete on the many tours that have no reviews yet.
-        if (!($tripId > 0 && $count > 0 && $avg > 0)) {
+        $offer = $tripId > 0 ? $this->tripOffer($trip) : null;
+        $hasRating = $tripId > 0 && $count > 0 && $avg > 0;
+
+        // Neither a price nor reviews: nothing a Product could carry. Keep the
+        // generic Article (unchanged behaviour) rather than a bare Product,
+        // which Google flags as incomplete.
+        if (!$hasRating && $offer === null) {
             return $this->generateArticleSchema($baseSchema);
         }
 
         $schema = [
-            '@context' => 'https://schema.org',
             '@type' => 'Product',
+            '@id' => $this->seoData['url'] . '#product',
             'name' => $this->seoData['title'],
             'url' => $this->seoData['url'],
             'brand' => [
@@ -1160,6 +1166,14 @@ class SEOService
         }
         if (!empty($this->seoData['image'])) {
             $schema['image'] = $this->seoData['image'];
+        }
+
+        if ($offer !== null) {
+            $schema['offers'] = $offer;
+        }
+
+        if (!$hasRating) {
+            return $this->tripGraph($schema, $trip, $offer);
         }
 
         $schema['aggregateRating'] = [
@@ -1224,7 +1238,101 @@ class SEOService
             $schema['review'] = $reviews;
         }
 
-        return $schema;
+        return $this->tripGraph($schema, $trip, $offer);
+    }
+
+    /**
+     * The trip's "from" price as a schema.org Offer, or null without a price
+     * ("Contact for pricing").
+     *
+     * @return array<string, mixed>|null
+     */
+    private function tripOffer(object $trip): ?array
+    {
+        try {
+            $pricing = \Yatra\Services\TripPricingService::resolveDisplayPricing($trip);
+        } catch (\Throwable $e) {
+            return null;
+        }
+        $price = (float) ($pricing['effective_price_min'] ?? 0);
+        if ($price <= 0) {
+            return null;
+        }
+
+        // A "from" price: AggregateOffer with lowPrice (a plain Offer reads
+        // as a shop listing and draws shipping/returns warnings).
+        return [
+            '@type' => 'AggregateOffer',
+            'lowPrice' => number_format($price, 2, '.', ''),
+            'offerCount' => 1,
+            'priceCurrency' => \Yatra\Services\SettingsService::getCurrency(),
+            'availability' => 'https://schema.org/InStock',
+            'url' => $this->seoData['url'],
+            'seller' => ['@type' => 'Organization', 'name' => get_bloginfo('name'), 'url' => home_url('/')],
+        ];
+    }
+
+    /**
+     * The trip page as one graph: the Product (price, rating, reviews) and a
+     * TouristTrip describing the trip itself (itinerary, duration, provider).
+     *
+     * @param array<string, mixed>      $product
+     * @param array<string, mixed>|null $offer
+     * @return array<string, mixed>
+     */
+    private function tripGraph(array $product, object $trip, ?array $offer): array
+    {
+        $touristTrip = [
+            '@type' => 'TouristTrip',
+            '@id' => $this->seoData['url'] . '#trip',
+            'name' => $this->seoData['title'],
+            'url' => $this->seoData['url'],
+            'provider' => ['@type' => 'Organization', 'name' => get_bloginfo('name'), 'url' => home_url('/')],
+        ];
+        if (!empty($this->seoData['description'])) {
+            $touristTrip['description'] = $this->seoData['description'];
+        }
+        if (!empty($this->seoData['image'])) {
+            $touristTrip['image'] = $this->seoData['image'];
+        }
+        if ($offer !== null) {
+            $touristTrip['offers'] = $offer;
+        }
+
+        $days = \method_exists($trip, 'getDurationDays') ? (int) $trip->getDurationDays() : 0;
+        $hours = \method_exists($trip, 'getDurationHours') ? (int) $trip->getDurationHours() : 0;
+        if ($days > 0) {
+            $touristTrip['duration'] = 'P' . $days . 'D';
+        } elseif ($hours > 0) {
+            $touristTrip['duration'] = 'PT' . $hours . 'H';
+        }
+
+        $items = [];
+        $itinerary = \method_exists($trip, 'getItineraryDays') ? $trip->getItineraryDays() : [];
+        foreach (array_values(is_array($itinerary) ? $itinerary : []) as $i => $day) {
+            $day = (array) $day;
+            $name = $this->sanitizeText(trim(\wp_strip_all_tags((string) ($day['day_title'] ?? $day['title'] ?? ''))));
+            if ($name === '') {
+                continue;
+            }
+            $item = ['@type' => 'ListItem', 'position' => $i + 1, 'item' => ['@type' => 'TouristAttraction', 'name' => $name]];
+            $desc = $this->truncateText($this->sanitizeText(trim(\wp_strip_all_tags((string) ($day['day_description'] ?? $day['description'] ?? '')))), 300);
+            if ($desc !== '') {
+                $item['item']['description'] = $desc;
+            }
+            $items[] = $item;
+            if (count($items) >= 30) {
+                break;
+            }
+        }
+        if ($items !== []) {
+            $touristTrip['itinerary'] = ['@type' => 'ItemList', 'numberOfItems' => count($items), 'itemListElement' => $items];
+        }
+
+        return [
+            '@context' => 'https://schema.org',
+            '@graph' => [$product, $touristTrip],
+        ];
     }
 
     /**
@@ -1232,10 +1340,13 @@ class SEOService
      */
     private function truncateText(string $text, int $length): string
     {
-        if (strlen($text) <= $length) {
+        // Characters, not bytes: cutting a multibyte character (Nepali,
+        // accented, Japanese text) made the JSON-LD invalid UTF-8 and the
+        // whole block came out empty.
+        if (mb_strlen($text, 'UTF-8') <= $length) {
             return $text;
         }
 
-        return substr($text, 0, $length - 3) . '...';
+        return rtrim(mb_substr($text, 0, $length - 1, 'UTF-8')) . '…';
     }
 }

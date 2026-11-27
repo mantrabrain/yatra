@@ -188,6 +188,7 @@ class ItineraryRepository extends BaseRepository
                     ['%d']
                 );
 
+                $this->applyDayAltitude((int) $existingDay->id, $data);
                 do_action('yatra_itinerary_day_updated', (int) $existingDay->id, $data);
 
                 return (int) $existingDay->id;
@@ -206,6 +207,7 @@ class ItineraryRepository extends BaseRepository
                 );
                 
                 $dayId = (int) $wpdb->insert_id;
+                $this->applyDayAltitude($dayId, $data);
                 // Fire hook for cache invalidation
                 do_action('yatra_itinerary_day_created', $dayId, $data);
                 
@@ -221,6 +223,7 @@ class ItineraryRepository extends BaseRepository
                 $data['day_description'] ?? null,
                 true // Allow existing days
             );
+            $this->applyDayAltitude((int) $dayId, $data);
             
             // Format time field
             $timeField = null;
@@ -318,6 +321,8 @@ class ItineraryRepository extends BaseRepository
                 $updateData['description'] = wp_kses_post($data['day_description'] ?? $data['description'] ?? '');
                 $updateFormat[] = '%s';
             }
+
+            $this->applyDayAltitude((int) $entryId, $data);
 
             // Only update day_number if it's actually changing to avoid unique constraint violation
             if (isset($data['day']) && (int) $data['day'] !== (int) $dayEntry->day_number) {
@@ -697,6 +702,7 @@ class ItineraryRepository extends BaseRepository
             $entry->day_number = (int) $day->day_number;
             $entry->day_title = $day->title;
             $entry->day_description = $day->description;
+            $entry->day_altitude = self::dayAltitude($day);
         }
         
         // Decode included/excluded items JSON columns
@@ -770,6 +776,7 @@ class ItineraryRepository extends BaseRepository
                 'day_number' => $dayEntry->day_number,
                 'day_title' => $dayEntry->title,
                 'day_description' => $dayEntry->description,
+                'day_altitude' => self::dayAltitude($dayEntry),
             ];
             
         
@@ -808,6 +815,7 @@ class ItineraryRepository extends BaseRepository
             $entry->day_number = (int) $day->day_number;
             $entry->day_title = $day->title;
             $entry->day_description = $day->description;
+            $entry->day_altitude = self::dayAltitude($day);
             
             } else {
             }
@@ -1246,5 +1254,56 @@ class ItineraryRepository extends BaseRepository
              ORDER BY d.day_number ASC, e.order ASC",
             $tripId
         )) ?: [];
+    }
+
+    /**
+     * A day's highest altitude in metres (days.metadata.altitude), or null.
+     *
+     * @since 3.3.0
+     * @param object|array $day
+     */
+    public static function dayAltitude($day): ?int
+    {
+        $meta = is_array($day) ? ($day['metadata'] ?? null) : ($day->metadata ?? null);
+        if (is_string($meta)) {
+            $meta = json_decode($meta, true);
+        }
+        if (!is_array($meta) || !isset($meta['altitude']) || !is_numeric($meta['altitude'])) {
+            return null;
+        }
+
+        return (int) $meta['altitude'];
+    }
+
+    /**
+     * Save `day_altitude` (metres) from an itinerary request into the day's
+     * metadata. Absent key: unchanged. Empty: removed. Out of range
+     * (-500…9000) or not a number: unchanged.
+     *
+     * @since 3.3.0
+     */
+    private function applyDayAltitude(int $dayId, array $data): void
+    {
+        global $wpdb;
+        if ($dayId <= 0 || !array_key_exists('day_altitude', $data)) {
+            return;
+        }
+        $raw = $data['day_altitude'];
+        $remove = $raw === null || (is_string($raw) && trim($raw) === '');
+        if (!$remove && (!is_numeric($raw) || (float) $raw < -500 || (float) $raw > 9000)) {
+            return;
+        }
+
+        $table = TripItineraryDaysTable::getTableName();
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        $current = $wpdb->get_var($wpdb->prepare("SELECT metadata FROM `{$table}` WHERE id = %d", $dayId));
+        $meta = is_string($current) && $current !== '' ? json_decode($current, true) : [];
+        $meta = is_array($meta) ? $meta : [];
+        if ($remove) {
+            unset($meta['altitude']);
+        } else {
+            $meta['altitude'] = (int) round((float) $raw);
+        }
+        $wpdb->update($table, ['metadata' => $meta === [] ? null : wp_json_encode($meta)], ['id' => $dayId], ['%s'], ['%d']);
     }
 }

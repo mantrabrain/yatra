@@ -48,7 +48,51 @@ final class BookingEmailRichMergeTags
             'booking_custom_fields_html' => self::buildBookingCustomFieldsHtml($booking),
             'special_requests' => $special,
             'special_requests_html' => $special !== '' ? nl2br(esc_html($special)) : '',
-        ], self::contactAndEmergencyTags($booking, $fieldMaps), self::leadTravellerTags($travellers, $fieldMaps['traveler']));
+        ], self::pickupTags($booking), self::choiceTags($booking), self::contactAndEmergencyTags($booking, $fieldMaps), self::leadTravellerTags($travellers, $fieldMaps['traveler']));
+    }
+
+    /**
+     * Accommodation option and travel insurance answer chosen at checkout.
+     *
+     * @since 3.3.0
+     * @return array<string, string>
+     */
+    private static function choiceTags(object $booking): array
+    {
+        if (!class_exists(CheckoutChoiceService::class)) {
+            return ['accommodation' => '', 'travel_insurance' => ''];
+        }
+        $choices = CheckoutChoiceService::forBooking($booking);
+
+        return [
+            'accommodation' => $choices['accommodation']['name'] ?? '',
+            'travel_insurance' => CheckoutChoiceService::insuranceLabel($choices['travel_insurance']),
+        ];
+    }
+
+    /**
+     * The pickup point the customer chose at checkout.
+     *
+     * @since 3.3.0
+     * @return array<string, string>
+     */
+    private static function pickupTags(object $booking): array
+    {
+        $point = class_exists(PickupPointService::class) ? PickupPointService::forBooking($booking) : null;
+        if ($point === null) {
+            return ['pickup_point' => '', 'pickup_time' => '', 'pickup_point_details' => ''];
+        }
+        $time = '';
+        if ($point['time'] !== '') {
+            $ts = strtotime('2000-01-01 ' . $point['time']);
+            $time = $ts !== false ? date_i18n((string) get_option('time_format', 'H:i'), $ts) : $point['time'];
+        }
+
+        return [
+            'pickup_point' => $point['name'],
+            'pickup_time' => $time,
+            'pickup_point_details' => $point['details'],
+        ];
     }
 
     /**
@@ -306,6 +350,9 @@ final class BookingEmailRichMergeTags
             'booking_custom_fields_html' => '',
             'special_requests' => '',
             'special_requests_html' => '',
+            'pickup_point' => '',
+            'pickup_time' => '',
+            'pickup_point_details' => '',
             'contact_country' => '',
             'contact_address' => '',
             'contact_nationality' => '',
@@ -522,6 +569,9 @@ final class BookingEmailRichMergeTags
             'additional_services',
             'additional_services_updated_at',
             'additional_services_snapshot',
+            // Set by Yatra on every booking (availability snapshot for auditing),
+            // not something to show a customer.
+            'resolved_availability',
         ], true);
     }
 

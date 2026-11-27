@@ -268,20 +268,24 @@ final class EmailTemplateDefaults
 
             return EmailTemplateLayout::customer(
                 '✈️',
-                __('Booking update', 'yatra'),
+                // Neutral heading: this layout also carries new bookings.
+                (string) ($v['email_heading'] ?? __('Your booking', 'yatra')),
                 $inner,
                 $site,
                 __('Your booking details are inside.', 'yatra')
             );
         }
 
+        // The details block below repeats reference, trip and date: show them once.
+        $hasDetails = !empty($v['details_html']);
         $rows = array_values(array_filter([
-            ['label' => __('Reference', 'yatra'), 'value' => esc_html($v['booking_reference'] ?? '')],
-            ['label' => __('Trip', 'yatra'), 'value' => esc_html($v['trip_name'] ?? '')],
-            ['label' => __('Travel date', 'yatra'), 'value' => esc_html($v['travel_date'] ?? '')],
+            ['label' => __('Reference', 'yatra'), 'value' => $hasDetails ? '' : esc_html($v['booking_reference'] ?? '')],
+            ['label' => __('Trip', 'yatra'), 'value' => $hasDetails ? '' : esc_html($v['trip_name'] ?? '')],
+            ['label' => __('Travel date', 'yatra'), 'value' => $hasDetails ? '' : esc_html($v['travel_date'] ?? '')],
             ['label' => __('Travelers', 'yatra'), 'value' => esc_html($v['travelers_count'] ?? '')],
             ['label' => __('Total', 'yatra'), 'value' => esc_html($v['total_amount_formatted'] ?? '')],
-            ['label' => __('Amount due now', 'yatra'), 'value' => esc_html($v['amount_due_formatted'] ?? '')],
+            // "now" was wrong for Pay Later / Bank Transfer, where nothing is due at checkout.
+            ['label' => __('Amount due', 'yatra'), 'value' => esc_html($v['amount_due_formatted'] ?? '')],
         ], static function (array $row): bool {
             return $row['value'] !== '';
         }));
@@ -302,7 +306,7 @@ final class EmailTemplateDefaults
 
         return EmailTemplateLayout::customer(
             '✈️',
-            __('Booking update', 'yatra'),
+            (string) ($v['email_heading'] ?? __('Your booking', 'yatra')),
             $inner,
             $site,
             __('Your booking details are inside.', 'yatra')
@@ -319,6 +323,8 @@ final class EmailTemplateDefaults
         $rows = array_values(array_filter([
             ['label' => __('Booking reference', 'yatra'), 'value' => esc_html($v['booking_reference'] ?? '')],
             ['label' => __('Amount paid', 'yatra'), 'value' => esc_html($v['payment_amount_formatted'] ?? '')],
+            // After a part payment the customer needs to know what is left.
+            ['label' => __('Balance remaining', 'yatra'), 'value' => (float) ($v['amount_due_value'] ?? 0) > 0.009 ? esc_html($v['amount_due_formatted'] ?? '') : ''],
             ['label' => __('Method', 'yatra'), 'value' => esc_html($v['payment_method'] ?? '')],
             ['label' => __('Transaction ID', 'yatra'), 'value' => esc_html($v['transaction_id'] ?? '')],
         ], static function (array $row): bool {
@@ -819,7 +825,7 @@ final class EmailTemplateDefaults
                 ['label' => 'Travel date', 'value' => '{{travel_date}}'],
                 ['label' => 'Travelers', 'value' => '{{travelers_count}}'],
                 ['label' => 'Total', 'value' => '{{total_amount_formatted}}'],
-                ['label' => 'Amount due now', 'value' => '{{amount_due_formatted}}'],
+                ['label' => 'Amount due', 'value' => '{{amount_due_formatted}}'],
             ])
             . '{{details_html}}'
             . '<p style="margin:24px 0 0;color:#475569;">{{footer_note}}</p>'
@@ -827,10 +833,10 @@ final class EmailTemplateDefaults
 
         return EmailTemplateLayout::customer(
             '✈️',
-            'Booking update',
+            'Your booking',
             $inner,
             '{{site_name}}',
-            'Booking update'
+            'Your booking'
         );
     }
 

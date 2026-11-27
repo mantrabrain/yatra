@@ -162,6 +162,11 @@ class DepartureRepository extends BaseRepository
     {
         $where = ['1=1']; // Always true for base condition
         $params = [];
+
+        // Only departures of trips that still exist (a deleted trip's
+        // departures used to stay in the all-trips list).
+        $trips = esc_sql(\Yatra\Database\Tables\TripsTable::getTableName());
+        $where[] = "trip_id IN (SELECT t.id FROM `{$trips}` t WHERE t.deleted_at IS NULL AND t.status <> 'trash')";
         
         // Status filter. 'past' is date-derived (see Departure::calculateStatus),
         // NOT the stored status column — that column is only kept current by the

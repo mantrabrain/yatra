@@ -228,6 +228,19 @@ abstract class AbstractPaymentGateway implements PaymentGatewayInterface
     }
 
     /**
+     * Can Yatra send a refund back through this gateway right now (its
+     * processRefund() is implemented and the gateway is set up for it)?
+     * Only then does the booking screen offer "send the money back through
+     * <gateway>"; otherwise a refund is recorded only.
+     *
+     * @since 3.2.0
+     */
+    public function canRefundThroughGateway(): bool
+    {
+        return false;
+    }
+
+    /**
      * Check if gateway supports tokenization
      */
     public function supportsTokenization(): bool

@@ -77,8 +77,19 @@ class ReportsController extends BaseController
             'date_to'   => $dateTo,
         ];
 
-        $bookingsList = $this->request('GET', '/yatra/v1/bookings', $params);
-        $paymentsList = $this->request('GET', '/yatra/v1/payments', $params);
+        // Bookings MADE in the window (created_from/created_to), every page.
+        // date_from/date_to on /bookings filter the travel date, so a booking
+        // made this month for a trip next month was never counted; and only
+        // the first 20 rows were read.
+        $bookingsList = ['data' => $this->requestAll('/yatra/v1/bookings', [
+            'created_from' => $dateFrom,
+            'created_to'   => $dateTo,
+        ])];
+        // Payments filter on created_at; include the whole last day.
+        $paymentsList = $this->requestAll('/yatra/v1/payments', [
+            'date_from' => $dateFrom,
+            'date_to'   => $dateTo . ' 23:59:59',
+        ]);
         // Departures are deliberately NOT capped at $dateTo.
         //
         // The reporting window [$dateFrom, $dateTo] is historical (default: the
@@ -156,10 +167,10 @@ class ReportsController extends BaseController
         // window, sum revenue + count. Cheap because /bookings already
         // applies a paginated cap; we accept that as the trade-off vs.
         // adding a dedicated repository method.
-        $prevBookingsList = $this->request('GET', '/yatra/v1/bookings', [
-            'date_from' => $prevFrom,
-            'date_to'   => $prevTo,
-        ]);
+        $prevBookingsList = ['data' => $this->requestAll('/yatra/v1/bookings', [
+            'created_from' => $prevFrom,
+            'created_to'   => $prevTo,
+        ])];
         $prevBookings = isset($prevBookingsList['data']) && is_array($prevBookingsList['data'])
             ? $prevBookingsList['data']
             : (is_array($prevBookingsList) ? $prevBookingsList : []);
@@ -419,6 +430,10 @@ class ReportsController extends BaseController
         $byStatus = [];
         foreach ($payments as $p) {
             $status = strtolower((string) ($p['status'] ?? 'pending'));
+            // A payment row is "completed"; the chart's bucket is "Paid".
+            if ($status === 'completed' || $status === 'succeeded') {
+                $status = 'paid';
+            }
             $amount = isset($p['amount']) ? (float) $p['amount'] : (isset($p['total_amount']) ? (float) $p['total_amount'] : 0.0);
             if (!isset($byStatus[$status])) {
                 $byStatus[$status] = ['count' => 0, 'amount' => 0.0];
@@ -1010,6 +1025,30 @@ class ReportsController extends BaseController
         // No availability/trip capacity resolved — fall back to the stored value,
         // but drop the legacy "unlimited" sentinels that would inflate occupancy.
         return $memo[$key] = ($stored >= 9999 ? 0 : $stored);
+    }
+
+    /**
+     * Every row of a paginated list endpoint, as arrays (the reports used to
+     * read only the first page of 20).
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function requestAll(string $route, array $params, int $maxPages = 100): array
+    {
+        $rows = [];
+        for ($page = 1; $page <= $maxPages; $page++) {
+            $res = $this->request('GET', $route, array_merge($params, ['page' => $page, 'per_page' => 100]));
+            $data = is_array($res) && isset($res['data']) && is_array($res['data']) ? $res['data'] : [];
+            foreach ($data as $row) {
+                $rows[] = is_array($row) ? $row : (array) json_decode((string) wp_json_encode($row), true);
+            }
+            $totalPages = (int) ($res['meta']['total_pages'] ?? $res['total_pages'] ?? 1);
+            if ($data === [] || $page >= $totalPages) {
+                break;
+            }
+        }
+
+        return $rows;
     }
 
     /**

@@ -41,6 +41,8 @@ class PaymentGatewayRegistry
         $freeGateways = [
             Gateways\PayLater\PayLaterGateway::class,      // Book Now Pay Later - Free
             Gateways\PayPal\PayPalGateway::class,          // PayPal - Free
+            Gateways\BankTransfer\BankTransferGateway::class, // Bank Transfer - Free since 3.2
+            Gateways\Cheque\ChequeGateway::class,             // Cheque - Free since 3.3
         ];
 
         foreach ($freeGateways as $gatewayClass) {
@@ -107,7 +109,11 @@ class PaymentGatewayRegistry
             'paystack',
             'square',
             'authorize_net',
-            'bank_transfer',
+            'payfast',
+            'payu',
+            'midtrans',
+            'payhere',
+            'himalayan_bank',
         ];
     }
     
@@ -159,7 +165,7 @@ class PaymentGatewayRegistry
         
         // Add premium gateway placeholders if Pro is not active
         if (!$isProActive) {
-            $premiumPlaceholders = $this->getPremiumGatewayPlaceholders();
+            $premiumPlaceholders = $this->getPremiumGatewayPlaceholders() + $this->getRegionalGatewayPlaceholders();
             foreach ($premiumPlaceholders as $id => $placeholder) {
                 // Only add if not already registered
                 if (!isset($definitions[$id])) {
@@ -276,6 +282,41 @@ class PaymentGatewayRegistry
                 'requires_pro' => true,
             ],
         ];
+    }
+
+    /**
+     * Placeholders for the regional hosted-page gateways in Yatra Pro 3.3+.
+     *
+     * @since 3.3.0
+     */
+    private function getRegionalGatewayPlaceholders(): array
+    {
+        $regional = [
+            'himalayan_bank' => [__('Himalayan Bank', 'yatra'), __('Accept card payments via Himalayan Bank (Nepal)', 'yatra')],
+            'payu' => [__('PayU', 'yatra'), __('Accept UPI, cards and net banking via PayU (India)', 'yatra')],
+            'payfast' => [__('PayFast', 'yatra'), __('Accept payments via PayFast (South Africa)', 'yatra')],
+            'midtrans' => [__('Midtrans', 'yatra'), __('Accept payments via Midtrans (Indonesia)', 'yatra')],
+            'payhere' => [__('PayHere', 'yatra'), __('Accept payments via PayHere (Sri Lanka)', 'yatra')],
+        ];
+        $placeholders = [];
+        foreach ($regional as $id => [$title, $description]) {
+            $placeholders[$id] = [
+                'id' => $id,
+                'title' => $title,
+                'description' => $description,
+                'icon' => YATRA_PLUGIN_URL . 'assets/images/payment-gateways/' . $id . '.svg',
+                'sandbox_url' => '',
+                'is_offline' => false,
+                'supports' => [],
+                'fields' => [],
+                'config' => ['enabled' => false],
+                'enabled' => false,
+                'is_premium' => true,
+                'requires_pro' => true,
+            ];
+        }
+
+        return $placeholders;
     }
 
     /**

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "yatra/trip-booking",
+  "title": "Trip Booking Card",
+  "category": "yatra",
+  "icon": "cart",
+  "description": "Price, departure date, travellers and the Check availability button.",
+  "keywords": [
+    "booking",
+    "price",
+    "availability",
+    "book",
+    "yatra"
+  ],
+  "textdomain": "yatra",
+  "attributes": {
+    "tripId": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "supports": {
+    "html": false,
+    "inserter": true,
+    "align": [
+      "wide",
+      "full"
+    ]
+  },
+  "editorScript": "yatra-trip-booking-block-editor"
+}

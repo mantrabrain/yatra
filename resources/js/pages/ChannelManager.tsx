@@ -62,6 +62,7 @@ import {
   type ChannelManagerMeta,
   type ChannelRow,
   type ChannelTypeDef,
+  type GygSupplierCredentials,
   type MappingRow,
 } from "../api/channel-manager-api";
 
@@ -592,6 +593,8 @@ const ChannelsSection: React.FC<{ meta: ChannelManagerMeta }> = ({ meta }) => {
                               variant="outline"
                               size="sm"
                               className="border-red-200 text-red-700 hover:bg-red-50 dark:border-red-700 dark:text-red-300 dark:hover:bg-red-900/30"
+                              aria-label={__("Delete channel", "yatra")}
+                              title={__("Delete channel", "yatra")}
                               onClick={() =>
                                 setPendingDeleteChannel({
                                   id: ch.id,
@@ -1121,7 +1124,11 @@ const ChannelEditForm: React.FC<{
         />
       )}
 
-      {!isCreate && (
+      {!isCreate && typeDef?.capabilities?.supplier_api && (
+        <GygSupplierCard channelId={existing!.id} initial={existing!.gyg_supplier} />
+      )}
+
+      {!isCreate && !typeDef?.capabilities?.supplier_api && (
         <WebhookCard
           channelId={existing!.id}
           webhookUrlTemplate={meta.webhook_url}
@@ -1270,6 +1277,104 @@ const CredentialsCard: React.FC<{
             </div>
           );
         })}
+      </CardContent>
+    </Card>
+  );
+};
+
+/**
+ * GetYourGuide calls Yatra (availability, reservations, bookings): the URL,
+ * username and password to enter in GetYourGuide's Integrator Portal.
+ */
+const GygSupplierCard: React.FC<{
+  channelId: number;
+  initial?: GygSupplierCredentials;
+}> = ({ channelId, initial }) => {
+  const { showToast } = useToast();
+  const [creds, setCreds] = useState<GygSupplierCredentials | undefined>(initial);
+  const run = useMutation({
+    mutationFn: (action: "reveal" | "rotate") => channelManagerApi.gygCredentials(channelId, action),
+    onSuccess: (res) => {
+      setCreds(res.data);
+      if (res.message) showToast(res.message, "success");
+    },
+    onError: (e: any) => showToast(extractError(e), "error"),
+  });
+  const copy = async (value: string) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      showToast(__("Copied.", "yatra"), "success");
+    } catch {
+      showToast(__("Couldn't copy — copy manually.", "yatra"), "error");
+    }
+  };
+  const row = (label: string, value: string, testId: string) => (
+    <div>
+      <div className="text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">{label}</div>
+      <div className="flex gap-2 flex-wrap">
+        <code
+          className="flex-1 min-w-[240px] rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-mono text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 break-all"
+          data-testid={testId}
+        >
+          {value || "••••••••"}
+        </code>
+        {value && (
+          <Button variant="outline" onClick={() => copy(value)}>
+            <Copy className="mr-1.5 h-4 w-4" />
+            {__("Copy", "yatra")}
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+
+  return (
+    <Card data-testid="gyg-supplier-card">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Inbox className="h-5 w-5 text-blue-500" />
+          {__("Connect GetYourGuide to this site", "yatra")}
+        </CardTitle>
+        <CardDescription>
+          {__(
+            "GetYourGuide asks this site for availability and sends its reservations and bookings here in real time. Enter these in GetYourGuide's Integrator Portal as your API configuration (test first, then production).",
+            "yatra",
+          )}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {row(__("API base URL", "yatra"), creds?.base_url || "", "gyg-base-url")}
+        {row(__("Username", "yatra"), creds?.user || "", "gyg-user")}
+        {row(__("Password", "yatra"), creds?.password || "", "gyg-password")}
+        <div className="flex gap-2 flex-wrap">
+          {!creds?.password && (
+            <Button variant="outline" onClick={() => run.mutate("reveal")} disabled={run.isPending} data-testid="gyg-reveal">
+              {creds?.configured ? __("Show password", "yatra") : __("Create credentials", "yatra")}
+            </Button>
+          )}
+          {creds?.configured && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (window.confirm(__("Create a new password? GetYourGuide can't reach this site until you enter it in the Integrator Portal.", "yatra"))) {
+                  run.mutate("rotate");
+                }
+              }}
+              disabled={run.isPending}
+            >
+              {__("Create new password", "yatra")}
+            </Button>
+          )}
+        </div>
+        <p className="text-xs text-gray-500 dark:text-gray-400 flex items-start gap-1.5">
+          <Info className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
+          <span>
+            {__(
+              "The site must be reachable over HTTPS from the internet. Products: map each trip under Mappings — its External product ID is the product ID you give the matching tour option in GetYourGuide. Places are held for 60 minutes while a customer checks out on GetYourGuide (shown as \"On hold\" bookings).",
+              "yatra",
+            )}
+          </span>
+        </p>
       </CardContent>
     </Card>
   );
@@ -1788,6 +1893,8 @@ const MappingsSection: React.FC = () => {
                               variant="outline"
                               size="sm"
                               className="border-red-200 text-red-700 hover:bg-red-50 dark:border-red-700 dark:text-red-300 dark:hover:bg-red-900/30"
+                              aria-label={__("Delete mapping", "yatra")}
+                              title={__("Delete mapping", "yatra")}
                               onClick={() =>
                                 setPendingDelete({ kind: "one", id: m.id })
                               }
@@ -2245,6 +2352,126 @@ const MappingAddForm: React.FC<{
   );
 };
 
+interface GygMappingSettings {
+  product_type: "auto" | "time_point" | "time_period";
+  start_time: string;
+  opening_from: string;
+  opening_to: string;
+  price_over_api: boolean;
+  categories: string[];
+}
+
+const GYG_CATEGORIES = ["ADULT", "CHILD", "YOUTH", "INFANT", "SENIOR", "STUDENT", "EU_CITIZEN", "MILITARY"];
+
+const readGygSettings = (data: Record<string, unknown> | undefined): GygMappingSettings => {
+  const raw = (data && typeof data.gyg === "object" && data.gyg ? data.gyg : {}) as Record<string, unknown>;
+  const type = raw.product_type === "time_point" || raw.product_type === "time_period" ? raw.product_type : "auto";
+  const cats = Array.isArray(raw.categories) ? (raw.categories as string[]).filter((c) => GYG_CATEGORIES.includes(c)) : [];
+  return {
+    product_type: type,
+    start_time: typeof raw.start_time === "string" ? raw.start_time : "",
+    opening_from: typeof raw.opening_from === "string" ? raw.opening_from : "00:00",
+    opening_to: typeof raw.opening_to === "string" ? raw.opening_to : "23:59",
+    price_over_api: !!raw.price_over_api,
+    categories: cats.length ? cats : ["ADULT"],
+  };
+};
+
+/** How this trip appears to GetYourGuide (stored in the mapping's external_data.gyg). */
+const GygMappingCard: React.FC<{
+  value: GygMappingSettings;
+  onChange: (v: GygMappingSettings) => void;
+}> = ({ value, onChange }) => {
+  const set = (patch: Partial<GygMappingSettings>) => onChange({ ...value, ...patch });
+  return (
+    <Card data-testid="gyg-mapping-card">
+      <CardHeader>
+        <CardTitle>{__("GetYourGuide product", "yatra")}</CardTitle>
+        <CardDescription>
+          {__(
+            "Must match how the tour option is set up on GetYourGuide. Places always come from this trip's departures.",
+            "yatra",
+          )}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-5">
+        <div className="grid gap-5 md:grid-cols-2">
+          <FormField
+            label={__("Product type", "yatra")}
+            description={__(
+              "Time point: fixed start times. Time period: open during opening hours (one entry per day). Automatic: departures with a start time are time points, the rest whole days.",
+              "yatra",
+            )}
+          >
+            <select
+              className="w-full h-10 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 text-sm"
+              value={value.product_type}
+              onChange={(e) => set({ product_type: e.target.value as GygMappingSettings["product_type"] })}
+            >
+              <option value="auto">{__("Automatic", "yatra")}</option>
+              <option value="time_point">{__("Time point (start times)", "yatra")}</option>
+              <option value="time_period">{__("Time period (opening hours)", "yatra")}</option>
+            </select>
+          </FormField>
+          {value.product_type === "time_point" && (
+            <FormField
+              label={__("Start time for departures without one", "yatra")}
+              description={__("HH:MM, in the trip's local time.", "yatra")}
+            >
+              <Input placeholder="09:00" value={value.start_time} onChange={(e) => set({ start_time: e.target.value })} />
+            </FormField>
+          )}
+          {value.product_type !== "time_point" && (
+            <FormField label={__("Opening hours", "yatra")} description={__("HH:MM – HH:MM (00:00 – 23:59 = all day).", "yatra")}>
+              <div className="flex gap-2">
+                <Input value={value.opening_from} onChange={(e) => set({ opening_from: e.target.value })} />
+                <Input value={value.opening_to} onChange={(e) => set({ opening_to: e.target.value })} />
+              </div>
+            </FormField>
+          )}
+        </div>
+        <FormField
+          label={__("Ticket categories", "yatra")}
+          description={__(
+            "For trips with one price per person: the GetYourGuide categories sold at that price. Trips priced per traveller category use their own categories (Adult, Child…).",
+            "yatra",
+          )}
+        >
+          <div className="flex flex-wrap gap-3">
+            {GYG_CATEGORIES.map((c) => (
+              <label key={c} className="inline-flex items-center gap-1.5 text-sm">
+                <input
+                  type="checkbox"
+                  checked={value.categories.includes(c)}
+                  onChange={(e) =>
+                    set({
+                      categories: e.target.checked
+                        ? [...value.categories, c]
+                        : value.categories.filter((x) => x !== c).length
+                          ? value.categories.filter((x) => x !== c)
+                          : ["ADULT"],
+                    })
+                  }
+                />
+                {c}
+              </label>
+            ))}
+          </div>
+        </FormField>
+        <ToggleRow
+          label={__("Send prices with availability (Price over API)", "yatra")}
+          description={__(
+            "Off: GetYourGuide uses the prices set up there. On: it uses this trip's prices (with the channel's price offset) — also switch on Price over API in GetYourGuide.",
+            "yatra",
+          )}
+          checked={value.price_over_api}
+          onChange={(v) => set({ price_over_api: v })}
+        />
+      </CardContent>
+    </Card>
+  );
+};
+
 /**
  * Full-edit form for an existing mapping. Backs the row-level
  * "Edit" button — previously the operator could only delete +
@@ -2280,6 +2507,8 @@ const MappingEditForm: React.FC<{
   );
 
   const channel = channels.find((c) => c.id === existing.channel_id);
+  const isGyg = channel?.channel_type === "getyourguide";
+  const [gyg, setGyg] = useState<GygMappingSettings>(() => readGygSettings(existing.external_data));
 
   const save = useMutation({
     mutationFn: () =>
@@ -2290,6 +2519,18 @@ const MappingEditForm: React.FC<{
         is_active: isActive,
         sync_inventory: syncInventory,
         sync_pricing: syncPricing,
+        // Keep settings this form doesn't show (category_map, timezone).
+        ...(isGyg
+          ? {
+              external_data: {
+                ...(existing.external_data || {}),
+                gyg: {
+                  ...((existing.external_data?.gyg as Record<string, unknown>) || {}),
+                  ...gyg,
+                },
+              },
+            }
+          : {}),
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["channel-manager-mappings"] });
@@ -2431,6 +2672,8 @@ const MappingEditForm: React.FC<{
           </div>
         </CardContent>
       </Card>
+
+      {isGyg && <GygMappingCard value={gyg} onChange={setGyg} />}
 
       <Card>
         <CardHeader>

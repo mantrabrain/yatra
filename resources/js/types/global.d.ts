@@ -49,6 +49,8 @@ declare global {
       whatsappEnabled?: boolean;
       channelManagerEnabled?: boolean;
       webhooksEnabled?: boolean;
+      /** Pro "Travel Agencies" module (Growth / Scale). */
+      travelAgencyEnabled?: boolean;
       /** Pro "Scheduled Payments" module — drives the Payments submenu. */
       scheduledPaymentsEnabled?: boolean;
       // Brand / chrome

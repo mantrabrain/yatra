@@ -22,6 +22,7 @@ class TripCategoryBlock
      */
     public function renderCallback(array $attributes, string $content): string
     {
+        FrontendAssetsProvider::ensureCommonAssets();
         FrontendAssetsProvider::registerCoreFrontendStylesheets();
         wp_enqueue_style('yatra-destination-shortcode');
 

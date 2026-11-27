@@ -307,7 +307,17 @@ class SingleTripController
         $trip->featured_image_url = $this->getFeaturedImageUrl($trip->featured_image ?? '');
 
         // Convert stdClass to Trip model instance
-        return \Yatra\Models\Trip::fromStdClass($trip);
+        $model = \Yatra\Models\Trip::fromStdClass($trip);
+
+        /**
+         * The trip prepared for the trip page (and the booking pages built
+         * from it). Yatra's WPML/Polylang support swaps in translations here.
+         *
+         * @param \Yatra\Models\Trip $model
+         */
+        $filtered = apply_filters('yatra_prepared_trip', $model);
+
+        return is_object($filtered) ? $filtered : $model;
     }
 
     /**
@@ -382,6 +392,14 @@ class SingleTripController
         $toDate = yatra_get_availability_horizon_date($fromDate);
         
         $availability = $resolutionService->getAllAvailabilityDates($trip_id, $fromDate, $toDate, \Yatra\Services\SettingsService::isEnabled('show_sold_out'));
+
+        // Dates with their own booking cutoff that has passed are closed: the
+        // booking calendar mustn't offer them (or count them as available).
+        $availability = array_values(array_filter($availability, static function ($avail) {
+            return !(is_object($avail)
+                && isset($avail->cutoff_hours) && $avail->cutoff_hours !== null && $avail->cutoff_hours !== ''
+                && \Yatra\Services\AvailabilityResolutionService::isPastBookingCutoff($avail));
+        }));
         
         // Add calculated fields
         foreach ($availability as $avail) {
@@ -1538,6 +1556,8 @@ class SingleTripController
                 /* translators: %d: itinerary day number. */
                 'day_title' => $day->title ?: sprintf(__('Day %d', 'yatra'), $day->day_number),
                 'day_description' => $day->description ?: '',
+                // Highest altitude of the day in metres (3.3), or null.
+                'altitude' => \Yatra\Repositories\ItineraryRepository::dayAltitude($day),
                 'entries' => $formatted_entries,
             ];
         }
@@ -1675,12 +1695,13 @@ class SingleTripController
      * Whether a tab has anything to show. An unfilled section would otherwise
      * render a "nothing here yet" box on the public page. Return true from the
      * yatra_trip_tab_has_content filter to show a section regardless.
+     * Public since 3.1.4 so the single-trip section blocks skip empty sections too.
      *
      * @param object $tab Tab configuration
      * @param object $trip Trip object
      * @return bool
      */
-    private static function tabHasContent($tab, $trip): bool
+    public static function tabHasContent($tab, $trip): bool
     {
         switch ($tab->content_type ?? '') {
             case 'itinerary':

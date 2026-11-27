@@ -1,0 +1,31 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "yatra/trip-gallery",
+  "title": "Trip Gallery",
+  "category": "yatra",
+  "icon": "format-gallery",
+  "description": "Photo gallery of a trip, with the full-screen viewer.",
+  "keywords": [
+    "gallery",
+    "photos",
+    "images",
+    "yatra"
+  ],
+  "textdomain": "yatra",
+  "attributes": {
+    "tripId": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "supports": {
+    "html": false,
+    "inserter": true,
+    "align": [
+      "wide",
+      "full"
+    ]
+  },
+  "editorScript": "yatra-trip-gallery-block-editor"
+}

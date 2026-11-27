@@ -223,8 +223,11 @@ class BookingDepartureRepository extends BaseRepository
     {
         $table = $this->getTableName();
 
+        // Only links to bookings that still exist: rows left behind by a
+        // booking deleted outside Yatra inflated the departure's counts.
+        $bookings = esc_sql(\Yatra\Database\Tables\BookingsTable::getTableName());
         $rows = $this->wpdb->get_col($this->wpdb->prepare(
-            "SELECT booking_id FROM `{$table}` WHERE departure_id = %d",
+            "SELECT bd.booking_id FROM `{$table}` bd INNER JOIN `{$bookings}` b ON b.id = bd.booking_id WHERE bd.departure_id = %d",
             $departureId
         ));
 

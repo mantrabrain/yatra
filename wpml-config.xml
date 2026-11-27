@@ -1,0 +1,19 @@
+<wpml-config>
+    <!--
+        Customer-facing Yatra settings that WPML and Polylang offer on their
+        string translation screens (WPML → String Translation, Polylang →
+        Languages → Translations). Trip, destination, activity and category
+        texts and customised customer emails are registered by Yatra itself
+        (see app/Multilingual).
+    -->
+    <admin-texts>
+        <key name="yatra_gateway_configs">
+            <key name="*">
+                <key name="title"/>
+                <key name="description"/>
+                <key name="instructions"/>
+            </key>
+        </key>
+        <key name="yatra_tax_label"/>
+    </admin-texts>
+</wpml-config>

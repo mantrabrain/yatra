@@ -65,6 +65,8 @@ class BookingRepository extends BaseRepository
      * @type string $search Search term
      * @type string $date_from Start date filter
      * @type string $date_to End date filter
+     * @type string $created_from Booked on or after (Y-m-d)
+     * @type string $created_to Booked on or before (Y-m-d)
      * }
      * @return array {data: array, total: int, page: int, per_page: int, total_pages: int}
      */
@@ -112,6 +114,17 @@ class BookingRepository extends BaseRepository
         if (!empty($filters['date_to'])) {
             $where_clauses[] = 'b.travel_date <= %s';
             $where_values[] = sanitize_text_field($filters['date_to']);
+        }
+
+        // When the booking was MADE (reports). Inclusive whole days.
+        if (!empty($filters['created_from'])) {
+            $where_clauses[] = 'b.created_at >= %s';
+            $where_values[] = substr(sanitize_text_field($filters['created_from']), 0, 10) . ' 00:00:00';
+        }
+
+        if (!empty($filters['created_to'])) {
+            $where_clauses[] = 'b.created_at <= %s';
+            $where_values[] = substr(sanitize_text_field($filters['created_to']), 0, 10) . ' 23:59:59';
         }
 
         $where_sql = implode(' AND ', $where_clauses);
@@ -881,6 +894,24 @@ class BookingRepository extends BaseRepository
      * @return array
      */
     /**
+     * Offline methods (besides the "pay later" kind) whose unpaid bookings are
+     * never cancelled by the expiry sweep.
+     *
+     * @since 3.3.0
+     * @return string[]
+     */
+    public static function expiryExemptGateways(): array
+    {
+        /**
+         * Payment methods whose unpaid bookings never expire.
+         *
+         * @since 3.3.0
+         * @param string[] $ids Default: cheque.
+         */
+        return array_values(array_filter(array_map('strval', (array) apply_filters('yatra_booking_expiry_exempt_gateways', ['cheque']))));
+    }
+
+    /**
      * Unpaid bookings past the expiry threshold.
      *
      * @param string $expiryThreshold Bookings created before this are expired.
@@ -894,18 +925,26 @@ class BookingRepository extends BaseRepository
      *                                hundreds of emails in one cron request and
      *                                time out half-way. It runs hourly, so a
      *                                backlog simply drains over the next runs.
+     * Pay Later bookings are never returned: the customer was told they pay
+     * later, so they must not be cancelled for being unpaid.
+     *
      * @return array<int, object>
      */
     public function getExpiredPendingBookings(string $expiryThreshold, string $createdSince = '', int $limit = 200): array
     {
         $table = $this->getTableName();
+        // Pay Later and any other "pay later" kind of method (e.g. Pay by invoice).
+        $deferred = function_exists('yatra_deferred_payment_gateway_ids') ? yatra_deferred_payment_gateway_ids() : ['pay_later'];
+        // Cheques (3.3) take days to arrive by post: never expired as unpaid.
+        $deferred = array_values(array_unique(array_merge($deferred, self::expiryExemptGateways())));
 
         $sql = "SELECT id, reference, contact_email, contact_first_name, contact_last_name, trip_id
                 FROM {$table}
                 WHERE status = 'pending'
                 AND payment_status = 'pending'
+                AND (payment_gateway IS NULL OR payment_gateway NOT IN (" . implode(', ', array_fill(0, count($deferred), '%s')) . "))
                 AND created_at < %s";
-        $params = [$expiryThreshold];
+        $params = array_merge($deferred, [$expiryThreshold]);
 
         if ($createdSince !== '') {
             $sql .= ' AND created_at >= %s';

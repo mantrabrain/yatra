@@ -32,7 +32,31 @@ class NotificationHooks
      */
     public static function onBookingCreated(int $bookingId, $bookingData): void
     {
-        NotificationService::sendBookingCreatedNotification($bookingId, $bookingData);
+        // Sent once the request is done: checkout confirms the booking (auto-
+        // confirm, payment) right after creating it, and the email read the
+        // row too early — "Booking status: pending" for a confirmed booking.
+        if (self::$pendingCreated === []) {
+            add_action('shutdown', [self::class, 'flushCreatedNotifications'], 1);
+        }
+        self::$pendingCreated[$bookingId] = $bookingData;
+    }
+
+    /** @var array<int, mixed> Bookings created in this request, waiting for their admin email. */
+    private static array $pendingCreated = [];
+
+    public static function flushCreatedNotifications(): void
+    {
+        $pending = self::$pendingCreated;
+        self::$pendingCreated = [];
+        foreach ($pending as $bookingId => $bookingData) {
+            try {
+                NotificationService::sendBookingCreatedNotification((int) $bookingId, $bookingData);
+            } catch (\Throwable $e) {
+                if (class_exists('\\Yatra\\Utils\\Logger')) {
+                    \Yatra\Utils\Logger::error('Admin new-booking email failed', ['booking_id' => $bookingId, 'error' => $e->getMessage()]);
+                }
+            }
+        }
     }
     
     /**

@@ -273,6 +273,14 @@
         }
 
         function formatPrice(amount) {
+            // The visitor's currency (Yatra Pro currency switcher); the filter
+            // itself still works on store-currency prices.
+            if (typeof window.yatraDisplayPrice === 'function') {
+                const shown = window.yatraDisplayPrice(Number(amount) || 0);
+                if (typeof shown === 'string' && shown !== '') {
+                    return shown;
+                }
+            }
             if (!priceFormat || typeof priceFormat.symbol !== 'string') {
                 // Older template override without the format attribute.
                 return typeof window.yatra_format_price === 'function'
@@ -428,13 +436,21 @@
                 maxSlider.value = max;
             }
 
-            // Update badges
-            if (minBadge) minBadge.textContent = min + ' Days';
-            if (maxBadge) maxBadge.textContent = max + ' Days';
+            // Translatable, singular/plural, and "12 Days" rather than "12 - 12 Days".
+            var i18n = (window.wp && window.wp.i18n) ? window.wp.i18n : null;
+            var daysLabel = function (n) {
+                return i18n
+                    ? i18n.sprintf(i18n._n('%d Day', '%d Days', n, 'yatra'), n)
+                    : n + (n === 1 ? ' Day' : ' Days');
+            };
+            if (minBadge) minBadge.textContent = daysLabel(min);
+            if (maxBadge) maxBadge.textContent = daysLabel(max);
 
             // Update the dropdown value display
             if (valueSpan) {
-                valueSpan.textContent = min + ' - ' + max + ' Days';
+                valueSpan.textContent = min === max
+                    ? daysLabel(min)
+                    : (i18n ? i18n.sprintf(i18n.__('%1$d - %2$d Days', 'yatra'), min, max) : min + ' - ' + max + ' Days');
                 valueSpan.classList.add('selected');
             }
 

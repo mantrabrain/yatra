@@ -1,0 +1,27 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "yatra/my-account",
+  "title": "My Account",
+  "category": "yatra",
+  "icon": "admin-users",
+  "description": "Customer dashboard: bookings, profile and wishlist. Guests see a login prompt.",
+  "keywords": [
+    "account",
+    "dashboard",
+    "bookings",
+    "profile",
+    "yatra"
+  ],
+  "textdomain": "yatra",
+  "attributes": {},
+  "supports": {
+    "html": false,
+    "inserter": true,
+    "align": [
+      "wide",
+      "full"
+    ]
+  },
+  "editorScript": "yatra-my-account-block-editor"
+}

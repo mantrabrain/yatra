@@ -474,6 +474,33 @@ do_action('yatra_booking_confirmation_header', $booking);
                                 <span class="yatra-info-label"><?php esc_html_e('Booked On', 'yatra'); ?></span>
                                 <span class="yatra-info-value"><?php echo esc_html($booking_date_formatted); ?></span>
                             </div>
+                            <?php
+                            $yatra_pickup = class_exists('\\Yatra\\Services\\PickupPointService') ? \Yatra\Services\PickupPointService::forBooking($booking) : null;
+                            if ($yatra_pickup !== null) : ?>
+                            <div class="yatra-info-item yatra-info-item--pickup">
+                                <span class="yatra-info-label"><?php esc_html_e('Pickup point', 'yatra'); ?></span>
+                                <span class="yatra-info-value">
+                                    <?php echo esc_html(\Yatra\Services\PickupPointService::label($yatra_pickup)); ?>
+                                    <?php if ($yatra_pickup['details'] !== '') : ?>
+                                        <br><small><?php echo esc_html($yatra_pickup['details']); ?></small>
+                                    <?php endif; ?>
+                                </span>
+                            </div>
+                            <?php endif; ?>
+                            <?php
+                            $yatra_choices = class_exists('\\Yatra\\Services\\CheckoutChoiceService') ? \Yatra\Services\CheckoutChoiceService::forBooking($booking) : ['accommodation' => null, 'travel_insurance' => null];
+                            if ($yatra_choices['accommodation'] !== null) : ?>
+                            <div class="yatra-info-item yatra-info-item--accommodation">
+                                <span class="yatra-info-label"><?php esc_html_e('Accommodation', 'yatra'); ?></span>
+                                <span class="yatra-info-value"><?php echo esc_html($yatra_choices['accommodation']['name']); ?></span>
+                            </div>
+                            <?php endif; ?>
+                            <?php if ($yatra_choices['travel_insurance'] !== null) : ?>
+                            <div class="yatra-info-item yatra-info-item--insurance">
+                                <span class="yatra-info-label"><?php echo esc_html($yatra_choices['travel_insurance']['title'] !== '' ? $yatra_choices['travel_insurance']['title'] : __('Travel insurance', 'yatra')); ?></span>
+                                <span class="yatra-info-value"><?php echo esc_html(\Yatra\Services\CheckoutChoiceService::insuranceLabel($yatra_choices['travel_insurance'])); ?></span>
+                            </div>
+                            <?php endif; ?>
                         </div>
                     </div>
 
@@ -744,6 +771,9 @@ do_action('yatra_booking_confirmation_header', $booking);
                                 $due_now_label = __('Deposit Due Now', 'yatra');
                             } elseif ($payment_method_type === 'partial') {
                                 $due_now_label = __('Partial Payment Due Now', 'yatra');
+                            } elseif (in_array((string) ($booking->payment_gateway ?? ''), ['pay_later', 'bank_transfer'], true) || yatra_is_deferred_payment_gateway((string) ($booking->payment_gateway ?? ''))) {
+                                // Nothing is collected at checkout with these.
+                                $due_now_label = __('Amount Due', 'yatra');
                             } else {
                                 $due_now_label = __('Due Now', 'yatra');
                             }
@@ -988,6 +1018,23 @@ do_action('yatra_booking_confirmation_header', $booking);
     max-width: 1300px;
     margin: 0 auto;
     padding: 40px 20px;
+    /* Inside a theme's flex row the page must not grow past the screen
+       (it was 535px wide on a 390px phone). */
+    min-width: 0;
+    box-sizing: border-box;
+    flex: 1 1 100%;
+}
+.yatra-confirmation-wrapper * {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+.yatra-confirmation-wrapper .yatra-ref-code {
+    white-space: nowrap;
+    overflow-wrap: normal;
+}
+.yatra-confirmation-wrapper .yatra-confirmation-reference {
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .yatra-confirmation-container {
@@ -1438,9 +1485,24 @@ do_action('yatra_booking_confirmation_header', $booking);
 
 .yatra-confirmation-actions {
     display: flex;
+    flex-wrap: wrap;
     gap: 16px;
     justify-content: center;
     margin-top: 32px;
+}
+
+/* Phones: one full-width button per row instead of three squeezed ones. */
+@media (max-width: 600px) {
+    .yatra-confirmation-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    .yatra-confirmation-actions .yatra-btn {
+        justify-content: center;
+        width: 100%;
+        box-sizing: border-box;
+    }
 }
 
 .yatra-btn {

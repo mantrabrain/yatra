@@ -336,7 +336,7 @@ class AvailabilityRepository extends BaseRepository
             'to_longitude' => $this->sanitizeCoordinate($data['to_longitude'] ?? null),
             'special_notes' => !empty($data['special_notes']) ? sanitize_textarea_field($data['special_notes']) : null,
             'cutoff_date' => !empty($data['cutoff_date']) ? sanitize_text_field($data['cutoff_date']) : null,
-            'cutoff_hours' => (int) ($data['cutoff_hours'] ?? 24),
+            'cutoff_hours' => min(65535, max(1, (int) ($data['cutoff_hours'] ?? 24))),
             'is_blocked' => !empty($data['is_blocked']) ? 1 : 0,
             'block_reason' => !empty($data['block_reason']) ? mb_substr(sanitize_textarea_field($data['block_reason']), 0, 255) : null,
             'alert_threshold' => (isset($data['alert_threshold']) && $data['alert_threshold'] !== '' && $data['alert_threshold'] !== null) ? $this->clampAlertThreshold($data['alert_threshold']) : null,
@@ -408,7 +408,7 @@ class AvailabilityRepository extends BaseRepository
         }
         if (isset($data['special_notes'])) $updateData['special_notes'] = !empty($data['special_notes']) ? sanitize_textarea_field($data['special_notes']) : null;
         if (isset($data['cutoff_date'])) $updateData['cutoff_date'] = !empty($data['cutoff_date']) ? sanitize_text_field($data['cutoff_date']) : null;
-        if (isset($data['cutoff_hours'])) $updateData['cutoff_hours'] = (int) $data['cutoff_hours'];
+        if (isset($data['cutoff_hours'])) $updateData['cutoff_hours'] = min(65535, max(1, (int) $data['cutoff_hours']));
         // array_key_exists (not isset) so an explicit null from the form — e.g.
         // clearing the block reason / threshold when a date is unblocked — is
         // honored instead of silently skipped (isset(null) === false).

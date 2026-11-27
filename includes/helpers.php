@@ -365,6 +365,21 @@ if (!function_exists('yatra_format_price')) {
             return __('Contact for pricing', 'yatra');
         }
 
+        /**
+         * Show a price differently (e.g. converted to the visitor's currency by
+         * Yatra Pro's currency switcher, on browsing pages only). Return a
+         * string to use it; null keeps Yatra's formatting.
+         *
+         * @param string|null $display
+         * @param float       $amount
+         * @param string|null $currency Null: the store currency.
+         * @since 3.2.0
+         */
+        $display = apply_filters('yatra_format_price_display', null, $amount, $currency);
+        if (is_string($display) && $display !== '') {
+            return $display;
+        }
+
         $format = yatra_get_price_format_settings($currency);
 
         // Format the amount with proper separators
@@ -1124,6 +1139,76 @@ function yatra_payment_gateway_label(?string $gatewayId, string $fallback = ''):
     }
 
     return ucwords(str_replace(['_', '-'], ' ', $id));
+}
+
+if (!function_exists('yatra_is_deferred_payment_gateway')) {
+    /**
+     * Is this a "pay later" kind of payment method — the customer is not
+     * expected to pay at checkout, so the booking must never expire for being
+     * unpaid? Pay Later, and any gateway that declares the `pay_later`
+     * capability (e.g. Yatra Pro's "Pay by invoice" for travel agencies).
+     *
+     * @since 3.2.0
+     */
+    function yatra_is_deferred_payment_gateway(string $gatewayId): bool
+    {
+        if ($gatewayId === 'pay_later') {
+            return true;
+        }
+        if ($gatewayId === '' || !class_exists('\\Yatra\\PaymentGateways\\PaymentGatewayRegistry')) {
+            return false;
+        }
+        try {
+            $gateway = \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance()->get($gatewayId);
+        } catch (\Throwable $e) {
+            return false;
+        }
+
+        if ($gateway) {
+            return in_array('pay_later', (array) $gateway->getSupports(), true);
+        }
+
+        // Not loaded right now (e.g. its module is off): ask the id list.
+        return in_array($gatewayId, yatra_deferred_payment_gateway_ids(), true);
+    }
+}
+
+if (!function_exists('yatra_deferred_payment_gateway_ids')) {
+    /**
+     * Ids of every registered deferred ("pay later" kind) payment method.
+     *
+     * @return string[]
+     * @since 3.2.0
+     */
+    function yatra_deferred_payment_gateway_ids(): array
+    {
+        // agency_invoice = Pro Travel Agency "Pay by invoice": listed here so its
+        // unpaid bookings stay safe even while Pro or the module is switched off.
+        $ids = ['pay_later', 'agency_invoice'];
+        if (class_exists('\\Yatra\\PaymentGateways\\PaymentGatewayRegistry')) {
+            try {
+                foreach (\Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance()->getAll() as $id => $gateway) {
+                    if (in_array('pay_later', (array) $gateway->getSupports(), true)) {
+                        $ids[] = (string) $id;
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Registry unavailable: Pay Later alone.
+            }
+        }
+
+        /**
+         * Deferred payment method ids (bookings with these never expire unpaid).
+         * Extensions add theirs even while their gateway isn't loaded, so old
+         * bookings stay safe if the feature is switched off.
+         *
+         * @param string[] $ids
+         * @since 3.2.0
+         */
+        $ids = (array) apply_filters('yatra_deferred_payment_gateway_ids', $ids);
+
+        return array_values(array_unique(array_filter(array_map('strval', $ids))));
+    }
 }
 
 /**
@@ -2151,6 +2236,23 @@ function yatra_build_archive_listing_sort_url(string $yatra_sort): string
  * PERMALINK HELPERS
  * ============================================
  */
+
+/**
+ * A destination, activity, category or difficulty name (or description) in
+ * the visitor's language when WPML / Polylang is active and it has been
+ * translated in their string translation screen; otherwise unchanged.
+ *
+ * @since 3.2.0
+ */
+function yatra_translate_term_name($value): string
+{
+    $value = (string) $value;
+    if ($value === '' || !class_exists('\\Yatra\\Multilingual\\Multilingual')) {
+        return $value;
+    }
+
+    return \Yatra\Multilingual\Multilingual::translateTerm($value);
+}
 
 /**
  * Get destination permalink
@@ -3252,6 +3354,23 @@ function yatra_get_header( $header_name = null ) {
          */
         remove_action( 'wp_head', '_wp_render_title_tag', 1 );
         remove_action( 'wp_head', '_block_template_render_title_tag', 1 );
+
+        /*
+         * Render the header and footer template parts BEFORE wp_head(), as core's
+         * template canvas does with the whole block template. On block themes
+         * WordPress prints the script-module import map in wp_head, so a block
+         * rendered later (e.g. core/navigation, which needs
+         * "@wordpress/interactivity") would enqueue a module the import map no
+         * longer knows about and the browser fails to resolve it. The footer
+         * HTML is kept for yatra_get_footer(); its styles land in the head too.
+         */
+        ob_start();
+        block_header_area();
+        $yatra_header_area_html = ob_get_clean();
+
+        ob_start();
+        block_footer_area();
+        $GLOBALS['yatra_block_footer_area_html'] = ob_get_clean();
         ?>
         <!doctype html>
             <html <?php language_attributes(); ?>>
@@ -3265,7 +3384,7 @@ function yatra_get_header( $header_name = null ) {
             <?php wp_body_open(); ?>
                 <div class="wp-site-blocks">
                     <header class="wp-block-template-part site-header">
-                        <?php block_header_area(); ?>
+                        <?php echo $yatra_header_area_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- core block markup, rendered by block_header_area(). ?>
                     </header>
         <?php
     } else {
@@ -3321,7 +3440,15 @@ if ( ! function_exists( 'yatra_get_footer' ) ) {
 		) {
 			?>
 			<footer class="wp-block-template-part site-footer">
-			<?php block_footer_area(); ?>
+			<?php
+			// Pre-rendered by yatra_get_header() so its script modules made the import map.
+			if ( isset( $GLOBALS['yatra_block_footer_area_html'] ) ) {
+				echo $GLOBALS['yatra_block_footer_area_html']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- core block markup, rendered by block_footer_area().
+				unset( $GLOBALS['yatra_block_footer_area_html'] );
+			} else {
+				block_footer_area();
+			}
+			?>
 			</footer>
 			</div>
             <?php yatra_block_support_styles(); ?>
@@ -3412,5 +3539,34 @@ if (!function_exists('yatra_usage_track_event')) {
             return;
         }
         \Yatra\Services\StatsUsage::instance()->record_event($event, $delta);
+    }
+}
+
+if (!function_exists('yatra_trip_booking_closed_reason')) {
+    /**
+     * Why a trip can't be booked through Yatra's own checkout, or '' when it can:
+     * 'enquiry_only' (Pro "Disable Booking Calendar") or 'external' (a custom
+     * booking link to another site). Admin-created bookings are not affected.
+     *
+     * @since 3.3.0
+     * @param object|array $trip Trip row (stdClass / array) or Trip model.
+     */
+    function yatra_trip_booking_closed_reason($trip): string
+    {
+        try {
+            $model = $trip instanceof \Yatra\Models\Trip
+                ? $trip
+                : (is_object($trip) ? \Yatra\Models\Trip::fromStdClass($trip) : \Yatra\Models\Trip::fromArray((array) $trip));
+        } catch (\Throwable $e) {
+            return '';
+        }
+        if ($model->isBookingDisabled()) {
+            return 'enquiry_only';
+        }
+        if ($model->getExternalBookingUrl() !== '') {
+            return 'external';
+        }
+
+        return '';
     }
 }

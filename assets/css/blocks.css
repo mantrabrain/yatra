@@ -1,0 +1,60 @@
+/**
+ * Yatra blocks & Elementor widgets (3.1.4).
+ *
+ * The single-trip section blocks reuse the trip page markup inside a
+ * .yatra-single-trip wrapper so trip.css applies; these rules undo the
+ * full-page sizing that wrapper has on the trip page.
+ */
+.yatra-trip-block.yatra-single-trip {
+    min-height: 0;
+    margin-bottom: var(--yatra-section-gap, 48px);
+}
+
+.yatra-trip-block.yatra-single-trip > .yatra-trip-section,
+.yatra-trip-block.yatra-single-trip > .yatra-reviews-section {
+    margin-top: 0;
+}
+
+/* The booking card is a sticky sidebar on the trip page; in a block it sits in the flow. */
+.yatra-trip-block--trip-booking .yatra-trip-sidebar {
+    position: static;
+    width: 100%;
+    max-width: 100%;
+    display: block;
+}
+
+/*
+ * On phones the trip page hides its sidebar card (!important) because it has
+ * a sticky booking bar instead. A page with the booking block has no such
+ * bar, so the card must stay visible there.
+ */
+@media (max-width: 1024px) {
+    .yatra-trip-block--trip-booking .yatra-trip-sidebar {
+        display: block !important;
+        position: static !important;
+    }
+}
+
+.yatra-trip-block-notice {
+    padding: 16px 20px;
+    border: 1px dashed #c3c4c7;
+    border-radius: 6px;
+    background: #f6f7f7;
+    color: #50575e;
+    font-size: 14px;
+}
+
+/*
+ * Every Yatra block spans the content width and keeps the same spacing as
+ * the trip sections (search and facts were narrower, and the search bar
+ * touched the next block).
+ */
+.yatra-block,
+.yatra-trip-block {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+.yatra-block {
+    margin-bottom: var(--yatra-section-gap, 48px);
+}

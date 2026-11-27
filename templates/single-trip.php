@@ -160,6 +160,15 @@ if (!empty($downloads)):
         <div class="yatra-trip-main">
             <!-- Dynamic Frontend Tabs -->
             <?php \Yatra\Controllers\SingleTripController::renderFrontendTabs($trip); ?>
+            <?php
+            /**
+             * After the trip page's content sections (e.g. Yatra Pro's guide profiles).
+             *
+             * @param \Yatra\Models\Trip $trip
+             * @since 3.3.0
+             */
+            do_action('yatra_single_trip_after_tabs', $trip);
+            ?>
             </div>
 
         <!-- Sidebar - Booking Card -->

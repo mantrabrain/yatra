@@ -236,6 +236,7 @@ class InstallerService
             \Yatra\Database\Tables\BookingsTable::class,
             \Yatra\Database\Tables\BookingPaymentsTable::class,
             \Yatra\Database\Tables\PaymentNotesTable::class,
+            \Yatra\Database\Tables\BookingActivityTable::class,
             \Yatra\Database\Tables\CustomersTable::class,
             \Yatra\Database\Tables\BookingTravellersTable::class,
             \Yatra\Database\Tables\BookingTravellerMetaTable::class,
@@ -579,6 +580,34 @@ class InstallerService
     }
 
     /**
+     * Booking activity log table (3.2) — same idempotent pattern as the
+     * payment notes table: gated by its own option, dbDelta only when absent,
+     * retried on the next admin pageview if creation failed.
+     */
+    public static function maybeCreateBookingActivityTable(): void
+    {
+        if (get_option('yatra_booking_activity_table_v1')) {
+            return;
+        }
+
+        $table = \Yatra\Database\Tables\BookingActivityTable::getTableName();
+
+        if (!self::databaseTableExists($table)) {
+            require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+            dbDelta(\Yatra\Database\Tables\BookingActivityTable::getSchema());
+        }
+
+        if (self::databaseTableExists($table)) {
+            update_option('yatra_booking_activity_table_v1', '1');
+            \Yatra\Repositories\BookingActivityRepository::resetCache();
+
+            return;
+        }
+
+        \Yatra\Utils\Logger::warning('Could not create the booking activity table', ['table' => $table]);
+    }
+
+    /**
      * Create the payment-note history table on sites that already exist.
      *
      * Database::createTables() only runs on activation and on a version change,
@@ -615,6 +644,112 @@ class InstallerService
         \Yatra\Utils\Logger::warning('Could not create the payment notes table', [
             'table' => $table,
         ]);
+    }
+
+    /**
+     * Bookings stamped "USD" on a non-USD store by mistake.
+     *
+     * Bookings created without a currency (the admin "Add booking" form,
+     * imports) took the column's DEFAULT 'USD', so on a Euro site the booking
+     * screen and its emails mixed "€" and "$". Multi-currency isn't a shipped
+     * feature — every amount is in the store currency — so those bookings are
+     * set to the store currency, with their manual payment rows.
+     *
+     * Left alone: bookings with a gateway payment the gateway itself reported
+     * in USD (real USD money, e.g. taken before the store currency was
+     * changed). Runs once; the ids changed are kept in an option for audit.
+     */
+    public static function maybeRepairDefaultedBookingCurrency(): void
+    {
+        if (get_option('yatra_booking_currency_repair_v1')) {
+            return;
+        }
+
+        global $wpdb;
+        $bookingsTable = $wpdb->prefix . 'yatra_bookings';
+        $paymentsTable = $wpdb->prefix . 'yatra_booking_payments';
+        if (!self::databaseTableExists($bookingsTable) || !self::databaseTableExists($paymentsTable)) {
+            return;
+        }
+
+        $store = strtoupper((string) SettingsService::getCurrency());
+        if ($store === '' || $store === 'USD' || !preg_match('/^[A-Z]{3}$/', $store)) {
+            update_option('yatra_booking_currency_repair_v1', '1', false);
+            return;
+        }
+
+        // Real USD money: a gateway payment with its own transaction id.
+        $ids = array_map('intval', (array) $wpdb->get_col(
+            "SELECT b.id FROM {$bookingsTable} b
+              WHERE b.currency = 'USD'
+                AND NOT EXISTS (
+                    SELECT 1 FROM {$paymentsTable} p
+                     WHERE p.booking_id = b.id
+                       AND p.currency = 'USD'
+                       AND COALESCE(p.transaction_id, '') <> ''
+                       AND COALESCE(p.gateway, '') NOT IN ('', 'manual', 'cash', 'card_terminal', 'cheque', 'other', 'pay_later', 'bank_transfer')
+                )
+              LIMIT 5000"
+        ));
+        if ($wpdb->last_error !== '') {
+            \Yatra\Utils\Logger::warning('Booking currency repair could not list bookings', ['error' => $wpdb->last_error]);
+            return;
+        }
+
+        foreach (array_chunk($ids, 200) as $chunk) {
+            $in = implode(',', $chunk);
+            $wpdb->query($wpdb->prepare("UPDATE {$bookingsTable} SET currency = %s WHERE id IN ({$in}) AND currency = 'USD'", $store));
+            $wpdb->query($wpdb->prepare("UPDATE {$paymentsTable} SET currency = %s WHERE booking_id IN ({$in}) AND currency = 'USD'", $store));
+        }
+
+        update_option('yatra_booking_currency_repair_v1', '1', false);
+        update_option('yatra_booking_currency_repair_ids', $ids, false);
+        if ($ids !== []) {
+            \Yatra\Utils\Logger::info('Bookings stamped USD by default set to the store currency', ['store' => $store, 'count' => count($ids)]);
+        }
+    }
+
+    /**
+     * Seeded customer email wording, updated once on saved templates:
+     * "Amount due now" (wrong for Pay Later / Bank Transfer, where nothing is
+     * due at checkout) → "Amount due", and the "Booking update" heading of the
+     * booking email (it also carries new bookings) → "Your booking".
+     *
+     * Only the exact seeded markup is touched (a label or heading between
+     * tags), so wording an operator wrote themselves is left alone.
+     */
+    public static function maybeRefreshSeededEmailWording(): void
+    {
+        if (get_option('yatra_email_wording_refresh_v1')) {
+            return;
+        }
+        global $wpdb;
+        $changed = [];
+        $names = (array) $wpdb->get_col(
+            "SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE 'yatra\\_email\\_tpl\\_%\\_body'"
+        );
+        foreach ($names as $name) {
+            $body = get_option($name, '');
+            if (!is_string($body) || $body === '') {
+                continue;
+            }
+            $new = self::refreshSeededWording($body);
+            if ($new !== $body) {
+                update_option($name, $new);
+                $changed[] = $name;
+            }
+        }
+        update_option('yatra_email_wording_refresh_v1', $changed !== [] ? $changed : '1', false);
+    }
+
+    /** The seeded labels / headings, between tags only. */
+    public static function refreshSeededWording(string $html): string
+    {
+        return (string) preg_replace(
+            ['/>(\s*)Amount due now(\s*)</', '/>(\s*)Booking update(\s*)</'],
+            ['>$1Amount due$2<', '>$1Your booking$2<'],
+            $html
+        );
     }
 
     /**

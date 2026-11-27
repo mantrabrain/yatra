@@ -33,6 +33,9 @@ $trip_id = $trip->id;
 $trip_slug = $trip->slug ?? '';
 $is_remaining_payment = !empty($booking->is_remaining_payment);
 $remaining_amount = isset($booking->remaining_amount) ? (float) $booking->remaining_amount : null;
+// A payment link may ask for part of the balance: show both amounts.
+$is_payment_link = $is_remaining_payment && !empty($booking->is_payment_link);
+$balance_due = $is_payment_link && isset($booking->balance_due) ? (float) $booking->balance_due : $remaining_amount;
 $existing_booking_id = $booking->existing_booking_id ?? 0;
 $booking_reference = $booking->booking_reference ?? '';
 $amount_paid = isset($booking->amount_paid) ? (float) $booking->amount_paid : null;
@@ -67,6 +70,15 @@ $summary_total_amount = $is_remaining_payment && !empty($total_amount)
 $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
     ? (float) $remaining_amount
     : ($pricing_calculation['amount_due'] ?? $pricing_calculation['final_total'] ?? 0);
+/**
+ * Amount of other bookings paid together with this checkout (Yatra Pro's
+ * multi-trip cart), added to the amount on the pay button.
+ *
+ * @param float $amount  0 for a normal checkout.
+ * @param array $session The booking session.
+ * @since 3.2.0
+ */
+$linked_checkout_amount = $is_remaining_payment ? 0.0 : max(0.0, (float) apply_filters('yatra_checkout_linked_amount', 0.0, function_exists('yatra_get_booking_session') ? (array) yatra_get_booking_session() : []));
 ?>
 
 <div class="yatra-booking-page">
@@ -90,7 +102,9 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                     <div class="yatra-booking-header">
                         <h1>
                             <?php
-                            if (!empty($booking->is_remaining_payment)) {
+                            if ($is_payment_link && $balance_due !== null && $remaining_amount !== null && $remaining_amount < $balance_due - 0.009) {
+                                esc_html_e('Make a Payment', 'yatra');
+                            } elseif (!empty($booking->is_remaining_payment)) {
                                 esc_html_e('Pay Remaining Balance', 'yatra');
                             } else {
                                 esc_html_e('Complete Your Booking', 'yatra');
@@ -101,7 +115,17 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                             <?php
                             $reference_label = $booking_reference ? '#' . $booking_reference : '';
 
-                            if ($is_remaining_payment) {
+                            if ($is_payment_link && $balance_due !== null && $remaining_amount !== null && $remaining_amount < $balance_due - 0.009) {
+                                echo esc_html(
+                                    sprintf(
+                                        /* translators: 1: amount requested now, 2: whole balance due, 3: booking reference */
+                                        __('You are paying %1$s of the %2$s balance for Booking %3$s.', 'yatra'),
+                                        yatra_format_price((float) $remaining_amount, null, false),
+                                        yatra_format_price((float) $balance_due, null, false),
+                                        $reference_label ?: __('(unknown reference)', 'yatra')
+                                    )
+                                );
+                            } elseif ($is_remaining_payment) {
                                 echo esc_html(
                                     sprintf(
                                         /* translators: %s booking reference */
@@ -133,11 +157,75 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                         <?php endif; ?>
                     </div>
 
+                    <?php
+                    /**
+                     * Show the step indicator above the checkout form (3.3).
+                     *
+                     * @since 3.3.0
+                     */
+                    if (!$is_remaining_payment && apply_filters('yatra_checkout_show_progress', true)) : ?>
+                    <ol class="yatra-checkout-progress" aria-label="<?php esc_attr_e('Booking steps', 'yatra'); ?>" style="display:flex;gap:8px;list-style:none;margin:0 0 20px;padding:0;flex-wrap:wrap;font-size:0.85rem;">
+                        <?php
+                        $yatra_steps = [
+                            ['trip', __('Trip & date', 'yatra')],
+                            ['details', __('Your details', 'yatra')],
+                            ['payment', __('Payment', 'yatra')],
+                            ['done', __('Confirmation', 'yatra')],
+                        ];
+                        foreach ($yatra_steps as $yatra_n => $yatra_step) : ?>
+                            <li class="yatra-checkout-step<?php echo $yatra_n === 0 ? ' is-done' : ($yatra_n === 1 ? ' is-current' : ''); ?>" data-step="<?php echo esc_attr($yatra_step[0]); ?>"<?php echo $yatra_n === 1 ? ' aria-current="step"' : ''; ?> style="flex:1 1 0;min-width:110px;display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:8px;background:#f3f4f6;color:#4b5563;">
+                                <span class="yatra-checkout-step-num" aria-hidden="true" style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#fff;font-weight:600;font-size:0.75rem;"><?php echo $yatra_n === 0 ? '&#10003;' : (int) ($yatra_n + 1); ?></span>
+                                <span><?php echo esc_html($yatra_step[1]); ?></span>
+                            </li>
+                        <?php endforeach; ?>
+                    </ol>
+                    <style>
+                        .yatra-checkout-step.is-current{background:var(--yatra-primary,#3b82f6)!important;color:#fff!important}
+                        .yatra-checkout-step.is-current .yatra-checkout-step-num{color:var(--yatra-primary,#3b82f6)}
+                        .yatra-checkout-step.is-done{background:#ecfdf5!important;color:#065f46!important}
+                        @media (max-width:600px){.yatra-checkout-step{min-width:calc(50% - 8px)!important}}
+                    </style>
+                    <script>
+                    (function () {
+                        function init() {
+                            var bar = document.querySelector('.yatra-checkout-progress');
+                            var pay = document.querySelector('input[name="payment_gateway"]');
+                            if (!bar || !pay || !('IntersectionObserver' in window)) { return; }
+                            var paySection = pay.closest('.yatra-booking-section');
+                            var steps = bar.querySelectorAll('.yatra-checkout-step');
+                            function mark(current) {
+                                steps.forEach(function (li, i) {
+                                    li.classList.toggle('is-current', i === current);
+                                    li.classList.toggle('is-done', i < current);
+                                    if (i === current) { li.setAttribute('aria-current', 'step'); } else { li.removeAttribute('aria-current'); }
+                                    var num = li.querySelector('.yatra-checkout-step-num');
+                                    if (num) { num.textContent = i < current ? '\u2713' : String(i + 1); }
+                                });
+                            }
+                            if (paySection) {
+                                new IntersectionObserver(function (entries) {
+                                    entries.forEach(function (e) {
+                                        if (e.isIntersecting) { mark(2); }
+                                        else if (e.boundingClientRect.top > 0) { mark(1); }
+                                    });
+                                }, { threshold: 0.25 }).observe(paySection);
+                            }
+                            document.addEventListener('change', function (e) {
+                                var t = e.target || {};
+                                if (t.name === 'payment_gateway') { mark(2); }
+                            });
+                        }
+                        if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); } else { init(); }
+                    })();
+                    </script>
+                    <?php endif; ?>
+
                     <!-- Booking Form -->
                     <form
                         class="yatra-booking-form"
                         id="yatra-booking-form"
                         data-payment-due="<?php echo esc_attr($summary_due_amount); ?>"
+                        data-linked-amount="<?php echo esc_attr((string) $linked_checkout_amount); ?>"
                         data-is-remaining-payment="<?php echo esc_attr($is_remaining_payment ? 'yes' : 'no'); ?>"
                     >
                         <?php 
@@ -173,8 +261,8 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                                 <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
                                 <line x1="1" y1="10" x2="23" y2="10"></line>
                             </svg>
-                            <span id="pay-button-text"><?php esc_html_e('Complete Booking', 'yatra'); ?></span>
-                            <span id="pay-amount"><?php echo esc_html(yatra_format_price((float) ($summary_due_amount ?? 0), null, false)); ?></span>
+                            <span id="pay-button-text"><?php echo $is_remaining_payment ? esc_html__('Pay Balance', 'yatra') : esc_html__('Complete Booking', 'yatra'); ?></span>
+                            <span id="pay-amount"><?php echo esc_html(yatra_format_price((float) ($summary_due_amount ?? 0) + $linked_checkout_amount, null, false)); ?></span>
                         </button>
                         <a href="<?php echo esc_url(yatra_get_trip_permalink($trip)); ?>" class="yatra-booking-cancel-btn">
                             <?php esc_html_e('Cancel', 'yatra'); ?>
@@ -257,7 +345,7 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                         </div>
                         <div class="yatra-remaining-row yatra-remaining-due">
                             <span><strong><?php esc_html_e('Remaining Balance', 'yatra'); ?></strong></span>
-                            <span class="yatra-due-amount"><strong><?php echo esc_html(yatra_format_price((float) ($remaining_amount ?? 0), null, false)); ?></strong></span>
+                            <span class="yatra-due-amount"><strong><?php echo esc_html(yatra_format_price((float) ($balance_due ?? 0), null, false)); ?></strong></span>
                         </div>
                     </div>
 
@@ -759,6 +847,18 @@ $summary_due_amount = $is_remaining_payment && $remaining_amount !== null
                         include YATRA_PLUGIN_PATH . 'templates/partials/pricing-summary.php';
                         ?>
                     </div>
+
+                    <?php
+                    /**
+                     * After the checkout's price summary (Yatra Pro's cart lists
+                     * the other trips paid with this checkout here).
+                     *
+                     * @param array $session The booking session.
+                     * @param float $linked_checkout_amount See yatra_checkout_linked_amount.
+                     * @since 3.2.0
+                     */
+                    do_action('yatra_checkout_after_price_summary', function_exists('yatra_get_booking_session') ? (array) yatra_get_booking_session() : [], (float) $linked_checkout_amount);
+                    ?>
 
                     <!-- Cancellation Policy -->
                     <?php if (!empty($trip->cancellation_policy)): ?>

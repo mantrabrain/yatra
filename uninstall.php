@@ -31,6 +31,7 @@ function yatra_uninstall_free_table_suffixes(): array
         'yatra_bookings',
         'yatra_booking_payments',
         'yatra_payment_notes',
+        'yatra_booking_activity',
         'yatra_customers',
         'yatra_customers_stats_backup_v1',
         'yatra_refund_totals_repair_backup_v1',

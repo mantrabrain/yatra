@@ -362,6 +362,7 @@ class ItineraryController extends BaseController
             'day' => isset($item->day_number) ? (int) $item->day_number : null,
             'day_title' => $item->day_title ?? null,
             'day_description' => $item->day_description ?? null,
+            'day_altitude' => $item->day_altitude ?? null,
             'title' => $item->title ?? '',
             'description' => $item->description ?? '',
             'time' => $item->time ?? null,

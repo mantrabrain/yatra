@@ -92,6 +92,7 @@ final class EmailTemplateSampleData
             'booking_id' => '42',
             'trip_id' => '101',
             'trip_name' => __('Sample Mountain Trek', 'yatra'),
+            'trip_code' => 'ABC-12',
             'travel_date' => $travelSample,
             'travelers_count' => '2',
             'total_amount_formatted' => yatra_format_price(2499.0, $currency),
@@ -163,6 +164,12 @@ final class EmailTemplateSampleData
                 . '</ul></div>',
             'special_requests' => $specialSample,
             'special_requests_html' => nl2br(esc_html($specialSample)),
+            'pickup_point' => __('Hotel Yak & Yeti, Durbar Marg', 'yatra'),
+            'pickup_time' => '06:30',
+            'pickup_point_details' => __('Main lobby, by the reception desk.', 'yatra'),
+            'accommodation' => __('Deluxe hotel, twin share', 'yatra'),
+            'travel_insurance' => __('Added', 'yatra'),
+            'departure_guides' => 'Pemba Sherpa, Maya Gurung',
         ];
     }
 

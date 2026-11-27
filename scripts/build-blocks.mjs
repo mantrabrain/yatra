@@ -1,5 +1,5 @@
 /**
- * Build yatra/tour, yatra/activity, yatra/destination, yatra/trip-category as single-file IIFE bundles.
+ * Build the Yatra Gutenberg blocks (yatra/tour, yatra/trip-gallery, …) as single-file IIFE bundles.
  *
  * CRITICAL: @wordpress/* packages MUST NOT be bundled. A bundled @wordpress/blocks uses a
  * separate block registry from the editor's wp.blocks — registerBlockType would succeed in
@@ -14,7 +14,25 @@ import { build } from 'vite';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..');
 
-const blocks = ['tour', 'activity', 'destination', 'trip-category'];
+const blocks = [
+  'tour',
+  'activity',
+  'destination',
+  'trip-category',
+  // 3.1.4: server-rendered blocks (also available as Elementor widgets).
+  'trip-search',
+  'deals',
+  'login',
+  'my-account',
+  'trip-gallery',
+  'trip-itinerary',
+  'trip-facts',
+  'trip-booking',
+  'trip-faq',
+  'trip-includes',
+  'trip-map',
+  'trip-reviews',
+];
 
 /**
  * Map @wordpress/package-name to the global WordPress exposes (wp.blockEditor, wp.apiFetch, …).

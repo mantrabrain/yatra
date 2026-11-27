@@ -224,6 +224,14 @@ class BookingService
             
             $data = BookingValidator::sanitize($data);
 
+            // Every amount is in the store currency (multi-currency isn't a
+            // shipped feature). A caller that sent none — the admin "Add
+            // booking" form, imports — used to get the column's DEFAULT 'USD',
+            // so a Euro site's bookings showed "$" next to "€".
+            if (empty($data['currency'])) {
+                $data['currency'] = SettingsService::getCurrency();
+            }
+
             // ========================================
             // SERVER-SIDE AVAILABILITY RESOLUTION (single source of truth)
             // ========================================
@@ -1102,12 +1110,17 @@ class BookingService
      */
     private function formatBooking(object $booking): array
     {
-        // Build customer name from contact fields
-        $customerName = trim(
-            ($booking->customer_first_name ?? $booking->contact_first_name ?? '') . ' ' . ($booking->customer_last_name ?? $booking->contact_last_name ?? '')
-        ) ?: ($booking->customer_name ?? $booking->customer_email ?? $booking->contact_email ?? null);
+        // The name typed on THIS booking. The linked customer record is matched
+        // by email, so when one address books for different people (a travel
+        // agency booking for each guest) the record keeps the first booking's
+        // name — showing it made every later booking look like the first guest's.
+        $contactName = trim(($booking->contact_first_name ?? '') . ' ' . ($booking->contact_last_name ?? ''));
+        $customerName = $contactName !== ''
+            ? $contactName
+            : (trim(($booking->customer_first_name ?? '') . ' ' . ($booking->customer_last_name ?? ''))
+                ?: ($booking->customer_name ?? $booking->customer_email ?? $booking->contact_email ?? null));
 
-        $customerEmail = $booking->customer_email ?? $booking->contact_email ?? null;
+        $customerEmail = $booking->contact_email ?? $booking->customer_email ?? null;
         $customerPhone = $booking->contact_phone ?? null;
 
         // Fallback: fetch customer record if customer_id is set and info missing
@@ -1136,7 +1149,7 @@ class BookingService
             }
         }
 
-        return [
+        $item = [
             'id' => (int) $booking->id,
             'reference' => $booking->reference,
             // UI expects booking_number and booking_status fields
@@ -1193,6 +1206,16 @@ class BookingService
             'created_at' => $booking->created_at,
             'updated_at' => $booking->updated_at,
         ];
+
+        /**
+         * One booking as the admin bookings list and booking screen get it
+         * (e.g. Yatra Pro adds the travel agency the booking was made by).
+         *
+         * @param array  $item    Formatted booking.
+         * @param object $booking Raw booking row.
+         * @since 3.2.0
+         */
+        return (array) apply_filters('yatra_admin_booking_list_item', $item, $booking);
     }
 
     /**
@@ -1204,6 +1227,24 @@ class BookingService
     private function formatBookingWithDetails(object $booking): array
     {
         $formatted = $this->formatBooking($booking);
+
+        // Change / cancellation requests the customer sent from their account.
+        $formatted['customer_requests'] = class_exists(\Yatra\Services\CustomerRequestService::class)
+            ? \Yatra\Services\CustomerRequestService::requestsOf($booking)
+            : [];
+
+        // Discounts / surcharges added on the booking screen, for its summary.
+        $bookingMeta = json_decode((string) ($booking->meta ?? ''), true);
+        $formatted['price_adjustments'] = is_array($bookingMeta) && isset($bookingMeta['price_adjustments']) && is_array($bookingMeta['price_adjustments'])
+            ? array_values($bookingMeta['price_adjustments'])
+            : [];
+
+        // The gateway's name ("Book Now, Pay Later") for the booking screen,
+        // which showed the stored key ("pay_later"). '' when unknown.
+        $gatewayId = (string) ($booking->payment_gateway ?? '');
+        $formatted['payment_gateway_label'] = $gatewayId !== '' && class_exists('\\Yatra\\PaymentGateways\\PaymentGatewayRegistry')
+            ? \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance()->resolveGatewayTitle($gatewayId)
+            : '';
 
         // Add customer name for easier access
         $formatted['customer_name'] = trim(
@@ -1242,6 +1283,23 @@ class BookingService
 
         // Add payments
         $formatted['payments'] = $this->getBookingPayments((int) $booking->id);
+        // Which payments the booking screen may refund through their gateway.
+        if (method_exists(PaymentService::class, 'refundGatewayFor')) {
+            foreach ($formatted['payments'] as $i => $p) {
+                $label = BookingActivityService::paymentMethodLabel((string) (is_object($p) ? ($p->gateway ?? '') : ($p['gateway'] ?? '')));
+                if (is_object($p)) {
+                    $formatted['payments'][$i]->gateway_refund_available = PaymentService::refundGatewayFor($p) !== null;
+                    if (empty($p->payment_method_label)) {
+                        $formatted['payments'][$i]->payment_method_label = $label;
+                    }
+                } elseif (is_array($p)) {
+                    $formatted['payments'][$i]['gateway_refund_available'] = PaymentService::refundGatewayFor((object) $p) !== null;
+                    if (empty($p['payment_method_label'])) {
+                        $formatted['payments'][$i]['payment_method_label'] = $label;
+                    }
+                }
+            }
+        }
 
         // The ledger in three figures, so the booking screen can state what was
         // received, what went back and what that leaves — rather than leaving an
@@ -1262,6 +1320,12 @@ class BookingService
 
         // Add additional fields
         $formatted['special_requests'] = $booking->special_requests;
+        // Pickup point chosen at checkout (3.3), as it was when booked.
+        $formatted['pickup_point'] = PickupPointService::forBooking($booking);
+        // Accommodation option / travel insurance answer chosen at checkout (3.3).
+        $choices = CheckoutChoiceService::forBooking($booking);
+        $formatted['accommodation'] = $choices['accommodation'];
+        $formatted['travel_insurance'] = $choices['travel_insurance'];
         $formatted['internal_notes'] = $booking->internal_notes;
         $formatted['payment_transaction_id'] = $booking->payment_transaction_id;
         $formatted['cancelled_at'] = $booking->cancelled_at;

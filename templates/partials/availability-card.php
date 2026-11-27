@@ -305,11 +305,12 @@ $initial_total_price = $display_sale_price;
                                 $cancellation_value = __('See details', 'yatra');
                             }
                         } else {
-                            // Default fallback when no policy is set
-                            $cancellation_label = __('Cancellation Policy', 'yatra');
-                            $cancellation_value = __('May apply', 'yatra');
+                            // No policy set: say nothing rather than a vague "May apply".
+                            $cancellation_label = '';
+                            $cancellation_value = '';
                         }
                         ?>
+                        <?php if ($cancellation_value !== '') : ?>
                         <div class="yatra-card-info-item">
                             <div class="yatra-card-info-icon">
                                 <?php echo yatra_svg_icon('check', 'yatra-icon-sm'); ?>
@@ -319,6 +320,7 @@ $initial_total_price = $display_sale_price;
                                 <div class="yatra-card-info-value"><?php echo esc_html($cancellation_value); ?></div>
                             </div>
                         </div>
+                        <?php endif; ?>
                     </div>
                     
                     <div class="yatra-card-traveler-section">
@@ -648,6 +650,17 @@ $initial_total_price = $display_sale_price;
                             <?php endif; ?>
                         </span>
                     </button>
+                    <?php
+                    /**
+                     * After a departure's Book Now button (e.g. Yatra Pro's "Add to cart").
+                     *
+                     * @param int   $trip_id
+                     * @param array $card       The departure card's data.
+                     * @param bool  $waitlist   Book Now joins the waitlist (sold out).
+                     * @since 3.2.0
+                     */
+                    do_action('yatra_availability_card_after_book_button', (int) $trip_id, is_array($card) ? $card : [], (bool) ($is_sold_out && $waitlist_available));
+                    ?>
                     <?php endif; ?>
                 </div>
             </div>

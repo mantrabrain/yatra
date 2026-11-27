@@ -1,5 +1,5 @@
 import React from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ChevronDown, Mail } from "lucide-react";
 import { apiClient } from "../../lib/api-client";
 import { useToast } from "../ui/toast";
@@ -66,6 +66,7 @@ export const ResendEmailMenu: React.FC<ResendEmailMenuProps> = ({
   amountPaid = 0,
 }) => {
   const { showToast } = useToast();
+  const queryClient = useQueryClient();
   const [open, setOpen] = React.useState(false);
 
   const mutation = useMutation({
@@ -82,6 +83,8 @@ export const ResendEmailMenu: React.FC<ResendEmailMenuProps> = ({
     onSuccess: (res: any) => {
       showToast(res?.message || __("Email sent.", "yatra"), "success");
       setOpen(false);
+      // The send is recorded in the booking's activity history.
+      queryClient.invalidateQueries({ queryKey: ["booking-activity", bookingId] });
     },
     onError: (err: any) => {
       showToast(err?.message || __("Failed to send email.", "yatra"), "error");

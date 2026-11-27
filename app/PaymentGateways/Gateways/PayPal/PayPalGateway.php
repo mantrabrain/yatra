@@ -636,30 +636,65 @@ class PayPalGateway extends AbstractPaymentGateway
         return $result;
     }
 
+    /** Refunds go through PayPal's API, which needs the Advanced (API) mode credentials. */
+    public function canRefundThroughGateway(): bool
+    {
+        return !$this->isSimpleMode() && $this->isProperlyConfigured();
+    }
+
     public function processRefund(string $transactionId, float $amount): array
     {
+        if (!$this->canRefundThroughGateway()) {
+            return ['success' => false, 'error' => __('PayPal refunds need the PayPal API (Advanced mode) credentials.', 'yatra')];
+        }
         $accessToken = $this->getAccessToken();
         if (!$accessToken) {
-            return ['success' => false, 'error' => 'Authentication failed'];
+            return ['success' => false, 'error' => __('Could not sign in to PayPal. Check the API credentials.', 'yatra')];
         }
+        // The capture's own currency (it was hard-coded to USD).
+        $payment = (new \Yatra\Repositories\PaymentRepository())->findByTransactionId($transactionId);
+        $currency = strtoupper((string) ($payment->currency ?? '')) ?: strtoupper(\Yatra\Services\SettingsService::getCurrency());
 
-        $response = $this->makeRequest($this->getBaseUrl() . "/v2/payments/captures/{$transactionId}/refund", [
+        $headers = [
+            'Authorization' => 'Bearer ' . $accessToken,
+            'Content-Type' => 'application/json',
+        ];
+        // PayPal's idempotency header: a retried call can't refund twice.
+        $key = \Yatra\Services\PaymentService::currentRefundIdempotencyKey();
+        if ($key !== '') {
+            $headers['PayPal-Request-Id'] = $key;
+        }
+        $response = $this->makeRequest($this->getBaseUrl() . "/v2/payments/captures/" . rawurlencode($transactionId) . "/refund", [
             'method' => 'POST',
-            'headers' => [
-                'Authorization' => 'Bearer ' . $accessToken,
-                'Content-Type' => 'application/json',
-            ],
+            'headers' => $headers,
             'body' => wp_json_encode([
                 'amount' => [
-                    'value' => number_format($amount, 2, '.', ''),
-                    'currency_code' => 'USD',
+                    'value' => in_array($currency, ['HUF', 'JPY', 'TWD'], true)
+                        ? number_format($amount, 0, '.', '')
+                        : number_format($amount, 2, '.', ''),
+                    'currency_code' => $currency,
                 ],
             ]),
         ]);
 
+        $body = is_array($response['body'] ?? null) ? $response['body'] : [];
+        if (empty($response['success']) || ($body['status'] ?? '') === 'CANCELLED' || ($body['status'] ?? '') === 'FAILED') {
+            $detail = (string) ($body['details'][0]['description'] ?? $body['message'] ?? ($response['error'] ?? ''));
+
+            return [
+                'success' => false,
+                'error' => $detail !== '' ? $detail : __('PayPal did not accept the refund.', 'yatra'),
+            ];
+        }
+
+        $status = (string) ($body['status'] ?? '');
+
         return [
-            'success' => $response['success'],
-            'refund_id' => $response['body']['id'] ?? null,
+            'success' => true,
+            'refund_id' => (string) ($body['id'] ?? ''),
+            'status' => $status,
+            // Only COMPLETED is final; PENDING is recorded as pending.
+            'pending' => $status !== 'COMPLETED',
         ];
     }
 
@@ -981,6 +1016,10 @@ class PayPalGateway extends AbstractPaymentGateway
             ]);
             return;
         }
+        // One payment for several bookings (Pro multi-trip cart): keep this
+        // booking's part; the others are recorded after this one.
+        $shares = \Yatra\Services\PaymentAllocationService::allocate($bookingId, $amount);
+        $amount = $shares[$bookingId];
         $previousBookingStatus = (string) ($booking->status ?? 'pending');
 
         // Accumulate paid amount so deposit/partial flows don't get force-marked fully paid.
@@ -1041,6 +1080,8 @@ class PayPalGateway extends AbstractPaymentGateway
         if ($shouldConfirm) {
             \yatra_trigger_booking_confirmed($bookingId, $previousBookingStatus, true);
         }
+
+        \Yatra\Services\PaymentAllocationService::creditOthers($shares, $bookingId, 'paypal', $transactionId, $currency);
 
         // Fire action for other plugins/services
         do_action('yatra_payment_completed', [

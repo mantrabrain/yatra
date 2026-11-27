@@ -21,7 +21,7 @@ import {
   MapPin,
   CalendarDays,
 } from "lucide-react";
-import { __ } from "../lib/i18n";
+import { __, _n, sprintf } from "../lib/i18n";
 import { toDateValue } from "../lib/dateFormat";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -182,9 +182,10 @@ const Departures: React.FC = () => {
     } catch {
       // Ignore errors
     }
-    // Default column visibility (trip and source hidden by default)
+    // Default column visibility (source hidden by default). Trip is shown:
+    // the list covers every trip until one is picked.
     return {
-      trip: false,
+      trip: true,
       date: true,
       time: true,
       capacity: true,
@@ -895,8 +896,10 @@ const Departures: React.FC = () => {
             disabled={!departure.travelers || departure.travelers.length === 0}
             className="px-3 py-1.5"
           >
-            {departure.travelers_count || departure.travelers?.length || 0}{" "}
-            {__("Traveler(s)", "yatra")}
+            {(() => {
+              const n = Number(departure.travelers_count || departure.travelers?.length || 0);
+              return sprintf(_n("%d traveler", "%d travelers", n, "yatra"), n);
+            })()}
           </Button>
         ),
       },
@@ -914,7 +917,10 @@ const Departures: React.FC = () => {
                   className="text-blue-600 hover:text-blue-800 hover:underline text-sm"
                   title={__("View booking", "yatra")}
                 >
-                  #{bookingId}
+                  {/* The booking reference people quote, not the row id. */}
+                  {((departure.travelers || []) as any[]).find(
+                    (t) => Number(t?.booking_id) === Number(bookingId) && t?.booking_reference,
+                  )?.booking_reference || `#${bookingId}`}
                 </a>
               ))}
               {departure.booking_ids.length > 3 && (

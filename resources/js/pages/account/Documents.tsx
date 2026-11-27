@@ -280,6 +280,8 @@ const Documents: React.FC<DocumentsProps> = ({ documents }) => {
                             }
                           }}
                           className="yatra-document-action yatra-document-action-preview inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium"
+                          // Themes restyle <button> (white text on the light outline button).
+                          style={{ color: "#374151", backgroundColor: "transparent" }}
                         >
                           {__("Preview", "yatra")}
                         </button>

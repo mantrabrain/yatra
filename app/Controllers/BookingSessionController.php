@@ -30,6 +30,12 @@ use Yatra\Utils\Logger;
 class BookingSessionController extends BaseController
 {
     /**
+     * Checkout runs the `yatra_checkout_pre_create_error` filter (3.3.0+).
+     * Yatra Pro checks this before relying on it.
+     */
+    public const SUPPORTS_PRE_CREATE_CHECK = true;
+
+    /**
      * @var TravellerRepository
      */
     private TravellerRepository $travellerRepository;
@@ -83,6 +89,51 @@ class BookingSessionController extends BaseController
             new \Yatra\Repositories\AvailabilityRepository()
         );
         $this->discountRepository = new \Yatra\Repositories\DiscountRepository();
+    }
+
+    /**
+     * Set while another booking of the same checkout is created (Yatra Pro's
+     * multi-trip cart): its session, and whether to skip starting a payment
+     * (one payment for all the bookings is taken on the first one).
+     *
+     * @var array{session: array, defer_payment: bool}|null
+     */
+    private static ?array $linkedCheckout = null;
+
+    /**
+     * Create one more booking within a checkout that has already been
+     * submitted and checked (CSRF nonce, reCAPTCHA, required fields) for its
+     * first booking — e.g. the other trips of a multi-trip cart.
+     *
+     * Runs the normal checkout for that trip (availability, capacity, price,
+     * customer, travellers, emails, status) with the given session; only the
+     * one-time checks of the original request are not repeated. Not reachable
+     * over REST: PHP callers only.
+     *
+     * @param array $session      A booking session for this trip (as created by POST /booking/session).
+     * @param array $data         The checkout form data to use (contact, payment method, travellers…).
+     * @param bool  $deferPayment Don't start an online payment for this booking.
+     * @return array{status:int, body:array}
+     * @since 3.2.0
+     */
+    public static function createLinkedBooking(array $session, array $data, bool $deferPayment): array
+    {
+        if (self::$linkedCheckout !== null) {
+            return ['status' => 409, 'body' => ['success' => false, 'message' => 'Nested linked checkout.']];
+        }
+        self::$linkedCheckout = ['session' => $session, 'defer_payment' => $deferPayment];
+        try {
+            unset($data['booking_token'], $data['recaptcha_token']);
+            $request = new WP_REST_Request('POST', '/yatra/v1/booking/create');
+            $request->set_header('Content-Type', 'application/json');
+            $request->set_header('X-Yatra-Booking-Nonce', wp_create_nonce('yatra_booking_action'));
+            $request->set_body((string) wp_json_encode($data));
+            $response = (new self())->create_booking($request);
+
+            return ['status' => (int) $response->get_status(), 'body' => (array) $response->get_data()];
+        } finally {
+            self::$linkedCheckout = null;
+        }
     }
 
     /**
@@ -262,6 +313,15 @@ class BookingSessionController extends BaseController
             $server_amount = (float) ($booking->amount_due ?? 0);
             if ($server_amount <= 0) {
                 $server_amount = (float) ($booking->total_amount ?? 0);
+            }
+            // Paying a payment link: its amount, not the whole balance.
+            if (function_exists('yatra_get_remaining_session')
+                && (int) yatra_get_remaining_session('booking_id', 0) === (int) $booking_id
+                && (string) yatra_get_remaining_session('payment_link_id', '') !== '') {
+                $link_amount = \Yatra\Services\PaymentLinkService::openAmount($booking, (string) yatra_get_remaining_session('payment_link_id', ''));
+                if ($link_amount !== null) {
+                    $server_amount = $link_amount;
+                }
             }
             $server_currency = (string) ($booking->currency ?? $client_currency);
 
@@ -473,7 +533,8 @@ class BookingSessionController extends BaseController
         }
 
         $is_partial_update = empty($data['trip_id']) && !empty($existing_session['trip_id']) &&
-                             (isset($data['travelers']) || isset($data['traveler_counts']) || isset($data['additional_services']));
+                             (isset($data['travelers']) || isset($data['traveler_counts']) || isset($data['additional_services'])
+                              || array_key_exists('accommodation', (array) $data) || array_key_exists('travel_insurance', (array) $data));
         
         if ($is_partial_update) {
             // Partial update: merge new data with existing session
@@ -488,6 +549,15 @@ class BookingSessionController extends BaseController
             // Handle additional services selection
             if (isset($data['additional_services']) && is_array($data['additional_services'])) {
                 $existing_session['additional_services'] = array_map('intval', $data['additional_services']);
+            }
+            // Accommodation option / travel insurance answer (3.3).
+            if (array_key_exists('accommodation', (array) $data) && (is_scalar($data['accommodation']) || $data['accommodation'] === null)) {
+                $existing_session['accommodation'] = sanitize_key((string) $data['accommodation']);
+            }
+            if (array_key_exists('travel_insurance', (array) $data)) {
+                $existing_session['travel_insurance'] = \Yatra\Services\CheckoutChoiceService::insuranceAnswer(
+                    is_scalar($data['travel_insurance']) || is_bool($data['travel_insurance']) ? $data['travel_insurance'] : null
+                );
             }
             
             // Recalculate taxes for partial updates
@@ -574,6 +644,22 @@ class BookingSessionController extends BaseController
                 'success' => false,
                 'message' => __('Trip not found.', 'yatra'),
             ], 404);
+        }
+
+        // A trip booked elsewhere (custom booking link) or enquiry-only can't
+        // start a Yatra checkout, whatever the browser sends. A balance
+        // payment of an existing booking is not a new booking. @since 3.3.0
+        if (empty($data['is_remaining_payment']) && function_exists('yatra_trip_booking_closed_reason')) {
+            $closedReason = yatra_trip_booking_closed_reason($trip);
+            if ($closedReason !== '') {
+                return new WP_REST_Response([
+                    'success' => false,
+                    'code' => 'booking_closed',
+                    'message' => $closedReason === 'external'
+                        ? __('This trip is booked on another website. Please use the booking link on the trip page.', 'yatra')
+                        : __('This trip is available for enquiry only.', 'yatra'),
+                ], 400);
+            }
         }
 
         global $wpdb;
@@ -1249,7 +1335,10 @@ class BookingSessionController extends BaseController
         // reCAPTCHA v3 — no-op unless the booking form is explicitly protected in
         // settings (off by default so payment flows are never gated unless the
         // operator opts in).
-        $recaptcha = \Yatra\Services\RecaptchaService::verifyForm(
+        $isLinkedBooking = self::$linkedCheckout !== null;
+        // A linked booking belongs to a checkout whose request already passed
+        // reCAPTCHA (a token can only be verified once).
+        $recaptcha = $isLinkedBooking ? ['success' => true] : \Yatra\Services\RecaptchaService::verifyForm(
             'booking',
             (string) (($data['recaptcha_token'] ?? '') ?: ''),
             $_SERVER['REMOTE_ADDR'] ?? null
@@ -1367,9 +1456,17 @@ class BookingSessionController extends BaseController
         // verified by WordPress on registration.
         $needs_email_verification = !is_user_logged_in()
             && (bool) \Yatra\Services\SettingsService::get('require_guest_email_verification', false);
+        /**
+         * Whether this checkout must verify the contact email first. Pro's
+         * Travel Agency module skips it for an agency that proved itself with
+         * its agency code (the contact email is the guest's, not the booker's).
+         *
+         * @since 3.2.0
+         */
+        $needs_email_verification = (bool) apply_filters('yatra_checkout_requires_email_verification', $needs_email_verification, $data);
 
-        // Get session data
-        $session = yatra_get_booking_session();
+        // Get session data (a linked booking brings its own).
+        $session = $isLinkedBooking ? self::$linkedCheckout['session'] : yatra_get_booking_session();
 
         // REST requests don't always carry PHPSESSID in the same scope as the
         // page that rendered the booking form (cookie path mismatches, output
@@ -1575,7 +1672,9 @@ class BookingSessionController extends BaseController
         // existing validation untouched. Mirrors the frontend's required rules so
         // a crafted request can't bypass them; respects the operator's config
         // (only enabled+required fields in enabled sections are checked).
-        if (function_exists('apply_filters') && apply_filters('yatra_dynamic_form_field_enabled', false)) {
+        // A linked booking reuses the travellers checked on the first booking;
+        // the extra places it needs are completed later from My Account.
+        if (!$isLinkedBooking && function_exists('apply_filters') && apply_filters('yatra_dynamic_form_field_enabled', false)) {
             $required_error = $this->validateRequiredFormFields(
                 is_array($form_config) ? $form_config : [],
                 $data,
@@ -1599,6 +1698,15 @@ class BookingSessionController extends BaseController
                 'success' => false,
                 'message' => __('Trip not found.', 'yatra'),
             ], 404);
+        }
+
+        // Booked elsewhere / enquiry-only: no Yatra checkout (3.3).
+        if (!$isLinkedBooking && function_exists('yatra_trip_booking_closed_reason') && yatra_trip_booking_closed_reason($trip) !== '') {
+            return new WP_REST_Response([
+                'success' => false,
+                'code' => 'booking_closed',
+                'message' => __('This trip can\'t be booked here. Please see the trip page.', 'yatra'),
+            ], 400);
         }
 
         // ========================================
@@ -1727,6 +1835,37 @@ class BookingSessionController extends BaseController
         }
         if (is_array($additional_services)) {
             $session_for_pricing['additional_services'] = array_values(array_map('intval', $additional_services));
+        }
+
+        // Accommodation option + travel insurance answer (3.3). The checkout
+        // form posts both, so a card retry (whose session is gone) is priced
+        // the same; a linked cart booking keeps its own session's choices.
+        if (!$isLinkedBooking) {
+            if (isset($data['accommodation']) && is_scalar($data['accommodation'])) {
+                $session_for_pricing['accommodation'] = sanitize_key((string) $data['accommodation']);
+            }
+            if (array_key_exists('travel_insurance', (array) $data)) {
+                $session_for_pricing['travel_insurance'] = \Yatra\Services\CheckoutChoiceService::insuranceAnswer(
+                    is_scalar($data['travel_insurance']) || is_bool($data['travel_insurance']) ? $data['travel_insurance'] : null
+                );
+            }
+            $choiceError = \Yatra\Services\CheckoutChoiceService::validateAccommodation((int) $trip_id, (string) ($session_for_pricing['accommodation'] ?? ''));
+            $choiceField = 'accommodation';
+            if ($choiceError === '' && empty($session_for_pricing['is_remaining_payment'])) {
+                $choiceError = \Yatra\Services\CheckoutChoiceService::validateInsurance(
+                    (int) $trip_id,
+                    \Yatra\Services\CheckoutChoiceService::insuranceAnswer($session_for_pricing['travel_insurance'] ?? null)
+                );
+                $choiceField = 'travel_insurance';
+            }
+            if ($choiceError !== '') {
+                return new WP_REST_Response([
+                    'success' => false,
+                    'message' => $choiceError,
+                    'code' => $choiceField,
+                    'errors' => [$choiceField => [$choiceError]],
+                ], 400);
+            }
         }
 
         try {
@@ -1860,6 +1999,51 @@ class BookingSessionController extends BaseController
             }
         }
 
+        /**
+         * Last check before a checkout booking is created: return a WP_Error
+         * to refuse it (its message is shown to the customer). Runs after
+         * the capacity / waitlist checks.
+         *
+         * @since 3.3.0
+         *
+         * @param null|\WP_Error $error   Null to allow.
+         * @param array          $data    The checkout request.
+         * @param array          $session The booking session.
+         * @param array          $context trip_id, travel_date, departure_time, travelers_count, is_waitlist.
+         */
+        $preCreateError = apply_filters('yatra_checkout_pre_create_error', null, is_array($data) ? $data : [], is_array($session) ? $session : [], [
+            'trip_id' => (int) $trip_id,
+            'travel_date' => (string) $travel_date,
+            'departure_time' => (string) $departure_time,
+            'travelers_count' => (int) $travelers_count,
+            'is_waitlist' => (bool) $isWaitlistCheckout,
+        ]);
+        if (is_wp_error($preCreateError)) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => $preCreateError->get_error_message(),
+                'code' => (string) $preCreateError->get_error_code(),
+            ], 400);
+        }
+
+        // Pickup point the customer chose (trips that list pickup points).
+        $pickup_point_id = isset($data['pickup_point']) && is_scalar($data['pickup_point'])
+            ? sanitize_key((string) $data['pickup_point'])
+            : '';
+        $pickup_point = null;
+        if (!$isLinkedBooking) {
+            $pickupError = \Yatra\Services\PickupPointService::validateChoice((int) $trip_id, $pickup_point_id);
+            if ($pickupError !== '') {
+                return new WP_REST_Response([
+                    'success' => false,
+                    'message' => $pickupError,
+                    'code' => 'pickup_point',
+                    'errors' => ['pickup_point' => [$pickupError]],
+                ], 400);
+            }
+            $pickup_point = $pickup_point_id !== '' ? \Yatra\Services\PickupPointService::find((int) $trip_id, $pickup_point_id) : null;
+        }
+
         // Generate booking reference using the same method as BookingService
         $bookingRepository = new \Yatra\Repositories\BookingRepository();
         $booking_reference = $bookingRepository->generateReference();
@@ -1913,6 +2097,19 @@ class BookingSessionController extends BaseController
                     );
                 }
                 $contact_data[$field_id] = sanitize_text_field($field_string);
+            }
+        }
+
+        // Coupon rules that depend on who is booking (uses per customer,
+        // first-time customers only) — only knowable once the email is in.
+        $applied_coupon = (string) ($pricing['coupon_discount']['code'] ?? '');
+        if (!$isLinkedBooking && $applied_coupon !== '' && (float) ($pricing['coupon_discount']['calculated_amount'] ?? 0) > 0) {
+            $coupon_refusal = (new \Yatra\Services\DiscountService())->customerRestriction($applied_coupon, (string) ($contact_data['email'] ?? ''));
+            if ($coupon_refusal !== null) {
+                return new WP_REST_Response([
+                    'success' => false,
+                    'message' => $coupon_refusal . ' ' . __('Remove the coupon to continue.', 'yatra'),
+                ], 400);
             }
         }
 
@@ -1978,6 +2175,20 @@ class BookingSessionController extends BaseController
                     }
                 }
                 $sanitized_travelers[] = $sanitized_traveler;
+            }
+        }
+
+        // Trip age limits (3.3): a traveller whose date of birth puts them
+        // outside the trip's ages on the travel date can't be booked. Only
+        // checked when a date of birth was given.
+        if (!$isLinkedBooking) {
+            $ageError = self::travellerAgeError($trip, $sanitized_travelers, (string) $travel_date);
+            if ($ageError !== '') {
+                return new WP_REST_Response([
+                    'success' => false,
+                    'message' => $ageError,
+                    'code' => 'traveller_age',
+                ], 400);
             }
         }
 
@@ -2221,7 +2432,7 @@ class BookingSessionController extends BaseController
         // booking it already created: same reference, no second row, no second
         // email, and the payment step below runs again so the customer can retry
         // the card against it.
-        $checkoutKey = $this->checkoutIdempotencyKey([
+        $checkoutKeyParts = [
             'token'     => (string) ($data['booking_token'] ?? ($_SESSION['yatra_booking_token'] ?? '')),
             'session'   => (string) ($session['session_id'] ?? ''),
             'email'     => (string) ($contact_data['email'] ?? ''),
@@ -2232,6 +2443,9 @@ class BookingSessionController extends BaseController
             'method'    => (string) $payment_method,
             'gateway'   => (string) $payment_gateway,
             'waitlist'  => $isWaitlistCheckout ? 1 : 0,
+            'pickup'    => (string) ($pickup_point['id'] ?? ''),
+            'stay'      => (string) ($pricing['accommodation']['id'] ?? ''),
+            'insurance' => isset($pricing['travel_insurance']) ? (!empty($pricing['travel_insurance']['accepted']) ? 'y' : (!empty($pricing['travel_insurance']['answered']) ? 'n' : '')) : '',
             // The details the customer typed. Included so that correcting any of
             // them and resubmitting is a new submission rather than a silent
             // no-op against the booking that still holds the old values. Hashed
@@ -2241,7 +2455,29 @@ class BookingSessionController extends BaseController
                 $emergency_data,
                 $sanitized_travelers,
             ])),
-        ]);
+        ];
+
+        /**
+         * Filter what makes two checkout submissions "the same", so an extension
+         * whose state changes the booking (for example the travel agency the
+         * booking is made for) starts a new booking instead of resuming one
+         * created without that state. Only add parts; the scope keys (token,
+         * session, email) are reserved.
+         *
+         * @since 3.2.0
+         *
+         * @param array $checkoutKeyParts Key parts.
+         * @param array $data             Submitted checkout data.
+         * @param array $session          Booking session.
+         */
+        $filteredKeyParts = apply_filters('yatra_checkout_idempotency_parts', $checkoutKeyParts, is_array($data) ? $data : [], is_array($session) ? $session : []);
+        if (is_array($filteredKeyParts)) {
+            foreach (['token', 'session', 'email'] as $reserved) {
+                $filteredKeyParts[$reserved] = $checkoutKeyParts[$reserved];
+            }
+            $checkoutKeyParts = $filteredKeyParts;
+        }
+        $checkoutKey = $this->checkoutIdempotencyKey($checkoutKeyParts);
 
         $resumedBooking = $this->resumableCheckoutBooking($checkoutKey);
         $isResumedCheckout = $resumedBooking !== null;
@@ -2269,11 +2505,36 @@ class BookingSessionController extends BaseController
                 ], 500);
             }
 
+            if (!empty($booking_id) && $pickup_point !== null) {
+                \Yatra\Services\PickupPointService::saveOnBooking((int) $booking_id, $pickup_point);
+            }
+            if (!empty($booking_id) && is_array($pricing)) {
+                \Yatra\Services\CheckoutChoiceService::saveOnBooking((int) $booking_id, $pricing);
+            }
+            if (!empty($booking_id) && (float) ($pricing['booking_fee'] ?? 0) > 0) {
+                \Yatra\Services\BookingFeeService::saveOnBooking((int) $booking_id, (float) $pricing['booking_fee'], \Yatra\Services\BookingFeeService::settings()['label']);
+            }
+
             if (!empty($booking_id) && $checkoutKey !== '') {
                 // Long enough to cover a customer going away to fix their card
                 // and coming back, short enough that a later, deliberate booking
                 // of the same trip is never absorbed into it.
                 set_transient($checkoutKey, (int) $booking_id, 30 * MINUTE_IN_SECONDS);
+            }
+            // Remembered so a card retry re-prices this booking with its coupon
+            // even when it took the coupon's last use (DiscountService::usageCount).
+            if (!empty($booking_id) && !empty($discount_code) && !$isLinkedBooking && session_status() === PHP_SESSION_ACTIVE) {
+                $_SESSION['yatra_coupon_checkout_booking'] = (int) $booking_id;
+            }
+            if (!empty($booking_id)) {
+                /**
+                 * A booking was just created by the public checkout (once per
+                 * booking: not for a resumed checkout). Linked cart bookings
+                 * pass $is_linked = true.
+                 *
+                 * @since 3.2.0
+                 */
+                do_action('yatra_checkout_booking_created', (int) $booking_id, is_array($data) ? $data : [], is_array($session) ? $session : [], (bool) $isLinkedBooking);
             }
         }
 
@@ -2537,13 +2798,62 @@ class BookingSessionController extends BaseController
         // Check if this is an offline gateway
         $is_offline = $is_offline_gateway;
 
+        // ========================================
+        // OTHER BOOKINGS OF THIS CHECKOUT (Pro multi-trip cart)
+        // ========================================
+        // Lets an add-on create the other bookings paid by this checkout now
+        // that this one exists. A WP_Error stops the checkout: nothing has been
+        // charged yet, and this booking stays unpaid (and is reused when the
+        // customer submits again).
+        $charge_amount = (float) $amount_due;
+        if ($isLinkedBooking) {
+            if (!$is_offline && $amount_due > 0 && !empty(self::$linkedCheckout['defer_payment'])) {
+                // Paid by the first booking's payment: no payment of its own.
+                // Same email as the first booking gets before its payment.
+                if (!$isResumedCheckout
+                    && $settings['booking_confirmation']
+                    && $this->shouldEmailWhilePaymentPending()
+                ) {
+                    $booking_service->sendNewBookingTransactionalConfirmation((int) $booking_id);
+                }
+                return new WP_REST_Response([
+                    'success' => true,
+                    'message' => __('Booking created.', 'yatra'),
+                    'data' => [
+                        'booking_id' => $booking_id,
+                        'reference' => $booking_reference,
+                        'amount_due' => (float) $amount_due,
+                        'currency' => $pricing['currency'] ?? \Yatra\Services\SettingsService::getCurrency(),
+                        'payment_deferred' => true,
+                    ],
+                ]);
+            }
+        } else {
+            $linked = apply_filters('yatra_checkout_linked_bookings', null, (int) $booking_id, is_array($data) ? $data : [], (string) $payment_gateway, is_array($session) ? $session : [], (bool) $is_offline);
+            if (is_wp_error($linked)) {
+                return new WP_REST_Response([
+                    'success' => false,
+                    'message' => $linked->get_error_message(),
+                    'data' => [
+                        'booking_id' => $booking_id,
+                        'reference' => $booking_reference,
+                    ],
+                ], 400);
+            }
+            /**
+             * The amount to charge for this checkout — this booking's amount
+             * due, plus that of other bookings paid with it (multi-trip cart).
+             */
+            $charge_amount = max((float) $amount_due, (float) apply_filters('yatra_checkout_charge_amount', (float) $amount_due, (int) $booking_id, (string) $payment_gateway));
+        }
+
         // For online gateways, create payment intent and return redirect URL
-        if (!$is_offline && $amount_due > 0) {
+        if (!$is_offline && $charge_amount > 0) {
             // Build payment params - merge with request data so gateways can access their own tokens
             $payment_params = array_merge($data, [
                 'booking_id' => $booking_id,
                 'reference' => $booking_reference,
-                'amount' => $amount_due,
+                'amount' => $charge_amount,
                 'currency' => $pricing['currency'] ?? \Yatra\Services\SettingsService::getCurrency(),
                 'customer_email' => $contact_data['email'],
                 'customer_name' => $contact_data['first_name'] . ' ' . $contact_data['last_name'],
@@ -2616,8 +2926,9 @@ class BookingSessionController extends BaseController
         // ========================================
         // Priority (Auto-Confirm mode: none | online | all):
         // - 'all'    → confirm every booking here at checkout.
-        // - 'online' → confirm nothing at checkout; only a successful online
-        //              gateway payment confirms later (offline stays pending).
+        // - 'online' → only a successful online gateway payment confirms
+        //              (later); Pay Later follows its own setting below; other
+        //              offline methods stay pending.
         // - 'none'   → per-method: pay_later uses auto_confirm_pay_later,
         //              bank_transfer stays pending, everything else pending.
 
@@ -2629,13 +2940,18 @@ class BookingSessionController extends BaseController
             // Confirm every booking immediately, regardless of payment.
             $booking_status = 'confirmed';
             $status_message = __('Booking confirmed!', 'yatra');
-        } elseif ($auto_confirm_mode === 'online') {
+        } elseif ($auto_confirm_mode === 'online' && $payment_gateway !== 'pay_later') {
             // Only successful online payments auto-confirm (at payment
             // completion). Leave the booking pending at checkout; offline
-            // methods (bank transfer, pay-later) stay pending for the operator.
+            // methods (bank transfer) stay pending for the operator.
             $booking_status = 'pending';
             $status_message = __('Booking received!', 'yatra');
         } elseif ($payment_gateway === 'pay_later') {
+            // "Auto-confirm Pay Later bookings" is its own setting (on by
+            // default) and is honoured in every mode but 'all'. In 'online'
+            // mode it used to be ignored, so a site showing the box ticked
+            // left Pay Later bookings pending — and the expiry sweep then
+            // cancelled them a day later.
             // Pay Later: Check the specific pay_later auto-confirm setting
             if ($settings['auto_confirm_pay_later']) {
                 $booking_status = 'confirmed';
@@ -2648,11 +2964,19 @@ class BookingSessionController extends BaseController
             // Bank Transfer: Always pending until payment is verified by admin
             $booking_status = 'pending';
             $status_message = __('Booking received! Please complete the bank transfer. We will confirm once payment is verified.', 'yatra');
+        } elseif ($payment_gateway === 'cheque') {
+            // Cheque (3.3): pending until the operator records the cleared cheque.
+            $booking_status = 'pending';
+            $status_message = __('Booking received! Please send your cheque. We will confirm once it has cleared.', 'yatra');
         }
         
         // Calculate booking expiry time for pending bookings
         $expiry_datetime = null;
-        if ($booking_status === 'pending' && $settings['booking_expiry_hours'] > 0) {
+        // Pay Later means the customer pays later: never an expiry deadline.
+        // Nor any other "pay later" kind of method (e.g. Pay by invoice for agencies).
+        if ($booking_status === 'pending' && !yatra_is_deferred_payment_gateway((string) $payment_gateway)
+            && !in_array((string) $payment_gateway, \Yatra\Repositories\BookingRepository::expiryExemptGateways(), true)
+            && $settings['booking_expiry_hours'] > 0) {
             $expiry_datetime = date('Y-m-d H:i:s', strtotime('+' . $settings['booking_expiry_hours'] . ' hours'));
         }
         
@@ -2943,9 +3267,24 @@ class BookingSessionController extends BaseController
             ], 400);
         }
 
+        // Opened from a payment link: pay the link's amount (re-checked here:
+        // still open, never more than the balance). The link is the permission.
+        $payment_link_id = (string) ($session['payment_link_id'] ?? '');
+        if ($payment_link_id !== '') {
+            $link_amount = \Yatra\Services\PaymentLinkService::openAmount($booking, $payment_link_id);
+            if ($link_amount === null) {
+                yatra_clear_remaining_session();
+                return new WP_REST_Response([
+                    'success' => false,
+                    'message' => __('This payment link has already been used, was cancelled or has expired.', 'yatra'),
+                ], 400);
+            }
+            $remaining_amount = $link_amount;
+        }
+
         // Verify user owns this booking
         $current_user = get_current_user_id();
-        if ($current_user && (int) $booking->user_id !== $current_user) {
+        if ($payment_link_id === '' && $current_user && (int) $booking->user_id !== $current_user) {
             yatra_clear_remaining_session();
             return new WP_REST_Response([
                 'success' => false,
@@ -3019,6 +3358,22 @@ class BookingSessionController extends BaseController
                 'trip_title' => $trip_title,
                 'return_url' => $remaining_return_url,
             ]);
+
+            // A payment link: claim it BEFORE charging (some gateways charge
+            // right here), so the payment is matched to this link and a second
+            // checkout of the same link elsewhere is refused.
+            if ($payment_link_id !== '') {
+                if (function_exists('yatra_start_session')) {
+                    yatra_start_session();
+                }
+                $session_key = session_id() ?: wp_hash((string) ($_SERVER['REMOTE_ADDR'] ?? '') . (string) ($_SERVER['HTTP_USER_AGENT'] ?? ''));
+                if (!\Yatra\Services\PaymentLinkService::start($booking_id, $payment_link_id, (string) $session_key)) {
+                    return new WP_REST_Response([
+                        'success' => false,
+                        'message' => __('This payment link is being paid in another window. Please wait a few minutes and try again.', 'yatra'),
+                    ], 409);
+                }
+            }
 
             $payment_result = $this->processPaymentGateway($payment_gateway, $payment_params);
 
@@ -3366,6 +3721,10 @@ class BookingSessionController extends BaseController
                 }
             }
 
+            // One payment for several bookings: keep this booking's part.
+            $shares = \Yatra\Services\PaymentAllocationService::allocate($bookingId, $amount);
+            $amount = $shares[$bookingId];
+
             // Record the payment
             $paymentRepository->create([
                 'booking_id' => $bookingId,
@@ -3408,6 +3767,8 @@ class BookingSessionController extends BaseController
             if ($shouldConfirm && function_exists('yatra_trigger_booking_confirmed')) {
                 \yatra_trigger_booking_confirmed($bookingId, $previousStatus, true);
             }
+
+            \Yatra\Services\PaymentAllocationService::creditOthers($shares, $bookingId, $gatewayId, (string) $transactionId, (string) $currency);
 
             // Fire payment completed action
             do_action('yatra_payment_completed', [
@@ -3681,6 +4042,62 @@ class BookingSessionController extends BaseController
     }
 
     /**
+     * '' when every traveller with a date of birth fits the trip's age limits
+     * on the travel date, else a message for the customer.
+     *
+     * @since 3.3.0
+     * @param object|null $trip
+     */
+    public static function travellerAgeError($trip, array $travellers, string $travelDate): string
+    {
+        if (!is_object($trip)) {
+            return '';
+        }
+        $min = isset($trip->age_min) && is_numeric($trip->age_min) ? (int) $trip->age_min : 0;
+        $max = isset($trip->age_max) && is_numeric($trip->age_max) ? (int) $trip->age_max : 0;
+        /**
+         * Whether checkout refuses travellers outside the trip's age limits.
+         *
+         * @since 3.3.0
+         */
+        if (($min <= 0 && $max <= 0) || !apply_filters('yatra_enforce_trip_age_limits', true, $trip)) {
+            return '';
+        }
+        try {
+            $on = $travelDate !== '' ? new \DateTimeImmutable(substr($travelDate, 0, 10)) : new \DateTimeImmutable(current_time('Y-m-d'));
+        } catch (\Throwable $e) {
+            $on = new \DateTimeImmutable(current_time('Y-m-d'));
+        }
+        foreach (array_values($travellers) as $i => $traveller) {
+            $dob = is_array($traveller) ? trim((string) ($traveller['date_of_birth'] ?? '')) : '';
+            if ($dob === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $dob)) {
+                continue;
+            }
+            $born = \DateTimeImmutable::createFromFormat('!Y-m-d', $dob);
+            if (!$born || $born > $on) {
+                continue;
+            }
+            $age = (int) $born->diff($on)->y;
+            if (($min > 0 && $age < $min) || ($max > 0 && $age > $max)) {
+                $limits = $min > 0 && $max > 0
+                    ? sprintf(/* translators: 1: minimum age, 2: maximum age */ __('ages %1$d to %2$d', 'yatra'), $min, $max)
+                    : ($min > 0
+                        ? sprintf(/* translators: %d: minimum age */ __('age %d and over', 'yatra'), $min)
+                        : sprintf(/* translators: %d: maximum age */ __('age %d and under', 'yatra'), $max));
+                return sprintf(
+                    /* translators: 1: traveller number, 2: their age on the travel date, 3: the trip's age limits */
+                    __('Traveller %1$d will be %2$d on the travel date, and this trip is for %3$s. Please check the date of birth.', 'yatra'),
+                    $i + 1,
+                    $age,
+                    $limits
+                );
+            }
+        }
+
+        return '';
+    }
+
+    /**
      * Get client IP address
      */
     private function getClientIp(): string
@@ -3766,13 +4183,53 @@ echo esc_html(sprintf(__('Payment type: Deposit — due now %1$s, remaining %2$s
         <?php elseif ($payment_method === 'partial') : ?>
             <p><?php /* translators: 1: amount due now (formatted), 2: remaining amount (formatted). */
 echo esc_html(sprintf(__('Payment type: Partial — due now %1$s, remaining %2$s', 'yatra'), $formatted_due, yatra_format_price($total_amount - $amount_due))); ?></p>
-        <?php else : ?>
+        <?php elseif (!in_array($payment_gateway, ['pay_later', 'bank_transfer', 'cheque'], true) && !yatra_is_deferred_payment_gateway((string) $payment_gateway)) : ?>
+            <?php // Pay Later / Bank Transfer: nothing is paid yet; the lines below say how to pay. ?>
             <p><?php esc_html_e('Payment type: Full payment', 'yatra'); ?></p>
         <?php endif; ?>
         <?php if ($payment_gateway === 'pay_later') : ?>
             <p><?php esc_html_e('Pay later — please contact us to arrange payment.', 'yatra'); ?></p>
-        <?php elseif ($payment_gateway === 'bank_transfer') : ?>
-            <p><?php esc_html_e('Bank transfer — you will receive bank details separately.', 'yatra'); ?></p>
+        <?php elseif (in_array($payment_gateway, ['bank_transfer', 'cheque'], true)) : ?>
+            <?php
+            // The account to pay into, from the Bank Transfer gateway's
+            // settings (the same details the invoice and confirmation page
+            // show). The email used to promise them "separately", and nothing
+            // ever sent them. Cheque (3.3): where to send it.
+            $bank_instructions = apply_filters('yatra_invoice_payment_instructions', [], (object) [
+                'payment_gateway' => (string) $payment_gateway,
+                'id' => $booking_id,
+                'reference' => $reference,
+                'amount_due' => $amount_due,
+                'currency' => (string) ($data['currency'] ?? ''),
+            ]);
+            ?>
+            <?php if (is_array($bank_instructions) && !empty($bank_instructions['rows'])) : ?>
+                <h3 style="font-size:16px;"><?php echo esc_html((string) ($bank_instructions['title'] ?? __('Bank Transfer Details', 'yatra'))); ?></h3>
+                <div style="background:#f3f4f6;padding:16px 20px;border-radius:8px;margin:0 0 16px;">
+                    <?php foreach ((array) $bank_instructions['rows'] as $bank_row) : ?>
+                        <p style="margin:0 0 6px;"><strong><?php echo esc_html(rtrim((string) ($bank_row['label'] ?? ''), ':')); ?>:</strong> <?php echo esc_html((string) ($bank_row['value'] ?? '')); ?></p>
+                    <?php endforeach; ?>
+                    <?php if (!empty($bank_instructions['note'])) : ?>
+                        <p style="margin:10px 0 0;"><?php echo esc_html((string) $bank_instructions['note']); ?></p>
+                    <?php endif; ?>
+                </div>
+            <?php else : ?>
+                <p><?php echo $payment_gateway === 'cheque'
+                    ? esc_html__('Cheque — we will send you the details.', 'yatra')
+                    : esc_html__('Bank transfer — you will receive bank details separately.', 'yatra'); ?></p>
+            <?php endif; ?>
+        <?php elseif (yatra_is_deferred_payment_gateway((string) $payment_gateway)) : ?>
+            <?php
+            $deferred_instructions = apply_filters('yatra_invoice_payment_instructions', [], (object) [
+                'payment_gateway' => (string) $payment_gateway,
+                'id' => $booking_id,
+                'reference' => $reference,
+                'amount_due' => $amount_due,
+            ]);
+            ?>
+            <?php if (is_array($deferred_instructions) && !empty($deferred_instructions['note'])) : ?>
+                <p><?php echo esc_html((string) $deferred_instructions['note']); ?></p>
+            <?php endif; ?>
         <?php endif; ?>
         <h3 style="font-size:16px;"><?php esc_html_e('Travelers', 'yatra'); ?></h3>
         <ul style="padding-left:20px;">
@@ -3810,6 +4267,10 @@ echo esc_html(sprintf(__('Traveler %1$d: %2$s', 'yatra'), $i + 1, $traveler_name
             ?>
             <li>
                 <?php
+                if (!is_user_logged_in()) {
+                    // A guest has no account to look in.
+                    esc_html_e('Keep this email: it has your booking reference and details. Reply to it if you need anything.', 'yatra');
+                } else
                 printf(
                     /* translators: %s: link labelled "My Account" pointing to the customer account page (HTML <a> wrapped). */
                     esc_html__('Your booking details, trip itinerary and any balance due are in %s.', 'yatra'),
@@ -4690,6 +5151,17 @@ echo esc_html(sprintf(__('Traveler %1$d: %2$s', 'yatra'), $i + 1, $traveler_name
             'departure_time' => $departure_time,
             'additional_services' => $additional_services
         ];
+        // Accommodation option / travel insurance answer (3.3): what the form
+        // shows now, else what the session holds.
+        foreach (['accommodation', 'travel_insurance'] as $choiceKey) {
+            if (is_array($data) && array_key_exists($choiceKey, $data)) {
+                $session_like_data[$choiceKey] = $choiceKey === 'accommodation'
+                    ? (is_scalar($data[$choiceKey]) ? sanitize_key((string) $data[$choiceKey]) : '')
+                    : \Yatra\Services\CheckoutChoiceService::insuranceAnswer(is_scalar($data[$choiceKey]) || is_bool($data[$choiceKey]) ? $data[$choiceKey] : null);
+            } elseif (is_array($session) && array_key_exists($choiceKey, $session)) {
+                $session_like_data[$choiceKey] = $session[$choiceKey];
+            }
+        }
         
         // Apply filter for pro plugins to modify summary calculation parameters
         $calculation_params = apply_filters('yatra_summary_calculation_params', [
@@ -4888,6 +5360,22 @@ echo esc_html(sprintf(__('Traveler %1$d: %2$s', 'yatra'), $i + 1, $traveler_name
             'partial_percentage' => $partial_percentage,
         ]);
         
+        // A group-size price tier (3.3) sets the per-person price inside the
+        // calculation; show that price, not the trip's list price.
+        if (!$is_traveler_based && isset($pricing['unit_price']) && \Yatra\Services\GroupPriceTierService::tierFor((int) $trip_id, (int) $total_travelers) !== null) {
+            $price_per_person = (float) $pricing['unit_price'];
+        }
+
+        // Lines the price calculation adds itself (booking fee, private trip,
+        // accommodation, travel insurance — 3.3): they are in the total, so
+        // they must be in the refreshed breakdown too, as on the first render.
+        $summary_services = is_array($additional_services) ? $additional_services : [];
+        foreach ((array) ($pricing['additional_services'] ?? []) as $pricing_row) {
+            if (is_array($pricing_row) && isset($pricing_row['id']) && is_numeric($pricing_row['id']) && (int) $pricing_row['id'] < 0 && !empty($pricing_row['selected'])) {
+                $summary_services[] = $pricing_row;
+            }
+        }
+
         // Build pricing HTML for the summary section (using CalculationService data)
         $pricing_html = $this->buildPricingHtml([
             'is_traveler_based' => $is_traveler_based,
@@ -4902,7 +5390,7 @@ echo esc_html(sprintf(__('Traveler %1$d: %2$s', 'yatra'), $i + 1, $traveler_name
             'coupon_discount_amount' => $pricing['coupon_discount']['calculated_amount'] ?? 0,
             'coupon_discount_label' => $pricing['coupon_discount']['label'] ?? '',
             'coupon_code' => $pricing['coupon_discount']['code'] ?? '',
-            'additional_services' => $additional_services,
+            'additional_services' => $summary_services,
             'services_total' => $services_total,
             'itinerary_costs' => $itinerary_costs,
             'itinerary_costs_total' => $itinerary_costs_total,
@@ -4973,6 +5461,18 @@ echo esc_html(sprintf(__('Traveler %1$d: %2$s', 'yatra'), $i + 1, $traveler_name
                 'partial_percentage' => $partial_percentage,
                 // HTML for the pricing section
                 'pricing_html' => $pricing_html,
+                // Other bookings paid with this checkout (see yatra_checkout_linked_amount).
+                'linked_amount' => round(max(0.0, (float) apply_filters('yatra_checkout_linked_amount', 0.0, is_array($session) ? $session : [], $payment_method)), 2),
+                /**
+                 * Prices of the other bookings paid with this checkout, so the
+                 * sidebar listing them follows a coupon applied here.
+                 *
+                 * @param array  $items          List of ['id' => string, 'total_formatted' => string].
+                 * @param array  $session        The booking session.
+                 * @param string $payment_method full|deposit|partial.
+                 * @since 3.2.0
+                 */
+                'linked_items' => array_values((array) apply_filters('yatra_checkout_linked_items', [], is_array($session) ? $session : [], $payment_method)),
             ],
         ]);
     }

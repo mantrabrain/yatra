@@ -205,6 +205,16 @@ export const DEFAULT_MENU_ITEMS: MenuItemDefault[] = [
   },
   { slug: "bookings", label: "Bookings", iconName: "Calendar" },
   { slug: "customers", label: "Customers", iconName: "UserCircle" },
+  {
+    slug: "travel-agencies",
+    label: "Travel Agencies",
+    iconName: "Briefcase",
+  },
+  {
+    slug: "guides-resources",
+    label: "Guides & Resources",
+    iconName: "Users",
+  },
   { slug: "travelers", label: "Travelers", iconName: "Plane" },
   { slug: "enquiries", label: "Enquiries", iconName: "MessageSquare" },
   { slug: "reviews", label: "Reviews", iconName: "Star" },

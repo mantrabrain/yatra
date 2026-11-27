@@ -240,6 +240,11 @@ class PaymentService
         // payment.partial_received automations, webhooks, …). Pending / failed /
         // refunded records are bookkeeping only.
         if (($data['status'] ?? '') === 'completed') {
+            // Recording the payment is the operator confirming they received
+            // it: a pending booking now paid in full is confirmed under the
+            // same Auto-Confirm rule as online payments ('online' or 'all';
+            // never with 'none').
+            $this->confirmIfSettled((int) $data['booking_id']);
             $this->dispatchPaymentCompleted((int) $paymentId, $data);
         }
 
@@ -248,6 +253,21 @@ class PaymentService
             'payment_id' => $paymentId,
             'message' => __('Payment recorded successfully.', 'yatra'),
         ];
+    }
+
+    private function confirmIfSettled(int $bookingId): void
+    {
+        $booking = $this->bookingRepository->find($bookingId);
+        if (!$booking || (string) ($booking->status ?? '') !== 'pending' || (float) ($booking->amount_due ?? 1) > 0.009) {
+            return;
+        }
+        if (!function_exists('yatra_should_confirm_booking_on_payment') || !\yatra_should_confirm_booking_on_payment(true, $bookingId)) {
+            return;
+        }
+        $this->bookingRepository->update($bookingId, ['status' => 'confirmed', 'confirmed_at' => current_time('mysql')]);
+        if (function_exists('yatra_trigger_booking_confirmed')) {
+            \yatra_trigger_booking_confirmed($bookingId, 'pending', true);
+        }
     }
 
     /**
@@ -470,8 +490,12 @@ class PaymentService
      * @param float  $amount    Refund amount (optional, full refund if not provided)
      * @param string $reason    Refund reason
      * @return array {success: bool, refund_id?: int, message: string}
+     *
+     * Record a refund against a payment. With $throughGateway the money is
+     * first sent back through the payment's gateway (PayPal, Stripe, …) and
+     * the refund is recorded only if the gateway accepted it.
      */
-    public function processRefund(int $paymentId, ?float $amount = null, string $reason = ''): array
+    public function processRefund(int $paymentId, ?float $amount = null, string $reason = '', bool $throughGateway = false): array
     {
         $payment = $this->paymentRepository->find($paymentId);
 
@@ -499,38 +523,102 @@ class PaymentService
         // than came in, however the refunds are split across payments. Refund
         // rows carry no link to the payment they reverse, so this is the
         // strongest guarantee available — and it is the one that matters.
-        $totals = $this->paymentRepository->getBookingPaymentTotals((int) $payment->booking_id);
-        $refundable = round($totals['successful'] - $totals['refunded'], 2);
+        $bookingId = (int) $payment->booking_id;
 
-        if ($refundAmount > $refundable) {
-            return [
-                'success' => false,
-                'message' => $refundable > 0
-                    ? sprintf(
-                        /* translators: %s: the largest amount still available to refund, already formatted with the site currency. */
-                        __('That is more than remains to be refunded on this booking (%s).', 'yatra'),
-                        \Yatra\Helpers\FormatHelper::formatPrice(
-                            $refundable,
-                            (string) ($payment->currency ?: \Yatra\Services\SettingsService::getCurrency())
-                        )
-                    )
-                    : __('Everything received on this booking has already been refunded.', 'yatra'),
-            ];
+        // One refund at a time per booking: two tabs (or a retried request)
+        // must not both pass the "how much is left?" check below and both
+        // send money through the gateway.
+        global $wpdb;
+        $lockName = 'yatra_refund_' . $bookingId;
+        $locked = (string) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 10)', $lockName)) === '1';
+        if (!$locked) {
+            return ['success' => false, 'message' => __('Another refund on this booking is being processed. Try again in a moment.', 'yatra')];
         }
 
-        // Create refund record
-        $refundId = $this->paymentRepository->create([
-            'booking_id' => $payment->booking_id,
-            'gateway' => $payment->gateway,
-            'amount' => -$refundAmount, // Negative for refund
-            'currency' => $payment->currency,
-            'status' => 'completed',
-            'payment_type' => 'refund',
-            'notes' => $reason,
-        ]);
+        try {
+            $refundable = $this->refundableAmount($bookingId);
 
-        if (!$refundId) {
-            return ['success' => false, 'message' => __('Failed to process refund.', 'yatra')];
+            if ($refundAmount > $refundable) {
+                return [
+                    'success' => false,
+                    'message' => $refundable > 0
+                        ? sprintf(
+                            /* translators: %s: the largest amount still available to refund, already formatted with the site currency. */
+                            __('That is more than remains to be refunded on this booking (%s).', 'yatra'),
+                            \Yatra\Helpers\FormatHelper::formatPrice(
+                                $refundable,
+                                (string) ($payment->currency ?: \Yatra\Services\SettingsService::getCurrency())
+                            )
+                        )
+                        : __('Everything received on this booking has already been refunded.', 'yatra'),
+                ];
+            }
+
+            $gateway = null;
+            if ($throughGateway) {
+                $gateway = self::refundGatewayFor($payment);
+                if ($gateway === null) {
+                    return ['success' => false, 'message' => __('This payment cannot be refunded through its payment provider. Send the money back yourself and record the refund.', 'yatra')];
+                }
+            }
+
+            // The refund row is written BEFORE any money moves. Through a
+            // gateway it starts as 'pending' — which already counts against
+            // what is left to refund, so a second click can't send it again —
+            // and is completed (or removed) once the gateway has answered.
+            $refundData = [
+                'booking_id' => $bookingId,
+                'gateway' => $payment->gateway,
+                'amount' => -$refundAmount, // Negative for refund
+                'currency' => $payment->currency,
+                'status' => $throughGateway ? 'pending' : 'completed',
+                'payment_type' => 'refund',
+                'notes' => $reason,
+            ];
+            $refundId = $this->paymentRepository->create($refundData);
+            if (!$refundId) {
+                return ['success' => false, 'message' => __('Failed to process refund.', 'yatra')];
+            }
+        } finally {
+            $wpdb->query($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $lockName));
+        }
+
+        $gatewayRefundId = '';
+        $gatewayPending = false;
+        if ($throughGateway && $gateway !== null) {
+            // Stable for this refund row: a retried HTTP call can't refund twice.
+            self::$currentRefundKey = 'yatra-refund-' . $refundId;
+            try {
+                $result = $gateway->processRefund((string) $payment->transaction_id, $refundAmount);
+            } catch (\Throwable $e) {
+                $result = ['success' => false, 'error' => $e->getMessage()];
+            } finally {
+                self::$currentRefundKey = '';
+            }
+            if (empty($result['success'])) {
+                $this->paymentRepository->delete((int) $refundId);
+                $error = (string) ($result['error'] ?? $result['message'] ?? '');
+
+                return [
+                    'success' => false,
+                    'message' => sprintf(
+                        /* translators: 1: payment provider name, 2: its error message. */
+                        __('%1$s refused the refund: %2$s Nothing was recorded.', 'yatra'),
+                        \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance()->resolveGatewayTitle((string) $payment->gateway),
+                        $error !== '' ? rtrim($error, '.') . '.' : __('unknown error.', 'yatra')
+                    ),
+                ];
+            }
+            $gatewayRefundId = (string) ($result['refund_id'] ?? '');
+            // Still being processed by the provider (e.g. a bank refund): keep
+            // the row pending so the booking isn't marked refunded too early.
+            $gatewayPending = !empty($result['pending']);
+            $this->paymentRepository->update((int) $refundId, array_filter([
+                'status' => $gatewayPending ? 'pending' : 'completed',
+                'transaction_id' => $gatewayRefundId !== '' ? $gatewayRefundId : null,
+            ], static function ($v) {
+                return $v !== null;
+            }));
         }
 
         // The original payment deliberately keeps its 'completed' status. It did
@@ -540,13 +628,81 @@ class PaymentService
         // had been successfully collected. Keeping both rows is also what lets
         // "total received" and "total refunded" be reported separately, and lets
         // a second partial refund be taken against the same payment.
-        $this->syncBookingPaymentState((int) $payment->booking_id);
+        $this->syncBookingPaymentState($bookingId);
+
+        if ($throughGateway) {
+            /**
+             * A refund was sent back through the payment's gateway and recorded.
+             *
+             * @param int    $refundId        Refund row in the payments ledger.
+             * @param object $payment         The original payment.
+             * @param float  $refundAmount
+             * @param string $gatewayRefundId The gateway's id for the refund.
+             */
+            do_action('yatra_gateway_refund_completed', (int) $refundId, $payment, $refundAmount, $gatewayRefundId);
+        }
 
         return [
             'success' => true,
             'refund_id' => $refundId,
-            'message' => __('Refund processed successfully.', 'yatra'),
+            'through_gateway' => $throughGateway,
+            'pending' => $gatewayPending,
+            'message' => $throughGateway
+                ? ($gatewayPending
+                    ? __('Refund requested. The payment provider is still processing it; it is recorded as pending.', 'yatra')
+                    : __('Refund sent to the customer and recorded.', 'yatra'))
+                : __('Refund processed successfully.', 'yatra'),
         ];
+    }
+
+    /** Idempotency key of the gateway refund being sent right now ('' otherwise). */
+    private static string $currentRefundKey = '';
+
+    /**
+     * For gateways: a key to send with the refund API call so a retried
+     * request can't refund twice ('' when called outside a Yatra refund).
+     *
+     * @since 3.2.0
+     */
+    public static function currentRefundIdempotencyKey(): string
+    {
+        return self::$currentRefundKey;
+    }
+
+    /**
+     * What is left to refund on a booking: received minus refunded, minus
+     * gateway refunds still pending.
+     */
+    private function refundableAmount(int $bookingId): float
+    {
+        global $wpdb;
+        $totals = $this->paymentRepository->getBookingPaymentTotals($bookingId);
+        $table = \Yatra\Database\Tables\BookingPaymentsTable::getTableName();
+        $pending = (float) $wpdb->get_var($wpdb->prepare(
+            "SELECT COALESCE(SUM(ABS(amount)), 0) FROM {$table} WHERE booking_id = %d AND payment_type = 'refund' AND status = 'pending'",
+            $bookingId
+        ));
+
+        return round($totals['successful'] - $totals['refunded'] - $pending, 2);
+    }
+
+    /**
+     * The gateway that can send this payment's money back, or null.
+     *
+     * @param object $payment Payments ledger row.
+     */
+    public static function refundGatewayFor(object $payment): ?\Yatra\PaymentGateways\PaymentGatewayInterface
+    {
+        if ((string) ($payment->status ?? '') !== 'completed' || (float) ($payment->amount ?? 0) <= 0
+            || trim((string) ($payment->transaction_id ?? '')) === '' || (string) ($payment->payment_type ?? '') === 'refund') {
+            return null;
+        }
+        $gateway = \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance()->get((string) ($payment->gateway ?? ''));
+        if (!$gateway || !method_exists($gateway, 'canRefundThroughGateway') || !$gateway->canRefundThroughGateway()) {
+            return null;
+        }
+
+        return $gateway;
     }
 
     /**

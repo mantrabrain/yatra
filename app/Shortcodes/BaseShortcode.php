@@ -47,6 +47,10 @@ abstract class BaseShortcode
     {
         $atts = shortcode_atts($this->default_attributes, $atts, $this->tag);
 
+        // A shortcode on a page Yatra didn't recognise in advance (widget,
+        // builder, do_shortcode) loads the shared Yatra files itself.
+        \Yatra\Providers\FrontendAssetsProvider::ensureCommonAssets();
+
         try {
             return $this->renderContent($atts);
         } catch (\Exception $e) {

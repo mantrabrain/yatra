@@ -37,11 +37,18 @@ class SearchShortcode extends BaseShortcode
             'date' => '',
         ]);
 
-        // [yatra_search] may appear in posts, widgets, builders, FSE templates, or do_shortcode()
-        // with no reliable way to detect that before output. Enqueue on every public frontend
-        // request so styles always print in wp_head (avoids FOUC). Rules are scoped to
-        // .yatra-trip-search-shortcode in trip-search-shortcode.css.
-        add_action('wp_enqueue_scripts', [self::class, 'enqueueTripSearchAssets'], 10);
+        // In <head> on pages that show Yatra content (no flash of unstyled
+        // content); anywhere else [yatra_search] loads its files when it
+        // renders (widgets, builders, do_shortcode()). It used to load on
+        // every page of the site.
+        add_action('wp_enqueue_scripts', [self::class, 'enqueueTripSearchAssetsForPage'], 10);
+    }
+
+    public static function enqueueTripSearchAssetsForPage(): void
+    {
+        if (\Yatra\Providers\FrontendAssetsProvider::shouldLoadOnThisRequest()) {
+            self::enqueueTripSearchAssets();
+        }
     }
 
     /**
@@ -126,6 +133,7 @@ class SearchShortcode extends BaseShortcode
     protected function renderContent(array $atts): string
     {
         $atts = shortcode_atts($this->default_attributes, $atts, $this->tag);
+        self::enqueueTripSearchAssets();
 
         // Same source as trip listing sidebar filters: published classifications.
         // TripRepository::*ForSearch() only returned rows linked via trip_classifications,

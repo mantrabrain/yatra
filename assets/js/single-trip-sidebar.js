@@ -340,7 +340,7 @@ function updateMobileTotal() {
     // The mobile total price display is no longer shown
     if (mobileTotal) {
         if (window.yatraTripData && window.yatraTripData.currencySymbol) {
-            mobileTotal.textContent = window.yatraTripData.currencySymbol + total.toFixed(2);
+            mobileTotal.textContent = typeof window.yatra_format_price_js === 'function' ? window.yatra_format_price_js(total) : window.yatraTripData.currencySymbol + total.toFixed(2);
         } else {
             mobileTotal.textContent = formatCurrency(total);
         }
@@ -349,12 +349,14 @@ function updateMobileTotal() {
     // Also sync with main form total if it exists (main total also removed)
     const mainTotal = document.getElementById('total-amount');
     if (mainTotal && window.yatraTripData && window.yatraTripData.currencySymbol) {
-        mainTotal.textContent = window.yatraTripData.currencySymbol + total.toFixed(2);
+        mainTotal.textContent = typeof window.yatra_format_price_js === 'function' ? window.yatra_format_price_js(total) : window.yatraTripData.currencySymbol + total.toFixed(2);
     }
 }
 
 function formatCurrency(amount) {
-    // Simple currency formatting (can be enhanced)
+    if (typeof window.yatra_format_price_js === 'function') {
+        return window.yatra_format_price_js(amount);
+    }
     return '$' + amount.toFixed(2);
 }
 

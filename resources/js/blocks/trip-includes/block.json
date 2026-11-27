@@ -1,0 +1,31 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "yatra/trip-includes",
+  "title": "Trip Includes & Excludes",
+  "category": "yatra",
+  "icon": "yes-alt",
+  "description": "What the trip price includes and excludes.",
+  "keywords": [
+    "included",
+    "excluded",
+    "inclusions",
+    "yatra"
+  ],
+  "textdomain": "yatra",
+  "attributes": {
+    "tripId": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "supports": {
+    "html": false,
+    "inserter": true,
+    "align": [
+      "wide",
+      "full"
+    ]
+  },
+  "editorScript": "yatra-trip-includes-block-editor"
+}

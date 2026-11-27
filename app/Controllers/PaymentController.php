@@ -100,6 +100,16 @@ class PaymentController extends BaseController
         // Note history. Reading needs only view rights; adding one is an
         // ordinary record-keeping action, so it sits with edit rather than with
         // the refund capability.
+        // Record a refund against a completed payment (full or partial). The
+        // ledger keeps the original payment and adds a negative refund row.
+        register_rest_route($this->namespace, '/payments/(?P<id>\d+)/refund', [
+            [
+                'methods' => 'POST',
+                'callback' => [$this, 'refundPayment'],
+                'permission_callback' => [$this, 'checkCanRefund'],
+            ],
+        ]);
+
         register_rest_route($this->namespace, '/payments/(?P<id>\d+)/notes', [
             [
                 'methods' => 'GET',
@@ -154,6 +164,20 @@ class PaymentController extends BaseController
     public function checkCanEdit(): bool
     {
         return current_user_can('yatra_edit_bookings');
+    }
+
+    /** POST /payments/{id}/refund {amount?, reason} */
+    public function refundPayment(WP_REST_Request $request): WP_REST_Response
+    {
+        $amount = $request->get_param('amount');
+        $amount = ($amount === null || $amount === '') ? null : (float) $amount;
+        $reason = sanitize_textarea_field((string) ($request->get_param('reason') ?? ''));
+
+        $throughGateway = filter_var($request->get_param('through_gateway'), FILTER_VALIDATE_BOOLEAN);
+
+        $result = $this->paymentService->processRefund((int) $request->get_param('id'), $amount, $reason, $throughGateway);
+
+        return new WP_REST_Response($result, !empty($result['success']) ? 200 : 400);
     }
 
     public function checkCanRefund(): bool

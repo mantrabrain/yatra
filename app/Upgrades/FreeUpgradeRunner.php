@@ -190,9 +190,20 @@ final class FreeUpgradeRunner
         // booking that had in fact been paid and partly refunded.
         InstallerService::maybeRepairRefundedBookingTotals();
 
+        // Bookings stamped "USD" by the column default on a non-USD store
+        // (admin-created bookings): set to the store currency. One-shot.
+        InstallerService::maybeRepairDefaultedBookingCurrency();
+
+        // Saved customer emails: "Amount due now" → "Amount due", heading
+        // "Booking update" → "Your booking" (seeded wording only). One-shot.
+        InstallerService::maybeRefreshSeededEmailWording();
+
         // Payment note history table — added without a version bump, so it
         // needs its own idempotent creation step for existing installs.
         InstallerService::maybeCreatePaymentNotesTable();
+
+        // Booking activity log (3.2), same pattern.
+        InstallerService::maybeCreateBookingActivityTable();
 
         // Widen reviews.status enum to accept 'spam' / 'trash' (and
         // recover rows previously coerced to ''). Called directly here

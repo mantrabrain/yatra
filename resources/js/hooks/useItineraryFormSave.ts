@@ -56,6 +56,7 @@ export const useItineraryFormSave = ({
             day: day,
             day_title: dayTitle,
             day_description: data.day_description?.trim() || null,
+            day_altitude: (data.day_altitude ?? "").toString().trim(),
             title: dayTitle || `Day ${day}`, // Backend requires title field
             item_type_id: null,
             item_id: null,
@@ -318,6 +319,7 @@ export const useItineraryFormSave = ({
             day: day,
             day_title: dayTitle,
             day_description: data.day_description?.trim() || null,
+            day_altitude: (data.day_altitude ?? "").toString().trim(),
             item_type_id: null,
             item_id: null,
             title: dayTitle || `Day ${day}`,
@@ -359,6 +361,7 @@ export const useItineraryFormSave = ({
             trip_id: tripId,
             day: day,
             day_title: dayTitle,
+            day_altitude: (data.day_altitude ?? "").toString().trim(),
             item_type_id: parseInt(activityData.item_type_id!),
             item_id: parseInt(activityData.item_id!),
             title: activityData.title!.trim(),

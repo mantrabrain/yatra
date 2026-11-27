@@ -51,7 +51,7 @@ import {
   type AiUsageSummary,
 } from "../api/ai-api";
 
-type SectionId = "keys" | "voice" | "prompts" | "usage";
+type SectionId = "keys" | "voice" | "prompts" | "usage" | "connect";
 
 interface SectionDef {
   id: SectionId;
@@ -88,7 +88,110 @@ const SECTIONS: SectionDef[] = [
     icon: BarChart3,
     description: "Token usage by month, per provider, per feature.",
   },
+  {
+    id: "connect",
+    label: "Connect AI assistants",
+    icon: Plug,
+    description:
+      "Let an AI assistant read your trips, departures and bookings and act on them, with your WordPress permissions.",
+  },
 ];
+
+/** Set by Yatra Pro 3.2+ when its MCP server is running. */
+const mcpGlobals = (): { endpoint: string; appPasswordsUrl: string } => {
+  const y = (window as any).yatraAdmin || {};
+  return {
+    endpoint: typeof y.aiMcpEndpoint === "string" ? y.aiMcpEndpoint : "",
+    appPasswordsUrl: typeof y.aiMcpAppPasswordsUrl === "string" ? y.aiMcpAppPasswordsUrl : "",
+  };
+};
+
+const CodeBlock: React.FC<{ text: string; testId?: string }> = ({ text, testId }) => (
+  <pre
+    className="whitespace-pre-wrap break-all rounded-md bg-gray-900 text-gray-100 text-xs p-3"
+    data-testid={testId}
+  >
+    {text}
+  </pre>
+);
+
+const McpConnectCard: React.FC = () => {
+  const { endpoint, appPasswordsUrl } = mcpGlobals();
+  const [user, setUser] = useState("");
+  const [password, setPassword] = useState("");
+  // Built in the browser only; nothing is sent anywhere.
+  const header =
+    user.trim() && password.trim()
+      ? "Basic " + btoa(unescape(encodeURIComponent(`${user.trim()}:${password.replace(/\s+/g, "")}`)))
+      : "Basic <your-credentials>";
+
+  return (
+    <Card data-testid="mcp-connect-card">
+      <CardHeader>
+        <CardTitle>{__("Connect Claude, Cursor or another MCP client", "yatra")}</CardTitle>
+        <CardDescription>
+          {__(
+            "Yatra runs an MCP server. Connect an AI assistant to it and ask things like \"who travels on the 12 March departure?\", \"which bookings still owe money?\" or \"draft a 7-day Mustang trek\". It works with the permissions of the WordPress user you connect as, and only confirms or cancels a booking when you ask it to.",
+            "yatra",
+          )}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-5 text-sm">
+        <div>
+          <Label>{__("Server URL", "yatra")}</Label>
+          <CodeBlock text={endpoint} testId="mcp-endpoint" />
+        </div>
+        <ol className="list-decimal pl-5 space-y-4">
+          <li>
+            {__("Create an Application Password for the WordPress user the assistant should act as (a staff account with only the access it needs is safest).", "yatra")}{" "}
+            {appPasswordsUrl && (
+              <a href={appPasswordsUrl} className="text-blue-600 hover:underline inline-flex items-center gap-1" target="_blank" rel="noreferrer">
+                {__("Open Application Passwords", "yatra")}
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            )}
+          </li>
+          <li>
+            <div className="mb-2">
+              {__("Enter the username and the new password to build the connection header (worked out in your browser, not saved):", "yatra")}
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <Input value={user} onChange={(e) => setUser(e.target.value)} placeholder={__("Username", "yatra")} autoComplete="off" data-testid="mcp-user" />
+              <Input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="xxxx xxxx xxxx xxxx xxxx xxxx" type="password" autoComplete="new-password" data-testid="mcp-password" />
+            </div>
+          </li>
+          <li>
+            <div className="font-medium mb-1">{__("Claude Code", "yatra")}</div>
+            <CodeBlock text={`claude mcp add --transport http yatra ${endpoint} --header "Authorization: ${header}"`} testId="mcp-claude-code" />
+          </li>
+          <li>
+            <div className="font-medium mb-1">{__("Claude Desktop (claude_desktop_config.json)", "yatra")}</div>
+            <CodeBlock
+              text={JSON.stringify(
+                { mcpServers: { yatra: { command: "npx", args: ["-y", "mcp-remote", endpoint, "--header", `Authorization:${header}`] } } },
+                null,
+                2,
+              )}
+            />
+          </li>
+          <li>
+            <div className="font-medium mb-1">{__("Cursor, VS Code and other clients (mcp.json)", "yatra")}</div>
+            <CodeBlock
+              text={JSON.stringify({ mcpServers: { yatra: { url: endpoint, headers: { Authorization: header } } } }, null, 2)}
+            />
+          </li>
+        </ol>
+        <p className="text-xs text-gray-500 dark:text-gray-400 flex items-start gap-1.5">
+          <Info className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+          {__(
+            "Your site must use HTTPS for Application Passwords. Revoke the password on your profile at any time to disconnect. Clients that can only sign in with OAuth (such as claude.ai web custom connectors and ChatGPT connectors) aren't supported yet.",
+            "yatra",
+          )}
+        </p>
+      </CardContent>
+    </Card>
+  );
+};
 
 const DEFAULT_BRAND_VOICE: AiBrandVoice = {
   tone: "",
@@ -512,7 +615,7 @@ const AiAssistant: React.FC = () => {
               </div>
               <p className="text-xs">
                 {__(
-                  "You bring your own OpenAI or Anthropic key. Each AI generation (trip description, FAQ, email body, etc.) is a single API call your provider charges you for — usually fractions of a cent. The plugin never proxies traffic and adds no markup. You only need one key to start; you can save both and pick a default per task under the Defaults tab.",
+                  "You bring your own OpenAI or Anthropic key. Each AI generation (trip description, FAQ, email body, etc.) is a single API call your provider charges you for — usually fractions of a cent. The plugin never proxies traffic and adds no markup. You only need one key to start; you can save both and choose which one is used under Brand voice → Default provider.",
                   "yatra",
                 )}
               </p>
@@ -1528,8 +1631,11 @@ const AiAssistant: React.FC = () => {
     );
   };
 
+  const visibleSections = SECTIONS.filter(
+    (s) => s.id !== "connect" || mcpGlobals().endpoint !== "",
+  );
   const currentSection =
-    SECTIONS.find((s) => s.id === activeSection) ?? SECTIONS[0];
+    visibleSections.find((s) => s.id === activeSection) ?? visibleSections[0];
 
   return (
     <div className="space-y-6">
@@ -1545,7 +1651,7 @@ const AiAssistant: React.FC = () => {
           <Card>
             <CardContent className="p-2">
               <nav className="flex flex-col gap-1">
-                {SECTIONS.map((s) => {
+                {visibleSections.map((s) => {
                   const Icon = s.icon;
                   const active = s.id === activeSection;
                   return (
@@ -1577,6 +1683,7 @@ const AiAssistant: React.FC = () => {
           {activeSection === "voice" && renderVoice()}
           {activeSection === "prompts" && renderPrompts()}
           {activeSection === "usage" && renderUsage()}
+          {activeSection === "connect" && mcpGlobals().endpoint !== "" && <McpConnectCard />}
         </div>
       </div>
     </div>

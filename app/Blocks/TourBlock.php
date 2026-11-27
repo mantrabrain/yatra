@@ -29,6 +29,18 @@ class TourBlock
      */
     public function renderCallback(array $attributes, string $content): string
     {
+        return self::renderMarkup($attributes);
+    }
+
+    /**
+     * Block markup + assets. Shared with the Elementor "Trip Grid" widget so both print the same HTML.
+     *
+     * @since 3.1.4
+     * @param array<string, mixed> $attributes Block attributes
+     */
+    public static function renderMarkup(array $attributes): string
+    {
+        FrontendAssetsProvider::ensureCommonAssets();
         FrontendAssetsProvider::registerCoreFrontendStylesheets();
         wp_enqueue_style('yatra-trip-shortcode');
 

@@ -1,0 +1,81 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "yatra/trip-search",
+  "title": "Trip Search",
+  "category": "yatra",
+  "icon": "search",
+  "description": "Search bar for trips by keyword, destination, activity, duration, budget and date.",
+  "keywords": [
+    "search",
+    "filter",
+    "find",
+    "yatra"
+  ],
+  "textdomain": "yatra",
+  "attributes": {
+    "keyword": {
+      "type": "string",
+      "default": "",
+      "enum": [
+        "",
+        "yes",
+        "no"
+      ]
+    },
+    "destination": {
+      "type": "string",
+      "default": "",
+      "enum": [
+        "",
+        "yes",
+        "no"
+      ]
+    },
+    "activities": {
+      "type": "string",
+      "default": "",
+      "enum": [
+        "",
+        "yes",
+        "no"
+      ]
+    },
+    "duration": {
+      "type": "string",
+      "default": "",
+      "enum": [
+        "",
+        "yes",
+        "no"
+      ]
+    },
+    "budget": {
+      "type": "string",
+      "default": "",
+      "enum": [
+        "",
+        "yes",
+        "no"
+      ]
+    },
+    "date": {
+      "type": "string",
+      "default": "",
+      "enum": [
+        "",
+        "yes",
+        "no"
+      ]
+    }
+  },
+  "supports": {
+    "html": false,
+    "inserter": true,
+    "align": [
+      "wide",
+      "full"
+    ]
+  },
+  "editorScript": "yatra-trip-search-block-editor"
+}

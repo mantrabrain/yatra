@@ -1220,9 +1220,11 @@ class YatraStripe {
     }
 
     getCurrentPaymentDue() {
+        // Other bookings paid with this checkout (Yatra Pro's cart) are part of the charge.
+        const linked = parseFloat(this.paymentForm?.dataset.linkedAmount) || 0;
         const summaryDue = parseFloat(window.yatraBookingSummary?.amountDue);
         if (!isNaN(summaryDue) && summaryDue > 0) {
-            return summaryDue;
+            return summaryDue + linked;
         }
 
         const candidates = [
@@ -1230,7 +1232,8 @@ class YatraStripe {
             parseFloat(window.yatraBookingData?.paymentDue)
         ].map((val) => (isNaN(val) ? 0 : val));
 
-        return candidates.find((val) => val > 0) ?? 0;
+        const picked = candidates.find((val) => val > 0) ?? 0;
+        return picked > 0 ? picked + linked : 0;
     }
 
     getPaymentRequestTotal() {

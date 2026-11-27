@@ -165,6 +165,7 @@ class BookingValidator
         $gatewayIds = apply_filters('yatra_valid_booking_payment_gateway_ids', [
             'cash',
             'bank_transfer',
+            'cheque',
             'credit_card',
             'paypal',
             'stripe',
@@ -350,6 +351,7 @@ class BookingValidator
                 'partial',
                 'cash',
                 'bank_transfer',
+                'cheque',
                 'credit_card',
                 'paypal',
                 'stripe',

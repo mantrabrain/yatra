@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useMemo } from "react";
+import { CsvExportButton } from "../components/common/CsvExportButton";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Plus,
@@ -703,15 +704,24 @@ const Customers: React.FC = () => {
       <PageHeader
         title={__("Customers")}
         description={__("Manage your customer database")}
-        actionCapability="yatra_edit_customers"
         actions={
-          <Button
-            onClick={handleCreateCustomer}
-            className="flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            {__("Add New Customer")}
-          </Button>
+          <div className="flex items-center gap-2">
+            {/* Each button has its own permission: export staff may not edit. */}
+            <CsvExportButton
+              endpoint="/customers/export"
+              capability="yatra_export_customers"
+              testId="export-customers"
+            />
+            <ConditionalRender capability="yatra_edit_customers">
+              <Button
+                onClick={handleCreateCustomer}
+                className="flex items-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                {__("Add New Customer")}
+              </Button>
+            </ConditionalRender>
+          </div>
         }
       />
 

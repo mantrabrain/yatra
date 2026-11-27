@@ -3597,7 +3597,8 @@ button.yatra-booking-button svg path {
         width: 48px;
         font-size: 15px;
         font-weight: 700;
-        color:#fff;
+        /* Was #fff: a white count on the light field, so the number was invisible. */
+        color: #374151;
     }
 }
 
@@ -3665,6 +3666,7 @@ button.yatra-booking-button svg path {
     .yatra-mobile-sticky-content {
         padding: 6px;
         gap: 4px;
+        padding-right: calc(6px + 52px); /* keep space for the close button */
     }
     
     .yatra-mobile-row-1,
@@ -13767,5 +13769,95 @@ a.yatra-card-book-btn:hover {
     .yatra-booking-card .yatra-trip-cta {
         min-height: 48px;
         font-size: 16px;
+    }
+}
+
+/*
+ * Phone widths (e.g. 390 px): the sticky booking bar's traveller field is
+ * half the bar wide, and two 55 px buttons squeezed the count to nothing and
+ * the +/- icons to dots. Compact buttons, a count that can't collapse, and
+ * a date that keeps its full text.
+ */
+.yatra-mobile-booking-field {
+    gap: 4px;
+    padding: 0 6px;
+}
+.yatra-mobile-booking-field .yatra-mobile-quantity-controls {
+    flex: 1 1 auto;
+    min-width: 0;
+    justify-content: space-between;
+    gap: 4px;
+}
+.yatra-mobile-booking-field .yatra-mobile-quantity-btn {
+    flex: 0 0 36px;
+    width: 36px;
+    min-width: 36px;
+    height: 36px;
+    padding: 0;
+}
+.yatra-mobile-booking-field .yatra-mobile-quantity-btn svg {
+    display: block;
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+}
+.yatra-mobile-booking-field .yatra-mobile-quantity-input {
+    flex: 0 1 36px;
+    width: 36px;
+    min-width: 24px;
+    max-width: 44px;
+    padding: 0;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+.yatra-mobile-booking-field .yatra-mobile-quantity-input::-webkit-inner-spin-button,
+.yatra-mobile-booking-field .yatra-mobile-quantity-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/*
+ * Stars beside "No reviews yet" / the review count: these are text glyphs,
+ * but the listing filter's 12 px star box (listing.css, loaded on trip pages
+ * too) squeezed them so they overlapped each other and the text.
+ */
+.yatra-hero-rating .yatra-rating-stars {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+.yatra-rating-stars > .yatra-star:not(:has(svg)) {
+    width: auto;
+    height: auto;
+}
+
+/* The sticky bar's date ("2026-11-28") was cut to "2026-11…" by the field's side padding. */
+.yatra-mobile-sticky-sidebar .yatra-mobile-date-btn input:not([type="hidden"]) {
+    padding-left: 6px;
+    padding-right: 6px;
+    min-width: 0;
+    text-overflow: clip;
+}
+
+/* Narrow phones (360 px): drop the decorative people icon so + stays clear of the close button. */
+@media (max-width: 380px) {
+    .yatra-mobile-booking-field:has(.yatra-mobile-quantity-controls) > .yatra-mobile-field-icon {
+        display: none;
+    }
+    .yatra-mobile-sticky-sidebar .yatra-mobile-date-btn .yatra-mobile-arrow {
+        display: none;
+    }
+    .yatra-mobile-booking-field .yatra-mobile-quantity-btn {
+        flex-basis: 32px;
+        width: 32px;
+        min-width: 32px;
+        height: 32px;
+        min-height: 32px;
+    }
+}
+
+/* Dark mode: the traveller field turns dark, so the count turns light. */
+@media (prefers-color-scheme: dark) {
+    .yatra-mobile-booking-field .yatra-mobile-quantity-input {
+        color: #f9fafb;
     }
 }

@@ -18,6 +18,8 @@ if (!defined('ABSPATH')) {
 
     // Pro: check whether this trip has booking disabled (enquiry-only mode)
     $booking_disabled = method_exists($trip, 'isBookingDisabled') && $trip->isBookingDisabled();
+    // Custom booking link (3.3): the trip is booked on another site.
+    $external_booking_url = method_exists($trip, 'getExternalBookingUrl') ? $trip->getExternalBookingUrl() : '';
 
     // Pricing — resolved via centralized TripPricingService (single source of truth)
     // SingleTripController pre-computes effective_price_min, min_category_original_price, max_discount_percentage
@@ -120,6 +122,33 @@ if (!defined('ABSPATH')) {
         yatra_get_template('partials/single-trip/ai-chat-widget', ['trip' => $trip]);
         ?>
     </div>
+    <?php elseif ($external_booking_url !== ''): ?>
+    <div class="yatra-booking-card yatra-external-booking-card">
+        <div class="yatra-booking-price">
+            <div class="yatra-booking-price-main">
+                <?php if ($pricing['has_price']): ?>
+                    <span class="yatra-booking-price-label-top"><?php echo esc_html__('From', 'yatra'); ?></span>
+                    <?php if ($pricing['has_discount'] && !empty($pricing['original_price']) && $show_strike_original_sidebar): ?>
+                        <span class="yatra-booking-price-original"><?php echo esc_html($pricing['original_price']); ?></span>
+                    <?php endif; ?>
+                    <span class="yatra-booking-price-amount" id="display-price"><?php echo esc_html($pricing['current_price']); ?></span>
+                    <span class="yatra-booking-price-label" data-price-unit="<?php echo esc_attr($pricing['price_unit']); ?>"><?php echo esc_html($pricing['price_unit_label']); ?></span>
+                <?php endif; ?>
+            </div>
+        </div>
+        <a class="yatra-booking-button yatra-external-booking-button" style="margin-top:12px;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;"
+           href="<?php echo esc_url($external_booking_url); ?>"
+           <?php echo $trip->opensExternalBookingInNewTab() ? 'target="_blank" rel="noopener"' : ''; ?>>
+            <?php echo esc_html($trip->getExternalBookingLabel()); ?>
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 3h7v7m0-7L10 14M5 5h4M5 5v14h14v-4"/></svg>
+        </a>
+        <?php if ($trip->opensExternalBookingInNewTab()): ?>
+            <p class="yatra-external-booking-note" style="margin:8px 0 0;font-size:0.8rem;opacity:0.75;text-align:center;"><?php esc_html_e('Opens in a new tab.', 'yatra'); ?></p>
+        <?php endif; ?>
+        <button type="button" class="yatra-text-button" style="margin-top:8px;width:100%;background:none;border:0;text-decoration:underline;cursor:pointer;color:inherit;" onclick="window.YatraEnquiry?.open?.(); return false;">
+            <?php echo esc_html__('Send Enquiry', 'yatra'); ?>
+        </button>
+    </div>
     <?php else: ?>
     <div class="yatra-booking-card">
 
@@ -160,6 +189,32 @@ if (!defined('ABSPATH')) {
                     <span class="yatra-booking-price-amount yatra-contact-pricing" id="display-price"><?php echo esc_html__('Contact for pricing', 'yatra'); ?></span>
                 <?php endif; ?>
             </div>
+            <?php
+            // Per-person price by group size (3.3).
+            $yatra_group_tiers = class_exists('\\Yatra\\Services\\GroupPriceTierService') ? \Yatra\Services\GroupPriceTierService::tiers((int) $trip->getId(), $trip) : [];
+            if (!empty($yatra_group_tiers)) : ?>
+                <div class="yatra-group-tiers" style="margin-top:10px;font-size:0.85rem;">
+                    <div style="font-weight:600;margin-bottom:4px;"><?php esc_html_e('Price per person by group size', 'yatra'); ?></div>
+                    <ul style="list-style:none;margin:0;padding:0;">
+                        <?php foreach ($yatra_group_tiers as $yatra_tier) : ?>
+                            <li style="display:flex;justify-content:space-between;gap:8px;padding:2px 0;border-bottom:1px dashed #e5e7eb;">
+                                <span><?php echo esc_html(\Yatra\Services\GroupPriceTierService::tierLabel($yatra_tier)); ?></span>
+                                <strong><?php echo esc_html(wp_strip_all_tags((string) yatra_format_price($yatra_tier['price']))); ?></strong>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            <?php endif; ?>
+            <?php
+            /**
+             * Below the price on the trip page's booking card (e.g. Yatra Pro's
+             * countdown and "booked N times" badge).
+             *
+             * @param \Yatra\Models\Trip $trip
+             * @since 3.3.0
+             */
+            do_action('yatra_trip_sidebar_after_price', $trip);
+            ?>
         </div>
 
         <?php if ($trip->getBookingMode() === 'date_specific' && $has_availability): ?>
@@ -542,4 +597,13 @@ if (!defined('ABSPATH')) {
             </form>
     </div>
     <?php endif; // end else (booking not disabled) ?>
+    <?php
+    /**
+     * After the trip page's booking card (e.g. the weather forecast).
+     *
+     * @param \Yatra\Models\Trip $trip
+     * @since 3.3.0
+     */
+    do_action('yatra_trip_sidebar_after_card', $trip);
+    ?>
 </aside>

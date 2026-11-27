@@ -218,6 +218,15 @@ class EnquiryController extends BaseController
             ], 400);
         }
 
+        // The operator's own questions (3.3): checked here, on the public form
+        // only, and appended to the message.
+        if (is_array($data) && class_exists(\Yatra\Services\EnquiryCustomFields::class)) {
+            $data = \Yatra\Services\EnquiryCustomFields::applyToSubmission($data);
+            if (is_string($data)) {
+                return new WP_REST_Response(['success' => false, 'message' => $data], 400);
+            }
+        }
+
         $result = $this->enquiryService->createEnquiry($data);
 
         if (!$result['success']) {

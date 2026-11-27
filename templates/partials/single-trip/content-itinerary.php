@@ -19,6 +19,15 @@ if (!defined('ABSPATH')) {
                 </svg>
                 <span class="toggle-text"><?php echo esc_html__('Expand All', 'yatra'); ?></span>
             </button>
+            <?php
+            /**
+             * Extra buttons beside "Expand All" in the itinerary section.
+             *
+             * @since 3.3.0
+             * @param object $trip The trip.
+             */
+            do_action('yatra_trip_itinerary_actions', $trip);
+            ?>
         </div>
     </div>
 
@@ -50,6 +59,14 @@ if (!defined('ABSPATH')) {
     ];
     ?>
 
+    <?php
+    // Altitude profile (3.3): when two or more days have a highest altitude.
+    if (!empty($itinerary_days) && class_exists('\\Yatra\\Services\\AltitudeChart')) {
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built from escaped parts.
+        echo \Yatra\Services\AltitudeChart::render($itinerary_days);
+    }
+    ?>
+
     <div class="yatra-itinerary-timeline">
         <?php if (empty($itinerary_days)): ?>
             <div class="yatra-empty-itinerary">
@@ -67,6 +84,12 @@ if (!defined('ABSPATH')) {
                 <div class="yatra-itinerary-day-header">
                     <div class="yatra-day-badge"><?php esc_html_e('Day', 'yatra'); ?> <?php echo esc_html($day['day']); ?></div>
                     <h3 class="yatra-day-title"><?php echo esc_html($day['day_title']); ?></h3>
+                    <?php if (isset($day['altitude']) && is_numeric($day['altitude']) && class_exists('\\Yatra\\Services\\AltitudeChart')): ?>
+                        <span class="yatra-day-altitude" title="<?php echo esc_attr(sprintf(/* translators: %s: altitude in feet */ __('%s ft', 'yatra'), number_format_i18n(\Yatra\Services\AltitudeChart::feet((int) $day['altitude'])))); ?>" style="font-size:0.85em;opacity:0.75;white-space:nowrap;margin-left:auto;margin-right:8px;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="vertical-align:-1px;"><path d="M12 3l9 17H3z"/></svg>
+                            <?php echo esc_html(\Yatra\Services\AltitudeChart::label((int) $day['altitude'])); ?>
+                        </span>
+                    <?php endif; ?>
                     <button type="button" class="yatra-day-toggle" aria-expanded="<?php echo (int) $idx === 0 ? 'true' : 'false'; ?>">
                         <svg class="yatra-chevron-icon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>

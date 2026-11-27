@@ -139,6 +139,10 @@ yatra_get_header();
                         // Destination is a stdClass from repository
                         $name        = isset($destination->name) ? $destination->name : '';
                         $description = isset($destination->description) ? $destination->description : '';
+                        if (function_exists('yatra_translate_term_name')) {
+                            $name = yatra_translate_term_name((string) $name);
+                            $description = yatra_translate_term_name((string) $description);
+                        }
 
                         // Resolve image/icon from the stored icon field when possible.
                         $image_url  = '';

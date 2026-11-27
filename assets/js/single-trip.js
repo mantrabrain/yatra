@@ -444,7 +444,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // The total price display is no longer shown in the sidebar
         // This code is kept for reference but will not execute as totalAmountElement is null
         if (totalAmountElement) {
-            totalAmountElement.textContent = (window.yatraTripData?.currencySymbol || '$') + finalTotal.toFixed(2);
+            totalAmountElement.textContent = typeof window.yatra_format_price_js === 'function' ? window.yatra_format_price_js(finalTotal) : (window.yatraTripData?.currencySymbol || '$') + finalTotal.toFixed(2);
         }
         
         // Show/hide group discount indicator

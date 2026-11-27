@@ -7,6 +7,7 @@ import { Modal } from "./ui/modal";
 import { __ } from "../lib/i18n";
 import { todayYmd } from "../lib/dateFormat";
 import { apiService } from "../lib/api-client";
+import WteImport from "./tools/WteImport";
 import {
   Download,
   Upload,
@@ -1297,8 +1298,23 @@ const Tools: React.FC = () => {
               <Database className="w-5 h-5" />
               <span>Migration</span>
             </button>
+            <button
+              onClick={() => setActiveTab("wte-import")}
+              data-testid="tools-tab-wte-import"
+              className={`flex-1 py-3 px-6 rounded-md font-medium text-sm flex items-center justify-center gap-3 transition-all duration-200 ${
+                activeTab === "wte-import"
+                  ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 shadow-sm"
+                  : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+              }`}
+            >
+              <Upload className="w-5 h-5" />
+              <span className="whitespace-nowrap">{__("WP Travel Engine", "yatra")}</span>
+            </button>
           </nav>
         </div>
+
+        {/* Import from WP Travel Engine Tab */}
+        {activeTab === "wte-import" && <WteImport />}
 
         {/* Export/Import Tab */}
         {activeTab === "export-import" && (

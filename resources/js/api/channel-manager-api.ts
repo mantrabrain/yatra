@@ -51,6 +51,15 @@ export interface ChannelRow {
   settings: Record<string, unknown>;
   credentials?: Record<string, { configured: boolean; hint: string }>;
   health?: ChannelHealth;
+  /** GetYourGuide: what GetYourGuide uses to call this site. */
+  gyg_supplier?: GygSupplierCredentials;
+}
+
+export interface GygSupplierCredentials {
+  base_url: string;
+  user: string;
+  password: string;
+  configured: boolean;
 }
 
 export interface MappingRow {
@@ -142,6 +151,11 @@ export const channelManagerApi = {
       credentials: Record<string, { configured: boolean; hint: string }>;
       message: string;
     }>,
+
+  gygCredentials: (id: number, action: "reveal" | "rotate") =>
+    apiClient.post(`/channel-manager/channels/${id}/gyg-credentials`, {
+      action,
+    }) as Promise<{ data: GygSupplierCredentials; message: string }>,
 
   testConnection: (id: number) =>
     apiClient.post(

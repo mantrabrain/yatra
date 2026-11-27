@@ -51,6 +51,9 @@ if ($expand) {
         <?php
         $val = $row['value'] ?? '';
         $label = isset($row['label']) ? (string) $row['label'] : '';
+        if (function_exists('yatra_translate_term_name')) {
+            $label = yatra_translate_term_name($label);
+        }
         $more_class = $idx >= $cap ? ' yatra-filter-option-more' : '';
         $attr_val = is_scalar($val) ? (string) $val : '';
         ?>

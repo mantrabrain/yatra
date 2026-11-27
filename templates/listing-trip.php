@@ -851,6 +851,7 @@ $yatra_listing_layout_class = \Yatra\Providers\FrontendAssetsProvider::listingLa
                         </div>
                     <?php endif; ?>
 
+                    <?php if ((int) ($yatra_pagination['total_pages'] ?? $trip_total_pages) > 1) : // Nothing to page through on one page. ?>
                     <div class="yatra-listing-pagination yatra-listing-pagination--trip-content">
                         <?php
                         $prev_url = $yatra_pagination['prev_url'] ?? null;
@@ -876,6 +877,7 @@ $yatra_listing_layout_class = \Yatra\Providers\FrontendAssetsProvider::listingLa
                             <?php echo yatra_svg_icon('chevron-right', 'yatra-btn-icon'); ?>
                         </a>
                     </div>
+                    <?php endif; ?>
                 </main>
             </div>
         </div>

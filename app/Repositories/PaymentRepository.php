@@ -97,8 +97,10 @@ class PaymentRepository extends BaseRepository
         $per_page = max(1, min(100, (int) ($filters['per_page'] ?? 20)));
         $offset = ($page - 1) * $per_page;
 
-        // Build WHERE clause
-        $where_clauses = ['1=1'];
+        // Build WHERE clause. Payments of a deleted booking stay in the table
+        // (money records are never destroyed) but are not listed: they have no
+        // booking to open, customer or trip to show.
+        $where_clauses = ['(p.booking_id IS NULL OR p.booking_id = 0 OR b.id IS NOT NULL)'];
         $where_values = [];
 
         if (!empty($filters['booking_id'])) {
@@ -289,7 +291,10 @@ class PaymentRepository extends BaseRepository
         $table = $this->getTableName();
 
         $query = $this->wpdb->prepare(
-            "SELECT * FROM {$table} WHERE transaction_id = %s",
+            // Oldest first: when one payment pays several bookings (one checkout,
+            // several trips) every booking has a row with this id, and the first
+            // is the booking the gateway charged.
+            "SELECT * FROM {$table} WHERE transaction_id = %s ORDER BY id ASC LIMIT 1",
             sanitize_text_field($transactionId)
         );
 

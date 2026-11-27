@@ -45,7 +45,7 @@ class BookingConfirmationPageHandler extends BasePageHandler
         ]);
 
         // Set up global booking object
-        $this->setGlobal('yatra_booking', $booking);
+        $this->setGlobal('yatra_booking', self::inVisitorLanguage($booking));
 
         // Set up query vars for backward compatibility
         $this->setQueryVars([
@@ -78,7 +78,7 @@ class BookingConfirmationPageHandler extends BasePageHandler
                     $reloaded = $bookingRepo->findByConfirmationSegment($confirmation_id);
                     if ($reloaded) {
                         $booking = $reloaded;
-                        $this->setGlobal('yatra_booking', $booking);
+                        $this->setGlobal('yatra_booking', self::inVisitorLanguage($booking));
                         $this->setQueryVars([
                             'yatra_booking_confirmation' => $confirmation_id,
                             'yatra_booking' => $booking,
@@ -90,6 +90,83 @@ class BookingConfirmationPageHandler extends BasePageHandler
             }
         }
 
+        $booking = $this->confirmRedirectGatewayReturn($booking, $bookingRepo, (string) $confirmation_id);
+
         return $this->selectTemplate('booking-confirmation', null, 'booking-confirmation');
+    }
+
+    /**
+     * A customer back from a redirect gateway (Mollie, Paystack, …) lands
+     * here, and nothing else records the payment if the gateway's webhook
+     * can't reach the site (or is late). Ask the gateway about the payment
+     * started at checkout and record it before the page renders.
+     *
+     * Only for gateways that declare it (`confirmsOnReturn()`), so PayPal,
+     * Stripe and offline methods keep their own paths. Every check of the
+     * public confirm endpoint applies, and a recorded payment is never
+     * recorded twice. At most one lookup per booking every 20 seconds.
+     */
+    private function confirmRedirectGatewayReturn(object $booking, BookingRepository $bookingRepo, string $confirmationId): object
+    {
+        try {
+            $gatewayId = sanitize_key((string) ($booking->payment_gateway ?? ''));
+            $sessionId = trim((string) ($booking->payment_session_id ?? ''));
+            if ($gatewayId === '' || $sessionId === '' || (string) ($booking->payment_status ?? '') === 'paid'
+                || !class_exists('\\Yatra\\PaymentGateways\\PaymentGatewayRegistry')) {
+                return $booking;
+            }
+
+            $gateway = \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance()->get($gatewayId);
+            if (!$gateway || !method_exists($gateway, 'confirmsOnReturn') || !$gateway->confirmsOnReturn()) {
+                return $booking;
+            }
+
+            $throttle = 'yatra_return_check_' . (int) $booking->id;
+            if (get_transient($throttle)) {
+                return $booking;
+            }
+            set_transient($throttle, 1, 20);
+
+            $controller = new \Yatra\Controllers\PaymentGatewayController();
+            if (!$controller->confirmVerifiedGatewayPayment($gatewayId, $sessionId, (int) $booking->id)) {
+                return $booking;
+            }
+
+            $reloaded = $bookingRepo->findByConfirmationSegment($confirmationId);
+            if ($reloaded) {
+                $booking = $reloaded;
+                $this->setGlobal('yatra_booking', self::inVisitorLanguage($booking));
+                $this->setQueryVars([
+                    'yatra_booking_confirmation' => $confirmationId,
+                    'yatra_booking' => $booking,
+                ]);
+            }
+        } catch (\Throwable $e) {
+            // Best effort: the page still renders; the webhook can reconcile.
+        }
+
+        return $booking;
+    }
+
+    /**
+     * The booking as shown on the confirmation page: the trip title in the
+     * visitor's language (WPML / Polylang).
+     *
+     * @param mixed $booking
+     * @return mixed
+     */
+    private static function inVisitorLanguage($booking)
+    {
+        if (!is_object($booking) || empty($booking->trip_title) || empty($booking->trip_id)
+            || !class_exists(\Yatra\Multilingual\Multilingual::class) || !\Yatra\Multilingual\Multilingual::isTranslating()) {
+            return $booking;
+        }
+        $copy = clone $booking;
+        $copy->trip_title = \Yatra\Multilingual\Multilingual::translate(
+            (string) $booking->trip_title,
+            \Yatra\Multilingual\TripStrings::hint((int) $booking->trip_id, 'title')
+        );
+
+        return $copy;
     }
 }

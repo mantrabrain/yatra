@@ -119,6 +119,12 @@ class AdminAssetsProvider
             'webhooksEnabled' => class_exists('\\Yatra\\Core\\Modules\\ModuleManager')
                 ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('webhooks')
                 : false,
+            'travelAgencyEnabled' => class_exists('\\Yatra\\Core\\Modules\\ModuleManager')
+                ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('travel_agency')
+                : false,
+            'guidesResourcesEnabled' => class_exists('\\Yatra\\Core\\Modules\\ModuleManager')
+                ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('guides_resources')
+                : false,
             // Settings → Pricing (Discount Stacking) drives off these
             // two. Setting them here (free plugin, AdminAssetsProvider)
             // matches the pattern used by every other Pro-module flag
@@ -142,6 +148,11 @@ class AdminAssetsProvider
             'countries' => class_exists('\\Yatra\\Helpers\\FormatHelper')
                 ? \Yatra\Helpers\FormatHelper::getCountries()
                 : [],
+            // The booking screen asks Trip Consent for a booking's signatures only
+            // when the module is on (its route doesn't exist otherwise → 404s).
+            'tripConsentEnabled' => class_exists('\\Yatra\\Core\\Modules\\ModuleManager')
+                ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('trip_consent')
+                : false,
             'customLandingPagesModuleEnabled' => class_exists('\\Yatra\\Core\\Modules\\ModuleManager')
                 ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('custom_landing_pages')
                 : false,

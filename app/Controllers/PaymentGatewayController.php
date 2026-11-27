@@ -570,7 +570,12 @@ class PaymentGatewayController extends BaseController
         }
 
         $bookingUserId = (int) ($booking->user_id ?? 0);
-        if ($bookingUserId > 0) {
+        // Paying from a payment link (the link was checked when the balance
+        // checkout started): the payer needn't be logged in as the owner.
+        $viaPaymentLink = function_exists('yatra_get_remaining_session')
+            && (int) yatra_get_remaining_session('booking_id', 0) === (int) $booking->id
+            && (string) yatra_get_remaining_session('payment_link_id', '') !== '';
+        if ($bookingUserId > 0 && !$viaPaymentLink) {
             $currentUserId = (int) get_current_user_id();
             if ($currentUserId !== $bookingUserId && !current_user_can('manage_options')) {
                 return new WP_Error('forbidden', __('You do not have permission to confirm this payment.', 'yatra'), ['status' => 403]);
@@ -818,6 +823,67 @@ class PaymentGatewayController extends BaseController
     }
 
     /**
+     * Credit a payment that a redirect gateway (Mollie, Paystack, …) reports
+     * for a booking: when the customer comes back from the gateway, or when
+     * the gateway's webhook arrives.
+     *
+     * Runs exactly the checks of the public confirm endpoint — the gateway is
+     * asked for the payment, which must be completed, made for this booking,
+     * in its currency, for a real amount, and not recorded before under any
+     * of its ids — and records it the same way. Safe to call repeatedly.
+     *
+     * @return bool True when the payment is (now or already) recorded.
+     */
+    public function confirmVerifiedGatewayPayment(string $gatewayId, string $transactionId, int $bookingId): bool
+    {
+        $gatewayId = sanitize_key($gatewayId);
+        $transactionId = sanitize_text_field($transactionId);
+        if ($gatewayId === '' || $transactionId === '' || $bookingId <= 0) {
+            return false;
+        }
+
+        $gateway = $this->registry->get($gatewayId);
+        if (!$gateway || $gateway->isOffline()) {
+            return false;
+        }
+
+        $booking = $this->bookingRepository->find($bookingId);
+        if (!$booking) {
+            return false;
+        }
+
+        $existing = $this->paymentRepository->findByTransactionId($transactionId);
+        if ($existing) {
+            return (int) ($existing->booking_id ?? 0) === $bookingId;
+        }
+
+        try {
+            $result = method_exists($gateway, 'verifyPaymentForBooking')
+                ? $gateway->verifyPaymentForBooking($transactionId, $bookingId)
+                : $gateway->verifyPayment($transactionId);
+        } catch (\Throwable $e) {
+            return false;
+        }
+
+        if (empty($result['success']) || $this->paymentRefusal($result, $booking, $gatewayId, $transactionId) !== null) {
+            return false;
+        }
+
+        $this->handle_successful_payment(
+            $bookingId,
+            $gatewayId,
+            self::canonicalTransactionId($result, $transactionId),
+            isset($result['amount']) ? (float) $result['amount'] : null,
+            isset($result['currency']) ? (string) $result['currency'] : null,
+            null,
+            null,
+            self::transactionIds($result, $transactionId)
+        );
+
+        return true;
+    }
+
+    /**
      * Get payment status
      *
      * Endpoint is public (`__return_true` permission) so guest checkouts can poll. Authorisation
@@ -930,6 +996,11 @@ class PaymentGatewayController extends BaseController
             }
         }
 
+        // One payment for several bookings (Pro multi-trip cart): this
+        // booking keeps its own part; the rest is recorded on the others below.
+        $shares = \Yatra\Services\PaymentAllocationService::allocate($bookingId, (float) $paid_amount);
+        $paid_amount = $shares[$bookingId];
+
         $payment_data = [
             'booking_id' => $bookingId,
             'gateway' => $gateway,
@@ -979,6 +1050,11 @@ class PaymentGatewayController extends BaseController
         if (function_exists('yatra_has_remaining_session') && yatra_has_remaining_session()) {
             yatra_clear_remaining_session();
         }
+
+        \Yatra\Services\PaymentAllocationService::creditOthers($shares, $bookingId, $gateway, $transactionId, (string) $payment_currency, array_filter([
+            'customer_id' => $customerId,
+            'payment_method_id' => $paymentMethodId,
+        ]));
 
         do_action('yatra_payment_completed', $bookingId, $gateway, $transactionId, [
             'amount' => $paid_amount,

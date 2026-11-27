@@ -635,11 +635,32 @@ class TripController extends BaseController
                 'id' => $id,
                 'message' => __('Trip created successfully', 'yatra'),
             ], 201);
+        } catch (ValidationException $e) {
+            // Say which field is wrong instead of a bare 500.
+            return $this->tripValidationError($e);
         } catch (\InvalidArgumentException $e) {
             return $this->error_response($e->getMessage(), $e->getCode() >= 400 ? $e->getCode() : 400);
         } catch (\Exception $e) {
             return $this->handle_exception($e);
         }
+    }
+
+    /**
+     * 422 naming each invalid field, e.g. "Price: Price must be a positive number".
+     */
+    private function tripValidationError(ValidationException $e): \WP_Error
+    {
+        $messages = [];
+        foreach ($e->getErrors() as $field => $fieldErrors) {
+            foreach ((array) $fieldErrors as $msg) {
+                $messages[] = (string) $msg;
+            }
+        }
+        $message = $messages !== []
+            ? implode(' ', array_unique($messages))
+            : ($e->getMessage() !== '' ? $e->getMessage() : __('Please check the trip details and try again.', 'yatra'));
+
+        return $this->validation_error($message, $e->getErrors());
     }
 
     /**
@@ -770,6 +791,9 @@ class TripController extends BaseController
             $prepared = $this->prepare_item_for_response($trip, $request);
 
             return $this->success_response($prepared, 200);
+        } catch (ValidationException $e) {
+            // Say which field is wrong instead of a bare 500.
+            return $this->tripValidationError($e);
         } catch (\InvalidArgumentException $e) {
             return $this->error_response($e->getMessage(), 400);
         } catch (\Exception $e) {
@@ -1943,14 +1967,14 @@ class TripController extends BaseController
 
                 $departure_date = strtotime($avail->departure_date);
                 
-                // Check booking cutoff - show all dates regardless of cutoff time
-                $cutoff_hours = (int) ($avail->cutoff_hours ?? 24); // Default 24 hours before
-                $departure_time_str = !empty($avail->departure_time) ? $avail->departure_time : '00:00:00';
-                $departure_datetime = strtotime($avail->departure_date . ' ' . $departure_time_str);
-                $cutoff_datetime = $departure_datetime - ($cutoff_hours * 3600);
-                
-                // Show all dates even if past cutoff time
-                $is_past_cutoff = $current_time > $cutoff_datetime;
+                // Booking cutoff: hours before departure when bookings close.
+                $is_past_cutoff = \Yatra\Services\AvailabilityResolutionService::isPastBookingCutoff($avail, $current_time);
+                // Bookings for this date are closed ("Booking cutoff"): the
+                // checkout refuses them, so don't offer the date. (Recurring
+                // dates inside their cutoff were already left out.)
+                if ($is_past_cutoff) {
+                    continue;
+                }
                 
                 // Show all dates even if no seats available
                 $seats = (int) ($avail->seats_available ?? 0);

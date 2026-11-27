@@ -81,6 +81,8 @@ class BookingPageHandler extends BasePageHandler
                             'remaining_amount' => isset($rem['remaining_amount']) ? (float) $rem['remaining_amount'] : null,
                             'amount_paid' => isset($rem['amount_paid']) ? (float) $rem['amount_paid'] : null,
                             'total_amount' => isset($rem['total_amount']) ? (float) $rem['total_amount'] : null,
+                            'balance_due' => isset($rem['balance_due']) ? (float) $rem['balance_due'] : null,
+                            'is_payment_link' => !empty($rem['payment_link_id']),
                             'booking_reference' => $rem['booking_reference'] ?? '',
                             'booking_id' => (int) ($rem['booking_id'] ?? 0),
                             'is_remaining_payment' => true,
@@ -96,6 +98,15 @@ class BookingPageHandler extends BasePageHandler
                     $trip = $tripRepo->findPublished((int) $session['trip_id']);
                 } catch (\Throwable $e) {
                     $trip = null;
+                }
+                if (is_object($trip)) {
+                    /**
+                     * The trip shown on the checkout page (e.g. in the visitor's language).
+                     *
+                     * @param object $trip
+                     */
+                    $filtered = apply_filters('yatra_booking_page_trip', $trip);
+                    $trip = is_object($filtered) ? $filtered : $trip;
                 }
 
                 // Ensure trip has a price property for templates (centralized pricing)
@@ -253,6 +264,8 @@ class BookingPageHandler extends BasePageHandler
                     'total_amount' => $session['total_amount'] ?? null,
                     'amount_paid' => $session['amount_paid'] ?? null,
                     'remaining_amount' => $session['remaining_amount'] ?? null,
+                    'balance_due' => $session['balance_due'] ?? null,
+                    'is_payment_link' => !empty($session['is_payment_link']),
                     'booking_reference' => $session['booking_reference'] ?? null,
                     'is_remaining_payment' => !empty($session['is_remaining_payment']),
                     'existing_booking_id' => (int) ($session['booking_id'] ?? 0),

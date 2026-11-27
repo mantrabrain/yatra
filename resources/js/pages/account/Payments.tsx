@@ -10,17 +10,21 @@ import {
   Download,
 } from "lucide-react";
 import { __ } from "../../lib/i18n";
-import { formatDate, getBadge, getStatusLabel, currency } from "./utils";
+import { formatDate, getBadge, getStatusLabel, currency, commonCurrency } from "./utils";
 import { downloadInvoice, previewPaymentInvoice } from "./utils/downloads";
-import type { Payment } from "./types";
+import type { Booking, Payment } from "./types";
 
 interface PaymentsProps {
   payments: Payment[];
   onSectionChange: (section: string) => void;
+  /** The customer's bookings: the source of totals (a booking may have no payment yet). */
+  bookings?: Booking[];
 }
 
 function paymentTypeLabel(type: Payment["type"] | string): string {
   switch (type) {
+    case "refund":
+      return __("Refund", "yatra");
     case "deposit":
       return __("Deposit", "yatra");
     case "balance":
@@ -32,7 +36,7 @@ function paymentTypeLabel(type: Payment["type"] | string): string {
   }
 }
 
-const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
+const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange, bookings }) => {
   const displayPayments = payments;
 
   const bookingSummaries = React.useMemo(() => {
@@ -76,6 +80,19 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
   }, [displayPayments]);
 
   const paymentStats = React.useMemo(() => {
+    // Prefer the bookings: every booking counts, paid or not.
+    if (Array.isArray(bookings) && bookings.length > 0) {
+      const live = bookings.filter(
+        (b) => !["cancelled", "refunded", "failed"].includes(String((b as any).booking_status || "")),
+      );
+      return {
+        total: displayPayments.length,
+        paid: live.filter((b) => (Number(b.amount_due) || 0) <= 0).length,
+        pending: live.filter((b) => (Number(b.amount_due) || 0) > 0).length,
+        totalPaidAmount: bookings.reduce((s, b) => s + (Number(b.amount_paid) || 0), 0),
+        outstandingAmount: live.reduce((s, b) => s + (Number(b.amount_due) || 0), 0),
+      };
+    }
     const totals = bookingSummaries.reduce(
       (acc, summary) => {
         acc.totalAmount += summary.total;
@@ -104,7 +121,15 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
       totalPaidAmount: totals.paidAmount,
       outstandingAmount: totals.outstanding,
     };
-  }, [displayPayments, bookingSummaries]);
+  }, [displayPayments, bookingSummaries, bookings]);
+
+  const statsCurrency = React.useMemo(
+    () =>
+      commonCurrency(
+        Array.isArray(bookings) && bookings.length > 0 ? (bookings as any[]) : (displayPayments as any[]),
+      ),
+    [bookings, displayPayments],
+  );
 
   return (
     <div className="yatra-payments-page space-y-6">
@@ -155,7 +180,7 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
                 {paymentStats.paid}
               </p>
               <p className="text-xs text-gray-400 dark:text-gray-500">
-                {currency(paymentStats.totalPaidAmount)}
+                {currency(paymentStats.totalPaidAmount, statsCurrency)}
               </p>
             </div>
             <div className="p-2 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
@@ -185,7 +210,7 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
                 {__("Outstanding", "yatra")}
               </p>
               <p className="text-xl font-bold text-gray-900 dark:text-white">
-                {currency(paymentStats.outstandingAmount)}
+                {currency(paymentStats.outstandingAmount, statsCurrency)}
               </p>
             </div>
             <div className="p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
@@ -203,10 +228,9 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
             {__("No payments found", "yatra")}
           </p>
           <p className="text-sm text-gray-400 dark:text-gray-500">
-            {__(
-              "Payment history will appear here once you make a booking.",
-              "yatra",
-            )}
+            {Array.isArray(bookings) && bookings.length > 0
+              ? __("Payments you make on your bookings will appear here.", "yatra")
+              : __("Payment history will appear here once you make a booking.", "yatra")}
           </p>
         </div>
       ) : (
@@ -235,9 +259,15 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
               (bookingTotal !== null ? bookingTotal - paid : total - paid);
             const due = Math.max(0, dueRaw || 0);
             const canPayRemaining =
-              typeof payment.booking_id === "number" && due > 0.01;
+              typeof payment.booking_id === "number" &&
+              due > 0.01 &&
+              !["", "0", "no", false].includes(
+                (window as any).yatraAccountPage?.canPayOnline,
+              ); // wp_localize_script turns false into "" 
+            // A refund is money going back: no invoice or receipt for it.
+            const isRefund = Number(payment.amount) < 0 || (payment as any).type === "refund";
             const isPaid =
-              payment.status === "paid" || payment.status === "completed";
+              !isRefund && (payment.status === "paid" || payment.status === "completed");
             const isPending = payment.status === "pending";
 
             return (
@@ -301,7 +331,7 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
                         {__("Amount", "yatra")}
                       </p>
                       <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                        {currency(payment.amount)}
+                        {currency(payment.amount, payment.currency)}
                       </p>
                     </div>
                     <div>
@@ -310,7 +340,7 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
                         {__("Payment Method", "yatra")}
                       </p>
                       <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                        {payment.method}
+                        {payment.method_label || payment.method}
                       </p>
                     </div>
                     <div>

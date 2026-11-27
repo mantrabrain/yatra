@@ -5,6 +5,7 @@
  */
 
 import React, { useState } from "react";
+import { CsvExportButton } from "../components/common/CsvExportButton";
 import { useQuery } from "@tanstack/react-query";
 import { __ } from "../lib/i18n";
 import { formatDate as formatDateUtil } from "../lib/dateFormat";
@@ -378,6 +379,20 @@ const ViewDeparture: React.FC = () => {
               </CardDescription>
             </div>
             <div className="flex items-center gap-3">
+              {(departure.trip_id || trip.id) &&
+                (departure.date || departure.start_date) && (
+                  <CsvExportButton
+                    endpoint="/bookings/manifest"
+                    capability="yatra_export_bookings"
+                    label={__("Download manifest", "yatra")}
+                    testId="export-manifest"
+                    params={{
+                      departure_id: departure.id,
+                      trip_id: departure.trip_id || trip.id,
+                      date: String(departure.date || departure.start_date).slice(0, 10),
+                    }}
+                  />
+                )}
               <Badge
                 variant={
                   departure.status === "confirmed"

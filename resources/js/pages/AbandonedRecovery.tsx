@@ -148,7 +148,7 @@ const AbandonedRecoveryPage: React.FC<AbandonedRecoveryProps> = ({ tab }) => {
     tracking_enabled: true,
     first_email_delay_hours: 1,
     second_email_delay_hours: 24,
-    final_email_delay_hours: 72,
+    final_email_delay_hours: 48,
   });
   const [isSavingSettings, setIsSavingSettings] = useState(false);
 

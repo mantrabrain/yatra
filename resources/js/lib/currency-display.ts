@@ -46,13 +46,14 @@ export function applyCurrencyPosition(
   switch (mode) {
     case "right":
       return `${formattedAmount}${currencySymbol}`;
+    // A no-break space: "$ 2,300.00" must not wrap between symbol and amount.
     case "right_space":
-      return `${formattedAmount} ${currencySymbol}`;
+      return `${formattedAmount}\u00a0${currencySymbol}`;
     case "left":
       return `${currencySymbol}${formattedAmount}`;
     case "left_space":
     default:
-      return `${currencySymbol} ${formattedAmount}`;
+      return `${currencySymbol}\u00a0${formattedAmount}`;
   }
 }
 

@@ -1,59 +1,59 @@
 {
-  "_ApplicableTripSelector-D2QW_HaZ.js": {
-    "file": "dist/js/ApplicableTripSelector-D2QW_HaZ.js",
+  "_ApplicableTripSelector-BkIbjolj.js": {
+    "file": "dist/js/ApplicableTripSelector-BkIbjolj.js",
     "name": "ApplicableTripSelector",
     "imports": [
-      "_react-vendor-W-_yntDU.js",
-      "_index-BepRZmXV.js",
+      "_react-vendor-B8PqgpgO.js",
+      "_index-_dIN_405.js",
       "resources/js/main.tsx"
     ]
   },
-  "_BuildItineraryModal-YugDA9cT.js": {
-    "file": "dist/js/BuildItineraryModal-YugDA9cT.js",
+  "_BuildItineraryModal-CyDwNxlk.js": {
+    "file": "dist/js/BuildItineraryModal-CyDwNxlk.js",
     "name": "BuildItineraryModal",
     "imports": [
-      "_react-vendor-W-_yntDU.js",
-      "_index-BepRZmXV.js",
+      "_react-vendor-B8PqgpgO.js",
+      "_index-_dIN_405.js",
       "resources/js/main.tsx"
     ]
   },
-  "_ProFeature-eW2EIwqA.js": {
-    "file": "dist/js/ProFeature-eW2EIwqA.js",
+  "_ProFeature-BFaiH-dq.js": {
+    "file": "dist/js/ProFeature-BFaiH-dq.js",
     "name": "ProFeature",
     "imports": [
-      "_react-vendor-W-_yntDU.js",
+      "_react-vendor-B8PqgpgO.js",
       "resources/js/main.tsx",
-      "_index-BepRZmXV.js"
+      "_index-_dIN_405.js"
     ]
   },
-  "_RuleTypeSelectionModal-DSWZlmcG.js": {
-    "file": "dist/js/RuleTypeSelectionModal-DSWZlmcG.js",
+  "_RuleTypeSelectionModal-CfKT6tL0.js": {
+    "file": "dist/js/RuleTypeSelectionModal-CfKT6tL0.js",
     "name": "RuleTypeSelectionModal",
     "imports": [
-      "_react-vendor-W-_yntDU.js",
-      "_index-BepRZmXV.js",
+      "_react-vendor-B8PqgpgO.js",
+      "_index-_dIN_405.js",
       "resources/js/main.tsx"
     ]
   },
-  "_index-!~{00l}~.js": {
+  "_index-!~{00n}~.js": {
     "file": "admin/dist/css/index.css",
-    "src": "_index-!~{00l}~.js"
+    "src": "_index-!~{00n}~.js"
   },
-  "_index-BepRZmXV.js": {
-    "file": "dist/js/index-BepRZmXV.js",
+  "_index-_dIN_405.js": {
+    "file": "dist/js/index-_dIN_405.js",
     "name": "index",
     "imports": [
-      "_react-vendor-W-_yntDU.js"
+      "_react-vendor-B8PqgpgO.js"
     ],
     "css": [
       "admin/dist/css/index.css"
     ]
   },
-  "_module-skeleton-C9FJOcwf.js": {
-    "file": "dist/js/module-skeleton-C9FJOcwf.js",
+  "_module-skeleton-BUfnfMLm.js": {
+    "file": "dist/js/module-skeleton-BUfnfMLm.js",
     "name": "module-skeleton",
     "imports": [
-      "_react-vendor-W-_yntDU.js",
+      "_react-vendor-B8PqgpgO.js",
       "resources/js/main.tsx"
     ]
   },
@@ -61,18 +61,18 @@
     "file": "admin/dist/css/react-vendor.css",
     "src": "_react-vendor-!~{001}~.js"
   },
-  "_react-vendor-W-_yntDU.js": {
-    "file": "dist/js/react-vendor-W-_yntDU.js",
+  "_react-vendor-B8PqgpgO.js": {
+    "file": "dist/js/react-vendor-B8PqgpgO.js",
     "name": "react-vendor",
     "css": [
       "admin/dist/css/react-vendor.css"
     ]
   },
-  "_toggle-DcgGKLMp.js": {
-    "file": "dist/js/toggle-DcgGKLMp.js",
+  "_toggle-dqBoVrZd.js": {
+    "file": "dist/js/toggle-dqBoVrZd.js",
     "name": "toggle",
     "imports": [
-      "_react-vendor-W-_yntDU.js"
+      "_react-vendor-B8PqgpgO.js"
     ]
   },
   "resources/js/account-page.tsx": {
@@ -81,8 +81,8 @@
     "src": "resources/js/account-page.tsx",
     "isEntry": true,
     "imports": [
-      "_react-vendor-W-_yntDU.js",
-      "_index-BepRZmXV.js"
+      "_react-vendor-B8PqgpgO.js",
+      "_index-_dIN_405.js"
     ]
   },
   "resources/js/main.tsx": {
@@ -91,8 +91,8 @@
     "src": "resources/js/main.tsx",
     "isEntry": true,
     "imports": [
-      "_react-vendor-W-_yntDU.js",
-      "_index-BepRZmXV.js"
+      "_react-vendor-B8PqgpgO.js",
+      "_index-_dIN_405.js"
     ],
     "dynamicImports": [
       "resources/js/pages/TripForm.tsx",
@@ -105,6 +105,8 @@
       "resources/js/pages/Whatsapp.tsx",
       "resources/js/pages/ChannelManager.tsx",
       "resources/js/pages/Webhooks.tsx",
+      "resources/js/pages/TravelAgencies.tsx",
+      "resources/js/pages/GuidesResources.tsx",
       "resources/js/pages/ScheduledPayments.tsx",
       "resources/js/pages/TripConsentForm.tsx",
       "resources/js/pages/BookingForm.tsx",
@@ -118,214 +120,236 @@
     ]
   },
   "resources/js/pages/AbandonedRecovery.tsx": {
-    "file": "dist/js/AbandonedRecovery-a5eULyr-.js",
+    "file": "dist/js/AbandonedRecovery-B1EcHvJO.js",
     "name": "AbandonedRecovery",
     "src": "resources/js/pages/AbandonedRecovery.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-W-_yntDU.js",
+      "_react-vendor-B8PqgpgO.js",
       "resources/js/main.tsx",
-      "_index-BepRZmXV.js",
-      "_toggle-DcgGKLMp.js"
+      "_index-_dIN_405.js",
+      "_toggle-dqBoVrZd.js"
     ]
   },
   "resources/js/pages/AiAssistant.tsx": {
-    "file": "dist/js/AiAssistant-DONS3P3T.js",
+    "file": "dist/js/AiAssistant-B2LdNa4s.js",
     "name": "AiAssistant",
     "src": "resources/js/pages/AiAssistant.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-W-_yntDU.js",
-      "_index-BepRZmXV.js",
+      "_react-vendor-B8PqgpgO.js",
+      "_index-_dIN_405.js",
       "resources/js/main.tsx",
-      "_module-skeleton-C9FJOcwf.js"
+      "_module-skeleton-BUfnfMLm.js"
     ]
   },
   "resources/js/pages/AvailabilityForm.tsx": {
-    "file": "dist/js/AvailabilityForm-p5NPshvM.js",
+    "file": "dist/js/AvailabilityForm-BNi8_Do5.js",
     "name": "AvailabilityForm",
     "src": "resources/js/pages/AvailabilityForm.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-W-_yntDU.js",
+      "_react-vendor-B8PqgpgO.js",
       "resources/js/main.tsx",
-      "_index-BepRZmXV.js"
+      "_index-_dIN_405.js"
     ]
   },
   "resources/js/pages/BookingForm.tsx": {
-    "file": "dist/js/BookingForm-WRfLP_5t.js",
+    "file": "dist/js/BookingForm-CmqBWZis.js",
     "name": "BookingForm",
     "src": "resources/js/pages/BookingForm.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-W-_yntDU.js",
-      "_index-BepRZmXV.js",
+      "_react-vendor-B8PqgpgO.js",
+      "_index-_dIN_405.js",
       "resources/js/main.tsx"
     ]
   },
   "resources/js/pages/ChannelManager.tsx": {
-    "file": "dist/js/ChannelManager-Fb0ex6IR.js",
+    "file": "dist/js/ChannelManager-B6mfK3Vn.js",
     "name": "ChannelManager",
     "src": "resources/js/pages/ChannelManager.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-W-_yntDU.js",
-      "_index-BepRZmXV.js",
+      "_react-vendor-B8PqgpgO.js",
+      "_index-_dIN_405.js",
       "resources/js/main.tsx",
-      "_module-skeleton-C9FJOcwf.js"
+      "_module-skeleton-BUfnfMLm.js"
     ]
   },
   "resources/js/pages/DiscountForm.tsx": {
-    "file": "dist/js/DiscountForm-DEhimB0H.js",
+    "file": "dist/js/DiscountForm-DpP7G12z.js",
     "name": "DiscountForm",
     "src": "resources/js/pages/DiscountForm.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-W-_yntDU.js",
-      "_index-BepRZmXV.js",
+      "_react-vendor-B8PqgpgO.js",
+      "_index-_dIN_405.js",
       "resources/js/main.tsx",
-      "_ApplicableTripSelector-D2QW_HaZ.js"
+      "_ApplicableTripSelector-BkIbjolj.js"
     ]
   },
   "resources/js/pages/DynamicPricing.tsx": {
-    "file": "dist/js/DynamicPricing-PAm1uvCr.js",
+    "file": "dist/js/DynamicPricing-BObeBao8.js",
     "name": "DynamicPricing",
     "src": "resources/js/pages/DynamicPricing.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-W-_yntDU.js",
+      "_react-vendor-B8PqgpgO.js",
       "resources/js/main.tsx",
-      "_RuleTypeSelectionModal-DSWZlmcG.js",
-      "_toggle-DcgGKLMp.js",
-      "_index-BepRZmXV.js"
+      "_RuleTypeSelectionModal-CfKT6tL0.js",
+      "_toggle-dqBoVrZd.js",
+      "_index-_dIN_405.js"
     ]
   },
   "resources/js/pages/DynamicPricingRuleForm.tsx": {
-    "file": "dist/js/DynamicPricingRuleForm-BNVsNOcm.js",
+    "file": "dist/js/DynamicPricingRuleForm-DC20vKS8.js",
     "name": "DynamicPricingRuleForm",
     "src": "resources/js/pages/DynamicPricingRuleForm.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-W-_yntDU.js",
+      "_react-vendor-B8PqgpgO.js",
       "resources/js/main.tsx",
-      "_index-BepRZmXV.js",
-      "_RuleTypeSelectionModal-DSWZlmcG.js"
+      "_index-_dIN_405.js",
+      "_RuleTypeSelectionModal-CfKT6tL0.js"
+    ]
+  },
+  "resources/js/pages/GuidesResources.tsx": {
+    "file": "dist/js/GuidesResources-CaWOGsCi.js",
+    "name": "GuidesResources",
+    "src": "resources/js/pages/GuidesResources.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_react-vendor-B8PqgpgO.js",
+      "_index-_dIN_405.js",
+      "resources/js/main.tsx"
     ]
   },
   "resources/js/pages/Itinerary.tsx": {
-    "file": "dist/js/Itinerary-CF5aaNMY.js",
+    "file": "dist/js/Itinerary-BvJkY4oM.js",
     "name": "Itinerary",
     "src": "resources/js/pages/Itinerary.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-W-_yntDU.js",
-      "_index-BepRZmXV.js",
+      "_react-vendor-B8PqgpgO.js",
+      "_index-_dIN_405.js",
       "resources/js/main.tsx",
-      "_BuildItineraryModal-YugDA9cT.js"
+      "_BuildItineraryModal-CyDwNxlk.js"
     ]
   },
   "resources/js/pages/RecurringRuleForm.tsx": {
-    "file": "dist/js/RecurringRuleForm-DGAFIGuV.js",
+    "file": "dist/js/RecurringRuleForm-BnxXoSMZ.js",
     "name": "RecurringRuleForm",
     "src": "resources/js/pages/RecurringRuleForm.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-W-_yntDU.js",
-      "_index-BepRZmXV.js",
+      "_react-vendor-B8PqgpgO.js",
+      "_index-_dIN_405.js",
       "resources/js/main.tsx"
     ]
   },
   "resources/js/pages/Reports.tsx": {
-    "file": "dist/js/Reports-DJFFzVlx.js",
+    "file": "dist/js/Reports-d4B5rrDw.js",
     "name": "Reports",
     "src": "resources/js/pages/Reports.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-W-_yntDU.js",
-      "_index-BepRZmXV.js",
+      "_react-vendor-B8PqgpgO.js",
+      "_index-_dIN_405.js",
       "resources/js/main.tsx"
     ]
   },
   "resources/js/pages/ScheduledPayments.tsx": {
-    "file": "dist/js/ScheduledPayments-DdSUOyEb.js",
+    "file": "dist/js/ScheduledPayments-DH_Bdv_C.js",
     "name": "ScheduledPayments",
     "src": "resources/js/pages/ScheduledPayments.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-W-_yntDU.js",
-      "_index-BepRZmXV.js",
+      "_react-vendor-B8PqgpgO.js",
+      "_index-_dIN_405.js",
       "resources/js/main.tsx"
     ]
   },
   "resources/js/pages/Settings.tsx": {
-    "file": "dist/js/Settings-5xW46lQt.js",
+    "file": "dist/js/Settings-BWgByeyf.js",
     "name": "Settings",
     "src": "resources/js/pages/Settings.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-W-_yntDU.js",
-      "_index-BepRZmXV.js",
+      "_react-vendor-B8PqgpgO.js",
+      "_index-_dIN_405.js",
       "resources/js/main.tsx",
-      "_ProFeature-eW2EIwqA.js"
+      "_ProFeature-BFaiH-dq.js"
     ]
   },
   "resources/js/pages/Team.tsx": {
-    "file": "dist/js/Team-DyYUid5I.js",
+    "file": "dist/js/Team-B6pKe6iB.js",
     "name": "Team",
     "src": "resources/js/pages/Team.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-W-_yntDU.js",
-      "_index-BepRZmXV.js",
+      "_react-vendor-B8PqgpgO.js",
+      "_index-_dIN_405.js",
+      "resources/js/main.tsx"
+    ]
+  },
+  "resources/js/pages/TravelAgencies.tsx": {
+    "file": "dist/js/TravelAgencies-D2llVuvh.js",
+    "name": "TravelAgencies",
+    "src": "resources/js/pages/TravelAgencies.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_react-vendor-B8PqgpgO.js",
+      "_index-_dIN_405.js",
       "resources/js/main.tsx"
     ]
   },
   "resources/js/pages/TripConsentForm.tsx": {
-    "file": "dist/js/TripConsentForm-BAKrDitH.js",
+    "file": "dist/js/TripConsentForm-CzReTXGd.js",
     "name": "TripConsentForm",
     "src": "resources/js/pages/TripConsentForm.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-W-_yntDU.js",
+      "_react-vendor-B8PqgpgO.js",
       "resources/js/main.tsx",
-      "_index-BepRZmXV.js",
-      "_ApplicableTripSelector-D2QW_HaZ.js"
+      "_index-_dIN_405.js",
+      "_ApplicableTripSelector-BkIbjolj.js"
     ]
   },
   "resources/js/pages/TripForm.tsx": {
-    "file": "dist/js/TripForm-DLxDKlIL.js",
+    "file": "dist/js/TripForm-C-a3J5A9.js",
     "name": "TripForm",
     "src": "resources/js/pages/TripForm.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-W-_yntDU.js",
+      "_react-vendor-B8PqgpgO.js",
       "resources/js/main.tsx",
-      "_index-BepRZmXV.js",
-      "_BuildItineraryModal-YugDA9cT.js",
-      "_ProFeature-eW2EIwqA.js"
+      "_index-_dIN_405.js",
+      "_BuildItineraryModal-CyDwNxlk.js",
+      "_ProFeature-BFaiH-dq.js"
     ]
   },
   "resources/js/pages/ViewBooking.tsx": {
-    "file": "dist/js/ViewBooking-D0EgePSD.js",
+    "file": "dist/js/ViewBooking-WCU20PD1.js",
     "name": "ViewBooking",
     "src": "resources/js/pages/ViewBooking.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-W-_yntDU.js",
-      "_index-BepRZmXV.js",
+      "_react-vendor-B8PqgpgO.js",
+      "_index-_dIN_405.js",
       "resources/js/main.tsx"
     ]
   },
   "resources/js/pages/Webhooks.tsx": {
-    "file": "dist/js/Webhooks-CwK81HRm.js",
+    "file": "dist/js/Webhooks-ipRnYIaP.js",
     "name": "Webhooks",
     "src": "resources/js/pages/Webhooks.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-W-_yntDU.js",
-      "_index-BepRZmXV.js",
+      "_react-vendor-B8PqgpgO.js",
+      "_index-_dIN_405.js",
       "resources/js/main.tsx",
-      "_module-skeleton-C9FJOcwf.js"
+      "_module-skeleton-BUfnfMLm.js"
     ]
   },
   "resources/js/pages/Whatsapp.tsx": {
@@ -334,22 +358,22 @@
     "src": "resources/js/pages/Whatsapp.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-W-_yntDU.js",
-      "_index-BepRZmXV.js",
+      "_react-vendor-B8PqgpgO.js",
+      "_index-_dIN_405.js",
       "resources/js/main.tsx",
-      "_module-skeleton-C9FJOcwf.js"
+      "_module-skeleton-BUfnfMLm.js"
     ]
   },
   "resources/js/pages/WhiteLabel.tsx": {
-    "file": "dist/js/WhiteLabel-BzFhb8A5.js",
+    "file": "dist/js/WhiteLabel-DKz0zXt3.js",
     "name": "WhiteLabel",
     "src": "resources/js/pages/WhiteLabel.tsx",
     "isDynamicEntry": true,
     "imports": [
-      "_react-vendor-W-_yntDU.js",
-      "_index-BepRZmXV.js",
+      "_react-vendor-B8PqgpgO.js",
+      "_index-_dIN_405.js",
       "resources/js/main.tsx",
-      "_module-skeleton-C9FJOcwf.js"
+      "_module-skeleton-BUfnfMLm.js"
     ]
   }
 }

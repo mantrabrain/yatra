@@ -27,6 +27,10 @@ class AvailabilityResolutionService
     private BookingRepository $bookingRepository;
     private CalculationService $calculationService;
 
+    /** Date / time asked of resolveAvailabilityForDate(), for the trip-default object. */
+    private ?string $resolvingDate = null;
+    private ?string $resolvingTime = null;
+
     public function __construct()
     {
         // Use the new recurring availability rules engine (wp_yatra_trip_availability_rules).
@@ -39,6 +43,30 @@ class AvailabilityResolutionService
         $this->tripRepository = new TripRepository();
         $this->bookingRepository = new BookingRepository();
         $this->calculationService = new CalculationService();
+    }
+
+    /**
+     * Is this date inside its booking cutoff ("Booking Cutoff (hours before)"),
+     * i.e. closed for new bookings? Same rule as the trip page's date list.
+     *
+     * @param object $avail Resolved availability row (departure_date, departure_time, cutoff_hours).
+     */
+    public static function isPastBookingCutoff(object $avail, ?int $now = null, int $defaultHours = 24): bool
+    {
+        $date = (string) ($avail->departure_date ?? $avail->date ?? '');
+        if ($date === '') {
+            return false;
+        }
+        $hours = isset($avail->cutoff_hours) && $avail->cutoff_hours !== null && $avail->cutoff_hours !== ''
+            ? (int) $avail->cutoff_hours
+            : $defaultHours;
+        $time = !empty($avail->departure_time) ? (string) $avail->departure_time : '00:00:00';
+        $departure = strtotime($date . ' ' . $time);
+        if ($departure === false) {
+            return false;
+        }
+
+        return ($now ?? time()) > $departure - ($hours * 3600);
     }
 
     /**
@@ -55,6 +83,18 @@ class AvailabilityResolutionService
      * @return object Resolved availability data
      */
     public function resolveAvailabilityForDate(int $tripId, string $date, ?string $departureTime = null): object
+    {
+        $previous = [$this->resolvingDate, $this->resolvingTime];
+        $this->resolvingDate = $date;
+        $this->resolvingTime = $departureTime;
+        try {
+            return $this->resolveAvailabilityForDateInner($tripId, $date, $departureTime);
+        } finally {
+            [$this->resolvingDate, $this->resolvingTime] = $previous;
+        }
+    }
+
+    private function resolveAvailabilityForDateInner(int $tripId, string $date, ?string $departureTime = null): object
     {
         // Get trip data
         $trip = $this->tripRepository->find($tripId);
@@ -673,6 +713,11 @@ class AvailabilityResolutionService
                 
                 $avail->trip_id = (int) $trip->id;
                 $avail->departure_date = $departure_date;
+                // A single-date lookup keeps departure_date null (flexible
+                // booking); the date that was asked for is passed on for
+                // filters (e.g. Pro Private Trips). @since 3.3.0
+                $avail->requested_date = $departure_date ?: $this->resolvingDate;
+                $avail->requested_time = $departure_date ? null : $this->resolvingTime;
                 $avail->arrival_date = null;
                 $avail->return_date = null;
                 $avail->departure_time = $departure_time_value;
