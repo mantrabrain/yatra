@@ -169,8 +169,9 @@ class WeatherService
                 'code' => $code,
                 'label' => self::label($code),
                 'icon' => self::icon($code),
-                'max' => round((float) $max),
-                'min' => round((float) $min),
+                // "+ 0.0" turns a rounded -0.4 (-0) into 0, so it never shows as "-0°".
+                'max' => round((float) $max) + 0.0,
+                'min' => round((float) $min) + 0.0,
                 'rain' => is_numeric($rain) ? (int) $rain : null,
             ];
         }

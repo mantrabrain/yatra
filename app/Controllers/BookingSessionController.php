@@ -4173,6 +4173,19 @@ class BookingSessionController extends BaseController
             <p style="margin:0 0 8px;"><strong><?php esc_html_e('Duration', 'yatra'); ?>:</strong> <?php /* translators: 1: number of days, 2: number of nights. */
 echo esc_html(yatra_format_duration((int) $trip->duration_days, (int) $trip->duration_nights, (int) ($trip->duration_hours ?? 0))); ?></p>
             <p style="margin:0;"><strong><?php esc_html_e('Travelers', 'yatra'); ?>:</strong> <?php echo esc_html((string) count($travelers)); ?></p>
+            <?php
+            // The customer's checkout choices (3.3): pickup point, accommodation, travel insurance.
+            $email_pickup = class_exists('\\Yatra\\Services\\PickupPointService') ? \Yatra\Services\PickupPointService::forBooking($booking_id) : null;
+            $email_choices = class_exists('\\Yatra\\Services\\CheckoutChoiceService') ? \Yatra\Services\CheckoutChoiceService::forBooking($booking_id) : ['accommodation' => null, 'travel_insurance' => null];
+            if ($email_pickup !== null) : ?>
+                <p style="margin:8px 0 0;"><strong><?php esc_html_e('Pickup point', 'yatra'); ?>:</strong> <?php echo esc_html(\Yatra\Services\PickupPointService::label($email_pickup)); ?><?php echo $email_pickup['details'] !== '' ? ' — ' . esc_html($email_pickup['details']) : ''; ?></p>
+            <?php endif; ?>
+            <?php if ($email_choices['accommodation'] !== null) : ?>
+                <p style="margin:8px 0 0;"><strong><?php esc_html_e('Accommodation', 'yatra'); ?>:</strong> <?php echo esc_html($email_choices['accommodation']['name']); ?></p>
+            <?php endif; ?>
+            <?php if ($email_choices['travel_insurance'] !== null) : ?>
+                <p style="margin:8px 0 0;"><strong><?php echo esc_html($email_choices['travel_insurance']['title'] !== '' ? $email_choices['travel_insurance']['title'] : __('Travel insurance', 'yatra')); ?>:</strong> <?php echo esc_html(\Yatra\Services\CheckoutChoiceService::insuranceLabel($email_choices['travel_insurance'])); ?></p>
+            <?php endif; ?>
         </div>
         <h3 style="font-size:16px;"><?php esc_html_e('Payment details', 'yatra'); ?></h3>
         <p><?php /* translators: %s: total amount (formatted). */
@@ -4200,7 +4213,8 @@ echo esc_html(sprintf(__('Payment type: Partial — due now %1$s, remaining %2$s
                 'id' => $booking_id,
                 'reference' => $reference,
                 'amount_due' => $amount_due,
-                'currency' => (string) ($data['currency'] ?? ''),
+                // The booking's own currency, so only the accounts for it are listed.
+                'currency' => (string) (($data['currency'] ?? '') ?: ($GLOBALS['wpdb']->get_var($GLOBALS['wpdb']->prepare('SELECT currency FROM ' . \Yatra\Database\Tables\BookingsTable::getTableName() . ' WHERE id = %d', $booking_id)) ?: '')),
             ]);
             ?>
             <?php if (is_array($bank_instructions) && !empty($bank_instructions['rows'])) : ?>

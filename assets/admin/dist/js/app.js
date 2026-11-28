@@ -71965,7 +71965,8 @@ const BOOL_KEYS = /* @__PURE__ */ new Set([
   "email_template_abandoned_booking_recovery_first",
   "email_template_abandoned_booking_recovery_second",
   "email_template_abandoned_booking_recovery_final",
-  "smtp_enabled"
+  "smtp_enabled",
+  "email_show_logo"
 ]);
 const EMAIL_SETTINGS_DEFAULTS = {
   admin_email: "admin@wpyatra.com",

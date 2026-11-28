@@ -34,6 +34,7 @@ class SliceWPBridge
         add_action('yatra_checkout_booking_created', [self::class, 'onBookingCreated'], 20, 4);
         add_action('yatra_booking_status_changed', [self::class, 'onStatusChanged'], 20, 3);
         add_action('yatra_payment_completed', [self::class, 'onPayment'], 20, 1);
+        add_action('yatra_booking_payment_refunded', [self::class, 'onRefunded'], 20, 1);
         add_filter('slicewp_list_table_commissions_column_reference', [self::class, 'referenceLink'], 10, 2);
     }
 
@@ -159,6 +160,14 @@ class SliceWPBridge
         $bookingId = is_array($arg) ? (int) ($arg['booking_id'] ?? 0) : (int) $arg;
         if ($bookingId > 0) {
             self::sync($bookingId);
+        }
+    }
+
+    /** A full refund changes the payment status only, not the booking status. @param mixed $bookingId */
+    public static function onRefunded($bookingId): void
+    {
+        if ((int) $bookingId > 0) {
+            self::sync((int) $bookingId);
         }
     }
 

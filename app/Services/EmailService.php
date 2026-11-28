@@ -39,6 +39,9 @@ class EmailService
         // so "[Tom &amp; Jerry&#039;s]" reached customers literally.
         $subject = wp_specialchars_decode($subject, ENT_QUOTES);
 
+        // Logo and brand colour (Settings → Email, 3.3), for both the SMTP and the wp_mail path.
+        $message = EmailBranding::apply($message);
+
         // Check if SMTP is enabled
         $smtp_enabled = SettingsService::isEnabled('smtp_enabled');
         
@@ -128,9 +131,6 @@ class EmailService
         add_filter('wp_mail_from', [self::class, 'customFromEmail']);
         add_filter('wp_mail_from_name', [self::class, 'customFromName']);
         
-        // Logo and brand colour (Settings → Email, 3.3).
-        $message = EmailBranding::apply($message);
-
         $result = wp_mail($to, $subject, $message, $headers, $attachments);
         
         // Remove filters after sending

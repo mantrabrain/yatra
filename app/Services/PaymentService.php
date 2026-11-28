@@ -728,7 +728,18 @@ class PaymentService
         $wasReversed = $totals['refunded'] > 0 || ($totals['reversed'] ?? 0) > 0;
 
         if ($wasReversed && $totals['net'] <= 0.009) {
+            $before = $this->bookingRepository->find($bookingId);
             $this->bookingRepository->update($bookingId, ['payment_status' => 'refunded']);
+            if ($before && (string) ($before->payment_status ?? '') !== 'refunded') {
+                /**
+                 * A booking's money has all been sent back (its payment status just became
+                 * 'refunded'). The booking's own status is not changed by a refund.
+                 *
+                 * @since 3.3.0
+                 * @param int $bookingId
+                 */
+                do_action('yatra_booking_payment_refunded', $bookingId);
+            }
         }
     }
 

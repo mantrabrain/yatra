@@ -135,6 +135,7 @@ const BOOL_KEYS = new Set<keyof EmailSettingsValues>([
   "email_template_abandoned_booking_recovery_second",
   "email_template_abandoned_booking_recovery_final",
   "smtp_enabled",
+  "email_show_logo",
 ]);
 
 export const EMAIL_SETTINGS_DEFAULTS: EmailSettingsValues = {

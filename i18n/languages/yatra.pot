@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-27T13:41:53+00:00\n"
+"POT-Creation-Date: 2026-11-28T04:02:34+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
@@ -183,7 +183,7 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:840
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74257
+#: assets/admin/dist/js/app.js:74258
 #, js-format
 msgid "%d overrides →"
 msgstr ""
@@ -309,7 +309,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailAutomation.tsx:773
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75193
+#: assets/admin/dist/js/app.js:75194
 msgid "(Body not recorded for this log entry.)"
 msgstr ""
 
@@ -437,7 +437,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:973
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76305
+#: assets/admin/dist/js/app.js:76306
 msgid "(off)"
 msgstr ""
 
@@ -449,7 +449,7 @@ msgstr ""
 
 # Source: resources/js/components/ai/AiEmailTemplateModal.tsx:210, resources/js/components/ai/BuildItineraryModal.tsx:411, resources/js/components/ai/BuildItineraryModal.tsx:429, resources/js/pages/AvailabilityForm.tsx:748, resources/js/pages/AvailabilityForm.tsx:770
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75475
+#: assets/admin/dist/js/app.js:75476
 #: assets/dist/js/AvailabilityForm-BNi8_Do5.js:562
 #: assets/dist/js/AvailabilityForm-BNi8_Do5.js:579
 #: assets/dist/js/BuildItineraryModal-CyDwNxlk.js:317
@@ -498,7 +498,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:988
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76319
+#: assets/admin/dist/js/app.js:76320
 msgid "+ Add override"
 msgstr ""
 
@@ -602,7 +602,7 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:839
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74257
+#: assets/admin/dist/js/app.js:74258
 msgid "1 override →"
 msgstr ""
 
@@ -765,7 +765,7 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailOverrideCreateModal.tsx:276
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73654
+#: assets/admin/dist/js/app.js:73655
 msgid "A blank template"
 msgstr ""
 
@@ -800,7 +800,7 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailOverrideCreateModal.tsx:254
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73629
+#: assets/admin/dist/js/app.js:73630
 msgid "A copy of the global template"
 msgstr ""
 
@@ -891,7 +891,7 @@ msgstr ""
 # Source: resources/js/components/ai/AiEmailTemplateModal.tsx:87, resources/js/components/ai/AutoFillTripModal.tsx:306, resources/js/components/ai/BuildItineraryModal.tsx:154, resources/js/components/ai/CreateTripWithAiWizard.tsx:404
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:27464
-#: assets/admin/dist/js/app.js:75391
+#: assets/admin/dist/js/app.js:75392
 #: assets/dist/js/BuildItineraryModal-CyDwNxlk.js:126
 msgid "AI Assistant not configured"
 msgstr ""
@@ -927,7 +927,7 @@ msgstr ""
 
 # Source: resources/js/components/ai/AiEmailTemplateModal.tsx:131
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75421
+#: assets/admin/dist/js/app.js:75422
 msgid "AI generation failed."
 msgstr ""
 
@@ -1008,13 +1008,13 @@ msgstr ""
 
 # Source: resources/js/components/ai/AiEmailTemplateModal.tsx:246
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75509
+#: assets/admin/dist/js/app.js:75510
 msgid "AI will only use tags from this list; it won't invent new ones."
 msgstr ""
 
 # Source: resources/js/components/ai/AiEmailTemplateModal.tsx:178
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75454
+#: assets/admin/dist/js/app.js:75455
 msgid "AI will write a fresh subject and body using only the merge tags this template supports."
 msgstr ""
 
@@ -1147,19 +1147,19 @@ msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:644
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73045
+#: assets/admin/dist/js/app.js:73046
 msgid "Abandoned booking recovery (Final)"
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:596
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73001
+#: assets/admin/dist/js/app.js:73002
 msgid "Abandoned booking recovery (First)"
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:620
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73023
+#: assets/admin/dist/js/app.js:73024
 msgid "Abandoned booking recovery (Second)"
 msgstr ""
 
@@ -1229,6 +1229,7 @@ msgstr ""
 
 # Source: resources/js/components/ai/BuildItineraryModal.tsx:386, resources/js/pages/TripForm.tsx:6791, resources/js/pages/ViewBooking.tsx:1587, resources/js/pages/account/BookingDetails.tsx:367
 #: assets/admin/dist/js/app.js
+#: app/Controllers/BookingSessionController.php:4184
 #: app/Services/BookingExportService.php:111
 #: app/Services/CheckoutChoiceService.php:82
 #: app/Services/CheckoutChoiceService.php:84
@@ -1290,13 +1291,13 @@ msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:234
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72666
+#: assets/admin/dist/js/app.js:72667
 msgid "Account email change request"
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:252
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72683
+#: assets/admin/dist/js/app.js:72684
 msgid "Account email changed"
 msgstr ""
 
@@ -1377,7 +1378,7 @@ msgstr ""
 
 # Source: resources/js/pages/License.tsx:696
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:79805
+#: assets/admin/dist/js/app.js:79806
 msgid "Active Sites"
 msgstr ""
 
@@ -1632,8 +1633,8 @@ msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:675, resources/js/pages/Attributes.tsx:642
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:78174
-#: assets/admin/dist/js/app.js:78868
+#: assets/admin/dist/js/app.js:78175
+#: assets/admin/dist/js/app.js:78869
 msgid "Add New Attribute"
 msgstr ""
 
@@ -1970,7 +1971,7 @@ msgstr ""
 # Source: resources/js/components/ai/AiEmailTemplateModal.tsx:90, resources/js/components/ai/AutoFillTripModal.tsx:309, resources/js/components/ai/BuildItineraryModal.tsx:157, resources/js/components/ai/CreateTripWithAiWizard.tsx:407
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:27465
-#: assets/admin/dist/js/app.js:75392
+#: assets/admin/dist/js/app.js:75393
 #: assets/dist/js/BuildItineraryModal-CyDwNxlk.js:127
 msgid "Add an OpenAI or Anthropic key under Yatra → AI Assistant first."
 msgstr ""
@@ -1989,13 +1990,13 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailOverrideCreateModal.tsx:121
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73518
+#: assets/admin/dist/js/app.js:73519
 msgid "Add an override"
 msgstr ""
 
 # Source: resources/js/components/email/EmailOverrideCreateModal.tsx:120
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73518
+#: assets/admin/dist/js/app.js:73519
 #, js-format
 msgid "Add an override of “%s”"
 msgstr ""
@@ -2020,7 +2021,7 @@ msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:343
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:78621
+#: assets/admin/dist/js/app.js:78622
 msgid "Add at least one option with a label (value can be left blank to auto-generate from the label)."
 msgstr ""
 
@@ -2200,19 +2201,19 @@ msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:882
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:79048
+#: assets/admin/dist/js/app.js:79049
 msgid "Add option"
 msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:1204
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74559
+#: assets/admin/dist/js/app.js:74560
 msgid "Add override"
 msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:1000
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74396
+#: assets/admin/dist/js/app.js:74397
 msgid "Add override…"
 msgstr ""
 
@@ -2500,19 +2501,19 @@ msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:86
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72220
+#: assets/admin/dist/js/app.js:72221
 msgid "Admin Email"
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:412
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72832
+#: assets/admin/dist/js/app.js:72833
 msgid "Admin notice when a booking is auto-cancelled for non-payment."
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:491
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72903
+#: assets/admin/dist/js/app.js:72904
 msgid "Admin notice when a scheduled payment permanently fails."
 msgstr ""
 
@@ -2530,37 +2531,37 @@ msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:308
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72734
+#: assets/admin/dist/js/app.js:72735
 msgid "Admin: Booking cancelled"
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:411
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72831
+#: assets/admin/dist/js/app.js:72832
 msgid "Admin: Booking expired"
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:270
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72700
+#: assets/admin/dist/js/app.js:72701
 msgid "Admin: New Booking"
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:541
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72950
+#: assets/admin/dist/js/app.js:72951
 msgid "Admin: New Enquiry"
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:289
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72717
+#: assets/admin/dist/js/app.js:72718
 msgid "Admin: Payment received"
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:490
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72902
+#: assets/admin/dist/js/app.js:72903
 msgid "Admin: Scheduled payment failed"
 msgstr ""
 
@@ -2572,7 +2573,7 @@ msgstr ""
 
 # Source: resources/js/pages/License.tsx:397
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:79598
+#: assets/admin/dist/js/app.js:79599
 msgid "Advanced Booking Management"
 msgstr ""
 
@@ -2748,7 +2749,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:63155
 #: assets/admin/dist/js/app.js:65830
 #: assets/admin/dist/js/app.js:68062
-#: assets/admin/dist/js/app.js:78067
+#: assets/admin/dist/js/app.js:78068
 #: assets/admin/dist/js/Whatsapp.js:2125
 #: assets/dist/js/GuidesResources-CaWOGsCi.js:196
 #: assets/dist/js/Itinerary-BvJkY4oM.js:1027
@@ -2857,7 +2858,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:62449
 #: assets/admin/dist/js/app.js:63749
 #: assets/admin/dist/js/app.js:65761
-#: assets/admin/dist/js/app.js:78193
+#: assets/admin/dist/js/app.js:78194
 msgid "All Status"
 msgstr ""
 
@@ -3103,7 +3104,7 @@ msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:105
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72243
+#: assets/admin/dist/js/app.js:72244
 msgid "Always BCC"
 msgstr ""
 
@@ -3183,7 +3184,7 @@ msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:560
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:78776
+#: assets/admin/dist/js/app.js:78777
 msgid "An error occurred while saving the attribute"
 msgstr ""
 
@@ -3249,13 +3250,13 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:545
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75986
+#: assets/admin/dist/js/app.js:75987
 msgid "An override needs at least one trip, category or trip type — or delete it to use the global template."
 msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:541
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75983
+#: assets/admin/dist/js/app.js:75984
 msgid "An override needs at least one trip, category, trip type or payment method — or delete it to use the global template."
 msgstr ""
 
@@ -3288,14 +3289,14 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:908
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76253
+#: assets/admin/dist/js/app.js:76254
 msgid "Any match applies. A trip in a sub-category also matches its parent category."
 msgstr ""
 
 # Source: resources/js/components/email/EmailOverrideCreateModal.tsx:201, resources/js/pages/EmailTemplateForm.tsx:889
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73581
-#: assets/admin/dist/js/app.js:76241
+#: assets/admin/dist/js/app.js:73582
+#: assets/admin/dist/js/app.js:76242
 msgid "Any payment method"
 msgstr ""
 
@@ -3332,7 +3333,7 @@ msgstr ""
 # Source: resources/js/components/ai/AiEmailTemplateModal.tsx:208, resources/js/components/ai/BuildItineraryModal.tsx:454, resources/js/components/ai/CreateTripWithAiWizard.tsx:1258
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:28090
-#: assets/admin/dist/js/app.js:75473
+#: assets/admin/dist/js/app.js:75474
 #: assets/dist/js/BuildItineraryModal-CyDwNxlk.js:362
 msgid "Anything else AI should know"
 msgstr ""
@@ -3410,8 +3411,8 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:801, resources/js/components/settings/BookingFormFieldsEditor.tsx:421, resources/js/pages/EmailTemplateForm.tsx:858
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74230
-#: assets/admin/dist/js/app.js:76213
+#: assets/admin/dist/js/app.js:74231
+#: assets/admin/dist/js/app.js:76214
 #: assets/dist/js/Settings-BWgByeyf.js:519
 msgid "Applies to"
 msgstr ""
@@ -3730,7 +3731,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailAutomation.tsx:338
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74936
+#: assets/admin/dist/js/app.js:74937
 msgid "Are you sure you want to delete this sequence? This action cannot be undone."
 msgstr ""
 
@@ -3801,7 +3802,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:31428
 #: assets/admin/dist/js/app.js:49397
 #: assets/admin/dist/js/app.js:50601
-#: assets/admin/dist/js/app.js:78142
+#: assets/admin/dist/js/app.js:78143
 msgid "Are you sure you want to move \"{name}\" to trash?"
 msgstr ""
 
@@ -3813,7 +3814,7 @@ msgstr ""
 
 # Source: resources/js/pages/Attributes.tsx:613
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:78148
+#: assets/admin/dist/js/app.js:78149
 msgid "Are you sure you want to move this attribute to trash?"
 msgstr ""
 
@@ -3850,7 +3851,7 @@ msgstr ""
 # Source: resources/js/pages/Activities.tsx:544, resources/js/pages/AdditionalServices.tsx:366, resources/js/pages/Attributes.tsx:571
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:31404
-#: assets/admin/dist/js/app.js:78118
+#: assets/admin/dist/js/app.js:78119
 msgid "Are you sure you want to permanently delete \"{name}\"? This action cannot be undone."
 msgstr ""
 
@@ -3868,7 +3869,7 @@ msgstr ""
 
 # Source: resources/js/pages/Attributes.tsx:575
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:78121
+#: assets/admin/dist/js/app.js:78122
 msgid "Are you sure you want to permanently delete this attribute? This action cannot be undone."
 msgstr ""
 
@@ -3912,7 +3913,7 @@ msgstr ""
 # Source: resources/js/pages/Activities.tsx:582, resources/js/pages/Attributes.tsx:608
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:31431
-#: assets/admin/dist/js/app.js:78145
+#: assets/admin/dist/js/app.js:78146
 msgid "Are you sure you want to restore \"{name}\"?"
 msgstr ""
 
@@ -3924,7 +3925,7 @@ msgstr ""
 
 # Source: resources/js/pages/Attributes.tsx:617
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:78151
+#: assets/admin/dist/js/app.js:78152
 msgid "Are you sure you want to restore this attribute?"
 msgstr ""
 
@@ -4127,26 +4128,26 @@ msgstr ""
 
 # Source: resources/js/pages/Attributes.tsx:279, resources/js/pages/Attributes.tsx:706
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:77875
-#: assets/admin/dist/js/app.js:78237
+#: assets/admin/dist/js/app.js:77876
+#: assets/admin/dist/js/app.js:78238
 msgid "Attribute"
 msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:1131
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:79293
+#: assets/admin/dist/js/app.js:79294
 msgid "Attribute Icon"
 msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:534
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:78758
+#: assets/admin/dist/js/app.js:78759
 msgid "Attribute created successfully"
 msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:533
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:78758
+#: assets/admin/dist/js/app.js:78759
 msgid "Attribute updated successfully"
 msgstr ""
 
@@ -4155,7 +4156,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:4206
 #: assets/admin/dist/js/app.js:30032
 #: assets/admin/dist/js/app.js:30395
-#: assets/admin/dist/js/app.js:78161
+#: assets/admin/dist/js/app.js:78162
 msgid "Attributes"
 msgstr ""
 
@@ -4323,7 +4324,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:37214
 #: assets/admin/dist/js/app.js:49897
 #: assets/admin/dist/js/app.js:51124
-#: assets/admin/dist/js/app.js:78950
+#: assets/admin/dist/js/app.js:78951
 msgid "Auto-generated from name. Click edit icon to customize."
 msgstr ""
 
@@ -4561,7 +4562,7 @@ msgstr ""
 
 # Source: resources/js/components/ai/AiEmailTemplateModal.tsx:228
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75492
+#: assets/admin/dist/js/app.js:75493
 msgid "Available merge tags"
 msgstr ""
 
@@ -4664,7 +4665,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:1404
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76633
+#: assets/admin/dist/js/app.js:76634
 msgid "BCC"
 msgstr ""
 
@@ -4704,8 +4705,8 @@ msgstr ""
 #: assets/admin/dist/js/app.js:64088
 #: assets/admin/dist/js/app.js:66375
 #: assets/admin/dist/js/app.js:66722
-#: assets/admin/dist/js/app.js:78849
-#: assets/admin/dist/js/app.js:78878
+#: assets/admin/dist/js/app.js:78850
+#: assets/admin/dist/js/app.js:78879
 #: assets/dist/js/AvailabilityForm-BNi8_Do5.js:518
 #: assets/dist/js/BookingForm-CmqBWZis.js:980
 #: assets/dist/js/DiscountForm-DpP7G12z.js:747
@@ -4905,7 +4906,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:49826
 #: assets/admin/dist/js/app.js:51022
 #: assets/admin/dist/js/app.js:52192
-#: assets/admin/dist/js/app.js:78887
+#: assets/admin/dist/js/app.js:78888
 #: assets/dist/js/DiscountForm-DpP7G12z.js:843
 #: assets/dist/js/RecurringRuleForm-BnxXoSMZ.js:624
 msgid "Basic Information"
@@ -5011,13 +5012,13 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:1415
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76643
+#: assets/admin/dist/js/app.js:76644
 msgid "Blind copy, hidden from the recipient. Separate several addresses with commas. Leave empty to send no copy."
 msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:106
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72244
+#: assets/admin/dist/js/app.js:72245
 msgid "Blind-copy this address on every email Yatra sends, for archiving or monitoring. Hidden from recipients. Separate several addresses with commas. Leave empty to send no copies."
 msgstr ""
 
@@ -5068,7 +5069,7 @@ msgstr ""
 
 # Source: resources/js/components/ai/AiEmailTemplateModal.tsx:341, resources/js/components/email/EmailTemplatesList.tsx:880, resources/js/components/email/EmailTemplatesList.tsx:1074, resources/js/pages/Whatsapp.tsx:1467
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75564
+#: assets/admin/dist/js/app.js:75565
 #: assets/admin/dist/js/Whatsapp.js:1127
 msgid "Body"
 msgstr ""
@@ -5081,7 +5082,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailAutomation.tsx:712
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75145
+#: assets/admin/dist/js/app.js:75146
 msgid "Body view"
 msgstr ""
 
@@ -5200,14 +5201,14 @@ msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:144
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72583
+#: assets/admin/dist/js/app.js:72584
 msgid "Booking Cancellation"
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:88
 #: assets/admin/dist/js/app.js
 #: app/Core/Handlers/BookingConfirmationPageHandler.php:35
-#: assets/admin/dist/js/app.js:72533
+#: assets/admin/dist/js/app.js:72534
 msgid "Booking Confirmation"
 msgstr ""
 
@@ -5218,7 +5219,7 @@ msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:359
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72783
+#: assets/admin/dist/js/app.js:72784
 msgid "Booking Confirmed"
 msgstr ""
 
@@ -5446,7 +5447,7 @@ msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:392
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72814
+#: assets/admin/dist/js/app.js:72815
 msgid "Booking expired (customer)"
 msgstr ""
 
@@ -5508,7 +5509,7 @@ msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:345
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72769
+#: assets/admin/dist/js/app.js:72770
 msgid "Booking payment notice"
 msgstr ""
 
@@ -5829,7 +5830,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:31262
 #: assets/admin/dist/js/app.js:33576
-#: assets/admin/dist/js/app.js:77818
+#: assets/admin/dist/js/app.js:77819
 msgid "Bulk action completed successfully"
 msgstr ""
 
@@ -5940,7 +5941,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:1423
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76649
+#: assets/admin/dist/js/app.js:76650
 msgid "CC"
 msgstr ""
 
@@ -6077,13 +6078,13 @@ msgstr ""
 #: assets/admin/dist/js/app.js:66102
 #: assets/admin/dist/js/app.js:66521
 #: assets/admin/dist/js/app.js:68218
-#: assets/admin/dist/js/app.js:73524
-#: assets/admin/dist/js/app.js:74941
-#: assets/admin/dist/js/app.js:75398
-#: assets/admin/dist/js/app.js:75526
-#: assets/admin/dist/js/app.js:78126
-#: assets/admin/dist/js/app.js:78153
-#: assets/admin/dist/js/app.js:79333
+#: assets/admin/dist/js/app.js:73525
+#: assets/admin/dist/js/app.js:74942
+#: assets/admin/dist/js/app.js:75399
+#: assets/admin/dist/js/app.js:75527
+#: assets/admin/dist/js/app.js:78127
+#: assets/admin/dist/js/app.js:78154
+#: assets/admin/dist/js/app.js:79334
 #: assets/admin/dist/js/Whatsapp.js:1001
 #: assets/admin/dist/js/Whatsapp.js:1168
 #: assets/dist/js/account-page.js:1206
@@ -6207,7 +6208,7 @@ msgstr ""
 
 # Source: resources/js/components/ai/AutoFillTripModal.tsx:193
 #: assets/admin/dist/js/app.js
-#: app/Controllers/BookingSessionController.php:4255
+#: app/Controllers/BookingSessionController.php:4269
 msgid "Cancellation policy"
 msgstr ""
 
@@ -6420,13 +6421,13 @@ msgstr ""
 #: assets/admin/dist/js/app.js:35508
 #: assets/admin/dist/js/app.js:59096
 #: assets/admin/dist/js/app.js:59339
-#: assets/admin/dist/js/app.js:73338
+#: assets/admin/dist/js/app.js:73339
 msgid "Category"
 msgstr ""
 
 # Source: resources/js/hooks/useTripTargets.ts:149
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73399
+#: assets/admin/dist/js/app.js:73400
 #, js-format
 msgid "Category #%s"
 msgstr ""
@@ -6954,9 +6955,9 @@ msgstr ""
 
 # Source: resources/js/components/shared/ApplicableTripSelector.tsx:214, resources/js/components/shared/BulkActionToolbar.tsx:152, resources/js/pages/AiAssistant.tsx:787, resources/js/pages/ChannelManager.tsx:1262, resources/js/pages/ChannelManager.tsx:1722, resources/js/pages/License.tsx:791, resources/js/pages/Team.tsx:771, resources/js/pages/Team.tsx:2460, resources/js/pages/TripConsentForm.tsx:259, resources/js/pages/Webhooks.tsx:1074, resources/js/pages/Webhooks.tsx:1177, resources/js/pages/Whatsapp.tsx:973
 #: assets/admin/dist/js/app.js
-#: app/Services/WeatherService.php:185
+#: app/Services/WeatherService.php:186
 #: assets/admin/dist/js/app.js:29311
-#: assets/admin/dist/js/app.js:79890
+#: assets/admin/dist/js/app.js:79891
 #: assets/admin/dist/js/Whatsapp.js:782
 #: assets/dist/js/AiAssistant-B2LdNa4s.js:536
 #: assets/dist/js/ChannelManager-B6mfK3Vn.js:1014
@@ -6990,7 +6991,7 @@ msgstr ""
 # Source: resources/js/components/trip-form/TestimonialsSelector.tsx:188, resources/js/components/ui/multi-select.tsx:135, resources/js/pages/Team.tsx:2607, resources/js/pages/Team.tsx:3266
 #: assets/admin/dist/js/app.js
 #: templates/listing-trip.php:170
-#: assets/admin/dist/js/app.js:73250
+#: assets/admin/dist/js/app.js:73251
 #: assets/dist/js/Team-B6pKe6iB.js:2037
 #: assets/dist/js/Team-B6pKe6iB.js:2578
 msgid "Clear all"
@@ -7137,7 +7138,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:1728
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76869
+#: assets/admin/dist/js/app.js:76870
 msgid "Click a tag to copy; paste into subject or HTML body."
 msgstr ""
 
@@ -7161,7 +7162,7 @@ msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:765
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:78947
+#: assets/admin/dist/js/app.js:78948
 msgid "Click the save icon to preserve your custom slug."
 msgstr ""
 
@@ -7253,9 +7254,9 @@ msgstr ""
 #: assets/admin/dist/js/app.js:51245
 #: assets/admin/dist/js/app.js:53337
 #: assets/admin/dist/js/app.js:63893
-#: assets/admin/dist/js/app.js:73136
-#: assets/admin/dist/js/app.js:75105
-#: assets/admin/dist/js/app.js:75447
+#: assets/admin/dist/js/app.js:73137
+#: assets/admin/dist/js/app.js:75106
+#: assets/admin/dist/js/app.js:75448
 #: assets/dist/js/BuildItineraryModal-CyDwNxlk.js:221
 #: assets/dist/js/BuildItineraryModal-CyDwNxlk.js:594
 #: assets/dist/js/BuildItineraryModal-CyDwNxlk.js:597
@@ -7378,7 +7379,7 @@ msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:123
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72265
+#: assets/admin/dist/js/app.js:72266
 msgid "Colour of the header band and buttons in customer emails. Leave empty for Yatra's teal."
 msgstr ""
 
@@ -7781,7 +7782,7 @@ msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:524
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72934
+#: assets/admin/dist/js/app.js:72935
 msgid "Confirmation sent to the customer after they submit an enquiry."
 msgstr ""
 
@@ -7910,7 +7911,7 @@ msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:272
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72435
+#: assets/admin/dist/js/app.js:72436
 msgid "Connection encryption type"
 msgstr ""
 
@@ -8080,7 +8081,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailAutomation.tsx:676
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75130
+#: assets/admin/dist/js/app.js:75131
 msgid "Context"
 msgstr ""
 
@@ -8162,7 +8163,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailAutomation.tsx:748, resources/js/pages/Settings.tsx:4962
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75179
+#: assets/admin/dist/js/app.js:75180
 #: assets/dist/js/Settings-BWgByeyf.js:5436
 msgid "Copied!"
 msgstr ""
@@ -8177,7 +8178,7 @@ msgstr ""
 
 # Source: resources/js/components/bookings/BookingWorkspace.tsx:383, resources/js/components/settings/ApiAccessSection.tsx:161, resources/js/pages/ChannelManager.tsx:1324, resources/js/pages/ChannelManager.tsx:1423, resources/js/pages/EmailAutomation.tsx:748, resources/js/pages/Itinerary.tsx:1789, resources/js/pages/Settings.tsx:563, resources/js/pages/Settings.tsx:4957, resources/js/pages/Settings.tsx:4972, resources/js/pages/Settings.tsx:5415, resources/js/pages/Settings.tsx:9694, resources/js/pages/Team.tsx:3116, resources/js/pages/TravelAgencies.tsx:818, resources/js/pages/Webhooks.tsx:2073, resources/js/pages/Webhooks.tsx:3242, resources/js/pages/Whatsapp.tsx:803, resources/js/pages/Whatsapp.tsx:850
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75179
+#: assets/admin/dist/js/app.js:75180
 #: assets/admin/dist/js/Whatsapp.js:649
 #: assets/admin/dist/js/Whatsapp.js:693
 #: assets/dist/js/ChannelManager-B6mfK3Vn.js:1063
@@ -8266,7 +8267,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:759
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76147
+#: assets/admin/dist/js/app.js:76148
 msgid "Core customer email (saved with site settings). From address is set under Email → Delivery."
 msgstr ""
 
@@ -8350,7 +8351,7 @@ msgstr ""
 
 # Source: resources/js/pages/License.tsx:622
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:79770
+#: assets/admin/dist/js/app.js:79771
 msgid "Could not match price ID or label — defaulted to Starter. Contact support if your subscription is Growth or Scale."
 msgstr ""
 
@@ -8530,7 +8531,7 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailOverrideCreateModal.tsx:140
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73532
+#: assets/admin/dist/js/app.js:73533
 msgid "Create & edit →"
 msgstr ""
 
@@ -8542,7 +8543,7 @@ msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:1170
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:79322
+#: assets/admin/dist/js/app.js:79323
 msgid "Create Attribute"
 msgstr ""
 
@@ -8843,7 +8844,7 @@ msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:680
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:78869
+#: assets/admin/dist/js/app.js:78870
 msgid "Create a new trip attribute"
 msgstr ""
 
@@ -9091,7 +9092,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:45819
 #: assets/admin/dist/js/app.js:58729
 #: assets/admin/dist/js/app.js:64990
-#: assets/admin/dist/js/app.js:78272
+#: assets/admin/dist/js/app.js:78273
 #: assets/dist/js/account-page.js:2103
 #: assets/dist/js/Settings-BWgByeyf.js:168
 #: assets/dist/js/ViewBooking-WCU20PD1.js:2169
@@ -9108,7 +9109,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:49483
 #: assets/admin/dist/js/app.js:50700
 #: assets/admin/dist/js/app.js:59288
-#: assets/admin/dist/js/app.js:78207
+#: assets/admin/dist/js/app.js:78208
 msgid "Created At"
 msgstr ""
 
@@ -9130,7 +9131,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:33929
 #: assets/admin/dist/js/app.js:35543
 #: assets/admin/dist/js/app.js:56109
-#: assets/admin/dist/js/app.js:77997
+#: assets/admin/dist/js/app.js:77998
 msgid "Created Date"
 msgstr ""
 
@@ -9190,7 +9191,7 @@ msgstr ""
 # Source: resources/js/components/bookings/BookingWorkspace.tsx:312, resources/js/components/email/EmailOverrideCreateModal.tsx:139, resources/js/pages/Team.tsx:1327, resources/js/pages/Team.tsx:2408, resources/js/pages/Trips.tsx:1745
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:30821
-#: assets/admin/dist/js/app.js:73532
+#: assets/admin/dist/js/app.js:73533
 #: assets/dist/js/Team-B6pKe6iB.js:997
 #: assets/dist/js/Team-B6pKe6iB.js:1876
 #: assets/dist/js/ViewBooking-WCU20PD1.js:445
@@ -9504,7 +9505,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailAutomation.tsx:962
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75319
+#: assets/admin/dist/js/app.js:75320
 msgid "Customer booking, payment, cancellation, and trip-reminder emails use the matching template when its body is filled; otherwise the free plugin defaults or settings HTML apply. Admin: New Booking sends when that template has a body (plain-text admin notices from checkout and notifications are skipped to avoid duplicates). Other booking.created templates send in addition to the customer email. Booking Confirmed uses the “Booking Confirmed” row when a booking moves to confirmed; Trip Completed uses its template instead of the generic completed email when the body is filled. Override templates replace their global template for the trips they target and are never sent in addition to it."
 msgstr ""
 
@@ -9521,7 +9522,7 @@ msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:89
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72534
+#: assets/admin/dist/js/app.js:72535
 msgid "Customer email for checkout, admin bookings, and confirmed status."
 msgstr ""
 
@@ -9533,7 +9534,7 @@ msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:198
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72632
+#: assets/admin/dist/js/app.js:72633
 msgid "Customer email verification"
 msgstr ""
 
@@ -9607,7 +9608,7 @@ msgstr ""
 # Source: resources/js/pages/EmailTemplateForm.tsx:1003
 #. translators: %s: name of the template that is sent instead.
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76335
+#: assets/admin/dist/js/app.js:76336
 #, js-format
 msgid "Customers get “%s” for this email instead. Edit that template, or switch it off to use this one."
 msgstr ""
@@ -10060,7 +10061,7 @@ msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:989
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:79154
+#: assets/admin/dist/js/app.js:79155
 msgid "Default Value"
 msgstr ""
 
@@ -10124,7 +10125,7 @@ msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:997
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:79163
+#: assets/admin/dist/js/app.js:79164
 msgid "Default value for the field"
 msgstr ""
 
@@ -10182,7 +10183,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:67969
 #: assets/admin/dist/js/app.js:68070
 #: assets/admin/dist/js/app.js:68217
-#: assets/admin/dist/js/app.js:74940
+#: assets/admin/dist/js/app.js:74941
 #: assets/dist/js/AbandonedRecovery-B1EcHvJO.js:1014
 #: assets/dist/js/ChannelManager-B6mfK3Vn.js:1379
 #: assets/dist/js/GuidesResources-CaWOGsCi.js:215
@@ -10215,7 +10216,7 @@ msgstr ""
 
 # Source: resources/js/pages/Attributes.tsx:568
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:78117
+#: assets/admin/dist/js/app.js:78118
 msgid "Delete Attribute Permanently"
 msgstr ""
 
@@ -10355,8 +10356,8 @@ msgstr ""
 #: assets/admin/dist/js/app.js:65349
 #: assets/admin/dist/js/app.js:65354
 #: assets/admin/dist/js/app.js:65362
-#: assets/admin/dist/js/app.js:78125
-#: assets/admin/dist/js/app.js:78332
+#: assets/admin/dist/js/app.js:78126
+#: assets/admin/dist/js/app.js:78333
 #: assets/dist/js/Itinerary-BvJkY4oM.js:1040
 #: assets/dist/js/Itinerary-BvJkY4oM.js:1047
 msgid "Delete Permanently"
@@ -10387,7 +10388,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailAutomation.tsx:337
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74935
+#: assets/admin/dist/js/app.js:74936
 msgid "Delete Sequence"
 msgstr ""
 
@@ -10635,14 +10636,14 @@ msgstr ""
 
 # Source: resources/js/pages/EmailAutomation.tsx:888, resources/js/pages/Whatsapp.tsx:171
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75265
+#: assets/admin/dist/js/app.js:75266
 #: assets/admin/dist/js/Whatsapp.js:128
 msgid "Delivery"
 msgstr ""
 
 # Source: resources/js/pages/EmailAutomation.tsx:915
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75290
+#: assets/admin/dist/js/app.js:75291
 msgid "Delivery (addresses & SMTP), core templates for everyone, and optional Pro sequences and logs."
 msgstr ""
 
@@ -10988,9 +10989,9 @@ msgstr ""
 #: assets/admin/dist/js/app.js:59123
 #: assets/admin/dist/js/app.js:59344
 #: assets/admin/dist/js/app.js:59852
-#: assets/admin/dist/js/app.js:78035
-#: assets/admin/dist/js/app.js:78282
-#: assets/admin/dist/js/app.js:78961
+#: assets/admin/dist/js/app.js:78036
+#: assets/admin/dist/js/app.js:78283
+#: assets/admin/dist/js/app.js:78962
 #: assets/admin/dist/js/Whatsapp.js:1330
 #: assets/dist/js/DiscountForm-DpP7G12z.js:939
 #: assets/dist/js/Settings-BWgByeyf.js:5070
@@ -11148,7 +11149,7 @@ msgstr ""
 
 # Source: resources/js/pages/License.tsx:614
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:79766
+#: assets/admin/dist/js/app.js:79767
 msgid "Detected from plan label (the original price ID was re-numbered on the store)."
 msgstr ""
 
@@ -11338,7 +11339,7 @@ msgstr ""
 
 # Source: resources/js/components/ai/AiEmailTemplateModal.tsx:294
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75538
+#: assets/admin/dist/js/app.js:75539
 msgid "Discard, try again"
 msgstr ""
 
@@ -11558,8 +11559,8 @@ msgstr ""
 # Source: resources/js/pages/AttributeForm.tsx:847, resources/js/pages/Attributes.tsx:756, resources/js/pages/DifficultyLevelForm.tsx:421
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:37249
-#: assets/admin/dist/js/app.js:78287
-#: assets/admin/dist/js/app.js:79013
+#: assets/admin/dist/js/app.js:78288
+#: assets/admin/dist/js/app.js:79014
 msgid "Display Order"
 msgstr ""
 
@@ -11580,7 +11581,7 @@ msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:927, resources/js/pages/ChannelManager.tsx:959
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:79091
+#: assets/admin/dist/js/app.js:79092
 #: assets/dist/js/ChannelManager-B6mfK3Vn.js:716
 msgid "Display name"
 msgstr ""
@@ -11810,10 +11811,10 @@ msgstr ""
 #: assets/admin/dist/js/app.js:59270
 #: assets/admin/dist/js/app.js:59325
 #: assets/admin/dist/js/app.js:60155
-#: assets/admin/dist/js/app.js:77991
-#: assets/admin/dist/js/app.js:78075
-#: assets/admin/dist/js/app.js:78195
-#: assets/admin/dist/js/app.js:79211
+#: assets/admin/dist/js/app.js:77992
+#: assets/admin/dist/js/app.js:78076
+#: assets/admin/dist/js/app.js:78196
+#: assets/admin/dist/js/app.js:79212
 #: assets/dist/js/DiscountForm-DpP7G12z.js:1982
 #: assets/dist/js/Itinerary-BvJkY4oM.js:906
 #: assets/dist/js/Itinerary-BvJkY4oM.js:920
@@ -12110,7 +12111,7 @@ msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:886
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:79053
+#: assets/admin/dist/js/app.js:79054
 msgid "Each row is one choice. Leave value empty to auto-generate a slug from the label."
 msgstr ""
 
@@ -12163,7 +12164,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:61911
 #: assets/admin/dist/js/app.js:63605
 #: assets/admin/dist/js/app.js:65506
-#: assets/admin/dist/js/app.js:78305
+#: assets/admin/dist/js/app.js:78306
 #: assets/admin/dist/js/Whatsapp.js:948
 #: assets/dist/js/AvailabilityForm-BNi8_Do5.js:504
 #: assets/dist/js/ChannelManager-B6mfK3Vn.js:416
@@ -12188,7 +12189,7 @@ msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:674
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:78868
+#: assets/admin/dist/js/app.js:78869
 msgid "Edit Attribute"
 msgstr ""
 
@@ -12432,7 +12433,7 @@ msgstr ""
 # Source: resources/js/pages/EmailTemplateForm.tsx:1013
 #. translators: %s: name of the template that is sent instead.
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76346
+#: assets/admin/dist/js/app.js:76347
 #, js-format
 msgid "Edit “%s”"
 msgstr ""
@@ -12476,7 +12477,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:63899
 #: assets/admin/dist/js/app.js:65782
 #: assets/admin/dist/js/app.js:66767
-#: assets/admin/dist/js/app.js:79780
+#: assets/admin/dist/js/app.js:79781
 #: assets/dist/js/account-page.js:1445
 #: assets/dist/js/Settings-BWgByeyf.js:2147
 #: assets/dist/js/Team-B6pKe6iB.js:1045
@@ -12537,7 +12538,7 @@ msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:81
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72214
+#: assets/admin/dist/js/app.js:72215
 msgid "Email Configuration"
 msgstr ""
 
@@ -12558,8 +12559,8 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailPreviewModal.tsx:35, resources/js/components/email/EmailPreviewModal.tsx:69, resources/js/pages/AbandonedRecoveryEmailForm.tsx:298
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73129
-#: assets/admin/dist/js/app.js:73150
+#: assets/admin/dist/js/app.js:73130
+#: assets/admin/dist/js/app.js:73151
 msgid "Email Preview"
 msgstr ""
 
@@ -12602,13 +12603,13 @@ msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:87
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72221
+#: assets/admin/dist/js/app.js:72222
 msgid "Email address to receive admin notifications"
 msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:176
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72327
+#: assets/admin/dist/js/app.js:72328
 msgid "Email address used as sender for customer emails"
 msgstr ""
 
@@ -12619,13 +12620,13 @@ msgstr ""
 
 # Source: resources/js/pages/EmailAutomation.tsx:761
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75188
+#: assets/admin/dist/js/app.js:75189
 msgid "Email body preview"
 msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:122
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72264
+#: assets/admin/dist/js/app.js:72265
 msgid "Email brand colour"
 msgstr ""
 
@@ -12641,7 +12642,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailAutomation.tsx:619
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75102
+#: assets/admin/dist/js/app.js:75103
 msgid "Email details"
 msgstr ""
 
@@ -12655,7 +12656,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailAutomation.tsx:905
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75281
+#: assets/admin/dist/js/app.js:75282
 msgid "Email logs"
 msgstr ""
 
@@ -12680,9 +12681,9 @@ msgstr ""
 msgid "Email sequences are automated workflows that send emails based on triggers and timing."
 msgstr ""
 
-# Source: resources/js/hooks/useEmailSettingsManager.ts:370
+# Source: resources/js/hooks/useEmailSettingsManager.ts:371
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72168
+#: assets/admin/dist/js/app.js:72169
 msgid "Email settings saved"
 msgstr ""
 
@@ -12827,7 +12828,7 @@ msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:225
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72383
+#: assets/admin/dist/js/app.js:72384
 msgid "Enable SMTP"
 msgstr ""
 
@@ -12903,7 +12904,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailAutomation.tsx:826
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75223
+#: assets/admin/dist/js/app.js:75224
 msgid "Enable the Email Automation module"
 msgstr ""
 
@@ -13001,7 +13002,7 @@ msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:271, resources/js/pages/premium-pages/TripConsent.tsx:81
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72434
+#: assets/admin/dist/js/app.js:72435
 msgid "Encryption"
 msgstr ""
 
@@ -13142,13 +13143,13 @@ msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:523
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72933
+#: assets/admin/dist/js/app.js:72934
 msgid "Enquiry Received"
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:559
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72967
+#: assets/admin/dist/js/app.js:72968
 msgid "Enquiry Response"
 msgstr ""
 
@@ -13205,7 +13206,7 @@ msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:314
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72487
+#: assets/admin/dist/js/app.js:72488
 msgid "Enter SMTP password"
 msgstr ""
 
@@ -13274,13 +13275,13 @@ msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:794
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:78970
+#: assets/admin/dist/js/app.js:78971
 msgid "Enter attribute description"
 msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:722
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:78908
+#: assets/admin/dist/js/app.js:78909
 msgid "Enter attribute name"
 msgstr ""
 
@@ -13660,7 +13661,7 @@ msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:636
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:78836
+#: assets/admin/dist/js/app.js:78837
 msgid "Error Loading Attribute"
 msgstr ""
 
@@ -14028,7 +14029,7 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:1346
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74679
+#: assets/admin/dist/js/app.js:74680
 msgid "Every trip gets the global templates. Use “Add override” here or “Add override…” on a global template."
 msgstr ""
 
@@ -14181,8 +14182,8 @@ msgstr ""
 
 # Source: resources/js/pages/AbandonedRecovery.tsx:1562, resources/js/pages/License.tsx:657, resources/js/pages/License.tsx:685, resources/js/pages/Team.tsx:2774, resources/js/pages/Webhooks.tsx:2500
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:79784
-#: assets/admin/dist/js/app.js:79801
+#: assets/admin/dist/js/app.js:79785
+#: assets/admin/dist/js/app.js:79802
 #: assets/dist/js/Team-B6pKe6iB.js:2164
 #: assets/dist/js/Webhooks-ipRnYIaP.js:1951
 msgid "Expires"
@@ -14458,8 +14459,8 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailOverrideCreateModal.tsx:85, resources/js/components/email/EmailOverrideCreateModal.tsx:104
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73486
-#: assets/admin/dist/js/app.js:73506
+#: assets/admin/dist/js/app.js:73487
+#: assets/admin/dist/js/app.js:73507
 msgid "Failed to create override."
 msgstr ""
 
@@ -14741,19 +14742,19 @@ msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:447
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:78696
+#: assets/admin/dist/js/app.js:78697
 msgid "Failed to load attribute data"
 msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:655
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:78856
+#: assets/admin/dist/js/app.js:78857
 msgid "Failed to load attribute data. The attribute may not exist or there might be a server error."
 msgstr ""
 
 # Source: resources/js/pages/Attributes.tsx:822
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:78341
+#: assets/admin/dist/js/app.js:78342
 msgid "Failed to load attributes"
 msgstr ""
 
@@ -14844,8 +14845,8 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:379, resources/js/components/email/EmailTemplatesList.tsx:395, resources/js/pages/EmailTemplateForm.tsx:480
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73913
-#: assets/admin/dist/js/app.js:73927
+#: assets/admin/dist/js/app.js:73914
+#: assets/admin/dist/js/app.js:73928
 msgid "Failed to load preview"
 msgstr ""
 
@@ -14859,9 +14860,9 @@ msgstr ""
 msgid "Failed to load reviews. Please try again."
 msgstr ""
 
-# Source: resources/js/hooks/useEmailSettingsManager.ts:290, resources/js/pages/Settings.tsx:1775
+# Source: resources/js/hooks/useEmailSettingsManager.ts:291, resources/js/pages/Settings.tsx:1775
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72102
+#: assets/admin/dist/js/app.js:72103
 #: assets/dist/js/Settings-BWgByeyf.js:2494
 msgid "Failed to load settings"
 msgstr ""
@@ -14997,7 +14998,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:31268
 #: assets/admin/dist/js/app.js:33582
-#: assets/admin/dist/js/app.js:77824
+#: assets/admin/dist/js/app.js:77825
 msgid "Failed to perform bulk action"
 msgstr ""
 
@@ -15067,7 +15068,7 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:304
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73847
+#: assets/admin/dist/js/app.js:73848
 msgid "Failed to reorder overrides"
 msgstr ""
 
@@ -15084,7 +15085,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:466, resources/js/pages/TripConsentForm.tsx:1782
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75916
+#: assets/admin/dist/js/app.js:75917
 #: assets/dist/js/TripConsentForm-CzReTXGd.js:1400
 msgid "Failed to save"
 msgstr ""
@@ -15138,9 +15139,9 @@ msgstr ""
 msgid "Failed to save service"
 msgstr ""
 
-# Source: resources/js/hooks/useEmailSettingsManager.ts:376, resources/js/pages/AbandonedRecovery.tsx:522, resources/js/pages/Settings.tsx:3039
+# Source: resources/js/hooks/useEmailSettingsManager.ts:377, resources/js/pages/AbandonedRecovery.tsx:522, resources/js/pages/Settings.tsx:3039
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72171
+#: assets/admin/dist/js/app.js:72172
 #: assets/dist/js/Settings-BWgByeyf.js:3595
 msgid "Failed to save settings"
 msgstr ""
@@ -15419,7 +15420,7 @@ msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:806
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:78979
+#: assets/admin/dist/js/app.js:78980
 msgid "Field Configuration"
 msgstr ""
 
@@ -15443,17 +15444,17 @@ msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:871, resources/js/pages/AttributeForm.tsx:1061
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:79034
-#: assets/admin/dist/js/app.js:79220
+#: assets/admin/dist/js/app.js:79035
+#: assets/admin/dist/js/app.js:79221
 msgid "Field Options"
 msgstr ""
 
 # Source: resources/js/components/settings/BookingFormFieldsEditor.tsx:329, resources/js/pages/AttributeForm.tsx:817, resources/js/pages/Attributes.tsx:325, resources/js/pages/Attributes.tsx:672, resources/js/pages/Attributes.tsx:711
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:77922
-#: assets/admin/dist/js/app.js:78205
-#: assets/admin/dist/js/app.js:78242
-#: assets/admin/dist/js/app.js:78989
+#: assets/admin/dist/js/app.js:77923
+#: assets/admin/dist/js/app.js:78206
+#: assets/admin/dist/js/app.js:78243
+#: assets/admin/dist/js/app.js:78990
 #: assets/dist/js/Settings-BWgByeyf.js:440
 msgid "Field Type"
 msgstr ""
@@ -15471,7 +15472,7 @@ msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:325
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:78612
+#: assets/admin/dist/js/app.js:78613
 msgid "Field type is required"
 msgstr ""
 
@@ -15569,8 +15570,8 @@ msgstr ""
 # Source: resources/js/pages/Attributes.tsx:365, resources/js/pages/Attributes.tsx:726
 #: assets/admin/dist/js/app.js
 #: templates/listing-trip.php:169
-#: assets/admin/dist/js/app.js:77958
-#: assets/admin/dist/js/app.js:78257
+#: assets/admin/dist/js/app.js:77959
+#: assets/admin/dist/js/app.js:78258
 #: assets/dist/blocks/tour.js:383
 msgid "Filters"
 msgstr ""
@@ -15588,7 +15589,7 @@ msgstr ""
 # Source: resources/js/lib/email-templates-catalog.ts:647
 #. translators: %s: brand name
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73048
+#: assets/admin/dist/js/app.js:73049
 #, js-format
 msgid "Final reminder sent by %s abandoned checkout recovery (module copy in {{recovery_intro_html}})."
 msgstr ""
@@ -15673,7 +15674,7 @@ msgstr ""
 # Source: resources/js/lib/email-templates-catalog.ts:599
 #. translators: %s: brand name (e.g. "Yatra Pro" or operator's white-labeled brand)
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73004
+#: assets/admin/dist/js/app.js:73005
 #, js-format
 msgid "First reminder sent by %s abandoned checkout recovery (module copy in {{recovery_intro_html}})."
 msgstr ""
@@ -16005,19 +16006,19 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:1392
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76627
+#: assets/admin/dist/js/app.js:76628
 msgid "From / reply addresses are configured under Email → Delivery. Recipient uses the customer on the booking."
 msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:175, resources/js/pages/EmailTemplateForm.tsx:1296
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72326
+#: assets/admin/dist/js/app.js:72327
 msgid "From Email"
 msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:194, resources/js/pages/EmailTemplateForm.tsx:1278
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72349
+#: assets/admin/dist/js/app.js:72350
 msgid "From Name"
 msgstr ""
 
@@ -16055,8 +16056,8 @@ msgstr ""
 
 # Source: resources/js/pages/Attributes.tsx:350, resources/js/pages/Attributes.tsx:721
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:77945
-#: assets/admin/dist/js/app.js:78252
+#: assets/admin/dist/js/app.js:77946
+#: assets/admin/dist/js/app.js:78253
 msgid "Frontend"
 msgstr ""
 
@@ -16198,7 +16199,7 @@ msgstr ""
 # Source: resources/js/components/ai/AiEmailTemplateModal.tsx:285, resources/js/components/ai/AiFieldAffordance.tsx:213, resources/js/components/ai/AutoFillTripModal.tsx:654, resources/js/components/ai/BuildItineraryModal.tsx:716, resources/js/components/ai/CreateTripWithAiWizard.tsx:1051
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:27913
-#: assets/admin/dist/js/app.js:75534
+#: assets/admin/dist/js/app.js:75535
 #: assets/dist/js/BuildItineraryModal-CyDwNxlk.js:560
 msgid "Generate"
 msgstr ""
@@ -16238,7 +16239,7 @@ msgstr ""
 
 # Source: resources/js/components/ai/AiEmailTemplateModal.tsx:155
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75437
+#: assets/admin/dist/js/app.js:75438
 msgid "Generate email with AI"
 msgstr ""
 
@@ -16262,7 +16263,7 @@ msgstr ""
 # Source: resources/js/components/ai/CreateTripWithAiWizard.tsx:959, resources/js/pages/EmailTemplateForm.tsx:1480
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:27851
-#: assets/admin/dist/js/app.js:76692
+#: assets/admin/dist/js/app.js:76693
 msgid "Generate with AI"
 msgstr ""
 
@@ -16290,7 +16291,7 @@ msgstr ""
 # Source: resources/js/components/ai/AiEmailTemplateModal.tsx:280, resources/js/components/ai/AutoFillTripModal.tsx:630, resources/js/components/ai/BuildItineraryModal.tsx:737, resources/js/components/ai/CustomerSummaryCard.tsx:81
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:43857
-#: assets/admin/dist/js/app.js:75531
+#: assets/admin/dist/js/app.js:75532
 #: assets/dist/js/BuildItineraryModal-CyDwNxlk.js:579
 msgid "Generating…"
 msgstr ""
@@ -16351,7 +16352,7 @@ msgstr ""
 
 # Source: resources/js/pages/Attributes.tsx:839
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:78353
+#: assets/admin/dist/js/app.js:78354
 msgid "Get started by creating your first attribute."
 msgstr ""
 
@@ -16466,15 +16467,15 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:707, resources/js/pages/ChannelManager.tsx:3206, resources/js/pages/EmailTemplateForm.tsx:786
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74164
-#: assets/admin/dist/js/app.js:76163
+#: assets/admin/dist/js/app.js:74165
+#: assets/admin/dist/js/app.js:76164
 #: assets/dist/js/ChannelManager-B6mfK3Vn.js:2582
 msgid "Global"
 msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:1124
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74495
+#: assets/admin/dist/js/app.js:74496
 msgid "Global templates"
 msgstr ""
 
@@ -16633,7 +16634,7 @@ msgstr ""
 
 # Source: resources/js/pages/DiscountForm.tsx:1095, resources/js/pages/Discounts.tsx:388, resources/js/pages/Discounts.tsx:1028, resources/js/pages/ViewBooking.tsx:1857
 #: assets/admin/dist/js/app.js
-#: app/Controllers/BookingSessionController.php:5100
+#: app/Controllers/BookingSessionController.php:5114
 #: app/Models/Checkout.php:228
 #: app/Services/CalculationService.php:816
 #: app/Services/CalculationService.php:842
@@ -16710,7 +16711,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:67251
 #: assets/admin/dist/js/app.js:67618
-#: assets/admin/dist/js/app.js:79763
+#: assets/admin/dist/js/app.js:79764
 msgid "Growth"
 msgstr ""
 
@@ -16731,7 +16732,7 @@ msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:216
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72649
+#: assets/admin/dist/js/app.js:72650
 msgid "Guest email verification (checkout)"
 msgstr ""
 
@@ -16804,7 +16805,7 @@ msgstr ""
 
 # Source: resources/js/components/ai/AiEmailTemplateModal.tsx:371
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75590
+#: assets/admin/dist/js/app.js:75591
 msgid "HTML"
 msgstr ""
 
@@ -17038,7 +17039,7 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:1011, resources/js/components/settings/BookingFormConditionsModal.tsx:192
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74403
+#: assets/admin/dist/js/app.js:74404
 #: assets/dist/js/Settings-BWgByeyf.js:1203
 msgid "Higher priority"
 msgstr ""
@@ -17061,13 +17062,13 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:1183
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74543
+#: assets/admin/dist/js/app.js:74544
 msgid "Highlighted rows are exactly what this trip's customers receive."
 msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:1179
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74540
+#: assets/admin/dist/js/app.js:74541
 msgid "Highlighted rows are what this trip's customers receive. An override limited to payment methods isn't shown here; it replaces these for bookings paid that way."
 msgstr ""
 
@@ -17373,7 +17374,7 @@ msgstr ""
 # Source: resources/js/pages/Attributes.tsx:670, resources/js/pages/TravelerCategories.tsx:696
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:59285
-#: assets/admin/dist/js/app.js:78203
+#: assets/admin/dist/js/app.js:78204
 msgid "ID"
 msgstr ""
 
@@ -17384,7 +17385,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:35346
 #: assets/admin/dist/js/app.js:36337
 #: assets/admin/dist/js/app.js:69521
-#: assets/admin/dist/js/app.js:77910
+#: assets/admin/dist/js/app.js:77911
 msgid "ID:"
 msgstr ""
 
@@ -17414,7 +17415,7 @@ msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:1138
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:79299
+#: assets/admin/dist/js/app.js:79300
 msgid "Icon or Image"
 msgstr ""
 
@@ -17972,8 +17973,8 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:438, resources/js/pages/EmailTemplateForm.tsx:487
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75890
-#: assets/admin/dist/js/app.js:75935
+#: assets/admin/dist/js/app.js:75891
+#: assets/admin/dist/js/app.js:75936
 msgid "Invalid template"
 msgstr ""
 
@@ -18545,7 +18546,7 @@ msgstr ""
 # Source: resources/js/components/settings/BookingFormFieldsEditor.tsx:349, resources/js/pages/AttributeForm.tsx:904, resources/js/pages/Settings.tsx:4429, resources/js/pages/TravelerCategories.tsx:697, resources/js/pages/TripConsentForm.tsx:1165, resources/js/pages/TripConsentForm.tsx:1280, resources/js/pages/TripForm.tsx:6103
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:59286
-#: assets/admin/dist/js/app.js:79067
+#: assets/admin/dist/js/app.js:79068
 #: assets/dist/js/Settings-BWgByeyf.js:456
 #: assets/dist/js/Settings-BWgByeyf.js:4987
 msgid "Label"
@@ -18994,25 +18995,25 @@ msgstr ""
 # Source: resources/js/components/Layout.tsx:660, resources/js/pages/License.tsx:359
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:4479
-#: assets/admin/dist/js/app.js:79582
+#: assets/admin/dist/js/app.js:79583
 msgid "License"
 msgstr ""
 
 # Source: resources/js/pages/License.tsx:560
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:79736
+#: assets/admin/dist/js/app.js:79737
 msgid "License Key"
 msgstr ""
 
 # Source: resources/js/pages/License.tsx:444
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:79633
+#: assets/admin/dist/js/app.js:79634
 msgid "License Management"
 msgstr ""
 
 # Source: resources/js/pages/License.tsx:634
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:79776
+#: assets/admin/dist/js/app.js:79777
 msgid "Licensed To"
 msgstr ""
 
@@ -19023,13 +19024,13 @@ msgstr ""
 
 # Source: resources/js/pages/License.tsx:608
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:79764
+#: assets/admin/dist/js/app.js:79765
 msgid "Lifetime"
 msgstr ""
 
 # Source: resources/js/pages/License.tsx:688
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:79802
+#: assets/admin/dist/js/app.js:79803
 msgid "Lifetime License"
 msgstr ""
 
@@ -19370,7 +19371,7 @@ msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:154
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72301
+#: assets/admin/dist/js/app.js:72302
 msgid "Logo in emails"
 msgstr ""
 
@@ -19448,7 +19449,7 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:1021, resources/js/components/settings/BookingFormConditionsModal.tsx:201
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74410
+#: assets/admin/dist/js/app.js:74411
 #: assets/dist/js/Settings-BWgByeyf.js:1214
 msgid "Lower priority"
 msgstr ""
@@ -19714,7 +19715,7 @@ msgstr ""
 
 # Source: resources/js/pages/Attributes.tsx:631
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:78162
+#: assets/admin/dist/js/app.js:78163
 msgid "Manage your travel attributes and their properties"
 msgstr ""
 
@@ -20368,7 +20369,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:1725
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76868
+#: assets/admin/dist/js/app.js:76869
 msgid "Merge tags"
 msgstr ""
 
@@ -20390,7 +20391,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailAutomation.tsx:705, resources/js/pages/Whatsapp.tsx:1938
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75139
+#: assets/admin/dist/js/app.js:75140
 #: assets/admin/dist/js/Whatsapp.js:1506
 msgid "Message body"
 msgstr ""
@@ -20458,7 +20459,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailAutomation.tsx:783
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75196
+#: assets/admin/dist/js/app.js:75197
 msgid "Metadata"
 msgstr ""
 
@@ -20818,9 +20819,9 @@ msgstr ""
 #: assets/admin/dist/js/app.js:63937
 #: assets/admin/dist/js/app.js:65353
 #: assets/admin/dist/js/app.js:65361
-#: assets/admin/dist/js/app.js:78141
-#: assets/admin/dist/js/app.js:78152
-#: assets/admin/dist/js/app.js:78322
+#: assets/admin/dist/js/app.js:78142
+#: assets/admin/dist/js/app.js:78153
+#: assets/admin/dist/js/app.js:78323
 #: assets/dist/js/Itinerary-BvJkY4oM.js:1046
 msgid "Move to Trash"
 msgstr ""
@@ -20843,7 +20844,7 @@ msgstr ""
 # Source: resources/js/components/availability/RecurringRules.tsx:681, resources/js/hooks/useTripTargets.ts:20, resources/js/pages/RecurringRuleForm.tsx:1734, resources/js/pages/TripForm.tsx:4881
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:61017
-#: assets/admin/dist/js/app.js:73310
+#: assets/admin/dist/js/app.js:73311
 #: assets/dist/js/RecurringRuleForm-BnxXoSMZ.js:1455
 msgid "Multi-Day Trip"
 msgstr ""
@@ -20934,10 +20935,10 @@ msgstr ""
 #: assets/admin/dist/js/app.js:50697
 #: assets/admin/dist/js/app.js:65781
 #: assets/admin/dist/js/app.js:66751
-#: assets/admin/dist/js/app.js:73591
-#: assets/admin/dist/js/app.js:73600
-#: assets/admin/dist/js/app.js:78204
-#: assets/admin/dist/js/app.js:78896
+#: assets/admin/dist/js/app.js:73592
+#: assets/admin/dist/js/app.js:73601
+#: assets/admin/dist/js/app.js:78205
+#: assets/admin/dist/js/app.js:78897
 #: assets/admin/dist/js/Whatsapp.js:885
 #: assets/admin/dist/js/Whatsapp.js:1110
 #: assets/dist/js/account-page.js:1444
@@ -20970,7 +20971,7 @@ msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:195
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72350
+#: assets/admin/dist/js/app.js:72351
 msgid "Name displayed as sender in customer emails"
 msgstr ""
 
@@ -20982,7 +20983,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:37023
 #: assets/admin/dist/js/app.js:49680
 #: assets/admin/dist/js/app.js:50916
-#: assets/admin/dist/js/app.js:78609
+#: assets/admin/dist/js/app.js:78610
 msgid "Name is required"
 msgstr ""
 
@@ -21063,7 +21064,7 @@ msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:327
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72751
+#: assets/admin/dist/js/app.js:72752
 msgid "New Booking Confirmation"
 msgstr ""
 
@@ -21330,7 +21331,7 @@ msgstr ""
 
 # Source: resources/js/pages/Attributes.tsx:832
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:78349
+#: assets/admin/dist/js/app.js:78350
 msgid "No attributes found"
 msgstr ""
 
@@ -21513,7 +21514,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:49210
 #: assets/admin/dist/js/app.js:50422
 #: assets/admin/dist/js/app.js:59125
-#: assets/admin/dist/js/app.js:78041
+#: assets/admin/dist/js/app.js:78042
 msgid "No description"
 msgstr ""
 
@@ -21790,7 +21791,7 @@ msgstr ""
 
 # Source: resources/js/components/ui/multi-select.tsx:168, resources/js/components/ui/searchable-select.tsx:233
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73280
+#: assets/admin/dist/js/app.js:73281
 #: assets/dist/js/index-_dIN_405.js:2676
 msgid "No options found"
 msgstr ""
@@ -21815,13 +21816,13 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:1341
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74678
+#: assets/admin/dist/js/app.js:74679
 msgid "No overrides yet"
 msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:944
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76281
+#: assets/admin/dist/js/app.js:76282
 msgid "No overrides yet. Every trip gets this template. Add an override to give some trips different wording."
 msgstr ""
 
@@ -22137,7 +22138,7 @@ msgstr ""
 #: templates/partials/single-trip/content-itinerary.php:219
 #: templates/partials/single-trip/content-itinerary.php:239
 #: assets/admin/dist/js/app.js:30401
-#: assets/admin/dist/js/app.js:72446
+#: assets/admin/dist/js/app.js:72447
 msgid "None"
 msgstr ""
 
@@ -22219,7 +22220,7 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:698
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74161
+#: assets/admin/dist/js/app.js:74162
 msgid "Not in use"
 msgstr ""
 
@@ -22231,7 +22232,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:1532
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76728
+#: assets/admin/dist/js/app.js:76729
 msgid "Not saved. Preview and Send Test Email use this trip's real name, link and sample booking data. Which trips actually get this template is set in “Applies to”."
 msgstr ""
 
@@ -22244,7 +22245,7 @@ msgstr ""
 # Source: resources/js/components/email/EmailTemplatesList.tsx:690
 #. translators: %s: the template that handles this event instead.
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74155
+#: assets/admin/dist/js/app.js:74156
 #, js-format
 msgid "Not sent — “%s” handles this event. Switch that one off to use this wording instead."
 msgstr ""
@@ -22676,7 +22677,7 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:1145
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74516
+#: assets/admin/dist/js/app.js:74517
 msgid "One template per event, sent to every trip unless an override applies. Editing a global template never changes its overrides."
 msgstr ""
 
@@ -22704,8 +22705,8 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailOverrideCreateModal.tsx:193, resources/js/pages/EmailTemplateForm.tsx:881
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73574
-#: assets/admin/dist/js/app.js:76234
+#: assets/admin/dist/js/app.js:73575
+#: assets/admin/dist/js/app.js:76235
 msgid "Only for bookings paid with"
 msgstr ""
 
@@ -22769,7 +22770,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:5439
 #: assets/admin/dist/js/app.js:27470
-#: assets/admin/dist/js/app.js:75397
+#: assets/admin/dist/js/app.js:75398
 #: assets/dist/js/BuildItineraryModal-CyDwNxlk.js:132
 msgid "Open AI settings"
 msgstr ""
@@ -22813,7 +22814,7 @@ msgstr ""
 
 # Source: resources/js/pages/ChannelManager.tsx:411, resources/js/pages/EmailAutomation.tsx:844, resources/js/pages/Reports.tsx:1045, resources/js/pages/Reports.tsx:1635, resources/js/pages/Settings.tsx:6456, resources/js/pages/Whatsapp.tsx:331
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75239
+#: assets/admin/dist/js/app.js:75240
 #: assets/admin/dist/js/Whatsapp.js:229
 #: assets/dist/js/ChannelManager-B6mfK3Vn.js:299
 #: assets/dist/js/Reports-d4B5rrDw.js:785
@@ -23074,7 +23075,7 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailOverrideCreateModal.tsx:205
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73585
+#: assets/admin/dist/js/app.js:73586
 msgid "Optional. For example, a payment reminder that only tells card customers they'll be charged automatically, or one with your bank details for bank-transfer bookings."
 msgstr ""
 
@@ -23131,7 +23132,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:36309
 #: assets/admin/dist/js/app.js:36785
 #: assets/admin/dist/js/app.js:36832
-#: assets/admin/dist/js/app.js:78047
+#: assets/admin/dist/js/app.js:78048
 #: assets/dist/blocks/activity.js:248
 #: assets/dist/blocks/deals.js:258
 #: assets/dist/blocks/destination.js:255
@@ -23246,27 +23247,27 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:703, resources/js/pages/EmailAutomation.tsx:391, resources/js/pages/EmailTemplateForm.tsx:767
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74164
-#: assets/admin/dist/js/app.js:74977
-#: assets/admin/dist/js/app.js:76152
+#: assets/admin/dist/js/app.js:74165
+#: assets/admin/dist/js/app.js:74978
+#: assets/admin/dist/js/app.js:76153
 msgid "Override"
 msgstr ""
 
 # Source: resources/js/pages/EmailAutomation.tsx:385
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74971
+#: assets/admin/dist/js/app.js:74972
 msgid "Override (deleted)"
 msgstr ""
 
 # Source: resources/js/components/email/EmailOverrideCreateModal.tsx:94
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73496
+#: assets/admin/dist/js/app.js:73497
 msgid "Override created — now edit the wording."
 msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:1137
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74510
+#: assets/admin/dist/js/app.js:74511
 msgid "Override templates"
 msgstr ""
 
@@ -23284,27 +23285,27 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailOverrideCreateModal.tsx:149
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73538
+#: assets/admin/dist/js/app.js:73539
 msgid "Override which global template?"
 msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:770, resources/js/components/email/EmailTemplatesList.tsx:815
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74204
-#: assets/admin/dist/js/app.js:74238
+#: assets/admin/dist/js/app.js:74205
+#: assets/admin/dist/js/app.js:74239
 msgid "Overrides"
 msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:1250
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74598
+#: assets/admin/dist/js/app.js:74599
 #, js-format
 msgid "Overrides of: %s"
 msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:1241
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74595
+#: assets/admin/dist/js/app.js:74596
 msgid "Overrides of: any"
 msgstr ""
 
@@ -23476,7 +23477,7 @@ msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:123
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72564
+#: assets/admin/dist/js/app.js:72565
 msgid "Partial Payment Received"
 msgstr ""
 
@@ -23828,13 +23829,13 @@ msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:107
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72550
+#: assets/admin/dist/js/app.js:72551
 msgid "Payment Received"
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:510
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72920
+#: assets/admin/dist/js/app.js:72921
 msgid "Payment Reminder"
 msgstr ""
 
@@ -24538,7 +24539,7 @@ msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:131
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72274
+#: assets/admin/dist/js/app.js:72275
 msgid "Pick a colour"
 msgstr ""
 
@@ -24550,13 +24551,13 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailOverrideCreateModal.tsx:74
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73475
+#: assets/admin/dist/js/app.js:73476
 msgid "Pick a global template."
 msgstr ""
 
 # Source: resources/js/components/email/EmailOverrideCreateModal.tsx:159
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73548
+#: assets/admin/dist/js/app.js:73549
 msgid "Pick a global template…"
 msgstr ""
 
@@ -24567,13 +24568,13 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:1713
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76862
+#: assets/admin/dist/js/app.js:76863
 msgid "Pick a trigger event below to see the variables that apply to that event. Showing the full catalog until then."
 msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:1187
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74546
+#: assets/admin/dist/js/app.js:74547
 msgid "Pick a trip to highlight exactly what that trip's customers receive."
 msgstr ""
 
@@ -24590,14 +24591,14 @@ msgstr ""
 
 # Source: resources/js/components/settings/BookingFormConditionsModal.tsx:270, resources/js/pages/EmailTemplateForm.tsx:900
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76248
+#: assets/admin/dist/js/app.js:76249
 #: assets/dist/js/Settings-BWgByeyf.js:1286
 msgid "Pick at least one trip, category or trip type."
 msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:896
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76245
+#: assets/admin/dist/js/app.js:76246
 msgid "Pick at least one trip, category, trip type or payment method."
 msgstr ""
 
@@ -24672,6 +24673,7 @@ msgstr ""
 
 # Source: resources/js/pages/ViewBooking.tsx:1557, resources/js/pages/account/BookingDetails.tsx:349
 #: assets/admin/dist/js/app.js
+#: app/Controllers/BookingSessionController.php:4181
 #: app/Services/BookingExportService.php:111
 #: templates/booking-confirmation.php:481
 #: templates/partials/booking-form-fields.php:854
@@ -24724,7 +24726,7 @@ msgstr ""
 
 # Source: resources/js/components/settings/BookingFormFieldsEditor.tsx:384, resources/js/pages/AttributeForm.tsx:1007, resources/js/pages/TripConsentForm.tsx:1179
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:79173
+#: assets/admin/dist/js/app.js:79174
 #: assets/dist/js/Settings-BWgByeyf.js:489
 msgid "Placeholder"
 msgstr ""
@@ -24736,7 +24738,7 @@ msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:1015
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:79182
+#: assets/admin/dist/js/app.js:79183
 msgid "Placeholder text for input field"
 msgstr ""
 
@@ -24747,7 +24749,7 @@ msgstr ""
 
 # Source: resources/js/pages/License.tsx:589
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:79756
+#: assets/admin/dist/js/app.js:79757
 msgid "Plan"
 msgstr ""
 
@@ -24779,7 +24781,7 @@ msgstr ""
 # Source: resources/js/components/availability/RecurringRules.tsx:301, resources/js/components/email/EmailTemplatesList.tsx:605
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:60737
-#: assets/admin/dist/js/app.js:74085
+#: assets/admin/dist/js/app.js:74086
 msgid "Please choose an action to apply."
 msgstr ""
 
@@ -24932,7 +24934,7 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:600
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74081
+#: assets/admin/dist/js/app.js:74082
 msgid "Please select at least one template."
 msgstr ""
 
@@ -25070,7 +25072,7 @@ msgstr ""
 
 # Source: resources/js/pages/License.tsx:403
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:79602
+#: assets/admin/dist/js/app.js:79603
 msgid "Premium Payment Gateways"
 msgstr ""
 
@@ -25086,9 +25088,9 @@ msgstr ""
 #: assets/admin/dist/js/app.js:33066
 #: assets/admin/dist/js/app.js:34380
 #: assets/admin/dist/js/app.js:35955
-#: assets/admin/dist/js/app.js:74418
-#: assets/admin/dist/js/app.js:75156
-#: assets/admin/dist/js/app.js:75579
+#: assets/admin/dist/js/app.js:74419
+#: assets/admin/dist/js/app.js:75157
+#: assets/admin/dist/js/app.js:75580
 #: assets/dist/js/account-page.js:2932
 #: assets/dist/js/account-page.js:2934
 #: assets/dist/js/RecurringRuleForm-BnxXoSMZ.js:2207
@@ -25134,7 +25136,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:501
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75948
+#: assets/admin/dist/js/app.js:75949
 msgid "Preview failed"
 msgstr ""
 
@@ -25157,7 +25159,7 @@ msgstr ""
 
 # Source: resources/js/components/ai/AiEmailTemplateModal.tsx:387
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75606
+#: assets/admin/dist/js/app.js:75607
 msgid "Preview shows the rendered email; HTML tab lets you edit. Merge tags like {{customer_name}} stay as-is — they're replaced when the email actually sends."
 msgstr ""
 
@@ -25168,7 +25170,7 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailPreviewModal.tsx:38
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73131
+#: assets/admin/dist/js/app.js:73132
 msgid "Preview with sample data"
 msgstr ""
 
@@ -25512,31 +25514,31 @@ msgstr ""
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:56475
 #: assets/admin/dist/js/app.js:56505
-#: assets/admin/dist/js/app.js:74137
+#: assets/admin/dist/js/app.js:74138
 msgid "Pro"
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:328
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72752
+#: assets/admin/dist/js/app.js:72753
 msgid "Pro automation alternative for the free Booking Confirmation template. Enable Email Automation to edit and send."
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:346
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72770
+#: assets/admin/dist/js/app.js:72771
 msgid "Pro automation alternative for the free Payment Received template. Enable Email Automation to edit and send."
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:360
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72784
+#: assets/admin/dist/js/app.js:72785
 msgid "Pro automation template fired on booking confirmation. Enable Email Automation to edit and send."
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:511
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72921
+#: assets/admin/dist/js/app.js:72922
 msgid "Pro automation template. Enable Email Automation to edit and send."
 msgstr ""
 
@@ -25738,7 +25740,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:58849
 #: assets/admin/dist/js/app.js:59269
 #: assets/admin/dist/js/app.js:60156
-#: assets/admin/dist/js/app.js:79212
+#: assets/admin/dist/js/app.js:79213
 #: assets/dist/js/DiscountForm-DpP7G12z.js:1983
 msgid "Publish"
 msgstr ""
@@ -25783,9 +25785,9 @@ msgstr ""
 #: assets/admin/dist/js/app.js:36813
 #: assets/admin/dist/js/app.js:49469
 #: assets/admin/dist/js/app.js:59320
-#: assets/admin/dist/js/app.js:77991
-#: assets/admin/dist/js/app.js:78070
-#: assets/admin/dist/js/app.js:78194
+#: assets/admin/dist/js/app.js:77992
+#: assets/admin/dist/js/app.js:78071
+#: assets/admin/dist/js/app.js:78195
 #: assets/dist/js/Itinerary-BvJkY4oM.js:903
 #: assets/dist/js/Itinerary-BvJkY4oM.js:917
 #: assets/dist/js/Itinerary-BvJkY4oM.js:942
@@ -25897,7 +25899,7 @@ msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:578
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72985
+#: assets/admin/dist/js/app.js:72986
 msgid "Queued when a booking is marked completed, then sent after the delay in Review settings (if reviews are enabled)."
 msgstr ""
 
@@ -25974,7 +25976,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailAutomation.tsx:739
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75167
+#: assets/admin/dist/js/app.js:75168
 msgid "Raw HTML"
 msgstr ""
 
@@ -26155,7 +26157,7 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:933, resources/js/components/email/EmailTemplatesList.tsx:1089, resources/js/pages/EmailAutomation.tsx:457, resources/js/pages/EmailAutomation.tsx:641, resources/js/pages/EmailTemplateForm.tsx:1884, resources/js/pages/Whatsapp.tsx:1139, resources/js/pages/Whatsapp.tsx:1450, resources/js/pages/Whatsapp.tsx:1850
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75113
+#: assets/admin/dist/js/app.js:75114
 #: assets/admin/dist/js/Whatsapp.js:887
 #: assets/admin/dist/js/Whatsapp.js:1118
 #: assets/admin/dist/js/Whatsapp.js:1422
@@ -26190,7 +26192,7 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailOverrideCreateModal.tsx:257
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73630
+#: assets/admin/dist/js/app.js:73631
 msgid "Recommended — edit only the parts that differ."
 msgstr ""
 
@@ -26767,7 +26769,7 @@ msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:968
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:79136
+#: assets/admin/dist/js/app.js:79137
 msgid "Remove option"
 msgstr ""
 
@@ -27060,8 +27062,8 @@ msgstr ""
 # Source: resources/js/components/settings/BookingFormFieldsEditor.tsx:578, resources/js/components/settings/BookingFormFieldsEditor.tsx:1011, resources/js/components/trip-form/TripAttributesSection.tsx:580, resources/js/pages/AdditionalServices.tsx:541, resources/js/pages/Attributes.tsx:337, resources/js/pages/Attributes.tsx:716, resources/js/pages/Settings.tsx:6222, resources/js/pages/TripConsentForm.tsx:1206, resources/js/pages/TripForm.tsx:4274, resources/js/pages/TripForm.tsx:4347, resources/js/pages/TripForm.tsx:5260, resources/js/pages/TripForm.tsx:5521, resources/js/pages/premium-pages/TripConsent.tsx:263
 #: assets/admin/dist/js/app.js
 #: templates/partials/pricing-summary.php:114
-#: assets/admin/dist/js/app.js:77932
-#: assets/admin/dist/js/app.js:78247
+#: assets/admin/dist/js/app.js:77933
+#: assets/admin/dist/js/app.js:78248
 #: assets/dist/js/Settings-BWgByeyf.js:662
 #: assets/dist/js/Settings-BWgByeyf.js:1002
 #: assets/dist/js/Settings-BWgByeyf.js:6561
@@ -27070,7 +27072,7 @@ msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:1115
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:79279
+#: assets/admin/dist/js/app.js:79280
 msgid "Required Field"
 msgstr ""
 
@@ -27272,8 +27274,8 @@ msgstr ""
 #: assets/admin/dist/js/app.js:63172
 #: assets/admin/dist/js/app.js:63614
 #: assets/admin/dist/js/app.js:63937
-#: assets/admin/dist/js/app.js:78152
-#: assets/admin/dist/js/app.js:78312
+#: assets/admin/dist/js/app.js:78153
+#: assets/admin/dist/js/app.js:78313
 msgid "Restore"
 msgstr ""
 
@@ -27285,7 +27287,7 @@ msgstr ""
 
 # Source: resources/js/pages/Attributes.tsx:599
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:78141
+#: assets/admin/dist/js/app.js:78142
 msgid "Restore Attribute"
 msgstr ""
 
@@ -27564,7 +27566,7 @@ msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:577
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72984
+#: assets/admin/dist/js/app.js:72985
 msgid "Review Request"
 msgstr ""
 
@@ -27930,49 +27932,49 @@ msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:241
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72396
+#: assets/admin/dist/js/app.js:72397
 msgid "SMTP Host"
 msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:302
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72474
+#: assets/admin/dist/js/app.js:72475
 msgid "SMTP Password"
 msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:255
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72414
+#: assets/admin/dist/js/app.js:72415
 msgid "SMTP Port"
 msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:211
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72368
+#: assets/admin/dist/js/app.js:72369
 msgid "SMTP Settings (Optional)"
 msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:288
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72456
+#: assets/admin/dist/js/app.js:72457
 msgid "SMTP Username"
 msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:242
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72397
+#: assets/admin/dist/js/app.js:72398
 msgid "SMTP server address"
 msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:256
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72415
+#: assets/admin/dist/js/app.js:72416
 msgid "SMTP server port (usually 587 or 465)"
 msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:281
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72445
+#: assets/admin/dist/js/app.js:72446
 msgid "SSL"
 msgstr ""
 
@@ -28009,13 +28011,13 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:1094
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76413
+#: assets/admin/dist/js/app.js:76414
 msgid "Same as the global template — an override can't change when it is sent, only what it says"
 msgstr ""
 
 # Source: resources/js/components/email/EmailOverrideCreateModal.tsx:123
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73519
+#: assets/admin/dist/js/app.js:73520
 msgid "Same event, same merge tags, your own wording. Bookings on the trips you pick get this override; every other booking keeps the global template."
 msgstr ""
 
@@ -28026,7 +28028,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:1527
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76724
+#: assets/admin/dist/js/app.js:76725
 msgid "Sample data (no trip)"
 msgstr ""
 
@@ -28062,7 +28064,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailAutomation.tsx:753
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75182
+#: assets/admin/dist/js/app.js:75183
 msgid "Sandboxed — links not clickable"
 msgstr ""
 
@@ -28208,7 +28210,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailAutomation.tsx:1024
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75349
+#: assets/admin/dist/js/app.js:75350
 msgid "Save email settings"
 msgstr ""
 
@@ -28319,7 +28321,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:60172
 #: assets/admin/dist/js/app.js:64262
 #: assets/admin/dist/js/app.js:66734
-#: assets/admin/dist/js/app.js:79319
+#: assets/admin/dist/js/app.js:79320
 #: assets/dist/js/AvailabilityForm-BNi8_Do5.js:1431
 #: assets/dist/js/BookingForm-CmqBWZis.js:1862
 #: assets/dist/js/DiscountForm-DpP7G12z.js:2023
@@ -28337,7 +28339,7 @@ msgstr ""
 # Source: resources/js/components/ai/BuildItineraryModal.tsx:759, resources/js/components/bookings/BookingWorkspace.tsx:138, resources/js/components/bookings/BookingWorkspace.tsx:478, resources/js/components/bookings/BookingWorkspace.tsx:606, resources/js/components/bookings/TravelAgencyPanel.tsx:133, resources/js/components/modals/PaymentNotesModal.tsx:182, resources/js/pages/AiAssistant.tsx:994, resources/js/pages/AiAssistant.tsx:1202, resources/js/pages/AiAssistant.tsx:1592, resources/js/pages/EmailAutomation.tsx:1019, resources/js/pages/GoogleCalendar.tsx:904, resources/js/pages/Team.tsx:1599, resources/js/pages/Team.tsx:2225, resources/js/pages/Team.tsx:3669, resources/js/pages/TravelAgencies.tsx:710, resources/js/pages/TravelAgencies.tsx:729, resources/js/pages/TravelAgencies.tsx:835, resources/js/pages/Webhooks.tsx:1929, resources/js/pages/Whatsapp.tsx:695, resources/js/pages/Whatsapp.tsx:1653, resources/js/pages/Whatsapp.tsx:2412, resources/js/pages/WhiteLabel.tsx:1556, resources/js/pages/account/Profile.tsx:470, resources/js/pages/account/TravellerDetailsEditor.tsx:245
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:56808
-#: assets/admin/dist/js/app.js:75346
+#: assets/admin/dist/js/app.js:75347
 #: assets/admin/dist/js/Whatsapp.js:554
 #: assets/admin/dist/js/Whatsapp.js:1278
 #: assets/admin/dist/js/Whatsapp.js:1871
@@ -28366,7 +28368,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:67252
 #: assets/admin/dist/js/app.js:67610
-#: assets/admin/dist/js/app.js:79761
+#: assets/admin/dist/js/app.js:79762
 msgid "Scale"
 msgstr ""
 
@@ -28489,20 +28491,20 @@ msgstr ""
 #: assets/admin/dist/js/app.js
 #: app/Services/BookingActivityService.php:83
 #: app/Services/EmailTemplateDefaults.php:1452
-#: assets/admin/dist/js/app.js:72884
+#: assets/admin/dist/js/app.js:72885
 msgid "Scheduled payment failed"
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:430
 #: assets/admin/dist/js/app.js
 #: app/Services/EmailTemplateDefaults.php:1384
-#: assets/admin/dist/js/app.js:72848
+#: assets/admin/dist/js/app.js:72849
 msgid "Scheduled payment reminder"
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:450
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72866
+#: assets/admin/dist/js/app.js:72867
 msgid "Scheduled payment succeeded"
 msgstr ""
 
@@ -28513,7 +28515,7 @@ msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:161
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72598
+#: assets/admin/dist/js/app.js:72599
 msgid "Scheduled reminder before departure (see Booking settings)."
 msgstr ""
 
@@ -28602,7 +28604,7 @@ msgstr ""
 
 # Source: resources/js/pages/Attributes.tsx:679
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:78212
+#: assets/admin/dist/js/app.js:78213
 msgid "Search attributes..."
 msgstr ""
 
@@ -28870,14 +28872,14 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailOverrideCreateModal.tsx:160
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73549
+#: assets/admin/dist/js/app.js:73550
 msgid "Search templates…"
 msgstr ""
 
 # Source: resources/js/components/email/EmailOverrideCreateModal.tsx:174, resources/js/components/settings/BookingFormConditionsModal.tsx:262, resources/js/pages/EmailTemplateForm.tsx:873
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73561
-#: assets/admin/dist/js/app.js:76227
+#: assets/admin/dist/js/app.js:73562
+#: assets/admin/dist/js/app.js:76228
 #: assets/dist/js/Settings-BWgByeyf.js:1279
 msgid "Search trips, categories, trip types…"
 msgstr ""
@@ -28890,23 +28892,23 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:1173, resources/js/pages/EmailTemplateForm.tsx:1528
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74537
-#: assets/admin/dist/js/app.js:76725
+#: assets/admin/dist/js/app.js:74538
+#: assets/admin/dist/js/app.js:76726
 msgid "Search trips…"
 msgstr ""
 
 # Source: resources/js/components/ui/multi-select.tsx:27, resources/js/components/ui/searchable-select.tsx:31
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73162
+#: assets/admin/dist/js/app.js:73163
 #: assets/dist/js/index-_dIN_405.js:2508
 msgid "Search..."
 msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:1100, resources/js/pages/Attributes.tsx:380, resources/js/pages/Attributes.tsx:731
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:77971
-#: assets/admin/dist/js/app.js:78262
-#: assets/admin/dist/js/app.js:79262
+#: assets/admin/dist/js/app.js:77972
+#: assets/admin/dist/js/app.js:78263
+#: assets/admin/dist/js/app.js:79263
 msgid "Searchable"
 msgstr ""
 
@@ -28981,7 +28983,7 @@ msgstr ""
 # Source: resources/js/lib/email-templates-catalog.ts:623
 #. translators: %s: brand name
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73026
+#: assets/admin/dist/js/app.js:73027
 #, js-format
 msgid "Second reminder sent by %s abandoned checkout recovery (module copy in {{recovery_intro_html}})."
 msgstr ""
@@ -29024,7 +29026,7 @@ msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:253
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72684
+#: assets/admin/dist/js/app.js:72685
 msgid "Security notice sent to the OLD address once a customer's account email change is confirmed."
 msgstr ""
 
@@ -29172,7 +29174,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:36639
 #: assets/admin/dist/js/app.js:59081
 #: assets/admin/dist/js/app.js:61710
-#: assets/admin/dist/js/app.js:77839
+#: assets/admin/dist/js/app.js:77840
 msgid "Select a bulk action first."
 msgstr ""
 
@@ -29299,7 +29301,7 @@ msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:1139
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:79300
+#: assets/admin/dist/js/app.js:79301
 msgid "Select an icon from the library or upload a custom image for this attribute."
 msgstr ""
 
@@ -29362,7 +29364,7 @@ msgstr ""
 
 # Source: resources/js/pages/Attributes.tsx:241
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:77843
+#: assets/admin/dist/js/app.js:77844
 msgid "Select at least one attribute."
 msgstr ""
 
@@ -29555,7 +29557,7 @@ msgstr ""
 
 # Source: resources/js/components/ui/multi-select.tsx:26, resources/js/pages/Settings.tsx:5318
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73161
+#: assets/admin/dist/js/app.js:73162
 #: assets/dist/js/Settings-BWgByeyf.js:5737
 msgid "Select options..."
 msgstr ""
@@ -29985,7 +29987,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailAutomation.tsx:688
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75136
+#: assets/admin/dist/js/app.js:75137
 msgid "Send failed"
 msgstr ""
 
@@ -30202,7 +30204,7 @@ msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:451
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72867
+#: assets/admin/dist/js/app.js:72868
 msgid "Sent after a scheduled / installment charge succeeds."
 msgstr ""
 
@@ -30214,7 +30216,7 @@ msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:431
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72849
+#: assets/admin/dist/js/app.js:72850
 msgid "Sent before an installment or gateway-scheduled charge when Scheduled payments is enabled in settings."
 msgstr ""
 
@@ -30233,91 +30235,91 @@ msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:217
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72650
+#: assets/admin/dist/js/app.js:72651
 msgid "Sent to a guest at checkout who must verify their email before the booking is finalized (when 'Require guest email verification' is enabled). Distinct from the account-registration verification above."
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:235
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72667
+#: assets/admin/dist/js/app.js:72668
 msgid "Sent to the NEW address when a customer changes their account email. Contains the confirmation link; the change only applies once they click it."
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:560
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72968
+#: assets/admin/dist/js/app.js:72969
 msgid "Sent to the customer when you reply to their enquiry."
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:309
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72735
+#: assets/admin/dist/js/app.js:72736
 msgid "Sent to your admin email when a booking is cancelled. Customer notice uses the Booking Cancellation template."
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:271
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72701
+#: assets/admin/dist/js/app.js:72702
 msgid "Sent to your admin email when a booking is created. Turn off here to stop this email."
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:542
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72951
+#: assets/admin/dist/js/app.js:72952
 msgid "Sent to your admin email when a new enquiry is submitted."
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:290
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72718
+#: assets/admin/dist/js/app.js:72719
 msgid "Sent to your admin email when a payment is recorded. Customer receipt uses the Payment Received template."
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:145
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72584
+#: assets/admin/dist/js/app.js:72585
 msgid "Sent when a booking is marked cancelled."
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:374
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72798
+#: assets/admin/dist/js/app.js:72799
 msgid "Sent when a booking is marked completed (after travel)."
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:199
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72633
+#: assets/admin/dist/js/app.js:72634
 msgid "Sent when a customer registers (e.g. from checkout) and must verify their email before logging in."
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:124
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72565
+#: assets/admin/dist/js/app.js:72566
 msgid "Sent when a payment is recorded but a balance is still outstanding. Only used when deposits or partial payments are enabled and this template is switched on — otherwise the standard Payment Received email is sent for every payment."
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:108
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72551
+#: assets/admin/dist/js/app.js:72552
 msgid "Sent when a payment is recorded for a booking."
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:393
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72815
+#: assets/admin/dist/js/app.js:72816
 msgid "Sent when a pending booking is auto-cancelled for non-payment."
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:471
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72885
+#: assets/admin/dist/js/app.js:72886
 msgid "Sent when a scheduled charge fails (temporary or final)."
 msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:180
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72615
+#: assets/admin/dist/js/app.js:72616
 msgid "Sent when a traveler must sign a trip consent form (Trip Consent module)."
 msgstr ""
 
@@ -30335,7 +30337,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailAutomation.tsx:664
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75126
+#: assets/admin/dist/js/app.js:75127
 msgid "Sequence"
 msgstr ""
 
@@ -30381,7 +30383,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailAutomation.tsx:900
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75276
+#: assets/admin/dist/js/app.js:75277
 msgid "Sequences"
 msgstr ""
 
@@ -30587,10 +30589,10 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-# Source: resources/js/hooks/useEmailSettingsManager.ts:358, resources/js/pages/EmailTemplateForm.tsx:441
+# Source: resources/js/hooks/useEmailSettingsManager.ts:359, resources/js/pages/EmailTemplateForm.tsx:441
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72156
-#: assets/admin/dist/js/app.js:75893
+#: assets/admin/dist/js/app.js:72157
+#: assets/admin/dist/js/app.js:75894
 msgid "Settings not loaded"
 msgstr ""
 
@@ -30766,7 +30768,7 @@ msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:1085
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:79245
+#: assets/admin/dist/js/app.js:79246
 msgid "Show in Filters"
 msgstr ""
 
@@ -30791,7 +30793,7 @@ msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:1070
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:79228
+#: assets/admin/dist/js/app.js:79229
 msgid "Show on Frontend"
 msgstr ""
 
@@ -30840,7 +30842,7 @@ msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:169
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72318
+#: assets/admin/dist/js/app.js:72319
 msgid "Show the logo"
 msgstr ""
 
@@ -30870,7 +30872,7 @@ msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:155
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72302
+#: assets/admin/dist/js/app.js:72303
 msgid "Show your company logo (Settings → General → Company Logo, or your site logo if none is set) at the top of customer emails."
 msgstr ""
 
@@ -31089,7 +31091,7 @@ msgstr ""
 
 # Source: resources/js/hooks/useTripTargets.ts:19, resources/js/pages/TripForm.tsx:4824
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73309
+#: assets/admin/dist/js/app.js:73310
 msgid "Single Day Trip"
 msgstr ""
 
@@ -31203,7 +31205,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:49862
 #: assets/admin/dist/js/app.js:51089
 #: assets/admin/dist/js/app.js:59805
-#: assets/admin/dist/js/app.js:78920
+#: assets/admin/dist/js/app.js:78921
 msgid "Slug"
 msgstr ""
 
@@ -31547,7 +31549,7 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailOverrideCreateModal.tsx:239
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73611
+#: assets/admin/dist/js/app.js:73612
 msgid "Start from"
 msgstr ""
 
@@ -31559,7 +31561,7 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailOverrideCreateModal.tsx:279
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73655
+#: assets/admin/dist/js/app.js:73656
 msgid "Start from scratch with the same merge tags. It stays unused until it has a body."
 msgstr ""
 
@@ -31733,11 +31735,11 @@ msgstr ""
 #: assets/admin/dist/js/app.js:65784
 #: assets/admin/dist/js/app.js:65923
 #: assets/admin/dist/js/app.js:66889
-#: assets/admin/dist/js/app.js:77984
-#: assets/admin/dist/js/app.js:78206
-#: assets/admin/dist/js/app.js:78267
-#: assets/admin/dist/js/app.js:79194
-#: assets/admin/dist/js/app.js:79201
+#: assets/admin/dist/js/app.js:77985
+#: assets/admin/dist/js/app.js:78207
+#: assets/admin/dist/js/app.js:78268
+#: assets/admin/dist/js/app.js:79195
+#: assets/admin/dist/js/app.js:79202
 #: assets/admin/dist/js/Whatsapp.js:889
 #: assets/admin/dist/js/Whatsapp.js:1981
 #: assets/admin/dist/js/Whatsapp.js:2165
@@ -31865,7 +31867,7 @@ msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:955
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:79120
+#: assets/admin/dist/js/app.js:79121
 msgid "Stored value (optional)"
 msgstr ""
 
@@ -31932,9 +31934,9 @@ msgstr ""
 
 # Source: resources/js/components/ai/AiEmailTemplateModal.tsx:329, resources/js/components/email/EmailPreviewModal.tsx:56, resources/js/components/email/EmailTemplatesList.tsx:867, resources/js/components/email/EmailTemplatesList.tsx:1071, resources/js/pages/EmailAutomation.tsx:460, resources/js/pages/EmailAutomation.tsx:649, resources/js/pages/account/Support.tsx:163
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73141
-#: assets/admin/dist/js/app.js:75117
-#: assets/admin/dist/js/app.js:75551
+#: assets/admin/dist/js/app.js:73142
+#: assets/admin/dist/js/app.js:75118
+#: assets/admin/dist/js/app.js:75552
 msgid "Subject"
 msgstr ""
 
@@ -31945,7 +31947,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:841
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76199
+#: assets/admin/dist/js/app.js:76200
 msgid "Subject and HTML body are read-only until the required module is active. You can still turn this email on or off below; values reflect your site settings."
 msgstr ""
 
@@ -32022,7 +32024,7 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailOverrideCreateModal.tsx:230
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73605
+#: assets/admin/dist/js/app.js:73606
 msgid "Suggested from what you picked; shown in the list and in Email logs."
 msgstr ""
 
@@ -32340,7 +32342,7 @@ msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:280
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72444
+#: assets/admin/dist/js/app.js:72445
 msgid "TLS"
 msgstr ""
 
@@ -32533,7 +32535,7 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:648, resources/js/components/email/EmailTemplatesList.tsx:1069, resources/js/pages/EmailAutomation.tsx:463, resources/js/pages/EmailAutomation.tsx:654, resources/js/pages/Whatsapp.tsx:2568
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75118
+#: assets/admin/dist/js/app.js:75119
 #: assets/admin/dist/js/Whatsapp.js:1980
 msgid "Template"
 msgstr ""
@@ -32599,7 +32601,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:462
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75913
+#: assets/admin/dist/js/app.js:75914
 msgid "Template saved"
 msgstr ""
 
@@ -32621,14 +32623,14 @@ msgstr ""
 
 # Source: resources/js/pages/EmailAutomation.tsx:893, resources/js/pages/Whatsapp.tsx:172
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75270
+#: assets/admin/dist/js/app.js:75271
 #: assets/admin/dist/js/Whatsapp.js:129
 msgid "Templates"
 msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:1103
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74476
+#: assets/admin/dist/js/app.js:74477
 msgid "Templates backed by site settings can be edited here. Rows for Yatra Pro Email Automation or optional modules stay visible with their on/off state; open a View only row to inspect content, or enable Pro or the module to edit HTML and unlock automation."
 msgstr ""
 
@@ -33196,7 +33198,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:949
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76285
+#: assets/admin/dist/js/app.js:76286
 #, js-format
 msgid "This global template has %d override(s) with their own wording. Changes you make here don't change them; every other trip gets this template."
 msgstr ""
@@ -33231,7 +33233,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:837
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76196
+#: assets/admin/dist/js/app.js:76197
 msgid "This link is view-only. Subject, body, and status cannot be changed from this screen."
 msgstr ""
 
@@ -33348,19 +33350,19 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:431
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75887
+#: assets/admin/dist/js/app.js:75888
 msgid "This template is view-only."
 msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:998
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76331
+#: assets/admin/dist/js/app.js:76332
 msgid "This template isn't sent, so changes here won't reach anyone."
 msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:755
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76144
+#: assets/admin/dist/js/app.js:76145
 msgid "This template uses site settings. Enable Yatra Pro and the required module to edit subject and HTML body."
 msgstr ""
 
@@ -33408,7 +33410,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:1543
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76738
+#: assets/admin/dist/js/app.js:76739
 msgid "This trip's customers get:"
 msgstr ""
 
@@ -33733,7 +33735,7 @@ msgstr ""
 
 # Source: resources/js/components/ai/AiEmailTemplateModal.tsx:186
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75459
+#: assets/admin/dist/js/app.js:75460
 msgid "Tone"
 msgstr ""
 
@@ -34062,7 +34064,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailAutomation.tsx:671
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75129
+#: assets/admin/dist/js/app.js:75130
 msgid "Transactional (no sequence)"
 msgstr ""
 
@@ -34139,10 +34141,10 @@ msgstr ""
 #: assets/admin/dist/js/app.js:65769
 #: assets/admin/dist/js/app.js:65860
 #: assets/admin/dist/js/app.js:66903
-#: assets/admin/dist/js/app.js:77991
-#: assets/admin/dist/js/app.js:78080
-#: assets/admin/dist/js/app.js:78196
-#: assets/admin/dist/js/app.js:79213
+#: assets/admin/dist/js/app.js:77992
+#: assets/admin/dist/js/app.js:78081
+#: assets/admin/dist/js/app.js:78197
+#: assets/admin/dist/js/app.js:79214
 #: assets/dist/js/DiscountForm-DpP7G12z.js:1984
 #: assets/dist/js/Itinerary-BvJkY4oM.js:909
 #: assets/dist/js/Itinerary-BvJkY4oM.js:923
@@ -34169,7 +34171,7 @@ msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:205
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72361
+#: assets/admin/dist/js/app.js:72362
 msgid "Travel Agency Name"
 msgstr ""
 
@@ -34223,6 +34225,7 @@ msgstr ""
 
 # Source: resources/js/pages/Settings.tsx:4474, resources/js/pages/ViewBooking.tsx:1594, resources/js/pages/account/BookingDetails.tsx:377, resources/js/pages/premium-pages/AdditionalServices.tsx:290
 #: assets/admin/dist/js/app.js
+#: app/Controllers/BookingSessionController.php:4187
 #: app/Services/BookingCronService.php:315
 #: app/Services/BookingExportService.php:111
 #: app/Services/CheckoutChoiceService.php:266
@@ -34242,7 +34245,7 @@ msgstr ""
 
 # Source: resources/js/pages/BookingForm.tsx:1791, resources/js/pages/Departures.tsx:1374, resources/js/pages/Travelers.tsx:314, resources/js/pages/Travelers.tsx:526, resources/js/pages/ViewBooking.tsx:694, resources/js/pages/ViewBooking.tsx:1392, resources/js/pages/account/BookingDetails.tsx:837, resources/js/pages/account/Dashboard.tsx:131
 #: assets/admin/dist/js/app.js
-#: app/Controllers/BookingSessionController.php:5041
+#: app/Controllers/BookingSessionController.php:5055
 #: app/Controllers/SingleTripController.php:489
 #: app/Controllers/SingleTripController.php:2026
 #: app/Controllers/SingleTripController.php:2067
@@ -34352,7 +34355,7 @@ msgstr ""
 # Source: resources/js/components/Layout.tsx:487, resources/js/pages/AbandonedRecovery.tsx:722, resources/js/pages/AbandonedRecovery.tsx:1515, resources/js/pages/Bookings.tsx:611, resources/js/pages/Bookings.tsx:724, resources/js/pages/ChannelManager.tsx:2801, resources/js/pages/Departures.tsx:889, resources/js/pages/Enquiries.tsx:270, resources/js/pages/Enquiries.tsx:823, resources/js/pages/Travelers.tsx:386, resources/js/pages/ViewBooking.tsx:695, resources/js/pages/ViewDeparture.tsx:773, resources/js/pages/account/Bookings.tsx:436
 #: assets/admin/dist/js/app.js
 #: app/Controllers/BookingSessionController.php:4175
-#: app/Controllers/BookingSessionController.php:4234
+#: app/Controllers/BookingSessionController.php:4248
 #: app/Services/EmailTemplateDefaults.php:285
 #: app/Services/EmailTemplateDefaults.php:455
 #: app/Services/EmailTemplateDefaults.php:786
@@ -34521,7 +34524,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:66462
 #: assets/admin/dist/js/app.js:67948
 #: assets/admin/dist/js/app.js:68156
-#: assets/admin/dist/js/app.js:73354
+#: assets/admin/dist/js/app.js:73355
 #: assets/dist/blocks/deals.js:50
 #: assets/dist/blocks/login.js:50
 #: assets/dist/blocks/myaccount.js:50
@@ -34558,7 +34561,7 @@ msgstr[1] ""
 
 # Source: resources/js/hooks/useTripTargets.ts:148
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73399
+#: assets/admin/dist/js/app.js:73400
 #, js-format
 msgid "Trip #%s"
 msgstr ""
@@ -34733,7 +34736,7 @@ msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:160
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72597
+#: assets/admin/dist/js/app.js:72598
 msgid "Trip Reminder"
 msgstr ""
 
@@ -34809,7 +34812,7 @@ msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:373
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72797
+#: assets/admin/dist/js/app.js:72798
 msgid "Trip completed"
 msgstr ""
 
@@ -34826,7 +34829,7 @@ msgstr ""
 
 # Source: resources/js/lib/email-templates-catalog.ts:179
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72614
+#: assets/admin/dist/js/app.js:72615
 msgid "Trip consent request"
 msgstr ""
 
@@ -34983,7 +34986,7 @@ msgstr ""
 
 # Source: resources/js/hooks/useTripTargets.ts:124
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73381
+#: assets/admin/dist/js/app.js:73382
 msgid "Trip type"
 msgstr ""
 
@@ -35025,7 +35028,7 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:1149
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74519
+#: assets/admin/dist/js/app.js:74520
 msgid "Trip-specific versions of a global template. Same event and merge tags as the template they override; used only for bookings on the trips they name. Everything else keeps the global template."
 msgstr ""
 
@@ -35091,7 +35094,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:928
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76265
+#: assets/admin/dist/js/app.js:76266
 msgid "Trips that match no override keep the global template. Switching this override off does the same for its trips."
 msgstr ""
 
@@ -35103,19 +35106,19 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailOverrideCreateModal.tsx:179
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73565
+#: assets/admin/dist/js/app.js:73566
 msgid "Trips, whole categories (sub-categories included) or a trip type. Leave empty to use it for every trip paid with the payment methods below. You can change this later."
 msgstr ""
 
 # Source: resources/js/components/email/EmailOverrideCreateModal.tsx:183
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73568
+#: assets/admin/dist/js/app.js:73569
 msgid "Trips, whole categories (sub-categories included) or a trip type. You can change this later."
 msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:661
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:78860
+#: assets/admin/dist/js/app.js:78861
 msgid "Try Again"
 msgstr ""
 
@@ -35146,7 +35149,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:56662
 #: assets/admin/dist/js/app.js:57630
 #: assets/admin/dist/js/app.js:59400
-#: assets/admin/dist/js/app.js:78350
+#: assets/admin/dist/js/app.js:78351
 #: assets/dist/js/Webhooks-ipRnYIaP.js:1856
 msgid "Try adjusting your filters to see more results."
 msgstr ""
@@ -35175,7 +35178,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:1513
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76713
+#: assets/admin/dist/js/app.js:76714
 msgid "Try it with a real trip"
 msgstr ""
 
@@ -35316,7 +35319,7 @@ msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:637
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:78837
+#: assets/admin/dist/js/app.js:78838
 msgid "Unable to load attribute data. Please try again."
 msgstr ""
 
@@ -35517,7 +35520,7 @@ msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:1169
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:79322
+#: assets/admin/dist/js/app.js:79323
 msgid "Update Attribute"
 msgstr ""
 
@@ -35651,7 +35654,7 @@ msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:679
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:78869
+#: assets/admin/dist/js/app.js:78870
 msgid "Update attribute information"
 msgstr ""
 
@@ -35774,7 +35777,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:49237
 #: assets/admin/dist/js/app.js:50449
 #: assets/admin/dist/js/app.js:59154
-#: assets/admin/dist/js/app.js:78277
+#: assets/admin/dist/js/app.js:78278
 #: assets/admin/dist/js/Whatsapp.js:2167
 #: assets/dist/js/account-page.js:2866
 msgid "Updated"
@@ -35788,7 +35791,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:49484
 #: assets/admin/dist/js/app.js:50701
 #: assets/admin/dist/js/app.js:59289
-#: assets/admin/dist/js/app.js:78208
+#: assets/admin/dist/js/app.js:78209
 msgid "Updated At"
 msgstr ""
 
@@ -35808,7 +35811,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:31757
 #: assets/admin/dist/js/app.js:33751
 #: assets/admin/dist/js/app.js:33951
-#: assets/admin/dist/js/app.js:78016
+#: assets/admin/dist/js/app.js:78017
 msgid "Updated Date"
 msgstr ""
 
@@ -36006,7 +36009,7 @@ msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:228
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72384
+#: assets/admin/dist/js/app.js:72385
 msgid "Use custom SMTP server instead of default WordPress mail"
 msgstr ""
 
@@ -36043,7 +36046,7 @@ msgstr ""
 
 # Source: resources/js/components/ai/AiEmailTemplateModal.tsx:298
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75541
+#: assets/admin/dist/js/app.js:75542
 msgid "Use this"
 msgstr ""
 
@@ -36075,7 +36078,7 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailOverrideCreateModal.tsx:168
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73554
+#: assets/admin/dist/js/app.js:73555
 msgid "Use this override for"
 msgstr ""
 
@@ -36285,7 +36288,7 @@ msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:932, resources/js/pages/TripConsentForm.tsx:1263
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:79096
+#: assets/admin/dist/js/app.js:79097
 msgid "Value"
 msgstr ""
 
@@ -36298,7 +36301,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:1695
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76847
+#: assets/admin/dist/js/app.js:76848
 msgid "Variables available for trigger event:"
 msgstr ""
 
@@ -36540,7 +36543,7 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:1162
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74526
+#: assets/admin/dist/js/app.js:74527
 msgid "View as a trip:"
 msgstr ""
 
@@ -36605,13 +36608,13 @@ msgstr ""
 # Source: resources/js/pages/EmailAutomation.tsx:523, resources/js/pages/TripConsent.tsx:865
 #: assets/admin/dist/js/app.js
 #: app/Providers/AdminServiceProvider.php:349
-#: assets/admin/dist/js/app.js:75042
+#: assets/admin/dist/js/app.js:75043
 msgid "View details"
 msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:747
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76141
+#: assets/admin/dist/js/app.js:76142
 msgid "View email template"
 msgstr ""
 
@@ -36634,7 +36637,7 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:668
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74137
+#: assets/admin/dist/js/app.js:74138
 msgid "View only"
 msgstr ""
 
@@ -36683,7 +36686,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:1434
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76659
+#: assets/admin/dist/js/app.js:76660
 msgid "Visible copy — the recipient can see this address. Separate several addresses with commas."
 msgstr ""
 
@@ -37192,7 +37195,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:914
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76257
+#: assets/admin/dist/js/app.js:76258
 msgid "When several overrides match one trip, the most specific wins — trip › category › trip type — then the priority order in the Override templates list."
 msgstr ""
 
@@ -37382,7 +37385,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:921
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76261
+#: assets/admin/dist/js/app.js:76262
 msgid "With payment methods picked, it is used only for bookings paid that way (and only on the trips above, if any). It then wins over overrides without payment methods. “Charged automatically to a saved card” matches scheduled payments Yatra will charge by itself; a gateway matches the booking's or the scheduled payment's gateway. “Charged automatically” only matches scheduled payment emails. A payment reminder for a balance charged automatically, sent from one of these, doesn't get Yatra's “Pay your balance now” button."
 msgstr ""
 
@@ -37475,7 +37478,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailAutomation.tsx:829
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75224
+#: assets/admin/dist/js/app.js:75225
 msgid "Yatra Pro is active. Turn on Email Automation under Modules to use custom templates, sequences, and send logs."
 msgstr ""
 
@@ -37667,13 +37670,13 @@ msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:303
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72475
+#: assets/admin/dist/js/app.js:72476
 msgid "Your SMTP account password or app password"
 msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:289
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72457
+#: assets/admin/dist/js/app.js:72458
 msgid "Your SMTP account username"
 msgstr ""
 
@@ -37888,7 +37891,7 @@ msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:99
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72234
+#: assets/admin/dist/js/app.js:72235
 msgid "admin@example.com"
 msgstr ""
 
@@ -37930,7 +37933,7 @@ msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:116
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72255
+#: assets/admin/dist/js/app.js:72256
 msgid "archive@example.com"
 msgstr ""
 
@@ -37942,14 +37945,14 @@ msgstr ""
 
 # Source: resources/js/pages/AttributeForm.tsx:745
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:78930
+#: assets/admin/dist/js/app.js:78931
 msgid "attribute-slug"
 msgstr ""
 
 # Source: resources/js/pages/Attributes.tsx:888, resources/js/pages/Trips.tsx:1253
 #: assets/admin/dist/js/app.js
 #: assets/admin/dist/js/app.js:30406
-#: assets/admin/dist/js/app.js:78393
+#: assets/admin/dist/js/app.js:78394
 msgid "attributes"
 msgstr ""
 
@@ -38319,7 +38322,7 @@ msgstr ""
 
 # Source: resources/js/components/ai/AiEmailTemplateModal.tsx:216
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75482
+#: assets/admin/dist/js/app.js:75483
 msgid "e.g. Mention our 24/7 support hotline. Keep total length under 120 words. Emphasize peace of mind."
 msgstr ""
 
@@ -38779,7 +38782,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:1411
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76639
+#: assets/admin/dist/js/app.js:76640
 msgid "e.g., archive@yoursite.com"
 msgstr ""
 
@@ -38802,7 +38805,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:1430
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76655
+#: assets/admin/dist/js/app.js:76656
 msgid "e.g., office@yoursite.com"
 msgstr ""
 
@@ -38848,7 +38851,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailAutomation.tsx:540
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:75058
+#: assets/admin/dist/js/app.js:75059
 msgid "entries"
 msgstr ""
 
@@ -39000,7 +39003,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:1555
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76745
+#: assets/admin/dist/js/app.js:76746
 msgid "it depends on how the booking is paid, which this check can't tell. Bookings paid with the payment methods above get this override when the trip matches too."
 msgstr ""
 
@@ -39075,7 +39078,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:60526
 #: assets/admin/dist/js/app.js:62291
 #: assets/admin/dist/js/app.js:66983
-#: assets/admin/dist/js/app.js:75506
+#: assets/admin/dist/js/app.js:75507
 #: assets/dist/js/ViewBooking-WCU20PD1.js:2144
 msgid "more"
 msgstr ""
@@ -39126,19 +39129,19 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:755
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74193
+#: assets/admin/dist/js/app.js:74194
 msgid "no body yet — its trips get the global template"
 msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:823
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74243
+#: assets/admin/dist/js/app.js:74244
 msgid "none"
 msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:188
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72340
+#: assets/admin/dist/js/app.js:72341
 msgid "noreply@example.com"
 msgstr ""
 
@@ -39162,7 +39165,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:770
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76153
+#: assets/admin/dist/js/app.js:76154
 msgid "of global template"
 msgstr ""
 
@@ -39181,7 +39184,7 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:748
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74192
+#: assets/admin/dist/js/app.js:74193
 msgid "off — its trips get the global template"
 msgstr ""
 
@@ -39239,7 +39242,7 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:737
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74185
+#: assets/admin/dist/js/app.js:74186
 #, js-format
 msgid "overridden for %1$s → %2$s"
 msgstr ""
@@ -39255,7 +39258,7 @@ msgstr ""
 
 # Source: resources/js/lib/email-override-targets.ts:73
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73441
+#: assets/admin/dist/js/app.js:73442
 #, js-format
 msgid "payment: %s"
 msgstr ""
@@ -39309,7 +39312,7 @@ msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:789
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74221
+#: assets/admin/dist/js/app.js:74222
 #, js-format
 msgid "priority %1$d of %2$d"
 msgstr ""
@@ -39404,14 +39407,14 @@ msgstr ""
 
 # Source: resources/js/components/shared/ApplicableTripSelector.tsx:293, resources/js/components/ui/multi-select.tsx:201, resources/js/components/ui/multi-select.tsx:202, resources/js/pages/Itinerary.tsx:1942, resources/js/pages/RecurringRulesPage.tsx:555
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:73301
+#: assets/admin/dist/js/app.js:73302
 #: assets/dist/js/Itinerary-BvJkY4oM.js:1349
 msgid "selected"
 msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:724
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74176
+#: assets/admin/dist/js/app.js:74177
 #, js-format
 msgid "sent for %s"
 msgstr ""
@@ -39468,14 +39471,14 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:1595
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76775
+#: assets/admin/dist/js/app.js:76776
 #, js-format
 msgid "the global template (%s)"
 msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:1605
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76782
+#: assets/admin/dist/js/app.js:76783
 #, js-format
 msgid "the override “%1$s” (%2$s), not this template"
 msgstr ""
@@ -39505,19 +39508,19 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:1566
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76753
+#: assets/admin/dist/js/app.js:76754
 msgid "this override"
 msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:1575
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76759
+#: assets/admin/dist/js/app.js:76760
 msgid "this override has no body yet, so it is skipped"
 msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:1615
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76788
+#: assets/admin/dist/js/app.js:76789
 msgid "this template"
 msgstr ""
 
@@ -39664,7 +39667,7 @@ msgstr ""
 
 # Source: resources/js/components/settings/EmailDeliverySection.tsx:296
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:72465
+#: assets/admin/dist/js/app.js:72466
 msgid "your-email@gmail.com"
 msgstr ""
 
@@ -39721,13 +39724,13 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:860
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76215
+#: assets/admin/dist/js/app.js:76216
 msgid "— bookings on these trips get this override instead of the global template"
 msgstr ""
 
 # Source: resources/js/components/email/EmailTemplatesList.tsx:1172
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:74536
+#: assets/admin/dist/js/app.js:74537
 msgid "— none (show everything) —"
 msgstr ""
 
@@ -39739,7 +39742,7 @@ msgstr ""
 
 # Source: resources/js/pages/EmailTemplateForm.tsx:1584
 #: assets/admin/dist/js/app.js
-#: assets/admin/dist/js/app.js:76766
+#: assets/admin/dist/js/app.js:76767
 #, js-format
 msgid "“%1$s” (%2$s)"
 msgstr ""
@@ -40151,7 +40154,7 @@ msgid "Redirect after login (this site only)"
 msgstr ""
 
 #: app/Blocks/MyAccountBlock.php:25
-#: app/Controllers/BookingSessionController.php:4278
+#: app/Controllers/BookingSessionController.php:4292
 #: app/Core/Handlers/AccountPageHandler.php:58
 #: app/Providers/FrontendAssetsProvider.php:1236
 #: app/Shortcodes/LoginShortcode.php:181
@@ -40533,19 +40536,19 @@ msgstr ""
 
 #: app/Controllers/AuthController.php:635
 #: app/Controllers/AuthController.php:680
-#: app/Controllers/BookingSessionController.php:4698
+#: app/Controllers/BookingSessionController.php:4712
 msgid "Go to Homepage"
 msgstr ""
 
 #: app/Controllers/AuthController.php:674
 #: app/Controllers/AuthController.php:682
-#: app/Controllers/BookingSessionController.php:4691
+#: app/Controllers/BookingSessionController.php:4705
 msgid "Email Already Verified"
 msgstr ""
 
 #: app/Controllers/AuthController.php:675
 #: app/Controllers/AuthController.php:683
-#: app/Controllers/BookingSessionController.php:4692
+#: app/Controllers/BookingSessionController.php:4706
 msgid "Email Verified"
 msgstr ""
 
@@ -40775,8 +40778,8 @@ msgstr ""
 #: app/Controllers/BookingSessionController.php:645
 #: app/Controllers/BookingSessionController.php:982
 #: app/Controllers/BookingSessionController.php:1699
-#: app/Controllers/BookingSessionController.php:4848
-#: app/Controllers/BookingSessionController.php:5500
+#: app/Controllers/BookingSessionController.php:4862
+#: app/Controllers/BookingSessionController.php:5514
 #: app/Controllers/ReviewController.php:575
 #: app/Services/BookingService.php:344
 #: app/Services/EnquiryService.php:129
@@ -41093,7 +41096,7 @@ msgid "Please complete your payment before %s to avoid automatic cancellation."
 msgstr ""
 
 #: app/Controllers/BookingSessionController.php:4170
-#: app/Controllers/BookingSessionController.php:4699
+#: app/Controllers/BookingSessionController.php:4713
 #: app/Services/EmailTemplateDefaults.php:324
 #: app/Services/EmailTemplateDefaults.php:374
 #: app/Services/EmailTemplateDefaults.php:510
@@ -41112,174 +41115,174 @@ msgstr ""
 msgid "Travel date"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:4177
+#: app/Controllers/BookingSessionController.php:4190
 msgid "Payment details"
 msgstr ""
 
 #. translators: %s: total amount (formatted).
-#: app/Controllers/BookingSessionController.php:4179
+#: app/Controllers/BookingSessionController.php:4192
 #, php-format
 msgid "Total: %s"
 msgstr ""
 
 #. translators: 1: amount due now (formatted), 2: remaining amount (formatted).
-#: app/Controllers/BookingSessionController.php:4182
+#: app/Controllers/BookingSessionController.php:4195
 #, php-format
 msgid "Payment type: Deposit — due now %1$s, remaining %2$s"
 msgstr ""
 
 #. translators: 1: amount due now (formatted), 2: remaining amount (formatted).
-#: app/Controllers/BookingSessionController.php:4185
+#: app/Controllers/BookingSessionController.php:4198
 #, php-format
 msgid "Payment type: Partial — due now %1$s, remaining %2$s"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:4188
+#: app/Controllers/BookingSessionController.php:4201
 msgid "Payment type: Full payment"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:4191
+#: app/Controllers/BookingSessionController.php:4204
 msgid "Pay later — please contact us to arrange payment."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:4207
+#: app/Controllers/BookingSessionController.php:4221
 #: app/PaymentGateways/Gateways/BankTransfer/BankTransferGateway.php:123
 #: app/PaymentGateways/Gateways/BankTransfer/confirmation-details.php:22
 msgid "Bank Transfer Details"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:4218
+#: app/Controllers/BookingSessionController.php:4232
 msgid "Cheque — we will send you the details."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:4219
+#: app/Controllers/BookingSessionController.php:4233
 msgid "Bank transfer — you will receive bank details separately."
 msgstr ""
 
 #. translators: 1: traveler number (1-based), 2: traveler full name.
-#: app/Controllers/BookingSessionController.php:4241
+#: app/Controllers/BookingSessionController.php:4255
 #, php-format
 msgid "Traveler %1$d: %2$s"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:4260
+#: app/Controllers/BookingSessionController.php:4274
 msgid "What’s next?"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:4272
+#: app/Controllers/BookingSessionController.php:4286
 msgid "Keep this email: it has your booking reference and details. Reply to it if you need anything."
 msgstr ""
 
 #. translators: %s: link labelled "My Account" pointing to the customer account page (HTML <a> wrapped).
-#: app/Controllers/BookingSessionController.php:4276
+#: app/Controllers/BookingSessionController.php:4290
 #, php-format
 msgid "Your booking details, trip itinerary and any balance due are in %s."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:4282
+#: app/Controllers/BookingSessionController.php:4296
 msgid "Our team will contact you to confirm any special requirements."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:4283
+#: app/Controllers/BookingSessionController.php:4297
 msgid "Please ensure travel documents meet entry requirements for your destination."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:4285
+#: app/Controllers/BookingSessionController.php:4299
 msgid "If you have any questions, contact us anytime."
 msgstr ""
 
 #. translators: %s: site name.
-#: app/Controllers/BookingSessionController.php:4325
+#: app/Controllers/BookingSessionController.php:4339
 #: app/Services/TransactionalEmailTemplateService.php:896
 #, php-format
 msgid "— %s"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:4358
+#: app/Controllers/BookingSessionController.php:4372
 #: assets/js/booking.js:1308
 msgid "Please enter a coupon code."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:4387
-#: app/Controllers/BookingSessionController.php:4839
-#: app/Controllers/BookingSessionController.php:5634
+#: app/Controllers/BookingSessionController.php:4401
+#: app/Controllers/BookingSessionController.php:4853
+#: app/Controllers/BookingSessionController.php:5648
 msgid "No active booking session found."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:4410
-#: app/Controllers/BookingSessionController.php:5124
+#: app/Controllers/BookingSessionController.php:4424
+#: app/Controllers/BookingSessionController.php:5138
 msgid "This coupon is not valid for your booking."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:4432
+#: app/Controllers/BookingSessionController.php:4446
 msgid "Coupon applied successfully!"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:4572
+#: app/Controllers/BookingSessionController.php:4586
 msgid "This verification link has expired. Please make a new booking — we keep the link valid for 48 hours."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:4573
+#: app/Controllers/BookingSessionController.php:4587
 msgid "This verification link is invalid or has been tampered with. Please make a new booking."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:4574
+#: app/Controllers/BookingSessionController.php:4588
 msgid "This verification link is malformed. Please make a new booking."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:4575
+#: app/Controllers/BookingSessionController.php:4589
 msgid "The email on this booking has changed since the link was sent. Please contact support."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:4576
+#: app/Controllers/BookingSessionController.php:4590
 msgid "We could not find a booking for this verification link. Please make a new booking."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:4578
+#: app/Controllers/BookingSessionController.php:4592
 msgid "This verification link is no longer valid."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:4591
-#: app/Controllers/BookingSessionController.php:4592
+#: app/Controllers/BookingSessionController.php:4605
+#: app/Controllers/BookingSessionController.php:4606
 msgid "Verification link issue"
 msgstr ""
 
 #. translators: %s: brand name
-#: app/Controllers/BookingSessionController.php:4595
+#: app/Controllers/BookingSessionController.php:4609
 #, php-format
 msgid "Return to %s"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:4673
+#: app/Controllers/BookingSessionController.php:4687
 msgid "Go to My Account"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:4674
+#: app/Controllers/BookingSessionController.php:4688
 msgid "Sign in"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:4694
+#: app/Controllers/BookingSessionController.php:4708
 msgid "Your booking email is already verified. You can view your booking confirmation, head to your account, or return to the homepage."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:4695
+#: app/Controllers/BookingSessionController.php:4709
 msgid "Thanks! Your booking email has been verified and your booking is confirmed. View the full confirmation below."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:4697
+#: app/Controllers/BookingSessionController.php:4711
 msgid "View Booking Confirmation"
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:5494
+#: app/Controllers/BookingSessionController.php:5508
 #: templates/partials/pricing-summary.php:24
 msgid "Pricing information not available."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:5587
+#: app/Controllers/BookingSessionController.php:5601
 msgid "Template not found."
 msgstr ""
 
-#: app/Controllers/BookingSessionController.php:5666
+#: app/Controllers/BookingSessionController.php:5680
 msgid "Coupon removed."
 msgstr ""
 
@@ -43574,7 +43577,7 @@ msgid "Edit this %s in Yatra admin"
 msgstr ""
 
 #. translators: %d: booking id
-#: app/Integrations/SliceWP/SliceWPBridge.php:208
+#: app/Integrations/SliceWP/SliceWPBridge.php:217
 #, php-format
 msgid "Rejected because booking #%d was cancelled or refunded."
 msgstr ""
@@ -46796,54 +46799,54 @@ msgstr ""
 msgid "Invalid revision data"
 msgstr ""
 
-#: app/Services/WeatherService.php:188
+#: app/Services/WeatherService.php:189
 msgid "Partly cloudy"
 msgstr ""
 
-#: app/Services/WeatherService.php:191
+#: app/Services/WeatherService.php:192
 msgid "Cloudy"
 msgstr ""
 
-#: app/Services/WeatherService.php:194
+#: app/Services/WeatherService.php:195
 msgid "Fog"
 msgstr ""
 
-#: app/Services/WeatherService.php:197
+#: app/Services/WeatherService.php:198
 msgid "Drizzle"
 msgstr ""
 
-#: app/Services/WeatherService.php:200
+#: app/Services/WeatherService.php:201
 msgid "Rain"
 msgstr ""
 
-#: app/Services/WeatherService.php:203
+#: app/Services/WeatherService.php:204
 msgid "Snow"
 msgstr ""
 
-#: app/Services/WeatherService.php:206
+#: app/Services/WeatherService.php:207
 msgid "Thunderstorm"
 msgstr ""
 
-#: app/Services/WeatherService.php:209
+#: app/Services/WeatherService.php:210
 msgid "Mixed"
 msgstr ""
 
 #. translators: %s: place name
-#: app/Services/WeatherService.php:250
+#: app/Services/WeatherService.php:251
 #, php-format
 msgid "Weather in %s"
 msgstr ""
 
-#: app/Services/WeatherService.php:251
+#: app/Services/WeatherService.php:252
 msgid "Weather at the start point"
 msgstr ""
 
-#: app/Services/WeatherService.php:255
+#: app/Services/WeatherService.php:256
 msgid "Weather data by Open-Meteo.com"
 msgstr ""
 
 #. translators: %d: chance of rain in percent
-#: app/Services/WeatherService.php:268
+#: app/Services/WeatherService.php:269
 #, php-format
 msgid "Rain %d%%"
 msgstr ""
